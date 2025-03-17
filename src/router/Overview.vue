@@ -1,6 +1,6 @@
 <template>
   <MainLayout>
-    <v-row class="pb-3 pt-1">
+    <v-row class="pb-2 pt-1">
       <v-col>
         <mediaplan-filters
             v-model:search="filters.search"

@@ -927,10 +927,10 @@ vue@^3.5.13:
     "@vue/server-renderer" "3.5.13"
     "@vue/shared" "3.5.13"
 
-vuetify@^3.7.0-beta.1:
-  version "3.7.0-beta.1"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.7.0-beta.1.tgz#a3c58cf170fd44c17427555390e7b88c6d3602a4"
-  integrity sha512-F6a+pSG7dLrU28sGlR8r4WMuBsLMprOsDpaywGopNrGk351Hs4AAhx/y88ROGUEf28yAPShSM86bPnD30xNyDw==
+vuetify@^3.7.16:
+  version "3.7.16"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.7.16.tgz#64ea3cd834f8c9fab6e5bc58f67a11daab06231d"
+  integrity sha512-Few/cBtgJYgdkzi0LWmVy67G5uc2+q7oWcadbcTUPAtEtGYNh2AM28h01Fk+ScJgfxkA077//ZDff1rh3jYG/w==
 
 yup@^1.6.1:
   version "1.6.1"
