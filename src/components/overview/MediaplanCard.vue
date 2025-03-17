@@ -2,10 +2,20 @@
   <v-card class="h-100 pa-3" elevation="3">
     <v-card-item class="pb-8">
       <div class="d-flex align-center">
-        <!-- Name and edit icon -->
-        <div class="text-h6 text-truncate mediaplan-title pr-1">
-          {{ mediaplan.name }}
-        </div>
+        <v-tooltip
+            location="top"
+            open-delay="300"
+        >
+          <template v-slot:activator="{ props }">
+            <div
+                class="text-h6 text-truncate mediaplan-title pr-1"
+                v-bind="props"
+            >
+              {{ mediaplan.name }}
+            </div>
+          </template>
+          <span>{{ mediaplan.name }}</span>
+        </v-tooltip>
         <v-icon size="x-small" color="primary" icon="mdi-pencil" class="mr-3"/>
 
         <!-- Brand logo -->
