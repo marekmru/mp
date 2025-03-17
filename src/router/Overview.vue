@@ -1,27 +1,27 @@
 <template>
   <MainLayout>
-      <!--      <v-row>
-              <v-col cols="12">
-                <mediaplan-filters
-                    v-model:search="filters.search"
-                    v-model:status="filters.status"
-                    v-model:country="countryFilter"
-                    v-model:sort-by="sortBy"
-                    v-model:sort-order="sortOrder"
-                />
-              </v-col>
-            </v-row>-->
+    <v-row>
+      <v-col cols="12">
+        <mediaplan-filters
+            v-model:search="filters.search"
+            v-model:status="filters.status"
+            v-model:country="countryFilter"
+            v-model:sort-by="sortBy"
+            v-model:sort-order="sortOrder"
+        />
+      </v-col>
+    </v-row>
 
-      <mediaplan-list
-          :filters="filters"
-          :sort-by="sortBy"
-          :sort-order="sortOrder"
-          :page="currentPage"
-          :per-page="perPage"
-          @update:page="currentPage = $event"
-          @update:total-pages="totalPages = $event"
-          @update:total-items="totalItems = $event"
-      />
+    <mediaplan-list
+        :filters="filters"
+        :sort-by="sortBy"
+        :sort-order="sortOrder"
+        :page="currentPage"
+        :per-page="perPage"
+        @update:page="currentPage = $event"
+        @update:total-pages="totalPages = $event"
+        @update:total-items="totalItems = $event"
+    />
   </MainLayout>
 </template>
 
@@ -30,7 +30,7 @@ import {ref, reactive, watch} from 'vue';
 import MainLayout from '@/layouts/MainLayout.vue';
 import MediaplanFilters from '@/components/overview/MediaplanFilters.vue';
 import MediaplanList from '@/components/overview/MediaplanList.vue';
-import { MediaplanFilter } from '@/types/mediaplan';
+import {MediaplanFilter} from '@/types/mediaplan';
 
 // State for filters and sorting
 const filters = reactive<MediaplanFilter>({
