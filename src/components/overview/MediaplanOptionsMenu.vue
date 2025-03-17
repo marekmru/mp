@@ -39,7 +39,7 @@
           <template v-slot:prepend>
             <v-icon icon="mdi-download" size="small"></v-icon>
           </template>
-          <v-list-item-title>Export Media Plan</v-list-item-title>
+          <v-list-item-title>Export Mediaplan</v-list-item-title>
         </v-list-item>
 
         <v-list-item @click="handleAction('duplicate')" class="menu-item">
@@ -53,7 +53,7 @@
           <template v-slot:prepend>
             <v-icon icon="mdi-archive-outline" size="small"></v-icon>
           </template>
-          <v-list-item-title>Archive Media Plan</v-list-item-title>
+          <v-list-item-title>Archive Mediaplan</v-list-item-title>
         </v-list-item>
 
         <v-list-item @click="handleAction('delete')" class="menu-item">

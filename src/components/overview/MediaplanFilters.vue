@@ -1,21 +1,23 @@
 <template>
-  <div class="d-flex align-center">
-    <div class="d-flex align-center mr-3">
+  <!-- Main filters row that becomes more flexible on small screens -->
+  <div class="filter-container">
+    <!-- Brand dropdown -->
+    <div class="filter-item">
       <v-select
           v-model="selectedBrandId"
           :items="brands"
           item-title="name"
           item-value="_id"
-          label="Brand Selection"
+          label="Brand"
           variant="underlined"
-          class="min-width-select"
+          hide-details
           prepend-inner-icon="mdi-filter"
           @update:model-value="updateBrand"
-      >
-      </v-select>
+      ></v-select>
     </div>
 
-    <div class="d-flex align-center mr-3">
+    <!-- Sort dropdown -->
+    <div class="filter-item">
       <v-select
           v-model="selectedSort"
           :items="sortOptions"
@@ -23,30 +25,32 @@
           item-value="value"
           label="Sort by"
           variant="underlined"
+          hide-details
           prepend-inner-icon="mdi-sort"
-          class="min-width-select"
           @update:model-value="handleSortChange"
       ></v-select>
     </div>
 
-    <div class="d-flex align-center mr-3">
+    <!-- Countries dropdown -->
+    <div class="filter-item">
       <v-autocomplete
           v-model="selectedCountries"
           :items="countries"
           item-title="value"
           item-value="abbreviation"
-          label="Country"
+          label="Country Selection"
           variant="underlined"
+          hide-details
           multiple
           chips
           closable-chips
           prepend-inner-icon="mdi-filter"
-          class="min-width-select"
           @update:model-value="updateCountryFilter"
       ></v-autocomplete>
     </div>
 
-    <div class="d-flex align-center mr-3">
+    <!-- Filter type dropdown -->
+    <div class="filter-item">
       <v-select
           v-model="filterType"
           :items="filterOptions"
@@ -54,18 +58,20 @@
           item-value="value"
           label="Filter by"
           variant="underlined"
+          hide-details
           prepend-inner-icon="mdi-filter"
-          class="min-width-select"
           @update:model-value="updateFilterType"
       ></v-select>
     </div>
 
-    <div class="d-flex align-center flex-grow-1 mr-2">
+    <!-- Search field - will grow to fill available space -->
+    <div class="filter-item search-field">
       <v-text-field
           v-model="searchQuery"
           placeholder="Search..."
           prepend-inner-icon="mdi-magnify"
           variant="underlined"
+          hide-details
           flat
           single-line
           @update:model-value="debouncedSearch"
@@ -73,16 +79,20 @@
       ></v-text-field>
     </div>
 
-    <v-btn
-        color="black"
-        class="text-white px-4"
-        prepend-icon="mdi-plus"
-        @click="$emit('create-mediaplan')"
-    >
-      Media Plan
-    </v-btn>
+    <!-- Create button - will stay right aligned -->
+    <div class="filter-item create-button">
+      <v-btn
+          color="black"
+          class="text-white px-4"
+          prepend-icon="mdi-plus"
+          @click="$emit('create-mediaplan')"
+      >
+        Mediaplan
+      </v-btn>
+    </div>
   </div>
 
+  <!-- Active filters display -->
   <div v-if="hasAnyFilter" class="mt-2">
     <v-sheet class="pa-2 rounded" color="grey-lighten-4">
       <div class="d-flex align-center flex-wrap">
@@ -127,6 +137,7 @@
         >
           Currently running
         </v-chip>
+
         <v-chip
             v-if="filterType !== '' && filterType !== 'created_by_me' && filterType !== 'approval_requested' && filterType !== 'currently_running'"
             size="small"
@@ -231,11 +242,10 @@ const selectAllCountries = ref(false);
 const createdByMe = ref(false);
 const approvalRequested = ref(false);
 const currentlyRunning = ref(false);
-//const selectedStatus = ref(props.status); // Remove
 
 // Select state
 const selectedSort = ref('updated_at:desc');
-const filterType = ref(props.status); // Use props.status as initial filter
+const filterType = ref(props.status);
 
 // Options for select components
 const sortOptions = [
@@ -256,7 +266,6 @@ const filterOptions = [
   {text: 'Approval requested', value: 'approval_requested'},
   {text: 'Currently running', value: 'currently_running'},
   {text: 'Active', value: 'active'},
-
   {text: 'Inactive', value: 'inactive'},
   {text: 'Draft', value: 'draft'},
   {text: 'Archived', value: 'archived'},
@@ -269,7 +278,7 @@ const hasAnyFilter = computed(() => {
       searchQuery.value ||
       selectedBrandId.value ||
       selectedCountries.length > 0 ||
-      filterType.value !== ''  // Check filterType directly
+      filterType.value !== ''
   );
 });
 
@@ -335,9 +344,9 @@ function debouncedSearch() {
 
 // Methods
 function updateBrand(brandId: string) {
-  selectedBrandId.value = brandId; // Update the ID *first*
+  selectedBrandId.value = brandId;
   const brand = brands.value.find(b => b._id === brandId);
-  selectedBrandName.value = brand ? brand.name : ''; // Use optional chaining for safety
+  selectedBrandName.value = brand ? brand.name : '';
   emit('update:brand', brandId);
 }
 
@@ -348,12 +357,10 @@ function handleSortChange(value: string) {
 }
 
 function updateFilterType(value: string) {
-// Reset all filter flags
   createdByMe.value = false;
   approvalRequested.value = false;
   currentlyRunning.value = false;
 
-// Set *only* the selected filter (treat status filters the same)
   if (value === 'created_by_me') {
     createdByMe.value = true;
   } else if (value === 'approval_requested') {
@@ -362,14 +369,7 @@ function updateFilterType(value: string) {
     currentlyRunning.value = true;
   }
 
-  emit('update:status', value);  // Directly emit the filter value
-}
-
-function toggleAllCountries() {
-  if (selectAllCountries.value) {
-    selectedCountries.value = [];
-  }
-  updateCountryFilter();
+  emit('update:status', value);
 }
 
 function updateCountryFilter() {
@@ -387,11 +387,10 @@ function clearSearch() {
 }
 
 function clearBrand() {
-  selectedBrandId.value = null; // Use null for unselected ID
+  selectedBrandId.value = null;
   selectedBrandName.value = '';
   emit('update:brand', '');
 }
-
 
 function clearCountries() {
   selectedCountries.value = [];
@@ -403,7 +402,6 @@ function clearCreatedByMe() {
   if (filterType.value === 'created_by_me') {
     emit('update:status', '');
   }
-
 }
 
 function clearApprovalRequested() {
@@ -424,17 +422,73 @@ function clearAllFilters() {
   clearSearch();
   clearBrand();
   clearCountries();
-  filterType.value = '';  // Clear the filter type
+  filterType.value = '';
   emit('update:status', '');
   createdByMe.value = false;
   approvalRequested.value = false;
   currentlyRunning.value = false;
-
 }
 </script>
 
 <style scoped>
-.min-width-select {
+.filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  width: 100%;
+}
+
+.filter-item {
+  min-width: 180px;
+}
+
+/* Search field grows to fill available space */
+.search-field {
+  flex-grow: 1;
   min-width: 200px;
+  max-width: 280px;
+}
+
+/* Create button stays on the right */
+.create-button {
+  margin-left: auto;
+  min-width: auto;
+}
+
+/* Media queries for smaller screens */
+@media (max-width: 1200px) {
+  .filter-item {
+    min-width: 160px;
+  }
+}
+
+@media (max-width: 960px) {
+  .filter-container {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .filter-item {
+    min-width: 140px;
+  }
+
+  .search-field {
+    flex-basis: 100%;
+    order: 5;
+  }
+
+  .create-button {
+    margin-left: 0;
+    flex-basis: 100%;
+    order: 6;
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 600px) {
+  .filter-item {
+    flex-basis: 100%;
+  }
 }
 </style>
