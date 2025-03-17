@@ -78,7 +78,7 @@ export interface MediaplanCreate {
 export interface Mediaplan {
     _id: string;
     name: string;
-    status: 'In Planning' | 'Draft' | 'For Approval';
+    status: 'in_planning' | 'draft' | 'for_approval';
     start_date: string;
     end_date: string;
     brand: EntityReference;

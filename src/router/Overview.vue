@@ -1,13 +1,14 @@
 <template>
   <MainLayout>
-    <v-row>
-      <v-col cols="12">
+    <v-row class="pb-3 pt-1">
+      <v-col>
         <mediaplan-filters
             v-model:search="filters.search"
             v-model:status="filters.status"
             v-model:country="countryFilter"
             v-model:sort-by="sortBy"
             v-model:sort-order="sortOrder"
+            @create-mediaplan="openCreateMediaplanDialog"
         />
       </v-col>
     </v-row>
@@ -53,4 +54,8 @@ watch(countryFilter, (newCountry) => {
   // Add country-specific logic here if needed
   // For example, you might want to update the filters.search
 });
+
+const openCreateMediaplanDialog = () => {
+  // Add your logic to open a dialog or navigate to create page
+};
 </script>

@@ -1,339 +1,239 @@
 <template>
-  <v-row>
-    <v-col cols="12" md="3">
-      <v-menu v-model="brandMenuOpen" :close-on-content-click="false">
-        <template v-slot:activator="{ props }">
-          <v-btn
-              variant="outlined"
-              v-bind="props"
-              class="w-100"
-              prepend-icon="mdi-tag-outline"
-              :color="selectedBrandId ? 'primary' : undefined"
-          >
-            {{ selectedBrandId ? selectedBrandName : 'Brand Selection' }}
-          </v-btn>
+  <div class="d-flex align-center">
+    <!-- Brand Selector Dropdown -->
+    <div class="d-flex align-center mr-2">
+      <v-select
+          v-model="selectedBrandId"
+          :items="brands"
+          item-title="name"
+          item-value="_id"
+          label="MINI Mediaplans"
+          variant="solo"
+          density="compact"
+          hide-details
+          prepend-inner-icon="mdi-chevron-down"
+          @update:model-value="updateBrand"
+      >
+        <template v-slot:item="{ item, props }">
+          <v-list-item v-bind="props">
+            <template v-slot:prepend>
+              <v-img
+                  v-if="item.raw.name === 'BMW'"
+                  :src="'/img/BMW.svg'"
+                  max-width="35"
+                  height="35"
+                  contain
+                  class="mr-3"
+              />
+              <v-img
+                  v-else-if="item.raw.name === 'MINI'"
+                  :src="'/img/MINI.svg'"
+                  max-width="76"
+                  height="35"
+                  contain
+                  class="mr-3"
+              />
+            </template>
+            <v-list-item-title>{{ item.raw.name }}</v-list-item-title>
+          </v-list-item>
         </template>
-        <v-card min-width="300" class="pa-2">
-          <v-card-title class="d-flex justify-space-between align-center">
-            Brand Selection
-            <v-btn icon size="small" @click="brandMenuOpen = false">
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-          </v-card-title>
-          <v-divider class="mb-2"></v-divider>
-          <v-list>
-            <v-list-item
-                v-for="brand in brands"
-                :key="brand._id"
-                :value="brand._id"
-                @click="selectBrand(brand)"
-            >
-              <template v-slot:prepend>
-                <v-avatar size="32" class="mr-3">
-                  <v-img v-if="brand.logo" :src="brand.logo" :alt="brand.name">
-                    <template v-slot:placeholder>
-                      <v-icon>mdi-domain</v-icon>
-                    </template>
-                  </v-img>
-                  <v-icon v-else>mdi-domain</v-icon>
-                </v-avatar>
-              </template>
-              <v-list-item-title>{{ brand.name }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-menu>
-    </v-col>
+      </v-select>
+    </div>
 
-    <v-col cols="12" md="3">
-      <v-menu v-model="sortMenuOpen" :close-on-content-click="false">
-        <template v-slot:activator="{ props }">
-          <v-btn
-              variant="outlined"
-              v-bind="props"
-              class="w-100"
-              prepend-icon="mdi-sort"
-          >
-            Sort by
-          </v-btn>
+    <!-- Sort by Dropdown -->
+    <div class="d-flex align-center mr-2">
+
+
+      </v-list-item>
+      <v-list-item @click="setSorting('created_at', 'desc')">
+        <template v-slot:prepend>
+          <v-icon>mdi-arrow-up</v-icon>
         </template>
-        <v-card min-width="300" class="pa-2">
-          <v-card-title class="d-flex justify-space-between align-center">
-            Sort by
-            <v-btn icon size="small" @click="sortMenuOpen = false">
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-          </v-card-title>
-          <v-divider class="mb-2"></v-divider>
-          <v-list>
-            <v-list-item @click="setSorting('updated_at', 'desc')">
-              <template v-slot:prepend>
-                <v-icon>mdi-arrow-down</v-icon>
-              </template>
-              <v-list-item-title>Last updated first</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="setSorting('start_date', 'asc')">
-              <template v-slot:prepend>
-                <v-icon>mdi-arrow-down</v-icon>
-              </template>
-              <v-list-item-title>Earliest Start Date first</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="setSorting('start_date', 'desc')">
-              <template v-slot:prepend>
-                <v-icon>mdi-arrow-up</v-icon>
-              </template>
-              <v-list-item-title>Start Date Descending</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="setSorting('created_at', 'asc')">
-              <template v-slot:prepend>
-                <v-icon>mdi-arrow-down</v-icon>
-              </template>
-              <v-list-item-title>Creation Date Ascending</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="setSorting('created_at', 'desc')">
-              <template v-slot:prepend>
-                <v-icon>mdi-arrow-up</v-icon>
-              </template>
-              <v-list-item-title>Creation Date Descending</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="setSorting('end_date', 'asc')">
-              <template v-slot:prepend>
-                <v-icon>mdi-arrow-down</v-icon>
-              </template>
-              <v-list-item-title>End Date Ascending</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="setSorting('end_date', 'desc')">
-              <template v-slot:prepend>
-                <v-icon>mdi-arrow-up</v-icon>
-              </template>
-              <v-list-item-title>End Date Descending</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="setSorting('budget.total', 'desc')">
-              <template v-slot:prepend>
-                <v-icon>mdi-arrow-up</v-icon>
-              </template>
-              <v-list-item-title>Budget Highest First</v-list-item-title>
-            </v-list-item>
-            <v-list-item @click="setSorting('budget.total', 'asc')">
-              <template v-slot:prepend>
-                <v-icon>mdi-arrow-down</v-icon>
-              </template>
-              <v-list-item-title>Budget Lowest First</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-menu>
-    </v-col>
-
-    <v-col cols="12" md="3">
-      <v-menu v-model="countryMenuOpen" :close-on-content-click="false">
-        <template v-slot:activator="{ props }">
-          <v-btn
-              variant="outlined"
-              v-bind="props"
-              class="w-100"
-              prepend-icon="mdi-earth"
-              :color="selectedCountries.length > 0 ? 'primary' : undefined"
-          >
-            Country Selection
-          </v-btn>
+        <v-list-item-title>Creation Date Descending</v-list-item-title>
+      </v-list-item>
+      <v-list-item @click="setSorting('end_date', 'asc')">
+        <template v-slot:prepend>
+          <v-icon>mdi-arrow-down</v-icon>
         </template>
-        <v-card min-width="300" class="pa-2">
-          <v-card-title class="d-flex justify-space-between align-center">
-            Country Selection
-            <v-btn icon size="small" @click="countryMenuOpen = false">
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-          </v-card-title>
-          <v-divider class="mb-2"></v-divider>
-          <v-list>
-            <v-list-item>
-              <v-checkbox
-                  v-model="selectAllCountries"
-                  label="Show all"
-                  hide-details
-                  @change="toggleAllCountries"
-              ></v-checkbox>
-            </v-list-item>
-            <v-divider></v-divider>
-            <v-list-item v-for="country in countries" :key="country.abbreviation">
-              <v-checkbox
-                  v-model="selectedCountries"
-                  :value="country.abbreviation"
-                  :label="country.value"
-                  hide-details
-                  @change="updateCountryFilter"
-              ></v-checkbox>
-            </v-list-item>
-          </v-list>
-        </v-card>
-      </v-menu>
-    </v-col>
-
-    <v-col cols="12" md="3">
-      <v-menu v-model="filterMenuOpen" :close-on-content-click="false">
-        <template v-slot:activator="{ props }">
-          <v-btn
-              variant="outlined"
-              v-bind="props"
-              class="w-100"
-              prepend-icon="mdi-filter-outline"
-              :color="hasActiveFilters ? 'primary' : undefined"
-          >
-            Filter by
-          </v-btn>
+        <v-list-item-title>End Date</v-list-item-title>
+      </v-list-item>
+      <v-list-item @click="setSorting('end_date', 'desc')">
+        <template v-slot:prepend>
+          <v-icon>mdi-arrow-up</v-icon>
         </template>
-        <v-card min-width="300" class="pa-2">
-          <v-card-title class="d-flex justify-space-between align-center">
-            Filter by
-            <v-btn icon size="small" @click="filterMenuOpen = false">
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
-          </v-card-title>
-          <v-divider class="mb-2"></v-divider>
-          <v-list>
-            <v-list-item>
-              <v-checkbox
-                  v-model="createdByMe"
-                  label="Created by me"
-                  hide-details
-                  @change="updateSpecialFilters"
-              ></v-checkbox>
-            </v-list-item>
-            <v-list-item>
-              <v-checkbox
-                  v-model="approvalRequested"
-                  label="Approval requested"
-                  hide-details
-                  @change="updateSpecialFilters"
-              ></v-checkbox>
-            </v-list-item>
-            <v-list-item>
-              <v-checkbox
-                  v-model="currentlyRunning"
-                  label="Currently running"
-                  hide-details
-                  @change="updateSpecialFilters"
-              ></v-checkbox>
-            </v-list-item>
-            <v-divider class="my-2"></v-divider>
-            <v-list-item>
-              <v-select
-                  v-model="selectedStatus"
-                  :items="statusOptions"
-                  label="Status"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  @update:model-value="updateStatusFilter"
-              ></v-select>
-            </v-list-item>
-          </v-list>
-        </v-card>
+        <v-list-item-title>End Date</v-list-item-title>
+      </v-list-item>
+      <v-list-item @click="setSorting('budget.total', 'desc')">
+        <template v-slot:prepend>
+          <v-icon>mdi-arrow-up</v-icon>
+        </template>
+        <v-list-item-title>Budget Highest First</v-list-item-title>
+      </v-list-item>
+      <v-list-item @click="setSorting('budget.total', 'asc')">
+        <template v-slot:prepend>
+          <v-icon>mdi-arrow-down</v-icon>
+        </template>
+        <v-list-item-title>Budget Lowest First</v-list-item-title>
+      </v-list-item>
+      </v-list>
+      </v-card>
       </v-menu>
-    </v-col>
+    </div>
 
-    <v-col cols="12">
+    <!-- Country Filter -->
+    <div class="d-flex align-center mr-2">
+      <v-autocomplete
+          v-model="selectedCountries"
+          :items="countries"
+          item-title="value"
+          item-value="abbreviation"
+          label="Country"
+          variant="solo"
+          density="compact"
+          hide-details
+          multiple
+          chips
+          closable-chips
+          prepend-inner-icon="mdi-filter"
+          @update:model-value="updateCountryFilter"
+      ></v-autocomplete>
+    </div>
+
+    <!-- Filter By Options -->
+    <div class="d-flex align-center mr-2">
+      <v-select
+          v-model="filterType"
+          :items="filterOptions"
+          label="Filter by"
+          variant="solo"
+          density="compact"
+          hide-details
+          prepend-inner-icon="mdi-filter"
+          @update:model-value="updateFilterType"
+      ></v-select>
+    </div>
+
+    <!-- Search input -->
+    <div class="d-flex align-center flex-grow-1 mr-2">
       <v-text-field
           v-model="searchQuery"
-          label="Search..."
+          placeholder="Search..."
           prepend-inner-icon="mdi-magnify"
-          single-line
-          hide-details
-          variant="outlined"
+          variant="solo"
           density="compact"
+          hide-details
+          flat
+          single-line
           @update:model-value="debouncedSearch"
           clearable
       ></v-text-field>
-    </v-col>
+    </div>
 
-    <!-- Active filters display -->
-    <v-col cols="12" v-if="hasAnyFilter">
-      <v-sheet class="pa-2 rounded" color="grey-lighten-4">
-        <div class="d-flex align-center">
-          <div class="text-body-2 mr-4">Active filters:</div>
-          <v-chip
-              v-if="searchQuery"
-              size="small"
-              class="mr-2"
-              closable
-              @click:close="clearSearch"
-          >
-            Search: {{ searchQuery }}
-          </v-chip>
-          <v-chip
-              v-if="selectedBrandId"
-              size="small"
-              class="mr-2"
-              closable
-              @click:close="clearBrand"
-          >
-            Brand: {{ selectedBrandName }}
-          </v-chip>
-          <v-chip
-              v-if="selectedStatus"
-              size="small"
-              class="mr-2"
-              closable
-              @click:close="clearStatus"
-          >
-            Status: {{ selectedStatus }}
-          </v-chip>
-          <v-chip
-              v-if="selectedCountries.length > 0"
-              size="small"
-              class="mr-2"
-              closable
-              @click:close="clearCountries"
-          >
-            Countries: {{ selectedCountries.length }}
-          </v-chip>
-          <v-chip
-              v-if="createdByMe"
-              size="small"
-              class="mr-2"
-              closable
-              @click:close="clearCreatedByMe"
-          >
-            Created by me
-          </v-chip>
-          <v-chip
-              v-if="approvalRequested"
-              size="small"
-              class="mr-2"
-              closable
-              @click:close="clearApprovalRequested"
-          >
-            Approval requested
-          </v-chip>
-          <v-chip
-              v-if="currentlyRunning"
-              size="small"
-              class="mr-2"
-              closable
-              @click:close="clearCurrentlyRunning"
-          >
-            Currently running
-          </v-chip>
-          <v-btn
-              v-if="hasAnyFilter"
-              size="small"
-              variant="text"
-              color="primary"
-              @click="clearAllFilters"
-          >
-            Clear all filters
-          </v-btn>
-        </div>
-      </v-sheet>
-    </v-col>
-  </v-row>
+    <!-- Create Media Plan Button -->
+    <v-btn
+        color="black"
+        class="text-white px-4"
+        prepend-icon="mdi-plus"
+        @click="$emit('create-mediaplan')"
+    >
+      Media Plan
+    </v-btn>
+  </div>
+
+  <!-- Active Filters Display -->
+  <div v-if="hasAnyFilter" class="mt-2">
+    <v-sheet class="pa-2 rounded" color="grey-lighten-4">
+      <div class="d-flex align-center flex-wrap">
+        <div class="text-body-2 mr-4">Active filters:</div>
+
+        <v-chip
+            v-if="searchQuery"
+            size="small"
+            class="mr-2 mb-1"
+            closable
+            @click:close="clearSearch"
+        >
+          Search: {{ searchQuery }}
+        </v-chip>
+
+        <v-chip
+            v-if="selectedBrandId"
+            size="small"
+            class="mr-2 mb-1"
+            closable
+            @click:close="clearBrand"
+        >
+          Brand: {{ selectedBrandName }}
+        </v-chip>
+
+        <v-chip
+            v-if="selectedStatus"
+            size="small"
+            class="mr-2 mb-1"
+            closable
+            @click:close="clearStatus"
+        >
+          Status: {{ selectedStatus }}
+        </v-chip>
+
+        <v-chip
+            v-if="selectedCountries.length > 0"
+            size="small"
+            class="mr-2 mb-1"
+            closable
+            @click:close="clearCountries"
+        >
+          Countries: {{ selectedCountries.length }}
+        </v-chip>
+
+        <v-chip
+            v-if="createdByMe"
+            size="small"
+            class="mr-2 mb-1"
+            closable
+            @click:close="clearCreatedByMe"
+        >
+          Created by me
+        </v-chip>
+
+        <v-chip
+            v-if="approvalRequested"
+            size="small"
+            class="mr-2 mb-1"
+            closable
+            @click:close="clearApprovalRequested"
+        >
+          Approval requested
+        </v-chip>
+
+        <v-chip
+            v-if="currentlyRunning"
+            size="small"
+            class="mr-2 mb-1"
+            closable
+            @click:close="clearCurrentlyRunning"
+        >
+          Currently running
+        </v-chip>
+
+        <v-btn
+            v-if="hasAnyFilter"
+            size="small"
+            variant="text"
+            color="primary"
+            @click="clearAllFilters"
+        >
+          Clear all filters
+        </v-btn>
+      </div>
+    </v-sheet>
+  </div>
 </template>
 
 <script setup lang="ts">
-import {ref, computed, onMounted, watch} from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import customFetch from '@/helpers/customFetch';
-import {Brand, Source} from '@/types/mediaplan';
+import { Brand, Source } from '@/types/mediaplan';
 
 // Define props and emits
 const props = defineProps({
@@ -364,7 +264,8 @@ const emit = defineEmits([
   'update:status',
   'update:country',
   'update:sort-by',
-  'update:sort-order'
+  'update:sort-order',
+  'create-mediaplan'
 ]);
 
 // Local state for sources
@@ -386,14 +287,29 @@ const approvalRequested = ref(false);
 const currentlyRunning = ref(false);
 const selectedStatus = ref(props.status);
 
-// Status options
-const statusOptions = ['In Planning', 'Draft', 'For Approval', ''];
+// Select state
+const selectedSort = ref('updated_at:desc');
+const filterType = ref('');
 
-// Menu state
-const brandMenuOpen = ref(false);
-const sortMenuOpen = ref(false);
-const countryMenuOpen = ref(false);
-const filterMenuOpen = ref(false);
+// Options for select components
+const sortOptions = [
+  { text: 'Last updated first', value: 'updated_at:desc' },
+  { text: 'Earliest Start Date first', value: 'start_date:asc' },
+  { text: 'Start Date Descending', value: 'start_date:desc' },
+  { text: 'Creation Date Ascending', value: 'created_at:asc' },
+  { text: 'Creation Date Descending', value: 'created_at:desc' },
+  { text: 'End Date Ascending', value: 'end_date:asc' },
+  { text: 'End Date Descending', value: 'end_date:desc' },
+  { text: 'Budget Highest First', value: 'budget.total:desc' },
+  { text: 'Budget Lowest First', value: 'budget.total:asc' }
+];
+
+const filterOptions = [
+  { text: 'All', value: '' },
+  { text: 'Created by me', value: 'created_by_me' },
+  { text: 'Approval requested', value: 'approval_requested' },
+  { text: 'Currently running', value: 'currently_running' }
+];
 
 // Computed properties
 const hasActiveFilters = computed(() => {
@@ -415,34 +331,44 @@ const hasAnyFilter = computed(() => {
 // Fetch sources data on component mount
 onMounted(async () => {
   try {
-    const response = await customFetch('/mediaplans/sources?type=overview');
+    // For development, we'll set up mock data similar to the screenshot
+    brands.value = [
+      { _id: 'bmw', name: 'BMW' },
+      { _id: 'mini', name: 'MINI' }
+    ];
 
-    // Map the response to our sources structure
+    // Set mock countries based on the screenshot
+    countries.value = [
+      { abbreviation: 'AT', value: 'Austria', category: null },
+      { abbreviation: 'BE', value: 'Belgium', category: null },
+      { abbreviation: 'DE', value: 'Germany', category: null },
+      { abbreviation: 'HU', value: 'Hungary', category: null },
+      { abbreviation: 'JP', value: 'Japan', category: null },
+      { abbreviation: 'KR', value: 'Korea', category: null },
+      { abbreviation: 'NL', value: 'Netherlands', category: null },
+      { abbreviation: 'ZA', value: 'South Africa', category: null }
+    ];
+
+    // In a real application, you would fetch this data from your API
+    /*
+    const response = await customFetch('/mediaplans/sources?type=overview');
     if (response && response.data) {
       if (response.data.subsegment) {
         subsegments.value = response.data.subsegment;
       }
-
       if (response.data.product) {
         products.value = response.data.product;
       }
-
       if (response.data.campaigntype) {
         campaigntypes.value = response.data.campaigntype;
       }
-
       if (response.data.language) {
         languages.value = response.data.language;
-        // Use languages as countries for this example
         countries.value = response.data.language;
       }
-
-      // Mock brands data (adjust as needed based on your actual API)
-      brands.value = [
-        {_id: 'bmw', name: 'BMW', logo: '/brands/bmw-logo.png'},
-        {_id: 'mini', name: 'Mini', logo: '/brands/mini-logo.png'}
-      ];
+      // Brands would come from a different endpoint potentially
     }
+    */
   } catch (error) {
     console.error('Error fetching filter sources:', error);
   }
@@ -477,19 +403,35 @@ function debouncedSearch() {
 }
 
 // Methods
-function selectBrand(brand: Brand) {
-  selectedBrandId.value = brand._id;
-  selectedBrandName.value = brand.name;
-  brandMenuOpen.value = false;
-
-  // Update filter
-  emit('update:status', selectedStatus.value);
+function updateBrand(brandId: string) {
+  const brand = brands.value.find(b => b._id === brandId);
+  if (brand) {
+    selectedBrandName.value = brand.name;
+  }
 }
 
-function setSorting(field: string, order: 'asc' | 'desc') {
+function handleSortChange(value: string) {
+  const [field, order] = value.split(':');
   emit('update:sort-by', field);
-  emit('update:sort-order', order);
-  sortMenuOpen.value = false;
+  emit('update:sort-order', order as 'asc' | 'desc');
+}
+
+function updateFilterType(value: string) {
+  // Reset all filter flags
+  createdByMe.value = false;
+  approvalRequested.value = false;
+  currentlyRunning.value = false;
+
+  // Set the selected filter
+  if (value === 'created_by_me') {
+    createdByMe.value = true;
+  } else if (value === 'approval_requested') {
+    approvalRequested.value = true;
+  } else if (value === 'currently_running') {
+    currentlyRunning.value = true;
+  }
+
+  updateSpecialFilters();
 }
 
 function toggleAllCountries() {
@@ -510,14 +452,9 @@ function updateCountryFilter() {
   }
 }
 
-function updateStatusFilter() {
-  emit('update:status', selectedStatus.value);
-}
-
 function updateSpecialFilters() {
   // This is a simplified implementation
   // In a real app, you might want to include these in a more complex filter object
-  // or handle them separately based on your API requirements
   const status = getFilterStatus();
   emit('update:status', status);
 }
@@ -581,7 +518,21 @@ function clearAllFilters() {
 </script>
 
 <style scoped>
-.w-100 {
-  width: 100%;
+.filter-card {
+  border-radius: 4px;
+}
+
+/* Add bottom margin to the list items to improve spacing */
+.v-list-item {
+  margin-bottom: 4px;
+}
+
+/* Override Vuetify's default padding for filter cards */
+.filter-card .v-card-title {
+  padding: 16px;
+}
+
+.text-none {
+  text-transform: none;
 }
 </style>

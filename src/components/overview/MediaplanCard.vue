@@ -26,7 +26,7 @@
               size="x-small"
               class="mr-1"
           />
-          <span class="status-text text-grey">{{ mediaplan.status }}</span>
+          <span class="status-text text-grey">{{ getMediaplanStatusLabel(mediaplan.status) }}</span>
         </div>
 
         <div class="d-flex align-center">
@@ -97,7 +97,7 @@
 <script setup lang="ts">
 import {ref} from 'vue';
 import {Mediaplan} from '@/types/mediaplan';
-import {getMediaplanStatusColor} from '@/constants/mediaplanStatuses';
+import {getMediaplanStatusColor, getMediaplanStatusLabel} from '@/constants/mediaplanStatuses';
 import MediaplanOptionsMenu from "@/components/overview/MediaplanOptionsMenu.vue";
 
 defineProps<{

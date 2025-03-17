@@ -33,3 +33,8 @@ export const getMediaplanStatusColor = (statusValue: string): string => {
     const status = Object.values(MEDIAPLAN_STATUSES).find(s => s.value === statusValue);
     return status?.color || 'grey';
 };
+
+export const getMediaplanStatusLabel = (statusValue: string): string => {
+    const status = Object.values(MEDIAPLAN_STATUSES).find(s => s.value === statusValue);
+    return status?.label || 'draft';
+};
