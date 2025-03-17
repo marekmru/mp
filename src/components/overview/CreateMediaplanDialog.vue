@@ -14,15 +14,15 @@
             :items="brands"
             item-title="name"
             item-value="_id"
-            label="Brand"
+            label="Brand Output"
             placeholder="Please Select a brand"
             :rules="[v => !!v || 'Brand is required']"
             variant="outlined"
-            class="mb-4"
+            class="mb-0"
         />
 
         <!-- Type Selection (PO Based or Draft) -->
-        <div class="d-flex mb-4">
+        <div class="d-flex mb-2">
           <v-radio-group
               v-model="mediaplanType"
               inline
@@ -66,7 +66,7 @@
         <!-- Creator Name -->
         <v-text-field
             v-model="creatorName"
-            label="Your name"
+            label="Creator"
             placeholder="Your name"
             :rules="[v => !!v || 'Creator name is required']"
             variant="outlined"
