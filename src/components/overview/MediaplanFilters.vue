@@ -81,14 +81,15 @@
 
     <!-- Create button - will stay right aligned -->
     <div class="filter-item create-button">
-      <v-btn
+      <create-mediaplan-button />
+<!--      <v-btn
           color="black"
           class="text-white px-4"
           prepend-icon="mdi-plus"
           @click="$emit('create-mediaplan')"
       >
         Mediaplan
-      </v-btn>
+      </v-btn>-->
     </div>
   </div>
 
@@ -186,6 +187,7 @@
 import {ref, computed, onMounted, watch} from 'vue';
 import customFetch from '@/helpers/customFetch';
 import {Brand, Source} from '@/types/mediaplan';
+import CreateMediaplanButton from "@/components/overview/CreateMediaplanButton.vue";
 
 // Define props and emits
 const props = defineProps({
