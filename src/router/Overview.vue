@@ -24,7 +24,7 @@
         @update:total-items="totalItems = $event"
     />
   </MainLayout>
-</template>
+¡¡</template>
 
 <script setup lang="ts">
 import {ref, reactive, watch} from 'vue';
