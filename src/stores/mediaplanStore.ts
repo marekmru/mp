@@ -6,8 +6,10 @@ import {
     MediaplanListResponse,
     SourcesResponse
 } from '../types';
-import type {MediaplanFilter} from "../types";
-import type {FilterSources, Mediaplan} from "../types";
+import type {
+    FilterSources, Mediaplan, MediaplanFilter, MediaplanListResponse,
+    SourcesResponse
+} from "../types";
 
 export const useMediaplanStore = defineStore('mediaplan', () => {
     // State
