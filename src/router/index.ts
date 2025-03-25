@@ -15,6 +15,18 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Login',
         component: Login,
     },
+    {
+        path: '/mediaplans/:id',
+        name: 'MediaplanDetail',
+        component: () => import('../views/MediaplanDetail.vue'),
+        props: true,
+    },
+    {
+        path: '/mediaplans/:id/edit',
+        name: 'MediaplanEdit',
+        component: () => import('../views/MediaplanEdit.vue'),
+        props: true,
+    },
     // Weitere Routen hier
 ]
 

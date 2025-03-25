@@ -1,167 +1,181 @@
 <template>
-  <v-dialog v-model="dialog" persistent max-width="500px">
-    <v-card class="pa-6">
-      <v-card-title class="text-h5 mb-4 px-0">Create new Mediaplan</v-card-title>
+  <div>
+    <!-- Mediaplan Creation Dialog -->
+    <v-dialog v-model="dialog" persistent max-width="500px">
+      <v-card class="pa-6">
+        <v-card-title class="text-h5 mb-4 px-0">Create new Mediaplan</v-card-title>
 
-      <v-form ref="form" @submit.prevent="submitForm">
-        <!-- Brand Selection -->
-        <v-select
-            v-model="formData.brand._id"
-            :items="brands"
-            item-title="name"
-            item-value="_id"
-            label="Brand Output*"
-            placeholder="Please Select a brand"
-            :rules="[v => !!v || 'Brand is required']"
-            variant="outlined"
-            class="mb-0"
-        />
-
-        <!-- Type Selection (PO Based or Draft) -->
-        <div class="d-flex mb-2">
-          <v-radio-group v-model="mediaplanType" inline class="mt-0">
-            <v-radio value="po" label="PO Based"/>
-            <v-radio value="draft" label="Draft"/>
-          </v-radio-group>
-        </div>
-
-        <!-- Mediaplan Name -->
-        <v-text-field
-            v-model="formData.name"
-            label="Individual Name*"
-            placeholder="please type in an individual title"
-            :rules="[v => !!v || 'Name is required']"
-            variant="outlined"
-            class="mb-4"
-        />
-
-        <!-- PO Selection - Only visible if PO Based selected -->
-        <v-row v-if="mediaplanType === 'po'" class="mb-4" no-gutters>
+        <v-form ref="form" @submit.prevent="submitForm">
+          <!-- Brand Selection -->
           <v-select
-              v-model="selectedPOs"
-              :items="poNumbers"
+              v-model="formData.brand._id"
+              :items="brands"
               item-title="name"
               item-value="_id"
-              label="Select existing PO*"
-              placeholder="Select POs"
-              :rules="[v => mediaplanType !== 'po' || (v && v.length > 0) || 'At least one PO is required']"
+              label="Brand Output*"
+              placeholder="Please Select a brand"
+              :rules="[v => !!v || 'Brand is required']"
               variant="outlined"
-              multiple
-              chips
-              closable-chips
-              class="flex-grow-1 mr-2"
-          />
-          <v-btn
-              color="primary"
-              variant="outlined"
-              @click="openCreatePODialog"
-              class="mt-0"
-              style="height: 56px;"
-          >
-            Create PO
-          </v-btn>
-        </v-row>
-
-        <template v-if="mediaplanType === 'po'">
-          <!-- Creator Name -->
-          <v-text-field
-              v-model="creatorName"
-              label="Creator*"
-              placeholder="Your name"
-              :rules="[v => !!v || 'Creator name is required']"
-              variant="outlined"
-              class="mb-4"
-              readonly
-              disabled
+              class="mb-0"
           />
 
-          <!-- Department -->
+          <!-- Type Selection (PO Based or Draft) -->
+          <div class="d-flex mb-2">
+            <v-radio-group v-model="mediaplanType" inline class="mt-0">
+              <v-radio value="po" label="PO Based"/>
+              <v-radio value="draft" label="Draft"/>
+            </v-radio-group>
+          </div>
+
+          <!-- Mediaplan Name -->
           <v-text-field
-              v-model="department"
-              label="Department"
-              placeholder="Department name"
-              variant="outlined"
-              class="mb-4"
-          />
-        </template>
-
-        <!-- Date Range - Using the new SimplifiedDateRangePicker component -->
-        <DateRangePicker
-            v-model="dateRange"
-            label="Start date* - End date *"
-            placeholder="Select start and end dates"
-            :rules="[v => !!v || 'Date range is required']"
-            :required="true"
-            dialog-title="Choose a date range"
-            class="mb-0"
-            @update:model-value="handleDateRangeChange"
-        />
-
-        <!-- Action Buttons -->
-        <v-card-actions class="pt-4 d-flex justify-end">
-          <v-btn size="large" variant="outlined" @click="cancelDialog" class="mr-2">
-            Cancel
-          </v-btn>
-          <v-btn
-              size="large"
-              color="primary"
-              type="submit"
-              variant="flat"
-              :loading="isSubmitting"
-              :disabled="!form?.isValid"
-          >
-            Next Step
-          </v-btn>
-        </v-card-actions>
-      </v-form>
-    </v-card>
-
-    <!-- Create PO Dialog -->
-    <v-dialog v-model="createPODialogVisible" max-width="500px">
-      <v-card class="pa-6">
-        <v-card-title class="text-h5 mb-4">Create New PO</v-card-title>
-
-        <v-form ref="poForm" @submit.prevent="submitPOForm">
-          <v-text-field
-              v-model="newPO.name"
-              label="PO Number"
-              placeholder="Enter PO number"
-              :rules="[v => !!v || 'PO number is required']"
+              v-model="formData.name"
+              label="Individual Name*"
+              placeholder="please type in an individual title"
+              :rules="[v => !!v || 'Name is required']"
               variant="outlined"
               class="mb-4"
           />
 
-          <v-text-field
-              v-model="newPO.value"
-              label="PO Value"
-              placeholder="Enter value"
-              type="number"
-              :rules="[
-              v => !!v || 'PO value is required',
-              v => v > 0 || 'Value must be greater than 0'
-            ]"
-              variant="outlined"
-              class="mb-4"
-              suffix="EUR"
+          <!-- PO Selection - Only visible if PO Based selected -->
+          <v-row v-if="mediaplanType === 'po'" class="mb-4" no-gutters>
+            <v-select
+                v-model="selectedPOs"
+                :items="poNumbers"
+                item-title="name"
+                item-value="_id"
+                label="Select existing PO*"
+                placeholder="Select POs"
+                :rules="[v => mediaplanType !== 'po' || (v && v.length > 0) || 'At least one PO is required']"
+                variant="outlined"
+                multiple
+                chips
+                closable-chips
+                class="flex-grow-1 mr-2"
+            />
+            <v-btn
+                color="primary"
+                variant="outlined"
+                @click="openCreatePODialog"
+                class="mt-0"
+                style="height: 56px;"
+            >
+              Create PO
+            </v-btn>
+          </v-row>
+
+          <template v-if="mediaplanType === 'po'">
+            <!-- Creator Name -->
+            <v-text-field
+                v-model="creatorName"
+                label="Creator*"
+                placeholder="Your name"
+                :rules="[v => !!v || 'Creator name is required']"
+                variant="outlined"
+                class="mb-4"
+                readonly
+                disabled
+            />
+
+            <!-- Department -->
+            <v-text-field
+                v-model="department"
+                label="Department"
+                placeholder="Department name"
+                variant="outlined"
+                class="mb-4"
+            />
+          </template>
+
+          <!-- Date Range - Using the DateRangePicker component -->
+          <DateRangePicker
+              v-model="dateRange"
+              label="Start date* - End date *"
+              placeholder="Select start and end dates"
+              :rules="[v => !!v || 'Date range is required']"
+              :required="true"
+              dialog-title="Choose a date range"
+              class="mb-0"
+              @update:model-value="handleDateRangeChange"
           />
 
-          <v-card-actions class="pt-3 d-flex justify-end">
-            <v-btn size="large" variant="outlined" @click="closeCreatePODialog" class="mr-2">
+          <!-- Action Buttons -->
+          <v-card-actions class="pt-4 d-flex justify-end">
+            <v-btn size="large" variant="outlined" @click="cancelDialog" class="mr-2">
               Cancel
             </v-btn>
-            <v-btn size="large" color="primary" type="submit" variant="flat" :loading="isSubmittingPO">
-              Create
+            <v-btn
+                size="large"
+                color="primary"
+                type="submit"
+                variant="flat"
+                :loading="isSubmitting"
+                :disabled="!form?.isValid"
+            >
+              Next Step
             </v-btn>
           </v-card-actions>
         </v-form>
       </v-card>
+
+      <!-- Create PO Dialog -->
+      <v-dialog v-model="createPODialogVisible" max-width="500px">
+        <v-card class="pa-6">
+          <v-card-title class="text-h5 mb-4">Create New PO</v-card-title>
+
+          <v-form ref="poForm" @submit.prevent="submitPOForm">
+            <v-text-field
+                v-model="newPO.name"
+                label="PO Number"
+                placeholder="Enter PO number"
+                :rules="[v => !!v || 'PO number is required']"
+                variant="outlined"
+                class="mb-4"
+            />
+
+            <v-text-field
+                v-model="newPO.value"
+                label="PO Value"
+                placeholder="Enter value"
+                type="number"
+                :rules="[
+                v => !!v || 'PO value is required',
+                v => v > 0 || 'Value must be greater than 0'
+              ]"
+                variant="outlined"
+                class="mb-4"
+                suffix="EUR"
+            />
+
+            <v-card-actions class="pt-3 d-flex justify-end">
+              <v-btn size="large" variant="outlined" @click="closeCreatePODialog" class="mr-2">
+                Cancel
+              </v-btn>
+              <v-btn size="large" color="primary" type="submit" variant="flat" :loading="isSubmittingPO">
+                Create
+              </v-btn>
+            </v-card-actions>
+          </v-form>
+        </v-card>
+      </v-dialog>
+
+      <!-- Success/Error Snackbar -->
+      <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+        {{ snackbar.text }}
+      </v-snackbar>
     </v-dialog>
 
-    <!-- Success/Error Snackbar -->
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-      {{ snackbar.text }}
-    </v-snackbar>
-  </v-dialog>
+    <!-- Project Creation Dialog (shown after mediaplan creation) -->
+    <CreateProjectDialog
+      v-model="showProjectDialog"
+      :mediaplan-id="createdMediaplanId"
+      :mediaplan-name="formData.name"
+      :po-numbers="formData.po_numbers"
+      :start-date="formData.start_date"
+      :end-date="formData.end_date"
+      @created="handleProjectCreated"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -169,7 +183,9 @@ import {ref, reactive, computed, onMounted, watch, nextTick} from 'vue';
 import {useAuthStore} from '@/stores/auth';
 import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
 import DateRangePicker from './DateRangePicker.vue';
+import CreateProjectDialog from './CreateProjectDialog.vue';
 import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
+import customFetch from '@/customFetch';
 
 // Props
 const props = defineProps<{
@@ -180,6 +196,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
   (e: 'created', mediaplanId: string): void;
+  (e: 'project-created', projectId: string): void;
 }>();
 
 // References
@@ -200,6 +217,10 @@ const department = ref('');
 const creatorName = ref('');
 const isSubmitting = ref(false);
 const dateRange = ref<[string, string] | null>(null);
+
+// Project dialog state
+const showProjectDialog = ref(false);
+const createdMediaplanId = ref('');
 
 // Create PO Dialog
 const createPODialogVisible = ref(false);
@@ -247,24 +268,17 @@ const handleDateRangeChange = (range: [string, string] | null) => {
   }
 };
 
-// Lifecycle
-onMounted(async () => {
-  await loadFormData();
-
-  // Set creator name from auth store if available
-  if (authStore.user) {
-    creatorName.value = authStore.user.name || 'Current User';
-  } else {
-    creatorName.value = 'Current User';
-  }
-});
-
-// Watch for dialog changes to reset form
-/*watch(dialog, (newValue) => {
-  if (newValue === false) {
-    resetForm();
-  }
-});*/
+// Method to handle project creation completion
+const handleProjectCreated = (projectId: string) => {
+  // Close the project dialog
+  showProjectDialog.value = false;
+  
+  // Emit the project created event
+  emit('project-created', projectId);
+  
+  // Close the main dialog as well
+  dialog.value = false;
+};
 
 const loadFormData = async () => {
   try {
@@ -306,29 +320,40 @@ const submitForm = async () => {
     // For demo purposes, log the payload
     console.log('Creating mediaplan with data:', formData);
 
-    // In real application, uncomment this to send to API:
-    /*
-    const response = await customFetch('/mediaplans', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    emit('created', response._id);
-    */
-
-    // For demo, simulate successful creation
-    setTimeout(() => {
+    // In real application, send to API:
+    try {
+      // This would be the actual API call in production
+      /*
+      const response = await customFetch('/mediaplans', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      createdMediaplanId.value = response._id;
+      */
+      
+      // For demo, simulate successful API call
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Simulate a response with a mock ID
+      createdMediaplanId.value = `mediaplan-${Date.now()}`;
+      
+      // Notify success
       showSuccess('Mediaplan created successfully');
-
-      // Close dialog after success
-      setTimeout(() => {
-        dialog.value = false;
-        emit('created', 'mock-mediaplan-id');
-      }, 1000);
-    }, 500);
+      
+      // Emit the created event
+      emit('created', createdMediaplanId.value);
+      
+      // Important: Here we don't close the dialog, but instead show the project dialog
+      showProjectDialog.value = true;
+      
+    } catch (apiError) {
+      console.error('API error creating mediaplan:', apiError);
+      showError('Failed to create mediaplan: API error');
+      throw apiError;
+    }
 
   } catch (error) {
     console.error('Error creating mediaplan:', error);
@@ -429,10 +454,6 @@ const resetForm = async () => {
   selectedPOs.value = [];
   department.value = '';
   mediaplanType.value = 'po';
-
-/*  if (form.value) {
-    form.value.reset();
-  }*/
 };
 
 // Lifecycle

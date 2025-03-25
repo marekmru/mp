@@ -1,14 +1,13 @@
 // src/stores/mediaplanStore.ts
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import customFetch from '@/customFetch';
+import {defineStore} from 'pinia';
+import {ref, computed} from 'vue';
+import customFetch from '@/helpers/customFetch';
 import {
-    Mediaplan,
-    MediaplanFilter,
-    FilterSources,
     MediaplanListResponse,
     SourcesResponse
-} from '@/types/mediaplan';
+} from '../types';
+import type {MediaplanFilter} from "../types";
+import type {FilterSources, Mediaplan} from "../types";
 
 export const useMediaplanStore = defineStore('mediaplan', () => {
     // State
@@ -124,8 +123,8 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
 
                 // Mock brands data (adjust as needed based on your actual API)
                 sources.value.brands = [
-                    { _id: 'bmw', name: 'BMW' },
-                    { _id: 'mini', name: 'Mini' }
+                    {_id: 'bmw', name: 'BMW'},
+                    {_id: 'mini', name: 'Mini'}
                 ];
             }
         } catch (err) {
@@ -137,7 +136,7 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
     }
 
     function setFilter(key: keyof MediaplanFilter, value: any) {
-        filters.value = { ...filters.value, [key]: value };
+        filters.value = {...filters.value, [key]: value};
 
         // Reset to first page when filter changes
         currentPage.value = 0;

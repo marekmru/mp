@@ -12,6 +12,7 @@
     <create-mediaplan-dialog
         v-model="dialogVisible"
         @created="handleMediaplanCreated"
+        @project-created="handleProjectCreated"
     />
   </div>
 </template>
@@ -20,8 +21,10 @@
 import { ref } from 'vue';
 import CreateMediaplanDialog from './CreateMediaplanDialog.vue';
 import { useRouter } from 'vue-router';
+import { useMediaplanStore } from '@/stores/mediaplanStore';
 
 const router = useRouter();
+const mediaplanStore = useMediaplanStore();
 const dialogVisible = ref(false);
 
 const showDialog = () => {
@@ -29,18 +32,23 @@ const showDialog = () => {
 };
 
 const handleMediaplanCreated = (mediaplanId: string) => {
-  // Navigate to the newly created mediaplan or refresh the list
-  // For now, we'll just log it
+  // Store the mediaplan ID but don't close the dialog yet
+  // as the project creation will follow
   console.log('Mediaplan created with ID:', mediaplanId);
+};
 
-  // You could redirect to the mediaplan detail page:
-  // router.push(`/mediaplans/${mediaplanId}`);
-
-  // Or just emit an event to refresh the list
-  emit('mediaplan-created');
+const handleProjectCreated = (projectId: string) => {
+  console.log('Project created with ID:', projectId);
+  
+  // Refresh the mediaplans list
+  mediaplanStore.fetchMediaplans();
+  
+  // Emit event to notify parent component
+  emit('project-created', projectId);
 };
 
 const emit = defineEmits<{
   (e: 'mediaplan-created'): void;
+  (e: 'project-created', projectId: string): void;
 }>();
 </script>
