@@ -1,35 +1,37 @@
 <template>
-    <v-row class="justify-center" >
-      <v-col
-          v-for="mediaplan in mediaplans"
-          :key="mediaplan._id"
-          cols="12" sm="6" md="4" lg="3"
-          class="mb-4 mediaplan-col"
-      >
-        <mediaplan-card
-            :mediaplan="mediaplan"
-            @view="viewMediaplan"
-        />
-      </v-col>
-    </v-row>
+  <v-row class="justify-center">
+    <v-col
+        v-for="mediaplan in mediaplans"
+        :key="mediaplan._id"
+        cols="12" sm="6" md="4" lg="3"
+        class="mb-4 mediaplan-col"
+    >
+      <mediaplan-card
+          :mediaplan="mediaplan"
+          @view="viewMediaplan"
+      />
+    </v-col>
+  </v-row>
 
-    <div v-if="loading" class="d-flex justify-center align-center my-4">
-      <v-progress-circular indeterminate color="primary" />
-    </div>
+  <div v-if="loading" class="d-flex justify-center align-center my-4">
+    <v-progress-circular indeterminate color="primary"/>
+  </div>
 
-    <div v-if="!loading && mediaplans.length === 0" class="text-center my-6">
-      <v-icon icon="mdi-alert-circle-outline" size="large" color="grey" class="mb-2" />
-      <div class="text-h6 text-grey">No mediaplans found</div>
-      <div class="text-body-2 text-grey">Try adjusting your filters or create a new mediaplan</div>
-    </div>
+  <div v-if="!loading && mediaplans.length === 0" class="text-center my-6">
+    <v-icon icon="mdi-alert-circle-outline" size="large" color="grey" class="mb-2"/>
+    <div class="text-h6 text-grey">No mediaplans found</div>
+    <div class="text-body-2 text-grey">Try adjusting your filters or create a new mediaplan</div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+
+
+import {ref, onMounted, watch} from 'vue';
 import MediaplanCard from './MediaplanCard.vue';
-import { Mediaplan } from '@/types/mediaplan';
+import {Mediaplan} from '@/types/mediaplan';
 // import customFetch from '@/customFetch'; // Commented out until API is ready
-import { mockFetchMediaplans } from '@/mocks/mediaplans'; // Import mock data service
+import {mockFetchMediaplans} from '@/mocks/mediaplans'; // Import mock data service
 
 interface Props {
   filters?: {
@@ -119,7 +121,7 @@ watch(() => [props.page, props.perPage, props.sortBy, props.sortOrder, props.fil
     () => {
       fetchMediaplans();
     },
-    { deep: true }
+    {deep: true}
 );
 
 onMounted(() => {

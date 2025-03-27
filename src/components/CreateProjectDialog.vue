@@ -44,8 +44,8 @@
           <div class="d-flex py-2 mb-4">
             <div class="text-body-2 text-medium-emphasis">Duration:</div>
             <div class="ml-2 text-body-2">
-              Start: 01.10.2024 
-              End: 01.10.2025
+              Start: {{ formatDate(startDateValue) }} 
+              End: {{ formatDate(endDateValue) }}
             </div>
           </div>
         </div>
@@ -72,16 +72,16 @@
             >
               <template v-slot:selection="{ item }">
                 <div class="d-flex align-center">
-                  <country-flag :country="item.raw.code" class="mr-2" />
+                  <span :class="`fi fi-${item.raw.code.toLowerCase()}`" class="mr-2" style="font-size: 1.2em;"></span>
                   {{ item.raw.code }} - {{ item.raw.name }}
                 </div>
               </template>
               <template v-slot:item="{ item, props }">
-                <v-list-item v-bind="props" :title="`${item.raw.code} - ${item.raw.name}`">
+                <v-list-item v-bind="props">
                   <template v-slot:prepend>
-                    <country-flag :country="item.raw.code" class="mr-2" />
+                    <span :class="`fi fi-${item.raw.code.toLowerCase()}`" style="font-size: 1.2em;"></span>
                   </template>
-<!--                  <v-list-item-title>{{ item.raw.code }} - {{ item.raw.name }}&#45;&#45;</v-list-item-title>-->
+                  <v-list-item-title>{{ item.raw.code }} - {{ item.raw.name }}</v-list-item-title>
                 </v-list-item>
               </template>
             </v-select>
@@ -206,7 +206,7 @@ import { format } from 'date-fns';
 import { useProjectStore } from '@/stores/projectStore';
 import type { ProjectCountry, ProjectLanguage, ProjectCampaignType, ProjectPhase, ProjectGoal } from '@/types/project';
 import customFetch from '@/helpers/customFetch';
-import CountryFlag from '@/components/common/CountryFlag.vue';
+import 'flag-icons/css/flag-icons.min.css';
 
 // MINI logo SVG (inline for simplicity)
 const miniLogoSvg = `data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160">
@@ -221,11 +221,30 @@ const props = defineProps<{
   mediaplanId: string;
   mediaplanName: string;
   poNumbers: { _id: string; name: string; value: number }[];
-  startDate: string;
-  endDate: string;
+  startDate: string | Date;
+  endDate: string | Date;
   brand?: { _id: string; name: string };
   isFirstProject?: boolean;
 }>();
+
+// Convert date props to properly handle both string and Date objects
+const startDateValue = computed(() => {
+  if (typeof props.startDate === 'string') {
+    return props.startDate;
+  } else if (props.startDate instanceof Date) {
+    return props.startDate.toISOString();
+  }
+  return '';
+});
+
+const endDateValue = computed(() => {
+  if (typeof props.endDate === 'string') {
+    return props.endDate;
+  } else if (props.endDate instanceof Date) {
+    return props.endDate.toISOString();
+  }
+  return '';
+});
 
 // Emits
 const emit = defineEmits<{
@@ -379,28 +398,32 @@ const submitForm = async () => {
       goal: selectedGoal.value
     };
     
-    // Call the API to create the project
-    const url = `/mediaplans/${props.mediaplanId}/projects`;
-    const response = await customFetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
-    });
-    
-    showSuccess('Project created successfully');
+    try {
+      // Call the API to create the project
+      const url = `/mediaplans/${props.mediaplanId}/projects`;
+      const response = await customFetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      showSuccess('Project created successfully');
 
-    // Close dialog after success and emit the created event
-    setTimeout(() => {
-      dialog.value = false;
-      emit('created', response._id);
-      // Navigate to the mediaplan detail view with the project tab active
-      router.push(`/mediaplans/${props.mediaplanId}?tab=projects`);
-    }, 1000);
-
+      // Close dialog after success and emit the created event
+      setTimeout(() => {
+        dialog.value = false;
+        emit('created', response._id);
+        // Navigate to the mediaplan detail view with the project tab active
+        router.push(`/mediaplans/${props.mediaplanId}?tab=projects`);
+      }, 1000);
+    } catch (error) {
+      console.error('Error with API call:', error);
+      showError(error instanceof Error ? error.message : 'Failed to create project');
+    }
   } catch (error) {
-    console.error('Error creating project:', error);
+    console.error('Error in form submission:', error);
     showError(error instanceof Error ? error.message : 'Failed to create project');
   } finally {
     isSubmitting.value = false;
@@ -496,5 +519,11 @@ onMounted(async () => {
 
 .w-50 {
   width: 50%;
+}
+
+/* Fix for flag icons */
+:deep(.fi) {
+  line-height: 1;
+  vertical-align: middle;
 }
 </style>

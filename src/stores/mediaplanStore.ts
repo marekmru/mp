@@ -2,13 +2,8 @@
 import {defineStore} from 'pinia';
 import {ref, computed} from 'vue';
 import customFetch from '@/helpers/customFetch';
-import {
-    MediaplanListResponse,
-    SourcesResponse
-} from '../types';
 import type {
-    FilterSources, Mediaplan, MediaplanFilter, MediaplanListResponse,
-    SourcesResponse
+    FilterSources, Mediaplan, MediaplanFilter, MediaplanListResponse, SourcesResponse
 } from "../types";
 
 export const useMediaplanStore = defineStore('mediaplan', () => {
