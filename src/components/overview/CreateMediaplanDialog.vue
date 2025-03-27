@@ -167,13 +167,15 @@
 
     <!-- Project Creation Dialog (shown after mediaplan creation) -->
     <CreateProjectDialog
-      v-model="showProjectDialog"
-      :mediaplan-id="createdMediaplanId"
-      :mediaplan-name="formData.name"
-      :po-numbers="formData.po_numbers"
-      :start-date="formData.start_date"
-      :end-date="formData.end_date"
-      @created="handleProjectCreated"
+        v-if="showProjectDialog"
+        v-model="showProjectDialog"
+        :mediaplan-id="createdMediaplanId"
+        :mediaplan-name="formData.name"
+        :po-numbers="formData.po_numbers"
+        :start-date="formData.start_date"
+        :end-date="formData.end_date"
+        :brand="{ _id: formData.brand._id, name: selectedBrandName }"
+        @created="handleProjectCreated"
     />
   </div>
 </template>
@@ -183,9 +185,9 @@ import {ref, reactive, computed, onMounted, watch, nextTick} from 'vue';
 import {useAuthStore} from '@/stores/auth';
 import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
 import DateRangePicker from './DateRangePicker.vue';
-import CreateProjectDialog from './CreateProjectDialog.vue';
+import CreateProjectDialog from '@/components/overview/CreateProjectDialog.vue';
 import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
-import customFetch from '@/customFetch';
+import customFetch from '@/helpers/customFetch';
 
 // Props
 const props = defineProps<{
@@ -234,6 +236,11 @@ const newPO = reactive<{ name: string; value: number | null }>({
 const brands = computed(() => createMediaplanStore.brands);
 const poNumbers = computed(() => createMediaplanStore.poNumbers);
 
+const selectedBrandName = computed(() => {
+  const selectedBrand = brands.value.find(brand => brand._id === formData.brand._id);
+  return selectedBrand ? selectedBrand.name : '';
+});
+
 const snackbar = reactive({
   show: false,
   text: '',
@@ -272,10 +279,10 @@ const handleDateRangeChange = (range: [string, string] | null) => {
 const handleProjectCreated = (projectId: string) => {
   // Close the project dialog
   showProjectDialog.value = false;
-  
+
   // Emit the project created event
   emit('project-created', projectId);
-  
+
   // Close the main dialog as well
   dialog.value = false;
 };
@@ -333,22 +340,22 @@ const submitForm = async () => {
       });
       createdMediaplanId.value = response._id;
       */
-      
+
       // For demo, simulate successful API call
       await new Promise(resolve => setTimeout(resolve, 800));
-      
+
       // Simulate a response with a mock ID
       createdMediaplanId.value = `mediaplan-${Date.now()}`;
-      
+
       // Notify success
       showSuccess('Mediaplan created successfully');
-      
+
       // Emit the created event
       emit('created', createdMediaplanId.value);
-      
+
       // Important: Here we don't close the dialog, but instead show the project dialog
       showProjectDialog.value = true;
-      
+
     } catch (apiError) {
       console.error('API error creating mediaplan:', apiError);
       showError('Failed to create mediaplan: API error');
@@ -425,6 +432,7 @@ const submitPOForm = async () => {
 };
 
 const cancelDialog = () => {
+  resetForm();
   dialog.value = false;
 };
 
@@ -444,7 +452,7 @@ const resetForm = async () => {
   if (form.value) {
     form.value.reset();
   }
-  await nextTick()
+  await nextTick();
 
   formData.name = '';
   formData.brand._id = '';
@@ -454,6 +462,8 @@ const resetForm = async () => {
   selectedPOs.value = [];
   department.value = '';
   mediaplanType.value = 'po';
+  showProjectDialog.value = false;
+  createdMediaplanId.value = '';
 };
 
 // Lifecycle

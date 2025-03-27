@@ -39,10 +39,10 @@ const handleMediaplanCreated = (mediaplanId: string) => {
 
 const handleProjectCreated = (projectId: string) => {
   console.log('Project created with ID:', projectId);
-  
+
   // Refresh the mediaplans list
   mediaplanStore.fetchMediaplans();
-  
+
   // Emit event to notify parent component
   emit('project-created', projectId);
 };
