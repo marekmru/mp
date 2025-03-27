@@ -62,7 +62,7 @@ const sortOrder = ref<'asc' | 'desc'>('desc');
 
 // Pagination state
 const currentPage = ref(0); // 0-based pagination as per API
-const perPage = ref(25);
+const perPage = ref(12);
 const totalPages = ref(0);
 const totalItems = ref(0);
 

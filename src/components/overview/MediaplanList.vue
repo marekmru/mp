@@ -22,14 +22,28 @@
     <div class="text-h6 text-grey">No mediaplans found</div>
     <div class="text-body-2 text-grey">Try adjusting your filters or create a new mediaplan</div>
   </div>
+
+  <!-- Pagination Controls -->
+  <pagination-controls
+      v-if="!loading && totalPages > 1"
+      v-model="currentPage"
+      :length="totalPages"
+      :disabled="loading"
+      :items-per-page-value="perPage"
+      @update:items-per-page="handleItemsPerPageChange"
+  />
+
+  <!-- Total Items Display -->
+  <div v-if="!loading && mediaplans.length > 0" class="text-center text-caption text-medium-emphasis mt-2">
+    Showing {{ paginationInfo }}
+  </div>
 </template>
 
 <script setup lang="ts">
-
-
-import {ref, onMounted, watch} from 'vue';
-import MediaplanCard from './MediaplanCard.vue';
+import {ref, onMounted, watch, computed} from 'vue';
 import {Mediaplan} from '@/types/mediaplan';
+import MediaplanCard from '@/components/overview/MediaplanCard.vue';
+import PaginationControls from '@/components/common/PaginationControls.vue';
 // import customFetch from '@/customFetch'; // Commented out until API is ready
 import {mockFetchMediaplans} from '@/mocks/mediaplans'; // Import mock data service
 
@@ -52,11 +66,12 @@ const props = withDefaults(defineProps<Props>(), {
   sortBy: 'updated_at',
   sortOrder: 'desc',
   page: 0,
-  perPage: 25
+  perPage: 10
 });
 
 const emit = defineEmits<{
   (e: 'update:page', page: number): void;
+  (e: 'update:per-page', perPage: number): void;
   (e: 'update:total-pages', totalPages: number): void;
   (e: 'update:total-items', totalItems: number): void;
 }>();
@@ -66,6 +81,29 @@ const loading = ref(true);
 const error = ref<string | null>(null);
 const totalPages = ref(0);
 const totalItems = ref(0);
+
+// Use internal current page state that syncs with props.page
+const currentPage = computed({
+  get: () => props.page,
+  set: (value: number) => {
+    emit('update:page', value);
+  }
+});
+
+// Compute pagination info text for display
+const paginationInfo = computed(() => {
+  const startItem = (props.page * props.perPage) + 1;
+  const endItem = Math.min(startItem + props.perPage - 1, totalItems.value);
+  return `${startItem}-${endItem} of ${totalItems.value} mediaplans`;
+});
+
+// Use internal per-page state that syncs with props.perPage
+const perPage = computed({
+  get: () => props.perPage,
+  set: (value: number) => {
+    emit('update:per-page', value);
+  }
+});
 
 const fetchMediaplans = async () => {
   loading.value = true;
@@ -97,7 +135,7 @@ const fetchMediaplans = async () => {
         props.sortBy,
         props.sortOrder
     );
-    console.log(data)
+
     mediaplans.value = data.items;
     totalPages.value = data.total_pages;
     totalItems.value = data.total_items;
@@ -115,6 +153,11 @@ const fetchMediaplans = async () => {
 
 const viewMediaplan = (mediaplanId: string) => {
   window.location.href = `/mediaplans/${mediaplanId}`;
+};
+
+const handleItemsPerPageChange = (value: number) => {
+  perPage.value = value;
+  currentPage.value = 0; // Reset to first page when changing items per page
 };
 
 watch(() => [props.page, props.perPage, props.sortBy, props.sortOrder, props.filters],
