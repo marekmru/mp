@@ -1,22 +1,25 @@
 <template>
   <v-dialog v-model="dialog" persistent max-width="500px">
     <v-card class="pa-6">
-      <v-card-title class="px-0 mb-6">
-        <div class="d-flex align-center w-100">
-          <v-icon class="mr-2" size="small" @click="cancelDialog">mdi-arrow-left</v-icon>
-          <span class="text-h5">Create Media Plan</span>
-          <v-spacer></v-spacer>
-          <v-icon size="small" @click="cancelDialog">mdi-close</v-icon>
-        </div>
-      </v-card-title>
+      <DialogHeader
+          title="Create Media Plan"
+          :show-back-button="true"
+          :show-close-button="true"
+          margin-bottom="2"
+          close-icon-color="primary"
+          @back="cancelDialog"
+          @close="cancelDialog"
+      />
 
-      <v-form ref="form" @submit.prevent="submitForm" v-model="isFormValid">        <!-- Brand Logo and Name -->
+      <v-form ref="form" @submit.prevent="submitForm" v-model="isFormValid">
+        <!-- Brand Logo and Name -->
         <v-row no-gutters align="center" class="mb-3">
-          <v-col cols="auto">
+          <v-col cols="auto" class="mr-2">
             <v-img
-                src="/img/BMW.svg"
+                :src="getBrandLogo()"
                 width="100"
                 height="40"
+                contain
             ></v-img>
           </v-col>
           <v-col cols="auto">
@@ -29,32 +32,32 @@
           <!-- Name -->
           <div class="d-flex py-2">
             <div class="text-body-2 text-medium-emphasis" style="width: 100px;">Name:</div>
-            <div class="ml-2 text-body-2 text-right" style="flex: 1;">{{ mediaplanName || 'Not specified' }}</div>
+            <div class="ml-2 text-body-2 text-right flex-grow-1">{{ mediaplanName || 'Not specified' }}</div>
           </div>
 
           <!-- PO Numbers -->
           <div class="d-flex py-2">
             <div class="text-body-2 text-medium-emphasis" style="width: 100px;">PO:</div>
-            <div class="ml-2 text-body-2 text-right" style="flex: 1;">{{ poNumbersDisplay }}</div>
+            <div class="ml-2 text-body-2 text-right flex-grow-1">{{ poNumbersDisplay }}</div>
           </div>
 
           <!-- Duration -->
-          <div class="d-flex py-2 mb-4">
+          <div class="d-flex py-2 mb-2">
             <div class="text-body-2 text-medium-emphasis" style="width: 100px;">Duration:</div>
-            <div class="ml-2 text-body-2 text-right" style="flex: 1;">
-              Start: {{ formatDate(startDateValue) }}
+            <div class="ml-2 text-body-2 text-right flex-grow-1">
+              Start: {{ formatDate(startDateValue) }}<br>
               End: {{ formatDate(endDateValue) }}
             </div>
           </div>
         </div>
 
-        <div class="solid-border-b mb-4"></div>
+        <v-divider class="mb-4" color="secondary"></v-divider>
 
-        <div class="text-subtitle-1 font-weight-medium mb-4">Add first project</div>
+        <div class="text-h6 mb-4">Add first project</div>
 
         <!-- Country Selection with Flag -->
         <div class="d-flex mb-4">
-          <div class="w-50 pr-2">
+          <div class="flex-1 pr-2" style="width: 50%">
             <label class="text-caption text-medium-emphasis mb-1 d-block">Country</label>
             <v-select
                 v-model="selectedCountry"
@@ -64,7 +67,6 @@
                 :rules="[v => !!v || 'Country is required']"
                 variant="outlined"
                 density="compact"
-                class="flex-grow-1"
                 hide-details
                 return-object
             >
@@ -84,8 +86,8 @@
             </v-select>
           </div>
 
-          <!-- Language Selection - Modified to move asterisk text below the dropdown -->
-          <div class="w-50 pl-2">
+          <!-- Language Selection -->
+          <div class="flex-1 pl-2" style="width: 50%">
             <label class="text-caption text-medium-emphasis mb-1 d-block">Language</label>
             <v-select
                 v-model="selectedLanguage"
@@ -97,7 +99,7 @@
                 hide-details
                 :disabled="!selectedCountry"
             />
-            <!-- Moved asterisk text below the dropdown -->
+            <!-- Asterisk text below the dropdown -->
             <div class="text-caption text-medium-emphasis mt-1">* Depends on Country</div>
           </div>
         </div>
@@ -163,24 +165,33 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="d-flex justify-space-between mt-6">
-          <v-btn
-              min-width="120"
-              variant="outlined"
-              @click="cancelDialog"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-              min-width="120"
-              color="primary"
-              type="submit"
-              :loading="isSubmitting"
-              :disabled="!isFormValid"
-          >
-            Save
-          </v-btn>
-        </div>
+        <DialogFooter
+            cancel-text="Cancel"
+            confirm-text="Save"
+            :loading="isSubmitting"
+            :disabled="!isFormValid"
+            :submit-button="true"
+            @cancel="cancelDialog"
+            class="mt-6"
+        />
+        <!--        <div class="d-flex justify-end gap-4 mt-6">
+                  <v-btn
+                      size="large" variant="outlined"
+                      min-width="120"
+                      @click="cancelDialog"
+                  >
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                      min-width="120"
+                      color="primary"
+                      size="large" type="submit" variant="flat"
+                      :loading="isSubmitting"
+                      :disabled="!isFormValid"
+                  >
+                    Save
+                  </v-btn>
+                </div>-->
       </v-form>
     </v-card>
 
@@ -198,6 +209,8 @@
 import {ref, reactive, computed, onMounted, watch} from 'vue';
 import {useRouter} from 'vue-router';
 import {format} from 'date-fns';
+import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
+import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
 import {useProjectStore} from '@/stores/projectStore';
 import type {ProjectCountry, ProjectLanguage, ProjectCampaignType, ProjectPhase, ProjectGoal} from '@/types/project';
 import customFetch from '@/helpers/customFetch';
@@ -295,7 +308,6 @@ const goals = ref([
 const availableLanguages = computed(() => {
   if (!selectedCountry.value) return [];
 
-  // Based on the mockup, we're showing DEU for AT
   switch (selectedCountry.value.code) {
     case 'DE':
     case 'AT':
@@ -333,6 +345,14 @@ const formatDate = (dateString: string): string => {
     console.error('Error formatting date:', e);
     return 'Invalid date';
   }
+};
+
+// Function to get the appropriate brand logo
+const getBrandLogo = (): string => {
+  if (props.brand?.name?.toLowerCase() === 'mini') {
+    return '/img/MINI.svg';
+  }
+  return '/img/BMW.svg';
 };
 
 const submitForm = async () => {
@@ -375,16 +395,13 @@ const submitForm = async () => {
     };
 
     try {
-      // Call the API to create the project
-      const url = `/mediaplans/${props.mediaplanId}/projects`;
-
       // For demonstration purposes, simulate API call success
       await new Promise(resolve => setTimeout(resolve, 800));
       const mockResponse = {_id: `project-${Date.now()}`};
 
       // In a real application, you'd use the actual API call
       /*
-      const response = await customFetch(url, {
+      const response = await customFetch(`/mediaplans/${props.mediaplanId}/projects`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -474,6 +491,7 @@ onMounted(async () => {
     if (projectStore.phases.length > 0) {
       phases.value = projectStore.phases.map(phase => ({
         code: phase.id,
+        name: phase.name
       }));
     }
 
@@ -489,16 +507,3 @@ onMounted(async () => {
   }
 });
 </script>
-
-<style scoped>
-
-
-.solid-border-b {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  height: 1px;
-}
-
-.w-50 {
-  width: 50%;
-}
-</style>

@@ -3,8 +3,13 @@
     <!-- Mediaplan Creation Dialog -->
     <v-dialog v-model="dialog" persistent max-width="500px">
       <v-card class="pa-6">
-        <v-card-title class="text-h5 mb-4 px-0">Create new Mediaplan</v-card-title>
-
+        <!--        <v-card-title class="text-h5 mb-4 px-0">Create new Mediaplan</v-card-title>-->
+        <DialogHeader
+            title="Create new Mediaplan"
+            :show-back-button="false"
+            margin-bottom="4"
+            @close="cancelDialog"
+        />
         <v-form ref="form" @submit.prevent="submitForm">
           <!-- Brand Selection -->
           <v-select
@@ -99,22 +104,14 @@
               @update:model-value="handleDateRangeChange"
           />
 
-          <!-- Action Buttons -->
-          <v-card-actions class="pt-4 d-flex justify-end">
-            <v-btn size="large" variant="outlined" @click="cancelDialog" class="mr-2">
-              Cancel
-            </v-btn>
-            <v-btn
-                size="large"
-                color="primary"
-                type="submit"
-                variant="flat"
-                :loading="isSubmitting"
-                :disabled="!form?.isValid"
-            >
-              Next Step
-            </v-btn>
-          </v-card-actions>
+          <DialogFooter
+              cancel-text="Cancel"
+              confirm-text="Next Step"
+              :loading="isSubmitting"
+              :disabled="!form?.isValid"
+              :submit-button="true"
+              @cancel="cancelDialog"
+          />
         </v-form>
       </v-card>
 
@@ -148,7 +145,7 @@
             />
 
             <v-card-actions class="pt-3 d-flex justify-end">
-              <v-btn size="large" variant="outlined" @click="closeCreatePODialog" class="mr-2">
+              <v-btn size="large" variant="outlined" @click="closeCreatePODialog" min-width="120" class="mr-2">
                 Cancel
               </v-btn>
               <v-btn size="large" color="primary" type="submit" variant="flat" :loading="isSubmittingPO">
@@ -184,10 +181,12 @@
 import {ref, reactive, computed, onMounted, watch, nextTick} from 'vue';
 import {useAuthStore} from '@/stores/auth';
 import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
+import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
+
+import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
 import DateRangePicker from './DateRangePicker.vue';
 import CreateProjectDialog from '@/components/overview/CreateProjectDialog.vue';
 import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
-import customFetch from '@/helpers/customFetch';
 
 // Props
 const props = defineProps<{
@@ -469,12 +468,10 @@ const resetForm = async () => {
 // Lifecycle
 onMounted(async () => {
   await loadFormData();
-  console.log(authStore.user)
   // Set creator name from auth store if available
   if (authStore.user) {
     creatorName.value = authStore.user.name || 'Current User';
   } else {
-    console.log('else')
     creatorName.value = 'Current User';
   }
 });
