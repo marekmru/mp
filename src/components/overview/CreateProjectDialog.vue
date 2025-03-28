@@ -10,38 +10,38 @@
         </div>
       </v-card-title>
 
-      <v-form ref="form" @submit.prevent="submitForm" v-model="isFormValid">
-
-        <!-- Brand Logo and Name -->
-        <div class="d-flex align-center mb-3">
-          <v-img
-              :src="miniLogoSvg"
-              width="80"
-              height="28"
-              class="mr-2"
-              contain
-          ></v-img>
-          <span class="text-subtitle-1 font-weight-medium">{{ brandName }}</span>
-        </div>
+      <v-form ref="form" @submit.prevent="submitForm" v-model="isFormValid">        <!-- Brand Logo and Name -->
+        <v-row no-gutters align="center" class="mb-3">
+          <v-col cols="auto">
+            <v-img
+                src="/img/BMW.svg"
+                width="100"
+                height="40"
+            ></v-img>
+          </v-col>
+          <v-col cols="auto">
+            <span class="text-subtitle-1 font-weight-medium">{{ brandName }}</span>
+          </v-col>
+        </v-row>
 
         <!-- Mediaplan Details (Read-only) -->
         <div class="mb-4">
           <!-- Name -->
-          <div class="d-flex py-2 dotted-border-b">
-            <div class="text-body-2 text-medium-emphasis">Name:</div>
-            <div class="ml-2 text-body-2">{{ mediaplanName || 'Not specified' }}</div>
+          <div class="d-flex py-2">
+            <div class="text-body-2 text-medium-emphasis" style="width: 100px;">Name:</div>
+            <div class="ml-2 text-body-2 text-right" style="flex: 1;">{{ mediaplanName || 'Not specified' }}</div>
           </div>
 
           <!-- PO Numbers -->
-          <div class="d-flex py-2 dotted-border-b">
-            <div class="text-body-2 text-medium-emphasis">PO:</div>
-            <div class="ml-2 text-body-2">{{ poNumbersDisplay }}</div>
+          <div class="d-flex py-2">
+            <div class="text-body-2 text-medium-emphasis" style="width: 100px;">PO:</div>
+            <div class="ml-2 text-body-2 text-right" style="flex: 1;">{{ poNumbersDisplay }}</div>
           </div>
 
           <!-- Duration -->
           <div class="d-flex py-2 mb-4">
-            <div class="text-body-2 text-medium-emphasis">Duration:</div>
-            <div class="ml-2 text-body-2">
+            <div class="text-body-2 text-medium-emphasis" style="width: 100px;">Duration:</div>
+            <div class="ml-2 text-body-2 text-right" style="flex: 1;">
               Start: {{ formatDate(startDateValue) }}
               End: {{ formatDate(endDateValue) }}
             </div>
@@ -202,13 +202,6 @@ import {useProjectStore} from '@/stores/projectStore';
 import type {ProjectCountry, ProjectLanguage, ProjectCampaignType, ProjectPhase, ProjectGoal} from '@/types/project';
 import customFetch from '@/helpers/customFetch';
 import CountryFlag from '@/components/common/CountryFlag.vue';
-
-// MINI logo SVG (inline for simplicity)
-const miniLogoSvg = `data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160">
-  <path d="M200,80 c0,44.18-35.82,80-80,80s-80-35.82-80-80s35.82-80,80-80S200,35.82,200,80z" fill="none" stroke="%23000" stroke-width="7"/>
-  <path d="M250,70 h120 M250,90 h120" stroke="%23000" stroke-width="7"/>
-  <path d="M40,70 h120 M40,90 h120" stroke="%23000" stroke-width="7"/>
-</svg>`;
 
 // Props
 const props = defineProps<{
@@ -498,9 +491,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.dotted-border-b {
-  border-bottom: 1px dotted rgba(0, 0, 0, 0.1);
-}
+
 
 .solid-border-b {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
