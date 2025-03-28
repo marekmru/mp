@@ -216,7 +216,7 @@ const dialog = computed({
 const mediaplanType = ref('po'); // Default to PO Based
 const selectedPOs = ref<string[]>([]); // Changed to array for multi-select
 const department = ref('');
-const creatorName = ref('');
+const creatorName = ref('Current User');
 const isSubmitting = ref(false);
 const dateRange = ref<[string, string] | null>(null);
 
@@ -469,11 +469,12 @@ const resetForm = async () => {
 // Lifecycle
 onMounted(async () => {
   await loadFormData();
-
+  console.log(authStore.user)
   // Set creator name from auth store if available
   if (authStore.user) {
     creatorName.value = authStore.user.name || 'Current User';
   } else {
+    console.log('else')
     creatorName.value = 'Current User';
   }
 });
