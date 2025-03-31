@@ -4,7 +4,7 @@
       <v-row>
         <v-col cols="12">
           <v-card class="pa-6">
-            <v-card-title class="text-h4 mb-4">Mediaplan Details</v-card-title>
+            <v-card-title class="text-h5 mb-4">Mediaplan Details</v-card-title>
             
             <v-card-text>
               <div v-if="isLoading" class="d-flex justify-center align-center my-6">
@@ -18,7 +18,7 @@
               </div>
               
               <div v-else>
-                <pre class="mediaplan-data pa-4 rounded bg-grey-lighten-4">{{ JSON.stringify(mediaplan, null, 2) }}</pre>
+                <pre>{{ JSON.stringify(mediaplan, null, 2) }}</pre>
               </div>
             </v-card-text>
             
@@ -36,17 +36,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import type { Mediaplan } from '@/types/mediaplan';
 
-// Props
-const props = defineProps<{
-  id: string;
-}>();
-
 // Router setup
+const route = useRoute();
 const router = useRouter();
-const mediaplanId = ref<string>(props.id);
+const mediaplanId = ref<string>(route.params.id as string);
 
 // State
 const mediaplan = ref<Mediaplan | null>(null);
@@ -97,7 +93,7 @@ const fetchMediaplan = async () => {
 };
 
 const goBack = () => {
-  router.push('/');
+  router.push('/mediaplans');
 };
 
 // Lifecycle hooks
@@ -116,15 +112,5 @@ onMounted(() => {
 .error-container {
   border-radius: 4px;
   background-color: rgba(var(--v-theme-error), 0.1);
-}
-
-.mediaplan-data {
-  overflow: auto;
-  max-height: 60vh;
-  white-space: pre-wrap;
-  word-break: break-word;
-  font-family: monospace;
-  font-size: 14px;
-  line-height: 1.5;
 }
 </style>

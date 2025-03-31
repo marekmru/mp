@@ -1,3 +1,4 @@
+
 <template>
   <v-dialog v-model="dialog" persistent max-width="500px">
     <v-card class="pa-6">
@@ -11,7 +12,7 @@
           @close="cancelDialog"
       />
 
-      <v-form ref="form" @submit.prevent="submitForm" v-model="isFormValid">
+      <v-form ref="form" @submit.prevent="submitForm" v-model="isFormValid" validate-on="input">
         <!-- Brand Logo and Name -->
         <v-row no-gutters align="center" class="mb-3">
           <v-col cols="auto" class="mr-2">
@@ -58,7 +59,7 @@
         <!-- Country Selection with Flag -->
         <div class="d-flex mb-4">
           <div class="flex-1 pr-2" style="width: 50%">
-            <label class="text-caption text-medium-emphasis mb-1 d-block">Country</label>
+            <label class="text-caption text-medium-emphasis mb-1 d-block">Country *</label>
             <v-select
                 v-model="selectedCountry"
                 :items="countries"
@@ -67,8 +68,8 @@
                 :rules="[v => !!v || 'Country is required']"
                 variant="outlined"
                 density="compact"
-                hide-details
                 return-object
+                error-messages=""
             >
               <template v-slot:selection="{ item }">
                 <div class="d-flex align-center">
@@ -88,7 +89,7 @@
 
           <!-- Language Selection -->
           <div class="flex-1 pl-2" style="width: 50%">
-            <label class="text-caption text-medium-emphasis mb-1 d-block">Language</label>
+            <label class="text-caption text-medium-emphasis mb-1 d-block">Language *</label>
             <v-select
                 v-model="selectedLanguage"
                 :items="availableLanguages"
@@ -96,8 +97,9 @@
                 item-value="code"
                 variant="outlined"
                 density="compact"
-                hide-details
                 :disabled="!selectedCountry"
+                :rules="[v => !!v || 'Language is required']"
+                error-messages=""
             />
             <!-- Asterisk text below the dropdown -->
             <div class="text-caption text-medium-emphasis mt-1">* Depends on Country</div>
@@ -115,7 +117,7 @@
               :rules="[v => !!v || 'Builder is required']"
               variant="outlined"
               density="compact"
-              hide-details
+              error-messages=""
           />
         </div>
 
@@ -130,7 +132,7 @@
               :rules="[v => !!v || 'Campaign type is required']"
               variant="outlined"
               density="compact"
-              hide-details
+              error-messages=""
           />
         </div>
 
@@ -145,7 +147,7 @@
               :rules="[v => !!v || 'Phase is required']"
               variant="outlined"
               density="compact"
-              hide-details
+              error-messages=""
           />
         </div>
 
@@ -160,7 +162,7 @@
               :rules="[v => !!v || 'Goal is required']"
               variant="outlined"
               density="compact"
-              hide-details
+              error-messages=""
           />
         </div>
 
@@ -169,29 +171,11 @@
             cancel-text="Cancel"
             confirm-text="Save"
             :loading="isSubmitting"
-            :disabled="!isFormValid"
+            :disabled="!formIsReady"
             :submit-button="true"
             @cancel="cancelDialog"
             class="mt-6"
         />
-        <!--        <div class="d-flex justify-end gap-4 mt-6">
-                  <v-btn
-                      size="large" variant="outlined"
-                      min-width="120"
-                      @click="cancelDialog"
-                  >
-                    Cancel
-                  </v-btn>
-                  <v-btn
-                      min-width="120"
-                      color="primary"
-                      size="large" type="submit" variant="flat"
-                      :loading="isSubmitting"
-                      :disabled="!isFormValid"
-                  >
-                    Save
-                  </v-btn>
-                </div>-->
       </v-form>
     </v-card>
 
@@ -241,17 +225,24 @@ const projectStore = useProjectStore();
 const isFormValid = ref(false);
 const isSubmitting = ref(false);
 
-// Selected form values
-const selectedCountry = ref<ProjectCountry | null>({
-  code: 'AT',
-  name: 'Austria'
-});
+// Selected form values - all initialized to null/empty
+const selectedCountry = ref<ProjectCountry | null>(null);
+const selectedLanguage = ref<string | null>(null);
+const selectedBuilder = ref<string | null>(null);
+const selectedCampaignType = ref<string | null>(null);
+const selectedPhase = ref<string | null>(null);
+const selectedGoal = ref<string | null>(null);
 
-const selectedLanguage = ref('DEU');
-const selectedBuilder = ref('SEA');
-const selectedCampaignType = ref('Always On');
-const selectedPhase = ref('Consideration');
-const selectedGoal = ref('Configurator');
+// Computed for form validation state
+const formIsReady = computed(() => {
+  return isFormValid.value && !isSubmitting.value && 
+    !!selectedCountry.value && 
+    !!selectedLanguage.value && 
+    !!selectedBuilder.value && 
+    !!selectedCampaignType.value &&
+    !!selectedPhase.value &&
+    !!selectedGoal.value;
+});
 
 // Dialog state
 const dialog = computed({
@@ -355,11 +346,21 @@ const getBrandLogo = (): string => {
   return '/img/BMW.svg';
 };
 
-const submitForm = async () => {
-  if (!form.value) return;
+// Validate the form
+const validateForm = async (): Promise<boolean> => {
+  if (!form.value) return false;
+  
+  const { valid } = await form.value.validate();
+  return valid;
+};
 
-  const {valid} = await form.value.validate();
-  if (!valid) return;
+const submitForm = async () => {
+  // Validate the form first
+  const isValid = await validateForm();
+  if (!isValid) {
+    showError('Please fill in all required fields');
+    return;
+  }
 
   isSubmitting.value = true;
 
@@ -369,20 +370,20 @@ const submitForm = async () => {
       abbreviation: props.mediaplanName || '',
       default_vars: {
         targeturls: null,
-        subsegment: selectedBuilder.value,
-        campaigntype: selectedCampaignType.value,
-        language: selectedLanguage.value,
+        subsegment: selectedBuilder.value || null,
+        campaigntype: selectedCampaignType.value || null,
+        language: selectedLanguage.value || null,
         campaigndetail: null,
         adtype: "Banner",
         dimension: "300x250"
       },
       descriptive_vars: {
         brand: props.brand?.name || 'MINI',
-        country: selectedCountry.value?.code || 'AT',
+        country: selectedCountry.value?.code || '',
         bmwponumber: props.poNumbers?.length ? props.poNumbers[0].name : '',
         adobecampaignname: props.mediaplanName || '',
-        subsegment: selectedBuilder.value,
-        campaigntype: selectedCampaignType.value,
+        subsegment: selectedBuilder.value || '',
+        campaigntype: selectedCampaignType.value || '',
         projectname: props.mediaplanName || '',
         year: new Date().getFullYear()
       },
@@ -412,12 +413,16 @@ const submitForm = async () => {
 
       showSuccess('Project created successfully');
 
-      // Close dialog after success and emit the created event
+      // Close dialog, emit created event, and navigate to the mediaplan detail view
       setTimeout(() => {
+        // Close the dialog
         dialog.value = false;
+        
+        // Emit the created event
         emit('created', mockResponse._id);
-        // Navigate to the mediaplan detail view with the project tab active
-        router.push(`/mediaplans/${props.mediaplanId}?tab=projects`);
+        
+        // Navigate to the mediaplan detail page
+        router.push(`/mediaplans/${props.mediaplanId}`);
       }, 1000);
     } catch (error) {
       console.error('Error with API call:', error);
@@ -463,6 +468,9 @@ watch(selectedCountry, (newCountry) => {
         selectedLanguage.value = 'ENG';
         break;
     }
+  } else {
+    // Reset language when country is cleared
+    selectedLanguage.value = null;
   }
 });
 
