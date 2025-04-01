@@ -3,7 +3,6 @@
     <!-- Mediaplan Creation Dialog -->
     <v-dialog v-model="dialog" persistent max-width="500px">
       <v-card class="pa-6">
-        <!--        <v-card-title class="text-h5 mb-4 px-0">Create new Mediaplan</v-card-title>-->
         <DialogHeader
             title="Create new Mediaplan"
             :show-back-button="false"
@@ -114,53 +113,14 @@
           />
         </v-form>
       </v-card>
-
-      <!-- Create PO Dialog -->
-      <v-dialog v-model="createPODialogVisible" max-width="500px">
-        <v-card class="pa-6">
-          <v-card-title class="text-h5 mb-4">Create New PO</v-card-title>
-
-          <v-form ref="poForm" @submit.prevent="submitPOForm">
-            <v-text-field
-                v-model="newPO.name"
-                label="PO Number"
-                placeholder="Enter PO number"
-                :rules="[v => !!v || 'PO number is required']"
-                variant="outlined"
-                class="mb-4"
-            />
-
-            <v-text-field
-                v-model="newPO.value"
-                label="PO Value"
-                placeholder="Enter value"
-                type="number"
-                :rules="[
-                v => !!v || 'PO value is required',
-                v => v > 0 || 'Value must be greater than 0'
-              ]"
-                variant="outlined"
-                class="mb-4"
-                suffix="EUR"
-            />
-
-            <v-card-actions class="pt-3 d-flex justify-end">
-              <v-btn size="large" variant="outlined" @click="closeCreatePODialog" min-width="120" class="mr-2">
-                Cancel
-              </v-btn>
-              <v-btn size="large" color="primary" type="submit" variant="flat" :loading="isSubmittingPO">
-                Create
-              </v-btn>
-            </v-card-actions>
-          </v-form>
-        </v-card>
-      </v-dialog>
-
-      <!-- Success/Error Snackbar -->
-      <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-        {{ snackbar.text }}
-      </v-snackbar>
     </v-dialog>
+
+    <!-- Create PO Dialog -->
+    <CreatePoDialog
+        v-model="createPODialogVisible"
+        :initial-brand-id="formData.brand._id"
+        @created="handlePoCreated"
+    />
 
     <!-- Project Creation Dialog (shown after mediaplan creation) -->
     <CreateProjectDialog
@@ -174,6 +134,11 @@
         :brand="{ _id: formData.brand._id, name: selectedBrandName }"
         @created="handleProjectCreated"
     />
+
+    <!-- Success/Error Snackbar -->
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+      {{ snackbar.text }}
+    </v-snackbar>
   </div>
 </template>
 
@@ -182,10 +147,10 @@ import {ref, reactive, computed, onMounted, watch, nextTick} from 'vue';
 import {useAuthStore} from '@/stores/auth';
 import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
 import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
-
 import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
 import DateRangePicker from './DateRangePicker.vue';
 import CreateProjectDialog from '@/components/overview/CreateProjectDialog.vue';
+import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
 import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
 
 // Props
@@ -202,7 +167,6 @@ const emit = defineEmits<{
 
 // References
 const form = ref();
-const poForm = ref();
 const authStore = useAuthStore();
 const createMediaplanStore = useCreateMediaplanStore();
 
@@ -225,11 +189,6 @@ const createdMediaplanId = ref('');
 
 // Create PO Dialog
 const createPODialogVisible = ref(false);
-const isSubmittingPO = ref(false);
-const newPO = reactive<{ name: string; value: number | null }>({
-  name: '',
-  value: null
-});
 
 // Use values from the store
 const brands = computed(() => createMediaplanStore.brands);
@@ -284,6 +243,15 @@ const handleProjectCreated = (projectId: string) => {
 
   // Close the main dialog as well
   dialog.value = false;
+};
+
+// Method to handle PO creation
+const handlePoCreated = (po: PONumber) => {
+  // Add the newly created PO to the selected POs
+  selectedPOs.value = [...selectedPOs.value, po._id];
+  
+  // Show success message
+  showSuccess(`PO "${po.name}" created successfully and added to selection`);
 };
 
 const loadFormData = async () => {
@@ -372,62 +340,6 @@ const submitForm = async () => {
 // PO Dialog methods
 const openCreatePODialog = () => {
   createPODialogVisible.value = true;
-};
-
-const closeCreatePODialog = () => {
-  createPODialogVisible.value = false;
-};
-
-const resetPOForm = () => {
-  newPO.name = '';
-  newPO.value = null;
-  if (poForm.value) {
-    poForm.value.reset();
-  }
-};
-
-const submitPOForm = async () => {
-  if (!poForm.value) return;
-
-  const {valid} = await poForm.value.validate();
-  if (!valid) return;
-
-  isSubmittingPO.value = true;
-
-  try {
-    // Generate a unique ID for the new PO
-    const newPOId = `po-${Date.now()}`;
-
-    // Create the new PO object
-    const poObject: PONumber = {
-      _id: newPOId,
-      name: newPO.name,
-      value: Number(newPO.value) || 0
-    };
-
-    // In a real application, you would send this to your API
-    // await customFetch('/po-numbers', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(poObject),
-    // });
-
-    // For demo, add the new PO to the local list
-    createMediaplanStore.poNumbers.push(poObject);
-
-    // Select the newly created PO
-    selectedPOs.value = [...selectedPOs.value, newPOId];
-
-    showSuccess('PO created successfully');
-    closeCreatePODialog();
-  } catch (error) {
-    console.error('Error creating PO:', error);
-    showError('Failed to create PO');
-  } finally {
-    isSubmittingPO.value = false;
-  }
 };
 
 const cancelDialog = () => {
