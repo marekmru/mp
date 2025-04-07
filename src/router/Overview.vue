@@ -25,7 +25,7 @@
     />
     
     <!-- Dialogs -->
-    <CreateMediaplanDialog 
+    <CreateMediaplanDialog
       v-model="showCreateMediaplanDialog"
       @created="handleMediaplanCreated"
       @project-created="handleProjectCreated"

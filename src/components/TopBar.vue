@@ -16,8 +16,8 @@
     <router-link to="/">
       <v-row align="center" no-gutters>
         <h4 class="text-h5 mr-4">Mediaplan</h4>
-        <img alt="BMW Logo" class="mr-3" src="/img/BMW.svg" width="35" />
-        <img alt="MINI Logo" class="mr-3" src="/img/MINI.svg" width="76" />
+        <img alt="BMW Logo" class="mr-3" src="/img/brands/BMW.svg" width="35" />
+        <img alt="MINI Logo" class="mr-3" src="/img/brands/MINI.svg" width="76" />
         <img alt="MINI Logo" class="mr-3" src="/img/the-marcom-engine.png" width="240" />
       </v-row>
     </router-link>

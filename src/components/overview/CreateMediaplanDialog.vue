@@ -158,24 +158,20 @@
         :brand="{ _id: formData.brand._id, name: selectedBrandName }"
         @created="handleProjectCreated"
     />
-
-    <!-- Success/Error Snackbar -->
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-      {{ snackbar.text }}
-    </v-snackbar>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref, reactive, computed, onMounted, watch, nextTick} from 'vue';
-import {useAuthStore} from '@/stores/auth';
-import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
+import {ref, computed, onMounted, watch, nextTick, reactive} from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { useCreateMediaplanStore } from '@/stores/createMediaplanStore';
 import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
 import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
 import DateRangePicker from './DateRangePicker.vue';
 import CreateProjectDialog from '@/components/overview/CreateProjectDialog.vue';
 import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
-import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
+import type { MediaplanCreate, Brand, PONumber } from '@/types/mediaplan';
+import { showSuccess, showError, showWarning } from '@/helpers/notificationUtils';
 
 // Props
 const props = defineProps<{
@@ -223,12 +219,6 @@ const selectedBrandName = computed(() => {
   return selectedBrand ? selectedBrand.name : '';
 });
 
-const snackbar = reactive({
-  show: false,
-  text: '',
-  color: 'success',
-});
-
 // Form data structure
 const formData = reactive<MediaplanCreate>({
   name: '',
@@ -267,6 +257,9 @@ const handleProjectCreated = (projectId: string) => {
 
   // Close the main dialog as well
   dialog.value = false;
+  
+  // Show success notification
+  showSuccess('Project created successfully');
 };
 
 // Method to handle PO creation
@@ -349,7 +342,7 @@ const submitForm = async () => {
 
     } catch (apiError) {
       console.error('API error creating mediaplan:', apiError);
-      showError('Failed to create mediaplan: API error');
+      showError('Failed to create mediaplan: API error', { timeout: 10000 });
       throw apiError;
     }
 
@@ -363,24 +356,16 @@ const submitForm = async () => {
 
 // PO Dialog methods
 const openCreatePODialog = () => {
+  if (!formData.brand._id) {
+    showWarning('Please select a brand first');
+    return;
+  }
   createPODialogVisible.value = true;
 };
 
 const cancelDialog = () => {
   resetForm();
   dialog.value = false;
-};
-
-const showSuccess = (message: string) => {
-  snackbar.color = 'success';
-  snackbar.text = message;
-  snackbar.show = true;
-};
-
-const showError = (message: string) => {
-  snackbar.color = 'error';
-  snackbar.text = message;
-  snackbar.show = true;
 };
 
 const resetForm = async () => {

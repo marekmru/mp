@@ -25,7 +25,7 @@
           <span class="text-subtitle-1">{{ dialogTitle }}</span>
           <v-spacer></v-spacer>
           <v-btn icon variant="text" @click="closeDialog">
-            <v-icon>mdi-cancelDoalog</v-icon>
+            <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-card-title>
 
@@ -33,8 +33,8 @@
         <v-card-text class="pt-2 pb-0">
           <div v-if="selectedDates.length >= 2" class="selected-dates">
             <span class="text-subtitle-1">Selected Range:</span>
-            {{ formatDateForDisplay(selectedDates[0]) }} -
-            {{ formatDateForDisplay(selectedDates[selectedDates.length - 1]) }}
+            {{ formatSelectedDatePreview(selectedDates[0]) }} -
+            {{ formatSelectedDatePreview(selectedDates[selectedDates.length - 1]) }}
           </div>
           <div v-else class="selected-dates">
             <strong>No date range selected</strong>
@@ -81,7 +81,8 @@
 </template>
 
 <script setup lang="ts">
-import {ref, computed, watch} from 'vue';
+import { ref, computed, watch } from 'vue';
+import { formatDate } from '@/helpers/dateUtils';
 
 // Define props with TypeScript interface
 interface Props {
@@ -123,9 +124,6 @@ const showDialog = ref(false);
 const selectedDates = ref<string[]>([]);
 const displayValue = ref('');
 
-// Weekdays for the header
-const weekdays = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-
 // Computed properties
 const canSetDates = computed(() => {
   return selectedDates.value.length >= 2;
@@ -139,6 +137,11 @@ const rules = computed(() => {
   }
   return rules;
 });
+
+// Format date for the dialog preview
+const formatSelectedDatePreview = (dateStr: string): string => {
+  return formatDate(dateStr, props.dateFormat);
+};
 
 // Methods
 const openDialog = () => {
@@ -176,33 +179,6 @@ const setDates = () => {
   }
 };
 
-// Format date from ISO to displayable format
-const formatDateForDisplay = (dateStr: string): string => {
-  if (!dateStr) return '';
-
-  try {
-    const date = new Date(dateStr);
-    return format(date, props.dateFormat);
-  } catch (e) {
-    console.error('Error formatting date:', e);
-    return '';
-  }
-};
-
-// Format date according to the specified format
-const format = (date: Date, formatStr: string): string => {
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-
-  let result = formatStr;
-  result = result.replace('DD', day);
-  result = result.replace('MM', month);
-  result = result.replace('YYYY', year.toString());
-
-  return result;
-};
-
 // Update display value when model value changes
 const updateDisplayValue = () => {
   if (!props.modelValue || props.modelValue.length !== 2) {
@@ -213,8 +189,8 @@ const updateDisplayValue = () => {
   const [start, end] = props.modelValue;
 
   if (start && end) {
-    const startFormatted = formatDateForDisplay(start);
-    const endFormatted = formatDateForDisplay(end);
+    const startFormatted = formatDate(start, props.dateFormat);
+    const endFormatted = formatDate(end, props.dateFormat);
     displayValue.value = `${startFormatted} - ${endFormatted}`;
   } else {
     displayValue.value = '';
@@ -231,8 +207,8 @@ watch(() => selectedDates.value, (newVal) => {
   if (newVal.length >= 2) {
     // Update the preview in the input field even before confirming
     const sortedDates = [...newVal].sort();
-    const startPreview = formatDateForDisplay(sortedDates[0]);
-    const endPreview = formatDateForDisplay(sortedDates[sortedDates.length - 1]);
+    const startPreview = formatDate(sortedDates[0], props.dateFormat);
+    const endPreview = formatDate(sortedDates[sortedDates.length - 1], props.dateFormat);
     displayValue.value = `${startPreview} - ${endPreview}`;
   }
 });
@@ -249,6 +225,4 @@ watch(() => selectedDates.value, (newVal) => {
   z-index: 1;
   background-color: white;
 }
-
-
 </style>

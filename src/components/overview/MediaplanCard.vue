@@ -115,17 +115,20 @@
 
 
 <script setup lang="ts">
-import {ref} from 'vue';
-import {Mediaplan} from '@/types/mediaplan';
-import {getMediaplanStatusColor, getMediaplanStatusLabel} from '@/constants/mediaplanStatuses';
+import { ref } from 'vue';
+import { Mediaplan } from '@/types/mediaplan';
+import { getMediaplanStatusColor, getMediaplanStatusLabel } from '@/constants/mediaplanStatuses';
 import MediaplanOptionsMenu from "@/components/overview/MediaplanOptionsMenu.vue";
 import { useRouter } from 'vue-router';
+import { formatDateRange } from '@/helpers/dateUtils';
+import { formatCurrency } from '@/helpers/currencyUtils';
+import { getBrandLogo } from '@/helpers/brandUtils';
 
 defineProps<{
   mediaplan: Mediaplan;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'view', id: string): void;
   (e: 'edit', id: string): void;
   (e: 'add-po', id: string): void;
@@ -147,7 +150,7 @@ const handleCardClick = (event: MouseEvent) => {
   // Navigate to detail page
   router.push({ name: 'MediaplanDetail', params: { id: mediaplan._id }});
 };
-
+  
 const handleMenuAction = (action: string, id: string) => {
   switch (action) {
     case 'view':
@@ -172,31 +175,6 @@ const handleMenuAction = (action: string, id: string) => {
       emit('delete', id);
       break;
   }
-};
-
-// Helper functions
-const formatDateRange = (startDate: string, endDate: string): string => {
-  try {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    return `${start.getDate().toString().padStart(2, '0')} ${start.toLocaleString('default', {month: 'short'})}. ${start.getFullYear()} - ${end.getDate().toString().padStart(2, '0')} ${end.toLocaleString('default', {month: 'short'})}. ${end.getFullYear()}`;
-  } catch (e) {
-    return 'Invalid date range';
-  }
-};
-
-const formatCurrency = (amount?: number): string => {
-  if (amount === undefined || amount === null) return 'N/A';
-  return `+${amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} EUR`;
-};
-
-const getBrandLogo = (brand: { _id: string; name: string; } | undefined): string => {
-  if (!brand) return '';
-  return `/img/BMW.svg`;
-  // In a real application, you might have a mapping of brands to logos
-  // This is just a placeholder that returns a dynamic URL based on the brand ID
-  // return `/img/${brand._id}.png`;
 };
 </script>
 

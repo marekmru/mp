@@ -175,21 +175,19 @@
         />
       </v-form>
     </v-card>
-
-    <!-- Success/Error Snackbar -->
-    <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
-      {{ snackbar.text }}
-    </v-snackbar>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
-import {ref, reactive, computed, onMounted, watch} from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
 import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
-import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
-import type {Brand, PONumber} from '@/types/mediaplan';
+import { useCreateMediaplanStore } from '@/stores/createMediaplanStore';
+import type { Brand, PONumber } from '@/types/mediaplan';
 import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
 import DateRangePicker from "./DateRangePicker.vue";
+import { showSuccess, showError, showWarning } from '@/helpers/notificationUtils';
+import { formatCurrency } from '@/helpers/currencyUtils';
+
 // Props
 const props = defineProps<{
   modelValue: boolean;
@@ -220,13 +218,13 @@ const isSubmitting = ref(false);
 const brands = computed(() => createMediaplanStore.brands);
 
 const markets = ref([
-  {_id: 'de', name: 'Germany'},
-  {_id: 'us', name: 'United States'},
-  {_id: 'uk', name: 'United Kingdom'},
-  {_id: 'fr', name: 'France'},
-  {_id: 'it', name: 'Italy'},
-  {_id: 'es', name: 'Spain'},
-  {_id: 'pl', name: 'Poland'},
+  { _id: 'de', name: 'Germany' },
+  { _id: 'us', name: 'United States' },
+  { _id: 'uk', name: 'United Kingdom' },
+  { _id: 'fr', name: 'France' },
+  { _id: 'it', name: 'Italy' },
+  { _id: 'es', name: 'Spain' },
+  { _id: 'pl', name: 'Poland' },
 ]);
 
 const currencies = ref(['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'PLN']);
@@ -245,18 +243,11 @@ const formData = reactive({
   contractorName: ''
 });
 
-// Snackbar for feedback
-const snackbar = reactive({
-  show: false,
-  text: '',
-  color: 'success',
-});
-
 // Methods
 const submitForm = async () => {
   if (!form.value) return;
 
-  const {valid} = await form.value.validate();
+  const { valid } = await form.value.validate();
   if (!valid) return;
 
   isSubmitting.value = true;
@@ -281,8 +272,10 @@ const submitForm = async () => {
       }
     });
 
-    // Show success message
-    showSuccess('PO created successfully');
+    // Show success message with formatted currency
+    showSuccess(
+      `PO "${formData.poNumber}" created successfully with budget ${formatCurrency(Number(formData.budget), { currency: formData.currency })}`
+    );
 
     // Emit the created event with the new PO
     emit('created', newPO);
@@ -293,26 +286,18 @@ const submitForm = async () => {
     }, 500);
   } catch (error) {
     console.error('Error creating PO:', error);
-    showError('Failed to create PO');
+    showError('Failed to create PO. Please try again.', { timeout: 8000 });
   } finally {
     isSubmitting.value = false;
   }
 };
 
 const cancelDialog = () => {
+  if (isSubmitting.value) {
+    showWarning('Please wait while the form is submitting...');
+    return;
+  }
   dialog.value = false;
-};
-
-const showSuccess = (message: string) => {
-  snackbar.color = 'success';
-  snackbar.text = message;
-  snackbar.show = true;
-};
-
-const showError = (message: string) => {
-  snackbar.color = 'error';
-  snackbar.text = message;
-  snackbar.show = true;
 };
 
 // Lifecycle
@@ -331,11 +316,21 @@ onMounted(async () => {
   // Initialize with the brand from the prop if provided
   if (props.initialBrandId) {
     formData.brand = props.initialBrandId;
+  } else if (brands.value.length > 0) {
+    // Set the first brand as default if no initial brand is provided
+    formData.brand = brands.value[0]._id;
   }
 
   // Make sure brands are loaded
   if (brands.value.length === 0) {
-    await createMediaplanStore.fetchBrands();
+    try {
+      await createMediaplanStore.fetchBrands();
+      if (brands.value.length > 0 && !formData.brand) {
+        formData.brand = brands.value[0]._id;
+      }
+    } catch (error) {
+      showError('Failed to load brands. Please try again later.');
+    }
   }
 });
 </script>
