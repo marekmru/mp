@@ -1,19 +1,19 @@
 
 <template>
   <v-dialog v-model="dialog" persistent max-width="500px">
-    <v-card class="pa-6">
+    <v-card class="px-6 pa-4">
       <DialogHeader
           title="Create Media Plan"
           :show-back-button="true"
           :show-close-button="true"
-          margin-bottom="2"
-          close-icon-color="primary"
           @back="cancelDialog"
           @close="cancelDialog"
       />
 
       <v-form ref="form" @submit.prevent="submitForm" v-model="isFormValid" validate-on="input">
         <!-- Brand Logo and Name -->
+        <v-card-text class="pa-0">
+
         <v-row no-gutters align="center" class="mb-3">
           <v-col cols="auto" class="mr-2">
             <v-img
@@ -165,7 +165,7 @@
               error-messages=""
           />
         </div>
-
+        </v-card-text>
         <!-- Action Buttons -->
         <DialogFooter
             cancel-text="Cancel"
@@ -176,6 +176,7 @@
             @cancel="cancelDialog"
             class="mt-6"
         />
+
       </v-form>
     </v-card>
 

@@ -41,6 +41,7 @@
 
 <script setup lang="ts">
 import {ref, onMounted, watch, computed} from 'vue';
+import { useRouter } from 'vue-router';
 import {Mediaplan} from '@/types/mediaplan';
 import MediaplanCard from '@/components/overview/MediaplanCard.vue';
 import PaginationControls from '@/components/common/PaginationControls.vue';
@@ -151,8 +152,12 @@ const fetchMediaplans = async () => {
   }
 };
 
+// Import router
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
 const viewMediaplan = (mediaplanId: string) => {
-  window.location.href = `/mediaplans/${mediaplanId}`;
+  router.push({ name: 'MediaplanDetail', params: { id: mediaplanId } });
 };
 
 const handleItemsPerPageChange = (value: number) => {

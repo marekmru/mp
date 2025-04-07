@@ -1,5 +1,11 @@
 <template>
-  <v-card class="h-100 pa-3" elevation="3">
+  <div class="position-relative card-wrapper">
+    <v-card 
+      class="h-100 pa-3 mediaplan-card" 
+      elevation="3" 
+      :data-mediaplan-id="mediaplan._id"
+      @click="handleCardClick"
+    >
     <v-card-item class="pb-8">
       <div class="d-flex align-center">
         <v-tooltip
@@ -87,28 +93,33 @@
     <v-card-actions>
       <!-- Action buttons -->
       <v-spacer/>
-
+      
+      <!-- Options menu -->
       <mediaplan-options-menu
           :mediaplan-id="mediaplan._id"
           @action="handleMenuAction"
       />
 
+      <!-- Navigation button -->
       <v-btn
           variant="flat"
           color="primary"
-          @click="$emit('view', mediaplan._id)"
+          :to="{ name: 'MediaplanDetail', params: { id: mediaplan._id }}"
       >
         Show Mediaplan
       </v-btn>
     </v-card-actions>
   </v-card>
+  </div>
 </template>
+
 
 <script setup lang="ts">
 import {ref} from 'vue';
 import {Mediaplan} from '@/types/mediaplan';
 import {getMediaplanStatusColor, getMediaplanStatusLabel} from '@/constants/mediaplanStatuses';
 import MediaplanOptionsMenu from "@/components/overview/MediaplanOptionsMenu.vue";
+import { useRouter } from 'vue-router';
 
 defineProps<{
   mediaplan: Mediaplan;
@@ -124,13 +135,26 @@ defineEmits<{
   (e: 'delete', id: string): void;
 }>();
 
+const router = useRouter();
+
+// Handle card click for navigation
+const handleCardClick = (event: MouseEvent) => {
+  // Don't navigate if clicking on buttons or menu items
+  if ((event.target as HTMLElement).closest('.v-card__actions')) {
+    return;
+  }
+  
+  // Navigate to detail page
+  router.push({ name: 'MediaplanDetail', params: { id: mediaplan._id }});
+};
+
 const handleMenuAction = (action: string, id: string) => {
   switch (action) {
     case 'view':
-      emit('view', id);
+      router.push({ name: 'MediaplanDetail', params: { id }});
       break;
     case 'edit':
-      emit('edit', id);
+      router.push({ name: 'MediaplanEdit', params: { id }});
       break;
     case 'addPo':
       emit('add-po', id);
@@ -186,5 +210,21 @@ const getBrandLogo = (brand: { _id: string; name: string; } | undefined): string
 
 .status-text, .date-range-text {
   font-size: 12px;
+}
+
+.mediaplan-card {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mediaplan-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Override cursor for buttons and menu */
+.v-menu__content, 
+.v-card__actions .v-btn {
+  cursor: default;
 }
 </style>

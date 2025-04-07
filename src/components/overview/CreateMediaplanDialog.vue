@@ -2,7 +2,7 @@
   <div>
     <!-- Mediaplan Creation Dialog -->
     <v-dialog v-model="dialog" persistent max-width="500px">
-      <v-card class="pa-6">
+      <v-card class="px-6 pa-4">
         <DialogHeader
             title="Create new Mediaplan"
             :show-back-button="false"
@@ -10,99 +10,123 @@
             @close="cancelDialog"
         />
         <v-form ref="form" @submit.prevent="submitForm">
-          <!-- Brand Selection -->
-          <v-select
-              v-model="formData.brand._id"
-              :items="brands"
-              item-title="name"
-              item-value="_id"
-              label="Brand Output*"
-              placeholder="Please Select a brand"
-              :rules="[v => !!v || 'Brand is required']"
-              variant="outlined"
-              class="mb-0"
-          />
+          <v-card-text class="pa-0">
 
-          <!-- Type Selection (PO Based or Draft) -->
-          <div class="d-flex mb-2">
-            <v-radio-group v-model="mediaplanType" inline class="mt-0">
-              <v-radio value="po" label="PO Based"/>
-              <v-radio value="draft" label="Draft"/>
-            </v-radio-group>
-          </div>
+            <!-- Brand Selection -->
+            <div class="mb-4">
+              <label for="brand-select" class="text-body-2 mb-1 d-block">Brand Output*</label>
+              <v-select
+                  id="brand-select"
+                  v-model="formData.brand._id"
+                  :items="brands"
+                  item-title="name"
+                  item-value="_id"
+                  placeholder="Please Select a brand"
+                  :rules="[v => !!v || 'Brand is required']"
+                  variant="outlined"
+                  class="mb-0"
+                  hide-details
+              />
+            </div>
 
-          <!-- Mediaplan Name -->
-          <v-text-field
-              v-model="formData.name"
-              label="Individual Name*"
-              placeholder="please type in an individual title"
-              :rules="[v => !!v || 'Name is required']"
-              variant="outlined"
-              class="mb-4"
-          />
+            <!-- Type Selection (PO Based or Draft) -->
+            <div class="mb-4">
+              <label class="text-body-2 mb-1 d-block">Mediaplan Type</label>
+              <v-radio-group v-model="mediaplanType" inline class="mt-0">
+                <v-radio value="po" label="PO Based"/>
+                <v-radio value="draft" label="Draft"/>
+              </v-radio-group>
+            </div>
 
-          <!-- PO Selection - Only visible if PO Based selected -->
-          <v-row v-if="mediaplanType === 'po'" class="mb-4" no-gutters>
-            <v-select
-                v-model="selectedPOs"
-                :items="poNumbers"
-                item-title="name"
-                item-value="_id"
-                label="Select existing PO*"
-                placeholder="Select POs"
-                :rules="[v => mediaplanType !== 'po' || (v && v.length > 0) || 'At least one PO is required']"
-                variant="outlined"
-                multiple
-                chips
-                closable-chips
-                class="flex-grow-1 mr-2"
-            />
-            <v-btn
-                color="primary"
-                variant="outlined"
-                @click="openCreatePODialog"
-                class="mt-0"
-                style="height: 56px;"
-            >
-              Create PO
-            </v-btn>
-          </v-row>
+            <!-- Mediaplan Name -->
+            <div class="mb-4">
+              <label for="mediaplan-name" class="text-body-2 mb-1 d-block">Individual Name*</label>
+              <v-text-field
+                  id="mediaplan-name"
+                  v-model="formData.name"
+                  placeholder="please type in an individual title"
+                  :rules="[v => !!v || 'Name is required']"
+                  variant="outlined"
+                  hide-details
+              />
+            </div>
 
-          <template v-if="mediaplanType === 'po'">
-            <!-- Creator Name -->
-            <v-text-field
-                v-model="creatorName"
-                label="Creator*"
-                placeholder="Your name"
-                :rules="[v => !!v || 'Creator name is required']"
-                variant="outlined"
-                class="mb-4"
-                readonly
-                disabled
-            />
+            <!-- PO Selection - Only visible if PO Based selected -->
+            <div v-if="mediaplanType === 'po'" class="mb-4">
+              <label for="po-select" class="text-body-2 mb-1 d-block">Select existing PO*</label>
+              <v-row no-gutters>
+                <v-select
+                    id="po-select"
+                    v-model="selectedPOs"
+                    :items="poNumbers"
+                    item-title="name"
+                    item-value="_id"
+                    placeholder="Select POs"
+                    :rules="[v => mediaplanType !== 'po' || (v && v.length > 0) || 'At least one PO is required']"
+                    variant="outlined"
+                    multiple
+                    chips
+                    closable-chips
+                    class="flex-grow-1 mr-2"
+                    hide-details
+                />
+                <v-btn
+                    color="primary"
+                    variant="outlined"
+                    @click="openCreatePODialog"
+                    class="mt-0"
+                    style="height: 56px;"
+                >
+                  Create PO
+                </v-btn>
+              </v-row>
+            </div>
 
-            <!-- Department -->
-            <v-text-field
-                v-model="department"
-                label="Department"
-                placeholder="Department name"
-                variant="outlined"
-                class="mb-4"
-            />
-          </template>
+            <template v-if="mediaplanType === 'po'">
+              <!-- Creator Name -->
+              <div class="mb-4">
+                <label for="creator-name" class="text-body-2 mb-1 d-block">Creator*</label>
+                <v-text-field
+                    id="creator-name"
+                    v-model="creatorName"
+                    placeholder="Your name"
+                    :rules="[v => !!v || 'Creator name is required']"
+                    variant="outlined"
+                    readonly
+                    disabled
+                    hide-details
+                />
+              </div>
 
-          <!-- Date Range - Using the DateRangePicker component -->
-          <DateRangePicker
-              v-model="dateRange"
-              label="Start date* - End date *"
-              placeholder="Select start and end dates"
-              :rules="[v => !!v || 'Date range is required']"
-              :required="true"
-              dialog-title="Choose a date range"
-              class="mb-0"
-              @update:model-value="handleDateRangeChange"
-          />
+              <!-- Department -->
+              <div class="mb-4">
+                <label for="department" class="text-body-2 mb-1 d-block">Department</label>
+                <v-text-field
+                    id="department"
+                    v-model="department"
+                    placeholder="Department name"
+                    variant="outlined"
+                    hide-details
+                />
+              </div>
+            </template>
 
+            <!-- Date Range - Using the DateRangePicker component -->
+            <div class="mb-4">
+              <label for="date-range" class="text-body-2 mb-1 d-block">Start date* - End date*</label>
+              <DateRangePicker
+                  id="date-range"
+                  v-model="dateRange"
+                  placeholder="Select start and end dates"
+                  :rules="[v => !!v || 'Date range is required']"
+                  :required="true"
+                  dialog-title="Choose a date range"
+                  @update:model-value="handleDateRangeChange"
+                  hide-details
+              />
+            </div>
+
+          </v-card-text>
           <DialogFooter
               cancel-text="Cancel"
               confirm-text="Next Step"
@@ -249,7 +273,7 @@ const handleProjectCreated = (projectId: string) => {
 const handlePoCreated = (po: PONumber) => {
   // Add the newly created PO to the selected POs
   selectedPOs.value = [...selectedPOs.value, po._id];
-  
+
   // Show success message
   showSuccess(`PO "${po.name}" created successfully and added to selection`);
 };
@@ -320,7 +344,7 @@ const submitForm = async () => {
       // Emit the created event
       emit('created', createdMediaplanId.value);
 
-      // Important: Here we don't close the dialog, but instead show the project dialog
+      // Important: Here we don't cancelDoalog the dialog, but instead show the project dialog
       showProjectDialog.value = true;
 
     } catch (apiError) {

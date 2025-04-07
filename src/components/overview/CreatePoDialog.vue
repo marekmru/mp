@@ -1,198 +1,181 @@
 <template>
   <v-dialog v-model="dialog" max-width="800px" persistent>
-    <v-card>
+    <v-card class="px-6 py-4">
       <DialogHeader
-        title="Create new PO"
-        :show-back-button="false"
-        @close="close"
+          title="Create new PO"
+          :show-back-button="false"
+          :show-close-button="true"
+          close-icon-color="primary"
+          @close="cancelDialog"
       />
-      
-      <v-card-text>
-        <v-form ref="form" @submit.prevent="submitForm" class="mt-2">
+
+      <v-form ref="form" @submit.prevent="submitForm" class="mt-2">
+        <v-card-text class="pa-0">
           <v-row>
             <!-- Left column -->
             <v-col cols="12" md="6">
-              <div class="text-subtitle-1 mb-2">Client Information</div>
-              
-              <v-text-field
-                v-model="formData.clientDepartment"
-                label="Client Department"
-                placeholder="Please enter department"
-                variant="outlined"
-                class="mb-4"
-              />
-              
-              <v-select
-                v-model="formData.brand"
-                :items="brands"
-                item-title="name"
-                item-value="_id"
-                label="Brand*"
-                placeholder="Select a Brand"
-                :rules="[v => !!v || 'Brand is required']"
-                variant="outlined"
-                class="mb-4"
-              />
-              
-              <v-text-field
-                v-model="formData.clientName"
-                label="Client Name"
-                placeholder="Please enter name & last name"
-                variant="outlined"
-                class="mb-4"
-              />
-              
-              <v-select
-                v-model="formData.market"
-                :items="markets"
-                item-title="name"
-                item-value="_id"
-                label="Market*"
-                placeholder="Select a Market"
-                :rules="[v => !!v || 'Market is required']"
-                variant="outlined"
-                class="mb-4"
-              />
-              
-              <v-textarea
-                v-model="formData.purpose"
-                label="Purpose"
-                placeholder="Please enter a description"
-                variant="outlined"
-                rows="4"
-                counter="250"
-                :rules="[v => !v || v.length <= 250 || 'Maximum 250 characters']"
-                class="mb-4"
-              />
+              <div class="mb-4">
+                <label for="client-department" class="text-body-2 mb-1 d-block">Client Department</label>
+                <v-text-field
+                    id="client-department"
+                    v-model="formData.clientDepartment"
+                    placeholder="Enter the client's department name"
+                    variant="outlined"
+                    hide-details
+                />
+              </div>
+
+              <div class="mb-4">
+                <label for="brand-select" class="text-body-2 mb-1 d-block">Brand*</label>
+                <v-select
+                    id="brand-select"
+                    v-model="formData.brand"
+                    :items="brands"
+                    item-title="name"
+                    item-value="_id"
+                    placeholder="Select the brand for this PO"
+                    :rules="[v => !!v || 'Brand is required']"
+                    variant="outlined"
+                    hide-details
+                />
+              </div>
+
+              <div class="mb-4">
+                <label for="client-name" class="text-body-2 mb-1 d-block">Client Name</label>
+                <v-text-field
+                    id="client-name"
+                    v-model="formData.clientName"
+                    placeholder="Enter client's full name"
+                    variant="outlined"
+                    hide-details
+                />
+              </div>
+
+              <div class="mb-4">
+                <label for="market-select" class="text-body-2 mb-1 d-block">Market*</label>
+                <v-select
+                    id="market-select"
+                    v-model="formData.market"
+                    :items="markets"
+                    item-title="name"
+                    item-value="_id"
+                    placeholder="Select target market region"
+                    :rules="[v => !!v || 'Market is required']"
+                    variant="outlined"
+                    hide-details
+                />
+              </div>
+
+              <div class="mb-4">
+                <label for="purpose-text" class="text-body-2 mb-1 d-block">Purpose</label>
+                <v-textarea
+                    id="purpose-text"
+                    v-model="formData.purpose"
+                    placeholder="Describe the purpose of this purchase order"
+                    variant="outlined"
+                    rows="4"
+                    counter="250"
+                    :rules="[v => !v || v.length <= 250 || 'Maximum 250 characters']"
+                    hide-details="auto"
+                />
+              </div>
             </v-col>
-            
+
             <!-- Right column -->
             <v-col cols="12" md="6">
-              <div class="text-subtitle-1 mb-2">PO Details</div>
-              
-              <v-text-field
-                v-model="formData.poNumber"
-                label="PO Number*"
-                placeholder="Please enter the PO Number"
-                :rules="[v => !!v || 'PO Number is required']"
-                variant="outlined"
-                class="mb-4"
-              />
-              
-              <div class="d-flex">
+              <div class="mb-4">
+                <label for="po-number" class="text-body-2 mb-1 d-block">PO Number*</label>
                 <v-text-field
-                  v-model="formData.budget"
-                  label="Budget*"
-                  placeholder="Please enter a budget"
-                  type="number"
-                  :rules="[
-                    v => !!v || 'Budget is required',
-                    v => v > 0 || 'Budget must be greater than 0'
-                  ]"
-                  variant="outlined"
-                  class="flex-grow-1 mb-4 mr-2"
-                />
-                
-                <v-select
-                  v-model="formData.currency"
-                  :items="currencies"
-                  label="Currency"
-                  variant="outlined"
-                  class="flex-grow-0 mb-4"
-                  style="width: 100px"
+                    id="po-number"
+                    v-model="formData.poNumber"
+                    placeholder="Enter official purchase order number"
+                    :rules="[v => !!v || 'PO Number is required']"
+                    variant="outlined"
+                    hide-details
                 />
               </div>
-              
-              <div class="d-flex gap-2">
-                <v-col>
+
+              <div class="d-flex">
+                <div class="flex-grow-1 mr-2">
+                  <label for="budget" class="text-body-2 mb-1 d-block">Budget*</label>
                   <v-text-field
-                    v-model="formData.validFrom"
-                    label="Valid from*"
-                    placeholder="DD.MM.YYYY"
-                    :rules="[v => !!v || 'Date is required']"
-                    variant="outlined"
-                    readonly
-                    class="mb-4"
-                    @click="dateFromMenu = true"
-                  >
-                    <template v-slot:append>
-                      <v-icon @click="dateFromMenu = true">mdi-calendar</v-icon>
-                    </template>
-                  </v-text-field>
-                  <v-date-picker
-                    v-model="formData.validFrom"
-                    v-if="dateFromMenu"
-                    @click:save="dateFromMenu = false"
-                    @click:cancel="dateFromMenu = false"
-                  ></v-date-picker>
-                </v-col>
-                
-                <v-col>
-                  <v-text-field
-                    v-model="formData.validTo"
-                    label="Valid to*"
-                    placeholder="DD.MM.YYYY"
-                    :rules="[v => !!v || 'Date is required']"
-                    variant="outlined"
-                    readonly
-                    class="mb-4"
-                    @click="dateToMenu = true"
-                  >
-                    <template v-slot:append>
-                      <v-icon @click="dateToMenu = true">mdi-calendar</v-icon>
-                    </template>
-                  </v-text-field>
-                  <v-date-picker
-                    v-model="formData.validTo"
-                    v-if="dateToMenu"
-                    @click:save="dateToMenu = false"
-                    @click:cancel="dateToMenu = false"
-                  ></v-date-picker>
-                </v-col>
+                      id="budget"
+                      v-model="formData.budget"
+                      placeholder="Enter budget amount"
+                      type="number"
+                      :rules="[
+                        v => !!v || 'Budget is required',
+                        v => v > 0 || 'Budget must be greater than 0'
+                      ]"
+                      variant="outlined"
+                      class="mb-4"
+                      hide-details
+                  />
+                </div>
+
+                <div class="flex-grow-0" style="width: 100px">
+                  <label for="currency" class="text-body-2 mb-1 d-block">Currency</label>
+                  <v-select
+                      id="currency"
+                      v-model="formData.currency"
+                      :items="currencies"
+                      variant="outlined"
+                      class="mb-4"
+                      hide-details
+                  />
+                </div>
               </div>
-              
-              <v-text-field
-                v-model="formData.contractorDepartment"
-                label="Contractor Department"
-                placeholder="Please enter department"
-                variant="outlined"
-                class="mb-4"
-              />
-              
-              <v-text-field
-                v-model="formData.contractorName"
-                label="Contractor Name"
-                placeholder="Please enter name & last name"
-                variant="outlined"
-                class="mb-4"
-              />
+
+              <div class="mb-4">
+                <label for="validity-range" class="text-body-2 mb-1 d-block">Validity Period*</label>
+                <DateRangePicker
+                    id="validity-range"
+                    v-model="dateRange"
+                    label=""
+                    placeholder="Select validity period"
+                    required
+                    :rules="[v => !!v || 'Validity period is required']"
+                    variant="outlined"
+                    dialog-title="Select PO Validity Period"
+                    hide-details
+                />
+              </div>
+
+              <div class="mb-4">
+                <label for="contractor-department" class="text-body-2 mb-1 d-block">Contractor Department</label>
+                <v-text-field
+                    id="contractor-department"
+                    v-model="formData.contractorDepartment"
+                    placeholder="Enter contractor's department name"
+                    variant="outlined"
+                    hide-details
+                />
+              </div>
+
+              <div class="mb-4">
+                <label for="contractor-name" class="text-body-2 mb-1 d-block">Contractor Name</label>
+                <v-text-field
+                    id="contractor-name"
+                    v-model="formData.contractorName"
+                    placeholder="Enter contractor's full name"
+                    variant="outlined"
+                    hide-details
+                />
+              </div>
             </v-col>
           </v-row>
-        </v-form>
-      </v-card-text>
-      
-      <v-card-actions class="pa-6 pt-0">
-        <v-spacer></v-spacer>
-        <v-btn
-          color="grey-lighten-1"
-          variant="flat"
-          min-width="120"
-          @click="close"
-        >
-          Cancel
-        </v-btn>
-        <v-btn
-          color="primary"
-          variant="flat"
-          min-width="120"
-          :loading="isSubmitting"
-          @click="submitForm"
-        >
-          Create PO
-        </v-btn>
-      </v-card-actions>
+        </v-card-text>
+        <DialogFooter
+            cancel-text="Cancel"
+            confirm-text="Create PO"
+            :loading="isSubmitting"
+            :disabled="!form?.isValid"
+            :submit-button="true"
+            @cancel="cancelDialog"
+        />
+      </v-form>
     </v-card>
-    
+
     <!-- Success/Error Snackbar -->
     <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
       {{ snackbar.text }}
@@ -201,11 +184,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue';
+import {ref, reactive, computed, onMounted, watch} from 'vue';
 import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
-import { useCreateMediaplanStore } from '@/stores/createMediaplanStore';
-import type { Brand, PONumber } from '@/types/mediaplan';
-
+import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
+import type {Brand, PONumber} from '@/types/mediaplan';
+import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
+import DateRangePicker from "./DateRangePicker.vue";
 // Props
 const props = defineProps<{
   modelValue: boolean;
@@ -226,9 +210,8 @@ const dialog = computed({
   set: (value) => emit('update:modelValue', value)
 });
 
-// Date picker menus
-const dateFromMenu = ref(false);
-const dateToMenu = ref(false);
+// Date range for the DateRangePicker
+const dateRange = ref<[string, string] | null>(null);
 
 // Loading state
 const isSubmitting = ref(false);
@@ -237,13 +220,13 @@ const isSubmitting = ref(false);
 const brands = computed(() => createMediaplanStore.brands);
 
 const markets = ref([
-  { _id: 'de', name: 'Germany' },
-  { _id: 'us', name: 'United States' },
-  { _id: 'uk', name: 'United Kingdom' },
-  { _id: 'fr', name: 'France' },
-  { _id: 'it', name: 'Italy' },
-  { _id: 'es', name: 'Spain' },
-  { _id: 'pl', name: 'Poland' },
+  {_id: 'de', name: 'Germany'},
+  {_id: 'us', name: 'United States'},
+  {_id: 'uk', name: 'United Kingdom'},
+  {_id: 'fr', name: 'France'},
+  {_id: 'it', name: 'Italy'},
+  {_id: 'es', name: 'Spain'},
+  {_id: 'pl', name: 'Poland'},
 ]);
 
 const currencies = ref(['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'PLN']);
@@ -258,8 +241,6 @@ const formData = reactive({
   poNumber: '',
   budget: 0,
   currency: 'EUR',
-  validFrom: '',
-  validTo: '',
   contractorDepartment: '',
   contractorName: ''
 });
@@ -274,18 +255,18 @@ const snackbar = reactive({
 // Methods
 const submitForm = async () => {
   if (!form.value) return;
-  
-  const { valid } = await form.value.validate();
+
+  const {valid} = await form.value.validate();
   if (!valid) return;
-  
+
   isSubmitting.value = true;
-  
+
   try {
     // Create the PO through the store
     const newPO = await createMediaplanStore.createPO({
       name: formData.poNumber,
       value: Number(formData.budget),
-      // We could also pass the additional metadata for a complete PO record
+      // Pass the dateRange values to the API
       metadata: {
         clientDepartment: formData.clientDepartment,
         brand: formData.brand,
@@ -293,19 +274,19 @@ const submitForm = async () => {
         market: formData.market,
         purpose: formData.purpose,
         currency: formData.currency,
-        validFrom: formData.validFrom,
-        validTo: formData.validTo,
+        validFrom: dateRange.value ? dateRange.value[0] : '',
+        validTo: dateRange.value ? dateRange.value[1] : '',
         contractorDepartment: formData.contractorDepartment,
         contractorName: formData.contractorName
       }
     });
-    
+
     // Show success message
     showSuccess('PO created successfully');
-    
+
     // Emit the created event with the new PO
     emit('created', newPO);
-    
+
     // Close the dialog
     setTimeout(() => {
       dialog.value = false;
@@ -318,7 +299,7 @@ const submitForm = async () => {
   }
 };
 
-const close = () => {
+const cancelDialog = () => {
   dialog.value = false;
 };
 
@@ -340,15 +321,18 @@ onMounted(async () => {
   const today = new Date();
   const nextYear = new Date(today);
   nextYear.setFullYear(today.getFullYear() + 1);
-  
-  formData.validFrom = today.toISOString().split('T')[0];
-  formData.validTo = nextYear.toISOString().split('T')[0];
-  
+
+  const todayStr = today.toISOString().split('T')[0];
+  const nextYearStr = nextYear.toISOString().split('T')[0];
+
+  // Set the default date range
+  dateRange.value = [todayStr, nextYearStr];
+
   // Initialize with the brand from the prop if provided
   if (props.initialBrandId) {
     formData.brand = props.initialBrandId;
   }
-  
+
   // Make sure brands are loaded
   if (brands.value.length === 0) {
     await createMediaplanStore.fetchBrands();

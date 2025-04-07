@@ -73,7 +73,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   showBackButton: true,
   showCloseButton: true,
-  marginBottom: 6,
+  marginBottom: 2,
   backIconColor: 'primary',
   closeIconColor: 'primary',
   titleClass: 'text-h6'

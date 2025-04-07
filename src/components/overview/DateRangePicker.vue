@@ -25,7 +25,7 @@
           <span class="text-subtitle-1">{{ dialogTitle }}</span>
           <v-spacer></v-spacer>
           <v-btn icon variant="text" @click="closeDialog">
-            <v-icon>mdi-close</v-icon>
+            <v-icon>mdi-cancelDoalog</v-icon>
           </v-btn>
         </v-card-title>
 
@@ -100,7 +100,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  label: 'Date range--',
+  label: 'Date range',
   placeholder: 'Select a date range',
   hint: '',
   disabled: false,
