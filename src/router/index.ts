@@ -1,19 +1,17 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
-import type {RouteRecordRaw} from 'vue-router' // Expliziter Import
+import type {RouteRecordRaw} from 'vue-router' // Explicit import
 import {useAuthStore} from '../stores/auth'
-import Overview from "./Overview.vue";
-import Login from "./Login.vue";
 
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
         name: 'Overview',
-        component: Overview,
+        component: () => import('../views/Overview.vue'),
     },
     {
         path: '/login',
         name: 'Login',
-        component: Login,
+        component: () => import('../views/Login.vue'),
     },
     {
         path: '/mediaplans/:id',
@@ -27,7 +25,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../views/MediaplanEdit.vue'),
         props: true,
     },
-    // Weitere Routen hier
+    // Additional routes here
 ]
 
 const router = createRouter({

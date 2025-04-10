@@ -1,6 +1,6 @@
 <template>
   <div class="planning-view-container mt-4">
-    <v-card class="projects-table elevation-0" variant="flat">
+    <v-card class="projects-table" variant="flat">
       <v-theme-provider theme="dark">
         <v-data-table-server
             v-model:items-per-page="itemsPerPage"
@@ -11,7 +11,7 @@
             :loading="isLoading"
             item-value="_id"
             hover
-            class="projects-data-table"
+            class="elevation-0 projects-data-table"
             @update:options="onOptionsUpdate"
         >
           <!-- Edit button column -->
@@ -24,7 +24,9 @@
           <!-- Name column with logo -->
           <template v-slot:item.abbreviation="{ item }">
             <div class="d-flex align-center" v-if="item.raw">
-              <v-avatar size="32" class="mr-2 grey lighten-4" :image="getBrandLogo(item.raw.descriptive_vars?.brand)"></v-avatar>
+              <v-avatar size="32" class="mr-2 grey lighten-4">
+                <v-img :src="getBrandLogo(item.raw.descriptive_vars?.brand)"></v-img>
+              </v-avatar>
               <span>{{ item.raw.abbreviation }}</span>
             </div>
             <div v-else>N/A</div>
@@ -33,7 +35,9 @@
           <!-- Country column with flag -->
           <template v-slot:item.country="{ item }">
             <div class="d-flex align-center" v-if="item.raw && item.raw.descriptive_vars?.country">
-              <CountryFlag :country="item.raw.descriptive_vars.country" class="mr-2" />
+              <v-avatar size="24" class="mr-2">
+                <v-img :src="getCountryFlag(item.raw.descriptive_vars.country)"></v-img>
+              </v-avatar>
               <span>{{ getCountryName(item.raw.descriptive_vars.country) }}</span>
             </div>
             <div v-else>N/A</div>
@@ -120,8 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import CountryFlag from '@/components/common/CountryFlag.vue';
+import {ref, watch} from 'vue';
 
 interface Props {
   projects: any[];
@@ -141,15 +144,15 @@ const page = ref(1);
 const itemsPerPage = ref(10);
 
 const headers = [
-  { title: '', key: 'edit', sortable: false, width: '50px' },
-  { title: 'Name', key: 'abbreviation', sortable: true, align: 'start' },
-  { title: 'Country', key: 'country', sortable: true },
-  { title: 'Duration', key: 'duration', sortable: true },
-  { title: 'Detail', key: 'detail', sortable: true },
-  { title: 'Campaign type', key: 'campaignType', sortable: true },
-  { title: 'Sub-segment', key: 'subsegment', sortable: true },
-  { title: '', key: 'lockStatus', sortable: false, width: '50px' },
-  { title: '', key: 'actions', sortable: false, width: '50px' }
+  {title: '', key: 'edit', sortable: false, width: '50px'},
+  {title: 'Name', key: 'abbreviation', sortable: true, align: 'start'},
+  {title: 'Country', key: 'country', sortable: true},
+  {title: 'Duration', key: 'duration', sortable: true},
+  {title: 'Detail', key: 'detail', sortable: true},
+  {title: 'Campaign type', key: 'campaignType', sortable: true},
+  {title: 'Sub-segment', key: 'subsegment', sortable: true},
+  {title: '', key: 'lockStatus', sortable: false, width: '50px'},
+  {title: '', key: 'actions', sortable: false, width: '50px'}
 ];
 
 watch([page, itemsPerPage], ([newPage, newItemsPerPage]) => {
@@ -199,6 +202,7 @@ const getCountryName = (countryCode: string): string => {
 
 <style scoped>
 .planning-view-container {
+  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -208,17 +212,14 @@ const getCountryName = (countryCode: string): string => {
   font-weight: 500;
 }
 
+.projects-data-table :deep(td),
 .projects-data-table :deep(.v-data-table__td) {
   background-color: #4D4D4D !important;
   color: white !important;
+  border-bottom: 1px solid #666;
   height: 60px;
   padding: 0 16px;
   vertical-align: middle;
-  border-radius: 0 !important;
-}
-
-.projects-data-table :deep(.v-data-table__tr:not(:last-child)) {
-  border-bottom: 4px solid #ffffff;
 }
 
 .projects-data-table :deep(.v-data-table__tr:hover) {

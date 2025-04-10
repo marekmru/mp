@@ -1,40 +1,54 @@
 // src/constants/mediaplanStatuses.ts
 
-export interface MediaplanStatus {
-    value: string;
-    label: string;
-    color: string;
+// Define the available mediaplan statuses
+export enum MediaplanStatus {
+  IN_PLANNING = 'in_planning',
+  DRAFT = 'draft',
+  FOR_APPROVAL = 'for_approval',
 }
 
-export const MEDIAPLAN_STATUSES: Record<string, MediaplanStatus> = {
-    IN_PLANNING: {
-        value: 'in_planning',
-        label: 'In Planning',
-        color: 'blue'
-    },
-    DRAFT: {
-        value: 'draft',
-        label: 'Draft',
-        color: 'grey'
-    },
-    FOR_APPROVAL: {
-        value: 'for_approval',
-        label: 'For Approval',
-        color: 'amber'
-    }
+// MEDIAPLAN_STATUSES object structure for backward compatibility with existing code
+export const MEDIAPLAN_STATUSES = {
+  IN_PLANNING: { value: MediaplanStatus.IN_PLANNING, label: 'In Planning' },
+  DRAFT: { value: MediaplanStatus.DRAFT, label: 'Draft' },
+  FOR_APPROVAL: { value: MediaplanStatus.FOR_APPROVAL, label: 'For Approval' },
 };
 
-// Helper functions to use throughout the application
+// Get array of status values
 export const getMediaplanStatusValues = (): string[] => {
-    return Object.values(MEDIAPLAN_STATUSES).map(status => status.value);
+  return Object.values(MediaplanStatus);
 };
 
-export const getMediaplanStatusColor = (statusValue: string): string => {
-    const status = Object.values(MEDIAPLAN_STATUSES).find(s => s.value === statusValue);
-    return status?.color || 'grey';
+// Get array of status objects with value and label
+export const getMediaplanStatusOptions = (): { value: string; label: string }[] => {
+  return Object.entries(MEDIAPLAN_STATUSES).map(([_, statusObj]) => ({
+    value: statusObj.value,
+    label: statusObj.label,
+  }));
 };
 
-export const getMediaplanStatusLabel = (statusValue: string): string => {
-    const status = Object.values(MEDIAPLAN_STATUSES).find(s => s.value === statusValue);
-    return status?.label || 'draft';
+// Get color for a mediaplan status
+export const getMediaplanStatusColor = (status?: string): string => {
+  if (!status) return 'grey';
+  
+  const statusColors: Record<string, string> = {
+    [MediaplanStatus.IN_PLANNING]: 'blue',
+    [MediaplanStatus.DRAFT]: 'grey',
+    [MediaplanStatus.FOR_APPROVAL]: 'amber'
+  };
+  
+  return statusColors[status] || 'grey';
+};
+
+// Get label for a mediaplan status
+export const getMediaplanStatusLabel = (status?: string): string => {
+  if (!status) return 'Unknown';
+  
+  const statusLabels: Record<string, string> = {
+    [MediaplanStatus.IN_PLANNING]: 'In Planning',
+    [MediaplanStatus.DRAFT]: 'Draft',
+    [MediaplanStatus.FOR_APPROVAL]: 'For Approval'
+  };
+  
+  return statusLabels[status] || 'Unknown';
 };

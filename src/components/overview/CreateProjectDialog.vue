@@ -1,8 +1,10 @@
 <template>
-  <v-dialog v-model="dialog" persistent max-width="500px">
-    <v-card class="px-6 pa-4">
+  <v-dialog v-model="dialog" persistent max-width="550px">
+    <v-card class="px-1 pb-6 pt-4">
+      <!-- Keep the original DialogHeader component -->
       <DialogHeader
-          title="Create Media Plan"
+          class="px-2"
+          title="Create new Mediaplan"
           :show-back-button="true"
           :show-close-button="true"
           @back="cancelDialog"
@@ -10,55 +12,78 @@
       />
 
       <v-form ref="form" @submit.prevent="submitForm" v-model="isFormValid" validate-on="input">
-        <!-- Brand Logo and Name -->
-        <v-card-text class="pa-0">
-
-          <v-row no-gutters align="center" class="mb-1">
-            <v-col cols="auto" class="mr-2">
-              <v-img
-                  :src="getBrandLogo(brand)"
-                  width="100"
-                  height="40"
-                  contain
-              ></v-img>
-            </v-col>
-            <v-col cols="auto">
-              <span class="text-subtitle-1 font-weight-medium">{{ brandName }}</span>
+        <v-card-text class="py-2">
+          <!-- Brand Logo and Name -->
+          <v-row class="mb-0">
+            <v-col cols="12">
+              <v-row align="center" no-gutters>
+                <v-col cols="auto" class="mr-2 pr-0">
+                  <v-img
+                      :src="getBrandLogo(brand)"
+                      width="100"
+                      height="40"
+                      contain
+                  ></v-img>
+                </v-col>
+                <v-col>
+                  <span class="text-h6 font-weight-regular">{{ brandName }}</span>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
 
           <!-- Mediaplan Details (Read-only) -->
-          <div class="mb-1">
-            <!-- Name -->
-            <div class="d-flex py-1">
-              <div class="text-body-2 text-medium-emphasis" style="width: 100px;">Name:</div>
-              <div class="ml-2 text-body-2 text-right flex-grow-1">{{ mediaplanName || 'Not specified' }}</div>
-            </div>
+          <v-row>
+            <v-col cols="12">
+              <!-- Name -->
+              <v-row no-gutters class="py-1 align-center">
+                <v-col cols="3" class="text-body-2 text-medium-emphasis">
+                  Name:
+                </v-col>
+                <v-col class="text-body-2 text-right">
+                  {{ mediaplanName || '-_______-_______-Testname' }}
+                </v-col>
+              </v-row>
 
-            <!-- PO Numbers -->
-            <div class="d-flex py-1">
-              <div class="text-body-2 text-medium-emphasis" style="width: 100px;">PO:</div>
-              <div class="ml-2 text-body-2 text-right flex-grow-1">{{ poNumbersDisplay }}</div>
-            </div>
+              <!-- PO Numbers -->
+              <v-row no-gutters class="py-1 align-center">
+                <v-col cols="3" class="text-body-2 text-medium-emphasis">
+                  PO:
+                </v-col>
+                <v-col class="text-body-2 text-right">
+                  {{ poNumbersDisplay }}
+                </v-col>
+              </v-row>
 
-            <!-- Duration -->
-            <div class="d-flex py-1 mb-1">
-              <div class="text-body-2 text-medium-emphasis" style="width: 100px;">Duration:</div>
-              <div class="ml-2 text-body-2 text-right flex-grow-1">
-                Start: {{ formatDate(startDateValue) }}<br>
-                End: {{ formatDate(endDateValue) }}
-              </div>
-            </div>
-          </div>
+              <!-- Duration -->
+              <v-row no-gutters class="py-1 align-center">
+                <v-col cols="3" class="text-body-2 text-medium-emphasis">
+                  Duration:
+                </v-col>
+                <v-col class="text-body-2 text-right">
+                  Start: {{ formatDate(startDateValue) }}<br>
+                  End: {{ formatDate(endDateValue) }}
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
 
-          <v-divider class="mb-3 mt-2" color="secondary"></v-divider>
+          <v-row>
+            <v-col cols="12">
+              <v-divider class="mt-0 mb-3"></v-divider>
+            </v-col>
+          </v-row>
 
-          <div class="text-h6 mb-1">Add first project</div>
+          <v-row class="mb-0" no-gutters>
+            <h6 class="text-h6 font-weight-regular">Add first project</h6>
+          </v-row>
 
-          <!-- Country Selection with Flag -->
-          <div class="d-flex mb-1">
-            <div class="flex-1 pr-2" style="width: 50%">
-              <label class="text-caption text-medium-emphasis mb-1 d-block">Country *</label>
+          <!-- Country and Language Selection -->
+          <v-row>
+            <v-col cols="12" md="6" class="pb-0">
+              <v-sheet class="mb-1">
+                <div class="text-caption text-medium-emphasis mb-1">Country *</div>
+              </v-sheet>
               <v-select
                   v-model="selectedCountry"
                   :items="countries"
@@ -66,9 +91,10 @@
                   item-value="code"
                   :rules="[v => !!v || 'Country is required']"
                   variant="outlined"
-                  density="compact"
+                  density="comfortable"
                   return-object
-                  error-messages=""
+                  hide-details
+                  class="rounded-lg"
               >
                 <template v-slot:selection="{ item }">
                   <div class="d-flex align-center">
@@ -84,113 +110,136 @@
                   </v-list-item>
                 </template>
               </v-select>
-            </div>
+            </v-col>
 
-            <!-- Language Selection -->
-            <div class="flex-1 pl-2" style="width: 50%">
-              <label class="text-caption text-medium-emphasis mb-1 d-block">Language *</label>
+            <v-col cols="12" md="6" class="pb-0">
+              <v-sheet class="mb-1">
+                <div class="text-caption text-medium-emphasis mb-1">Language *</div>
+              </v-sheet>
               <v-select
                   v-model="selectedLanguage"
                   :items="availableLanguages"
                   item-title="name"
                   item-value="code"
                   variant="outlined"
-                  density="compact"
+                  density="comfortable"
                   :disabled="!selectedCountry"
                   :rules="[v => !!v || 'Language is required']"
-                  error-messages="* Depends on Country"
-                  persistent-hint
+                  hide-details
+                  class="rounded-lg"
               />
-            </div>
-          </div>
+              <div class="text-caption text-medium-emphasis mt-1">* Depends on Country</div>
+            </v-col>
+          </v-row>
 
           <!-- Builder -->
-          <div class="mb-1">
-            <label class="text-caption text-medium-emphasis mb-1 d-block">Builder *</label>
-            <v-select
-                v-model="selectedBuilder"
-                :items="builders"
-                item-title="name"
-                item-value="code"
-                :rules="[v => !!v || 'Builder is required']"
-                variant="outlined"
-                density="compact"
-                error-messages=""
-            />
-          </div>
+          <v-row>
+            <v-col cols="12">
+              <v-sheet class="mb-1">
+                <div class="text-caption text-medium-emphasis mb-1">Builder *</div>
+              </v-sheet>
+              <v-select
+                  v-model="selectedBuilder"
+                  :items="builders"
+                  item-title="name"
+                  item-value="code"
+                  :rules="[v => !!v || 'Builder is required']"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details
+                  class="rounded-lg"
+              />
+            </v-col>
+          </v-row>
 
           <!-- Campaign Type -->
-          <div class="mb-1">
-            <label class="text-caption text-medium-emphasis mb-1 d-block">Campaign type *</label>
-            <v-select
-                v-model="selectedCampaignType"
-                :items="campaignTypes"
-                item-title="name"
-                item-value="code"
-                :rules="[v => !!v || 'Campaign type is required']"
-                variant="outlined"
-                density="compact"
-                error-messages=""
-            >
-              <template v-slot:selection="{ item }">
-                <v-chip
-                    size="small"
-                    :color="getCampaignTypeColor(item.raw.code)"
-                    class="text-capitalize"
-                >
-                  {{ item.raw.name }}
-                </v-chip>
-              </template>
-              <template v-slot:item="{ item, props }">
-                <v-list-item v-bind="props">
-                  <template v-slot:prepend>
-                    <v-icon :color="getCampaignTypeColor(item.raw.code)"
-                            :icon="getCampaignTypeIcon(item.raw.code)"></v-icon>
-                  </template>
-                </v-list-item>
-              </template>
-            </v-select>
-          </div>
+          <v-row>
+            <v-col cols="12">
+              <v-sheet class="mb-1">
+                <div class="text-caption text-medium-emphasis mb-1">Campaign type *</div>
+              </v-sheet>
+              <v-select
+                  v-model="selectedCampaignType"
+                  :items="campaignTypes"
+                  item-title="name"
+                  item-value="code"
+                  :rules="[v => !!v || 'Campaign type is required']"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details
+                  class="rounded-lg"
+              >
+                <template v-slot:selection="{ item }">
+                  <v-chip
+                      size="small"
+                      :color="getCampaignTypeColor(item.raw.code)"
+                      class="text-capitalize"
+                  >
+                    {{ item.raw.name }}
+                  </v-chip>
+                </template>
+                <template v-slot:item="{ item, props }">
+                  <v-list-item v-bind="props">
+                    <template v-slot:prepend>
+                      <v-icon :color="getCampaignTypeColor(item.raw.code)"
+                              :icon="getCampaignTypeIcon(item.raw.code)"></v-icon>
+                    </template>
+                  </v-list-item>
+                </template>
+              </v-select>
+            </v-col>
+          </v-row>
 
           <!-- Phase -->
-          <div class="mb-1">
-            <label class="text-caption text-medium-emphasis mb-1 d-block">Phase *</label>
-            <v-select
-                v-model="selectedPhase"
-                :items="phases"
-                item-title="name"
-                item-value="code"
-                :rules="[v => !!v || 'Phase is required']"
-                variant="outlined"
-                density="compact"
-                error-messages=""
-            />
-          </div>
+          <v-row>
+            <v-col cols="12">
+              <v-sheet class="mb-1">
+                <div class="text-caption text-medium-emphasis mb-1">Phase *</div>
+              </v-sheet>
+              <v-select
+                  v-model="selectedPhase"
+                  :items="phases"
+                  item-title="name"
+                  item-value="code"
+                  :rules="[v => !!v || 'Phase is required']"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details
+                  class="rounded-lg"
+              />
+            </v-col>
+          </v-row>
 
           <!-- Goal -->
-          <div class="mb-1">
-            <label class="text-caption text-medium-emphasis mb-1 d-block">Goal *</label>
-            <v-select
-                v-model="selectedGoal"
-                :items="goals"
-                item-title="name"
-                item-value="code"
-                :rules="[v => !!v || 'Goal is required']"
-                variant="outlined"
-                density="compact"
-                error-messages=""
-            />
-          </div>
+          <v-row class="mb-0">
+            <v-col cols="12">
+              <v-sheet class="mb-1">
+                <div class="text-caption text-medium-emphasis mb-1">Goal *</div>
+              </v-sheet>
+              <v-select
+                  v-model="selectedGoal"
+                  :items="goals"
+                  item-title="name"
+                  item-value="code"
+                  :rules="[v => !!v || 'Goal is required']"
+                  variant="outlined"
+                  density="comfortable"
+                  hide-details
+                  class="rounded-lg"
+              />
+            </v-col>
+          </v-row>
         </v-card-text>
-        <!-- Action Buttons -->
+
+        <!-- Keep the original DialogFooter component -->
         <DialogFooter
+            class="px-4"
             cancel-text="Cancel"
             confirm-text="Save"
             :loading="isSubmitting"
             :disabled="!formIsReady"
             :submit-button="true"
             @cancel="cancelDialog"
-            class="mt-0"
         />
       </v-form>
     </v-card>
@@ -335,13 +384,8 @@ const poNumbersDisplay = computed(() => {
     return 'None';
   }
 
-  if (props.poNumbers.length === 1) {
-    const po = props.poNumbers[0];
-    return `${po.name} (${formatCurrency(po.value)})`;
-  }
-
-  const total = props.poNumbers.reduce((sum, po) => sum + po.value, 0);
-  return `${props.poNumbers.length} POs (${formatCurrency(total)})`;
+  // Format to match the Figma design (comma-separated list of PO numbers)
+  return props.poNumbers.map(po => po.name).join(', ');
 });
 
 // Validate the form
@@ -506,3 +550,21 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+/*.rounded-lg {
+  border-radius: 8px;
+}
+
+!* Remove the double border when selections are made *!
+:deep(.v-field.v-field--variant-outlined .v-field__outline) {
+  --v-field-border-opacity: 1;
+  --v-field-border-width: 1px;
+}
+
+!* Ensure select fields match Figma design *!
+:deep(.v-field--variant-outlined) {
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  background-color: white;
+}*/
+</style>

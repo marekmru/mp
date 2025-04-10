@@ -1,53 +1,71 @@
 // src/types/project.ts
 
-export interface ProjectCountry {
+// Country reference
+export interface Country {
   code: string;
   name: string;
 }
 
-export interface ProjectLanguage {
-  code: string;
-  name: string;
+// Basic structure for default variables
+export interface ProjectDefaultVars {
+  targeturls: string | null;
+  subsegment: string | null;
+  campaigntype: string | null;
+  language: string | null;
+  campaigndetail: string | null;
+  adtype: string | null;
+  dimension: string | null;
 }
 
-export interface ProjectCampaignType {
-  id: string;
-  name: string;
+// Basic structure for descriptive variables
+export interface ProjectDescriptiveVars {
+  brand: string;
+  country: string;
+  bmwponumber: string;
+  adobecampaignname: string;
+  subsegment: string;
+  campaigntype: string;
+  projectname: string;
+  year: number;
 }
 
-export interface ProjectPhase {
-  id: string;
-  name: string;
+// Duration information
+export interface ProjectDuration {
+  start_date: string;
+  end_date: string;
+  formatted: string;
 }
 
-export interface ProjectGoal {
-  id: string;
-  name: string;
-}
-
-export interface ProjectCreate {
-  name: string;
-  mediaplanId: string;
-  country: ProjectCountry;
-  language: string;
-  campaignType: string;
-  phase: string;
-  goal: string;
-}
-
+// Project object
 export interface Project {
   _id: string;
-  name: string;
-  mediaplanId: string;
-  country: ProjectCountry;
-  language: string;
-  campaignType: string;
-  phase: string;
-  goal: string;
-  createdAt: string;
-  updatedAt: string;
+  abbreviation: string;
+  created_at: string;
+  default_vars: ProjectDefaultVars;
+  descriptive_vars: ProjectDescriptiveVars;
+  is_locked: boolean;
+  labels: string[];
+  lock_state: number;
+  owner: string;
+  updated_at: string;
+  uploaded_at: string;
+  message: string;
+  timestamp: string;
+  version: string;
+  duration?: ProjectDuration;
+  detail?: string;
+  mediaplanId?: string;
 }
 
+// Project create request
+export interface ProjectCreate {
+  abbreviation?: string;
+  default_vars: ProjectDefaultVars;
+  descriptive_vars: ProjectDescriptiveVars;
+  labels?: string[];
+}
+
+// API response for project list
 export interface ProjectListResponse {
   total_items: number;
   total_pages: number;

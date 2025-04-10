@@ -89,7 +89,6 @@
       </div>
     </v-card-text>
 
-
     <v-card-actions>
       <!-- Action buttons -->
       <v-spacer/>
@@ -108,6 +107,8 @@
       >
         Show Mediaplan
       </v-btn>
+      <br>
+
     </v-card-actions>
   </v-card>
   </div>
@@ -124,7 +125,8 @@ import { formatDateRange } from '@/helpers/dateUtils';
 import { formatCurrency } from '@/helpers/currencyUtils';
 import { getBrandLogo } from '@/helpers/brandUtils';
 
-defineProps<{
+// Store mediaplan prop in a variable to access it throughout the component
+const props = defineProps<{
   mediaplan: Mediaplan;
 }>();
 
@@ -148,7 +150,7 @@ const handleCardClick = (event: MouseEvent) => {
   }
   
   // Navigate to detail page
-  router.push({ name: 'MediaplanDetail', params: { id: mediaplan._id }});
+  router.push({ name: 'MediaplanDetail', params: { id: props.mediaplan._id }});
 };
   
 const handleMenuAction = (action: string, id: string) => {
