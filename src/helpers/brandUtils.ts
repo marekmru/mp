@@ -17,25 +17,26 @@ export const hasBrandLogo = (brand?: Brand | EntityReference): boolean => {
   const knownBrands = ['BMW', 'MINI'];
   return knownBrands.includes(brand.name);
 };
-
 /**
  * Gets the brand logo URL
  */
-export const getBrandLogo = (brand?: Brand | EntityReference): string => {
-  if (!brand) return '/brands/default.png';
-  
-  // If it's a Brand with logo property
+export const getBrandLogo = (brand?: Brand | EntityReference | string): string => {
+  const brandLogos: Record<string, string> = {
+    'BMW': '/img/brands/BMW.svg',
+    'MINI': '/img/brands/MINI.svg'
+  };
+
+  if (!brand) return '/img/brands/logoipsum.svg';
+
+  if (typeof brand === 'string') {
+    return brandLogos[brand] || '/img/brands/logoipsum.svg';
+  }
+
   if ('logo' in brand && brand.logo) {
     return brand.logo;
   }
-  
-  // Default logos for known brands
-  const brandLogos: Record<string, string> = {
-    'BMW': '/brands/bmw.png',
-    'MINI': '/brands/mini.png'
-  };
-  
-  return brandLogos[brand.name] || '/brands/default.png';
+
+  return brandLogos[brand.name] || '/img/brands/logoipsum.svg';
 };
 /**
  * Gets brand initials for brands without logos

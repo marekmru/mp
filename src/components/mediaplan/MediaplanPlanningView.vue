@@ -2,7 +2,6 @@
   <div class="planning-view-container mt-4">
     <v-card class="projects-table elevation-0" variant="flat">
       <v-theme-provider theme="dark">
-        <pre>{{ projects}}</pre>
         <v-data-table-server
             v-model:items-per-page="itemsPerPage"
             v-model:page="page"
@@ -22,73 +21,69 @@
             </v-btn>
           </template>
 
-          <!-- Name column with logo -->
           <template v-slot:item.abbreviation="{ item }">
-            <div class="d-flex align-center" v-if="item.raw">
+            <div class="d-flex align-center" v-if="item.abbreviation">
               <v-avatar size="32" class="mr-2 grey lighten-4"
-                        :image="getBrandLogo(item.raw.descriptive_vars?.brand)"></v-avatar>
-              <span>{{ item.raw.abbreviation }}</span>
+                        :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
+              <span>{{ item.abbreviation }}</span>
             </div>
             <div v-else>N/A</div>
           </template>
 
-          <!-- Country column with flag -->
           <template v-slot:item.country="{ item }">
-            <div class="d-flex align-center" v-if="item.raw && item.raw.descriptive_vars?.country">
-              <CountryFlag :country="item.raw.descriptive_vars.country" class="mr-2"/>
-              <span>{{ getCountryName(item.raw.descriptive_vars.country) }}</span>
+            <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
+              <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2"/>
+              <span>{{ item.descriptive_vars.country }}</span>
             </div>
             <div v-else>N/A</div>
+          </template>
+
+          <template v-slot:item.bmwponumber="{ item }">
+            {{ item.descriptive_vars?.bmwponumber || 'N/A' }}
           </template>
 
           <!-- Duration column with date range -->
           <template v-slot:item.duration="{ item }">
-            <div class="d-flex align-center" v-if="item.raw && item.raw.duration?.formatted">
+            <div class="d-flex align-center" v-if="item.duration?.formatted">
               <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
-              <span>{{ item.raw.duration.formatted }}</span>
+              <span>{{ item.duration.formatted }}</span>
             </div>
             <div v-else>N/A</div>
           </template>
 
-          <!-- Detail column with long text -->
           <template v-slot:item.detail="{ item }">
-            <span v-if="item.raw && item.raw.detail">{{ item.raw.detail }}</span>
-            <span v-else>N/A</span>
+            {{ item.detail || 'N/A' }}
           </template>
 
-          <!-- Campaign Type column with chip -->
-          <template v-slot:item.campaignType="{ item }">
-            <v-chip
-                v-if="item.raw && item.raw.default_vars?.campaigntype"
-                size="small"
-                class="text-capitalize"
-                color="primary"
-                variant="flat"
-            >
-              {{ item.raw.default_vars.campaigntype }}
-            </v-chip>
-            <span v-else>N/A</span>
-          </template>
-
-          <!-- Sub-Segment column with chip -->
           <template v-slot:item.subsegment="{ item }">
-            <v-chip
-                v-if="item.raw && item.raw.default_vars?.subsegment"
-                size="small"
-                class="text-capitalize"
-                color="grey-lighten-1"
-                variant="flat"
-            >
-              {{ item.raw.default_vars.subsegment }}
-            </v-chip>
-            <span v-else>N/A</span>
+            {{ item.default_vars?.subsegment || 'N/A' }}
+          </template>
+
+          <template v-slot:item.campaigntype="{ item }">
+            {{ item.default_vars?.campaigntype || 'N/A' }}
+          </template>
+
+          <template v-slot:item.year="{ item }">
+            {{ item.descriptive_vars?.year || 'N/A' }}
+          </template>
+
+          <template v-slot:item.targeturls="{ item }">
+            {{ item.default_vars?.targeturls || 'N/A' }}
+          </template>
+
+          <template v-slot:item.language="{ item }">
+            {{ item.default_vars?.language || 'N/A' }}
+          </template>
+
+          <template v-slot:item.campaigndetail="{ item }">
+            {{ item.default_vars?.campaigndetail || 'N/A' }}
           </template>
 
           <!-- Lock Status column with icon -->
           <template v-slot:item.lockStatus="{ item }">
             <v-icon
                 v-if="item.raw"
-                :color="item.raw.is_locked ? 'warning' : 'grey-lighten-1'"
+                :color="item.is_locked ? 'warning' : 'grey-lighten-1'"
             >
               mdi-lock
             </v-icon>
@@ -124,6 +119,7 @@
 <script setup lang="ts">
 import {ref, watch} from 'vue';
 import CountryFlag from '@/components/common/CountryFlag.vue';
+import {getBrandLogo} from "@/helpers/brandUtils.ts";
 
 interface Props {
   projects: any[];
@@ -143,15 +139,15 @@ const page = ref(1);
 const itemsPerPage = ref(10);
 
 const headers = [
-  {title: '', key: 'edit', sortable: false, width: '50px'},
-  {title: 'Name', key: 'abbreviation', sortable: true, align: 'start'},
-  {title: 'Country', key: 'country', sortable: true},
-  {title: 'Duration', key: 'duration', sortable: true},
-  {title: 'Detail', key: 'detail', sortable: true},
-  {title: 'Campaign type', key: 'campaignType', sortable: true},
-  {title: 'Sub-segment', key: 'subsegment', sortable: true},
-  {title: '', key: 'lockStatus', sortable: false, width: '50px'},
-  {title: '', key: 'actions', sortable: false, width: '50px'}
+  { title: '', key: 'edit', sortable: false, width: '50px' },
+  { title: 'Name', key: 'abbreviation', sortable: true, align: 'start' },
+  { title: 'Country', key: 'country', sortable: true },
+  { title: 'Duration', key: 'duration', sortable: true },
+  { title: 'Detail', key: 'detail', sortable: true },
+  { title: 'Campaign Type', key: 'campaigntype', sortable: true },
+  { title: 'Subsegment', key: 'subsegment', sortable: true },
+  { title: '', key: 'lockStatus', sortable: false, width: '50px' },
+  { title: '', key: 'actions', sortable: false, width: '50px' }
 ];
 
 watch([page, itemsPerPage], ([newPage, newItemsPerPage]) => {
@@ -175,7 +171,6 @@ const updateItemsPerPage = (newItemsPerPage: number) => {
 const addProject = () => {
   emit('addProject');
 };
-
 
 </script>
 
