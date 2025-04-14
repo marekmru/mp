@@ -1,7 +1,8 @@
 <template>
   <div class="planning-view-container mt-4">
-    <v-card class="projects-table" variant="flat">
+    <v-card class="projects-table elevation-0" variant="flat">
       <v-theme-provider theme="dark">
+        <pre>{{ projects}}</pre>
         <v-data-table-server
             v-model:items-per-page="itemsPerPage"
             v-model:page="page"
@@ -11,7 +12,7 @@
             :loading="isLoading"
             item-value="_id"
             hover
-            class="elevation-0 projects-data-table"
+            class="projects-data-table"
             @update:options="onOptionsUpdate"
         >
           <!-- Edit button column -->
@@ -24,9 +25,8 @@
           <!-- Name column with logo -->
           <template v-slot:item.abbreviation="{ item }">
             <div class="d-flex align-center" v-if="item.raw">
-              <v-avatar size="32" class="mr-2 grey lighten-4">
-                <v-img :src="getBrandLogo(item.raw.descriptive_vars?.brand)"></v-img>
-              </v-avatar>
+              <v-avatar size="32" class="mr-2 grey lighten-4"
+                        :image="getBrandLogo(item.raw.descriptive_vars?.brand)"></v-avatar>
               <span>{{ item.raw.abbreviation }}</span>
             </div>
             <div v-else>N/A</div>
@@ -35,9 +35,7 @@
           <!-- Country column with flag -->
           <template v-slot:item.country="{ item }">
             <div class="d-flex align-center" v-if="item.raw && item.raw.descriptive_vars?.country">
-              <v-avatar size="24" class="mr-2">
-                <v-img :src="getCountryFlag(item.raw.descriptive_vars.country)"></v-img>
-              </v-avatar>
+              <CountryFlag :country="item.raw.descriptive_vars.country" class="mr-2"/>
               <span>{{ getCountryName(item.raw.descriptive_vars.country) }}</span>
             </div>
             <div v-else>N/A</div>
@@ -103,14 +101,13 @@
               <v-icon>mdi-dots-vertical</v-icon>
             </v-btn>
           </template>
-
-          <!-- Footer with add project button -->
           <template v-slot:bottom>
-            <div class="d-flex align-center pa-4">
+            <div class="d-flex align-center pa-4 bg-grey-lighten-2">
               <v-btn
                   prepend-icon="mdi-plus"
+                  class="black-text-button"
                   variant="text"
-                  color="primary"
+                  color="black"
                   @click="addProject"
               >
                 Add Project
@@ -121,10 +118,12 @@
       </v-theme-provider>
     </v-card>
   </div>
+
 </template>
 
 <script setup lang="ts">
 import {ref, watch} from 'vue';
+import CountryFlag from '@/components/common/CountryFlag.vue';
 
 interface Props {
   projects: any[];
@@ -156,11 +155,13 @@ const headers = [
 ];
 
 watch([page, itemsPerPage], ([newPage, newItemsPerPage]) => {
+  // You can add your pagination logic here if needed
 });
 
 const onOptionsUpdate = (options: any) => {
   page.value = options.page;
   itemsPerPage.value = options.itemsPerPage;
+  // If you need to fetch data when options change, add that logic here
 };
 
 const updatePage = (newPage: number) => {
@@ -175,34 +176,11 @@ const addProject = () => {
   emit('addProject');
 };
 
-const getBrandLogo = (brand: string): string => {
-  const brands: Record<string, string> = {
-    'MINI': '/brands/mini.png',
-    'BMW': '/brands/bmw.png'
-  };
-  return brands[brand] || '/brands/default.png';
-};
 
-const getCountryFlag = (countryCode: string): string => {
-  return `/flags/${countryCode.toLowerCase()}.svg`;
-};
-
-const getCountryName = (countryCode: string): string => {
-  const countries: Record<string, string> = {
-    'DE': 'Germany',
-    'FR': 'France',
-    'IT': 'Italy',
-    'ES': 'Spain',
-    'UK': 'United Kingdom',
-    'US': 'United States'
-  };
-  return countries[countryCode] || countryCode;
-};
 </script>
 
 <style scoped>
 .planning-view-container {
-  border-radius: 8px;
   overflow: hidden;
 }
 
@@ -212,14 +190,25 @@ const getCountryName = (countryCode: string): string => {
   font-weight: 500;
 }
 
-.projects-data-table :deep(td),
 .projects-data-table :deep(.v-data-table__td) {
   background-color: #4D4D4D !important;
   color: white !important;
-  border-bottom: 1px solid #666;
   height: 60px;
   padding: 0 16px;
   vertical-align: middle;
+  border-radius: 0 !important;
+  border-bottom: 4px solid #fff !important;
+}
+
+/* Add border under each table row */
+
+.projects-data-table :deep(.v-btn.bg-grey-lighten-3) {
+  box-shadow: none !important;
+}
+
+/* Replace existing border with our new border */
+.projects-data-table :deep(.v-data-table__tr:not(:last-child)) {
+  border-bottom: 4px solid red !important;
 }
 
 .projects-data-table :deep(.v-data-table__tr:hover) {
@@ -241,5 +230,26 @@ const getCountryName = (countryCode: string): string => {
 
 .projects-data-table :deep(.v-btn) {
   color: white !important;
+}
+
+/* Style for pagination controls */
+.projects-data-table :deep(.v-data-table-footer) {
+  background-color: #4D4D4D !important;
+  color: white !important;
+}
+
+.projects-data-table :deep(.v-data-table-footer .v-btn) {
+  color: white !important;
+}
+
+
+/* Override for Add Project button to ensure black text */
+
+.projects-data-table .black-text-button {
+  color: black !important;
+}
+.black-text-button :deep(.v-btn__content),
+.black-text-button :deep(.v-btn__prepend) {
+  color: black !important;
 }
 </style>

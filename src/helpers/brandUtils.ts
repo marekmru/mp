@@ -37,7 +37,6 @@ export const getBrandLogo = (brand?: Brand | EntityReference): string => {
   
   return brandLogos[brand.name] || '/brands/default.png';
 };
-
 /**
  * Gets brand initials for brands without logos
  */
