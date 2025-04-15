@@ -1,183 +1,187 @@
 <template>
-  <div>
-    <!-- Mediaplan Creation Dialog -->
-    <v-dialog v-model="dialog" persistent max-width="500px">
-      <v-card class="px-6 pa-4">
-        <DialogHeader
-            title="Create new Mediaplan"
-            :show-back-button="false"
-            margin-bottom="4"
-            @close="cancelDialog"
-        />
-        <v-form ref="form" @submit.prevent="submitForm">
+  <v-dialog v-model="dialog" persistent max-width="450px">
+    <v-card class="px-6 pa-4">
+      <DialogHeader
+          title="Create new Mediaplan"
+          :show-back-button="false"
+          margin-bottom="4"
+          @close="cancelDialog"
+      />
+      <v-form ref="form" @submit.prevent="submitForm">
+        <WithFormDefaults>
           <v-card-text class="pa-0">
 
             <!-- Brand Selection -->
-            <div class="mb-4">
-              <label for="brand-select" class="text-body-2 mb-1 d-block">Brand Output*</label>
-              <v-select
-                  id="brand-select"
-                  v-model="formData.brand._id"
-                  :items="brands"
-                  item-title="name"
-                  item-value="_id"
-                  placeholder="Please Select a brand"
-                  :rules="[v => !!v || 'Brand is required']"
-                  variant="outlined"
-                  class="mb-0"
-                  hide-details
-              />
-            </div>
-
-            <!-- Type Selection (PO Based or Draft) -->
-            <div class="mb-4">
-              <label class="text-body-2 mb-1 d-block">Mediaplan Type</label>
-              <v-radio-group v-model="mediaplanType" inline class="mt-0">
-                <v-radio value="po" label="PO Based"/>
-                <v-radio value="draft" label="Draft"/>
-              </v-radio-group>
-            </div>
-
-            <!-- Mediaplan Name -->
-            <div class="mb-4">
-              <label for="mediaplan-name" class="text-body-2 mb-1 d-block">Individual Name*</label>
-              <v-text-field
-                  id="mediaplan-name"
-                  v-model="formData.name"
-                  placeholder="please type in an individual title"
-                  :rules="[v => !!v || 'Name is required']"
-                  variant="outlined"
-                  hide-details
-              />
-            </div>
-
-            <!-- PO Selection - Only visible if PO Based selected -->
-            <div v-if="mediaplanType === 'po'" class="mb-4">
-              <label for="po-select" class="text-body-2 mb-1 d-block">Select existing PO*</label>
-              <v-row no-gutters>
+            <v-row>
+              <v-col cols="12">
+                <div class="text-caption text-medium-emphasis mb-1">Brand Output*</div>
                 <v-select
-                    id="po-select"
-                    v-model="selectedPOs"
-                    :items="poNumbers"
+                    id="brand-select"
+                    v-model="formData.brand._id"
+                    :items="brands"
                     item-title="name"
                     item-value="_id"
-                    placeholder="Select POs"
-                    :rules="[v => mediaplanType !== 'po' || (v && v.length > 0) || 'At least one PO is required']"
-                    variant="outlined"
-                    multiple
-                    chips
-                    closable-chips
-                    class="flex-grow-1 mr-2"
-                    hide-details
+                    placeholder="Please Select a brand"
+                    :rules="[v => !!v || 'Brand is required']"
                 />
-                <v-btn
-                    color="primary"
-                    variant="outlined"
-                    @click="openCreatePODialog"
-                    class="mt-0"
-                    style="height: 56px;"
-                >
-                  Create PO
-                </v-btn>
-              </v-row>
-            </div>
+              </v-col>
+            </v-row>
 
+            <!-- Mediaplan Type -->
+            <v-row>
+              <v-col cols="12">
+                <div class="text-caption text-medium-emphasis mb-1">Mediaplan Type</div>
+                <v-radio-group v-model="mediaplanType" inline>
+                  <v-radio value="po" label="PO Based" />
+                  <v-radio value="draft" label="Draft" />
+                </v-radio-group>
+              </v-col>
+            </v-row>
+
+            <!-- Mediaplan Name -->
+            <v-row>
+              <v-col cols="12">
+                <div class="text-caption text-medium-emphasis mb-1">Individual Name*</div>
+                <v-text-field
+                    id="mediaplan-name"
+                    v-model="formData.name"
+                    placeholder="please type in an individual title"
+                    :rules="[v => !!v || 'Name is required']"
+                />
+              </v-col>
+            </v-row>
+
+            <!-- PO Selection -->
+            <v-row v-if="mediaplanType === 'po'">
+              <v-col cols="12">
+                <div class="text-caption text-medium-emphasis mb-1">Select existing PO*</div>
+                <v-row no-gutters>
+                  <v-col class="mr-2">
+                    <v-select
+                        id="po-select"
+                        v-model="selectedPOs"
+                        :items="poNumbers"
+                        item-title="name"
+                        item-value="_id"
+                        placeholder="Select POs"
+                        :rules="[v => mediaplanType !== 'po' || (v && v.length > 0) || 'At least one PO is required']"
+                        multiple
+                        chips
+                        closable-chips
+                    />
+                  </v-col>
+                  <v-col cols="auto">
+                    <v-btn
+                        color="primary"
+                        variant="outlined"
+                        @click="openCreatePODialog"
+                        style="height: 56px"
+                    >
+                      Create PO
+                    </v-btn>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+
+            <!-- Creator and Department -->
             <template v-if="mediaplanType === 'po'">
-              <!-- Creator Name -->
-              <div class="mb-4">
-                <label for="creator-name" class="text-body-2 mb-1 d-block">Creator*</label>
-                <v-text-field
-                    id="creator-name"
-                    v-model="creatorName"
-                    placeholder="Your name"
-                    :rules="[v => !!v || 'Creator name is required']"
-                    variant="outlined"
-                    readonly
-                    disabled
-                    hide-details
-                />
-              </div>
-
-              <!-- Department -->
-              <div class="mb-4">
-                <label for="department" class="text-body-2 mb-1 d-block">Department</label>
-                <v-text-field
-                    id="department"
-                    v-model="department"
-                    placeholder="Department name"
-                    variant="outlined"
-                    hide-details
-                />
-              </div>
+              <v-row>
+                <v-col cols="12">
+                  <div class="text-caption text-medium-emphasis mb-1">Creator*</div>
+                  <v-text-field
+                      id="creator-name"
+                      v-model="creatorName"
+                      placeholder="Your name"
+                      :rules="[v => !!v || 'Creator name is required']"
+                      readonly
+                      disabled
+                  />
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <div class="text-caption text-medium-emphasis mb-1">Department</div>
+                  <v-text-field
+                      id="department"
+                      v-model="department"
+                      placeholder="Department name"
+                  />
+                </v-col>
+              </v-row>
             </template>
 
-            <!-- Date Range - Using the DateRangePicker component -->
-            <div class="mb-4">
-              <label for="date-range" class="text-body-2 mb-1 d-block">Start date* - End date*</label>
-              <DateRangePicker
-                  id="date-range"
-                  v-model="dateRange"
-                  placeholder="Select start and end dates"
-                  :rules="[v => !!v || 'Date range is required']"
-                  :required="true"
-                  dialog-title="Choose a date range"
-                  @update:model-value="handleDateRangeChange"
-                  hide-details
-              />
-            </div>
+            <!-- Date Range -->
+            <v-row>
+              <v-col cols="12">
+                <div class="text-caption text-medium-emphasis mb-1">Start date* - End date*</div>
+                <DateRangePicker
+                    id="date-range"
+                    v-model="dateRange"
+                    placeholder="Select start and end dates"
+                    :rules="[v => !!v || 'Date range is required']"
+                    :required="true"
+                    dialog-title="Choose a date range"
+                    @update:model-value="handleDateRangeChange"
+                />
+              </v-col>
+            </v-row>
 
           </v-card-text>
-          <DialogFooter
-              cancel-text="Cancel"
-              confirm-text="Next Step"
-              :loading="isSubmitting"
-              :disabled="!form?.isValid"
-              :submit-button="true"
-              @cancel="cancelDialog"
-          />
-        </v-form>
-      </v-card>
-    </v-dialog>
+        </WithFormDefaults>
 
-    <!-- Create PO Dialog -->
-    <CreatePoDialog
-        v-model="createPODialogVisible"
-        :initial-brand-id="formData.brand._id"
-        @created="handlePoCreated"
-    />
+        <DialogFooter
+            cancel-text="Cancel"
+            confirm-text="Next Step"
+            :loading="isSubmitting"
+            :disabled="!form?.isValid"
+            :submit-button="true"
+            @cancel="cancelDialog"
+        />
+      </v-form>
+    </v-card>
+  </v-dialog>
 
-    <!-- Project Creation Dialog (shown after mediaplan creation) -->
-    <CreateProjectDialog
-        v-if="showProjectDialog"
-        v-model="showProjectDialog"
-        :mediaplan-id="createdMediaplanId"
-        :mediaplan-name="formData.name"
-        :po-numbers="formData.po_numbers"
-        :start-date="formData.start_date"
-        :end-date="formData.end_date"
-        :brand="{ _id: formData.brand._id, name: selectedBrandName }"
-        @created="handleProjectCreated"
-    />
-  </div>
+  <!-- Create PO Dialog -->
+  <CreatePoDialog
+      v-model="createPODialogVisible"
+      :initial-brand-id="formData.brand._id"
+      @created="handlePoCreated"
+  />
+
+  <!-- Project Creation Dialog (shown after mediaplan creation) -->
+  <CreateProjectDialog
+      v-if="showProjectDialog"
+      v-model="showProjectDialog"
+      :mediaplan-id="createdMediaplanId"
+      :mediaplan-name="formData.name"
+      :po-numbers="formData.po_numbers"
+      :start-date="formData.start_date"
+      :end-date="formData.end_date"
+      :brand="{ _id: formData.brand._id, name: selectedBrandName }"
+      @created="handleProjectCreated"
+  />
 </template>
+
+
 
 <script setup lang="ts">
 import {ref, computed, onMounted, watch, nextTick, reactive} from 'vue';
-import { useAuthStore } from '@/stores/auth';
-import { useCreateMediaplanStore } from '@/stores/createMediaplanStore';
+import {useAuthStore} from '@/stores/auth';
+import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
 import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
 import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
 import DateRangePicker from './DateRangePicker.vue';
 import CreateProjectDialog from '@/components/overview/CreateProjectDialog.vue';
 import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
-import type { MediaplanCreate, Brand, PONumber } from '@/types/mediaplan';
-import { showSuccess, showError, showWarning } from '@/helpers/notificationUtils';
+import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
+import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
+import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
 
 // Props
 const props = defineProps<{
   modelValue: boolean;
 }>();
-
 // Emits
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
@@ -257,7 +261,7 @@ const handleProjectCreated = (projectId: string) => {
 
   // Close the main dialog as well
   dialog.value = false;
-  
+
   // Show success notification
   showSuccess('Project created successfully');
 };
@@ -342,7 +346,7 @@ const submitForm = async () => {
 
     } catch (apiError) {
       console.error('API error creating mediaplan:', apiError);
-      showError('Failed to create mediaplan: API error', { timeout: 10000 });
+      showError('Failed to create mediaplan: API error', {timeout: 10000});
       throw apiError;
     }
 

@@ -50,7 +50,7 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
     async function fetchMediaplans() {
         isLoading.value = true;
         error.value = null;
-
+        console.log('fetchMediaplans')
         try {
             // Build query parameters
             const queryParams = new URLSearchParams();

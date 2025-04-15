@@ -49,7 +49,7 @@ import { useMediaplanStore } from '@/stores/mediaplanStore';
 
 // Store
 const mediaplanStore = useMediaplanStore();
-
+console.log('mediaplanStore')
 // State for filters and sorting
 const filters = reactive<MediaplanFilter>({
   search: '',

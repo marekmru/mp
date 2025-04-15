@@ -8,7 +8,7 @@
           class="mr-2"
           :color="backIconColor"
       >
-        mdi-arrow-left
+        mdi-arrow-u-left-top
       </v-icon>
       <span :class="titleClass">{{ title }}</span>
       <v-spacer></v-spacer>

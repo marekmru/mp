@@ -1,237 +1,149 @@
 <template>
-  <v-dialog v-model="dialog" persistent max-width="550px">
-    <v-card class="px-1 pb-6 pt-4">
-      <!-- Keep the original DialogHeader component -->
+  <v-dialog v-model="dialog" persistent max-width="450px">
+    <v-card class="px-6 pa-4">
       <DialogHeader
-          class="px-2"
           title="Create new Mediaplan"
           :show-back-button="true"
           :show-close-button="true"
+          margin-bottom="4"
           @back="cancelDialog"
           @close="cancelDialog"
       />
 
       <v-form ref="form" @submit.prevent="submitForm" v-model="isFormValid" validate-on="input">
-        <v-card-text class="py-2">
-          <!-- Brand Logo and Name -->
-          <v-row class="mb-0">
-            <v-col cols="12">
-              <v-row align="center" no-gutters>
-                <v-col cols="auto" class="mr-2 pr-0">
-                  <v-img
-                      :src="getBrandLogo(brand)"
-                      width="100"
-                      height="40"
-                      contain
-                  ></v-img>
-                </v-col>
-                <v-col>
-                  <span class="text-h6 font-weight-regular">{{ brandName }}</span>
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
+        <WithFormDefaults>
+          <v-card-text class="pa-0">
+            <!-- Brand Logo and Name -->
+            <v-row class="align-center mb-3 pl-2">
+              <v-img :src="getBrandLogo(brand)" class="mr-2" width="40" max-width="40"></v-img>
+              <span class="text-h6 font-weight-regular">{{ brandName }}</span>
+            </v-row>
 
-          <!-- Mediaplan Details (Read-only) -->
-          <v-row>
-            <v-col cols="12">
-              <!-- Name -->
-              <v-row no-gutters class="py-1 align-center">
-                <v-col cols="3" class="text-body-2 text-medium-emphasis">
-                  Name:
-                </v-col>
-                <v-col class="text-body-2 text-right">
-                  {{ mediaplanName || '-_______-_______-Testname' }}
-                </v-col>
-              </v-row>
+            <v-row no-gutters class="pb-3 align-center">
+              <v-col cols="3" class="text-body-2 text-medium-emphasis">Name:</v-col>
+              <v-col class="text-body-2 text-right">{{ mediaplanName || '-_______-_______-Testname' }}</v-col>
+            </v-row>
+            <v-row no-gutters class="pb-3 align-center">
+              <v-col cols="3" class="text-body-2 text-medium-emphasis">PO:</v-col>
+              <v-col class="text-body-2 text-right">{{ poNumbersDisplay }}</v-col>
+            </v-row>
+            <v-row no-gutters class="pb-0 align-start">
+              <v-col cols="3" class="text-body-2 text-medium-emphasis">Duration:</v-col>
+              <v-col class="text-body-2 text-right">
+                Start: {{ formatDate(startDateValue) }}<br>
+                End: {{ formatDate(endDateValue) }}
+              </v-col>
+            </v-row>
 
-              <!-- PO Numbers -->
-              <v-row no-gutters class="py-1 align-center">
-                <v-col cols="3" class="text-body-2 text-medium-emphasis">
-                  PO:
-                </v-col>
-                <v-col class="text-body-2 text-right">
-                  {{ poNumbersDisplay }}
-                </v-col>
-              </v-row>
+            <v-divider class="mt-4 mb-5"></v-divider>
 
-              <!-- Duration -->
-              <v-row no-gutters class="py-1 align-center">
-                <v-col cols="3" class="text-body-2 text-medium-emphasis">
-                  Duration:
-                </v-col>
-                <v-col class="text-body-2 text-right">
-                  Start: {{ formatDate(startDateValue) }}<br>
-                  End: {{ formatDate(endDateValue) }}
-                </v-col>
-              </v-row>
-            </v-col>
-          </v-row>
+            <!-- Section Title -->
+            <v-row>
+              <v-col cols="12">
+                <h6 class="text-h6 font-weight-regular">Add first project</h6>
+              </v-col>
+            </v-row>
 
-          <v-row>
-            <v-col cols="12">
-              <v-divider class="mt-0 mb-3"></v-divider>
-            </v-col>
-          </v-row>
-
-          <v-row class="mb-0" no-gutters>
-            <h6 class="text-h6 font-weight-regular">Add first project</h6>
-          </v-row>
-
-          <!-- Country and Language Selection -->
-          <v-row>
-            <v-col cols="12" md="6" class="pb-0">
-              <v-sheet class="mb-1">
-                <div class="text-caption text-medium-emphasis mb-1">Country *</div>
-              </v-sheet>
-              <v-select
-                  v-model="selectedCountry"
-                  :items="countries"
-                  item-title="name"
-                  item-value="code"
-                  :rules="[v => !!v || 'Country is required']"
-                  variant="outlined"
-                  density="comfortable"
-                  return-object
-                  hide-details
-                  class="rounded-lg"
-              >
-                <template v-slot:selection="{ item }">
-                  <div class="d-flex align-center">
-                    <country-flag :country="item.raw.code" class="mr-2"/>
-                    {{ item.raw.code }} - {{ item.raw.name }}
-                  </div>
-                </template>
-                <template v-slot:item="{ item, props }">
-                  <v-list-item v-bind="props" :title="`${item.raw.code} - ${item.raw.name}`">
-                    <template v-slot:prepend>
+            <!-- Country and Language -->
+            <v-row>
+              <v-col cols="12" md="6">
+                <div class="text-caption text-medium-emphasis">Country *</div>
+                <v-select
+                    v-model="selectedCountry"
+                    :items="countries"
+                    item-title="name"
+                    item-value="code"
+                    :rules="[v => !!v || 'Country is required']"
+                    return-object
+                >
+                  <template v-slot:selection="{ item }">
+                    <div class="d-flex align-center">
                       <country-flag :country="item.raw.code" class="mr-2"/>
-                    </template>
-                  </v-list-item>
-                </template>
-              </v-select>
-            </v-col>
+                      {{ item.raw.code }} - {{ item.raw.name }}
+                    </div>
+                  </template>
+                  <template v-slot:item="{ item, props }">
+                    <v-list-item v-bind="props" :title="`${item.raw.code} - ${item.raw.name}`">
+                      <template v-slot:prepend>
+                        <country-flag :country="item.raw.code" class="mr-2"/>
+                      </template>
+                    </v-list-item>
+                  </template>
+                </v-select>
+              </v-col>
 
-            <v-col cols="12" md="6" class="pb-0">
-              <v-sheet class="mb-1">
-                <div class="text-caption text-medium-emphasis mb-1">Language *</div>
-              </v-sheet>
-              <v-select
-                  v-model="selectedLanguage"
-                  :items="availableLanguages"
-                  item-title="name"
-                  item-value="code"
-                  variant="outlined"
-                  density="comfortable"
-                  :disabled="!selectedCountry"
-                  :rules="[v => !!v || 'Language is required']"
-                  hide-details
-                  class="rounded-lg"
-              />
-              <div class="text-caption text-medium-emphasis mt-1">* Depends on Country</div>
-            </v-col>
-          </v-row>
+              <v-col cols="12" md="6">
+                <div class="text-caption text-medium-emphasis mb-0">Language *</div>
+                <v-select
+                    v-model="selectedLanguage"
+                    :items="availableLanguages"
+                    item-title="name"
+                    item-value="code"
+                    :disabled="!selectedCountry"
+                    :rules="[v => !!v || 'Language is required']"
+                />
+                <div class="text-caption text-medium-emphasis mt-1">* Depends on Country</div>
+              </v-col>
+            </v-row>
 
-          <!-- Builder -->
-          <v-row>
-            <v-col cols="12">
-              <v-sheet class="mb-1">
-                <div class="text-caption text-medium-emphasis mb-1">Builder *</div>
-              </v-sheet>
-              <v-select
-                  v-model="selectedBuilder"
-                  :items="builders"
-                  item-title="name"
-                  item-value="code"
-                  :rules="[v => !!v || 'Builder is required']"
-                  variant="outlined"
-                  density="comfortable"
-                  hide-details
-                  class="rounded-lg"
-              />
-            </v-col>
-          </v-row>
+            <!-- Builder -->
+            <v-row>
+              <v-col cols="12">
+                <div class="text-caption text-medium-emphasis mb-0">Builder *</div>
+                <v-select
+                    v-model="selectedBuilder"
+                    :items="builders"
+                    item-title="name"
+                    item-value="code"
+                    :rules="[v => !!v || 'Builder is required']"
+                />
+              </v-col>
+            </v-row>
 
-          <!-- Campaign Type -->
-          <v-row>
-            <v-col cols="12">
-              <v-sheet class="mb-1">
-                <div class="text-caption text-medium-emphasis mb-1">Campaign type *</div>
-              </v-sheet>
-              <v-select
-                  v-model="selectedCampaignType"
-                  :items="campaignTypes"
-                  item-title="name"
-                  item-value="code"
-                  :rules="[v => !!v || 'Campaign type is required']"
-                  variant="outlined"
-                  density="comfortable"
-                  hide-details
-                  class="rounded-lg"
-              >
-                <template v-slot:selection="{ item }">
-                  <v-chip
-                      size="small"
-                      :color="getCampaignTypeColor(item.raw.code)"
-                      class="text-capitalize"
-                  >
-                    {{ item.raw.name }}
-                  </v-chip>
-                </template>
-                <template v-slot:item="{ item, props }">
-                  <v-list-item v-bind="props">
-                    <template v-slot:prepend>
-                      <v-icon :color="getCampaignTypeColor(item.raw.code)"
-                              :icon="getCampaignTypeIcon(item.raw.code)"></v-icon>
-                    </template>
-                  </v-list-item>
-                </template>
-              </v-select>
-            </v-col>
-          </v-row>
+            <!-- Campaign Type -->
+            <v-row>
+              <v-col cols="12">
+                <div class="text-caption text-medium-emphasis mb-0">Campaign type *</div>
+                <v-select
+                    v-model="selectedCampaignType"
+                    :items="campaignTypes"
+                    item-title="name"
+                    item-value="code"
+                    :rules="[v => !!v || 'Campaign type is required']"
+                />
+              </v-col>
+            </v-row>
 
-          <!-- Phase -->
-          <v-row>
-            <v-col cols="12">
-              <v-sheet class="mb-1">
-                <div class="text-caption text-medium-emphasis mb-1">Phase *</div>
-              </v-sheet>
-              <v-select
-                  v-model="selectedPhase"
-                  :items="phases"
-                  item-title="name"
-                  item-value="code"
-                  :rules="[v => !!v || 'Phase is required']"
-                  variant="outlined"
-                  density="comfortable"
-                  hide-details
-                  class="rounded-lg"
-              />
-            </v-col>
-          </v-row>
+            <!-- Phase -->
+            <v-row>
+              <v-col cols="12">
+                <div class="text-caption text-medium-emphasis mb-0">Phase *</div>
+                <v-select
+                    v-model="selectedPhase"
+                    :items="phases"
+                    item-title="name"
+                    item-value="code"
+                    :rules="[v => !!v || 'Phase is required']"
+                />
+              </v-col>
+            </v-row>
 
-          <!-- Goal -->
-          <v-row class="mb-0">
-            <v-col cols="12">
-              <v-sheet class="mb-1">
-                <div class="text-caption text-medium-emphasis mb-1">Goal *</div>
-              </v-sheet>
-              <v-select
-                  v-model="selectedGoal"
-                  :items="goals"
-                  item-title="name"
-                  item-value="code"
-                  :rules="[v => !!v || 'Goal is required']"
-                  variant="outlined"
-                  density="comfortable"
-                  hide-details
-                  class="rounded-lg"
-              />
-            </v-col>
-          </v-row>
-        </v-card-text>
+            <!-- Goal -->
+            <v-row>
+              <v-col cols="12">
+                <div class="text-caption text-medium-emphasis mb-0">Goal *</div>
+                <v-select
+                    v-model="selectedGoal"
+                    :items="goals"
+                    item-title="name"
+                    item-value="code"
+                    :rules="[v => !!v || 'Goal is required']"
+                />
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </WithFormDefaults>
 
-        <!-- Keep the original DialogFooter component -->
         <DialogFooter
             class="px-4"
             cancel-text="Cancel"
@@ -246,6 +158,7 @@
   </v-dialog>
 </template>
 
+
 <script setup lang="ts">
 import {ref, reactive, computed, onMounted, watch} from 'vue';
 import {useRouter} from 'vue-router';
@@ -254,12 +167,22 @@ import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
 import {useProjectStore} from '@/stores/projectStore';
 import type {ProjectCountry, ProjectLanguage, ProjectCampaignType, ProjectPhase, ProjectGoal} from '@/types/project';
 import CountryFlag from '@/components/common/CountryFlag.vue';
-import {formatDate} from '@/helpers/dateUtils';
+// Inline utility function to format dates in German format (DD.MM.YYYY)
 import {formatCurrency} from '@/helpers/currencyUtils';
 import {getBrandLogo} from '@/helpers/brandUtils';
 import {getCampaignTypeColor, getCampaignTypeIcon} from '@/helpers/campaignTypeUtils';
 import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
+import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
 
+const formatDate = (dateStr?: string): string => {
+  if (!dateStr) return '-';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
 // Props
 const props = defineProps<{
   modelValue: boolean;
@@ -552,19 +475,5 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/*.rounded-lg {
-  border-radius: 8px;
-}
 
-!* Remove the double border when selections are made *!
-:deep(.v-field.v-field--variant-outlined .v-field__outline) {
-  --v-field-border-opacity: 1;
-  --v-field-border-width: 1px;
-}
-
-!* Ensure select fields match Figma design *!
-:deep(.v-field--variant-outlined) {
-  border: 1px solid rgba(0, 0, 0, 0.23);
-  background-color: white;
-}*/
 </style>
