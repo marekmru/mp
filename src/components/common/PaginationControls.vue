@@ -41,7 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   totalVisible: 7,
   showItemsPerPage: true,
-  itemsPerPageValue: 25,
+  itemsPerPageValue: 10,
   itemsPerPageOptions: () => [10, 25, 50, 100]
 });
 

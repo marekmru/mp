@@ -1,185 +1,125 @@
 <template>
-  <v-row class="justify-center">
-    <v-col
-        v-for="mediaplan in mediaplans"
-        :key="mediaplan._id"
-        cols="12" sm="6" md="4" lg="3"
-        class="mb-4 mediaplan-col"
-    >
-      <mediaplan-card
-          :mediaplan="mediaplan"
-          @view="viewMediaplan"
-      />
-    </v-col>
-  </v-row>
-
-  <div v-if="loading" class="d-flex justify-center align-center my-4">
-    <v-progress-circular indeterminate color="primary"/>
+  <div v-if="isLoading && mediaplans.length === 0" class="d-flex justify-center align-center my-10">
+    <v-progress-circular indeterminate color="primary" size="64"/>
   </div>
+  <div v-else>
+    <v-row v-if="mediaplans.length > 0" class="justify-center">
+      <v-col
+          v-for="mediaplan in mediaplans"
+          :key="mediaplan._id"
+          cols="12" sm="6" md="4" lg="3"
+          class="mb-4 mediaplan-col d-flex"
+      >
+        <mediaplan-card
+            :mediaplan="mediaplan"
+            class="flex-grow-1"
+            @view="viewMediaplan"
+        />
+      </v-col>
+    </v-row>
 
-  <div v-if="!loading && mediaplans.length === 0" class="text-center my-6">
-    <v-icon icon="mdi-alert-circle-outline" size="large" color="grey" class="mb-2"/>
-    <div class="text-h6 text-grey">No mediaplans found</div>
-    <div class="text-body-2 text-grey">Try adjusting your filters or create a new mediaplan</div>
-  </div>
+    <div v-if="!isLoading && mediaplans.length === 0" class="text-center my-10 text-disabled">
+      <v-icon size="x-large" class="mb-2">mdi-database-off-outline</v-icon>
+      <p>No mediaplans found</p>
+      <p class="text-caption">Try adjusting your filters.</p>
+    </div>
 
-  <!-- Pagination Controls -->
-  <pagination-controls
-      v-if="!loading && totalPages > 1"
-      v-model="currentPage"
-      :length="totalPages"
-      :disabled="loading"
-      :items-per-page-value="perPage"
-      @update:items-per-page="handleItemsPerPageChange"
-  />
+    <pagination-controls
+        v-if="!isLoading && totalPages > 1"
+        v-model="paginationModel"
+        :length="totalPages"
+        :disabled="isLoading"
+        :items-per-page-value="itemsPerPageModel"
+        @update:items-per-page="itemsPerPageModel = $event"
+    />
 
-  <!-- Total Items Display -->
-  <div v-if="!loading && mediaplans.length > 0" class="text-center text-caption text-medium-emphasis mt-2">
-    Showing {{ paginationInfo }}
+    <div v-if="!isLoading && totalItems > 0" class="text-center text-caption text-medium-emphasis mt-2">
+      {{ paginationInfo }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref, onMounted, watch, computed} from 'vue';
-import { useRouter } from 'vue-router';
-import {Mediaplan} from '@/types/mediaplan';
-import MediaplanCard from '@/components/overview/MediaplanCard.vue';
-import PaginationControls from '@/components/common/PaginationControls.vue';
-// import customFetch from '@/customFetch'; // Commented out until API is ready
-import {mockFetchMediaplans} from '@/mocks/mediaplans'; // Import mock data service
+import {ref, computed, watch} from 'vue';
+import {useRouter} from 'vue-router';
+import type {Mediaplan} from '@/types/mediaplan'; // Pfad prüfen
+import MediaplanCard from '@/components/overview/MediaplanCard.vue'; // Pfad prüfen
+import PaginationControls from '@/components/common/PaginationControls.vue'; // Pfad prüfen
 
+// --- Props ---
+// Empfängt jetzt Daten und Zustand direkt von Overview.vue (aus dem Store)
 interface Props {
-  filters?: {
-    search?: string;
-    status?: string;
-    startDateBefore?: string;
-    startDateAfter?: string;
-    brandId?: string;
-  };
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-  page?: number;
-  perPage?: number;
+  mediaplans: Mediaplan[];
+  isLoading: boolean;
+  totalPages: number;
+  totalItems: number;
+  currentPage: number; // 0-basiert
+  itemsPerPage: number;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  filters: () => ({}),
-  sortBy: 'updated_at',
-  sortOrder: 'desc',
-  page: 0,
-  perPage: 10
-});
+const props = defineProps<Props>();
 
+// --- Emits ---
+// Meldet nur noch Benutzerinteraktionen nach oben, die eine Änderung im Store erfordern
 const emit = defineEmits<{
-  (e: 'update:page', page: number): void;
-  (e: 'update:per-page', perPage: number): void;
-  (e: 'update:total-pages', totalPages: number): void;
-  (e: 'update:total-items', totalItems: number): void;
+  (e: 'update:page', page: number): void; // Meldet gewünschte Seitenänderung (1-basiert von PaginationControls)
+  (e: 'update:items-per-page', perPage: number): void; // Meldet gewünschte Items pro Seite Änderung
 }>();
 
-const mediaplans = ref<Mediaplan[]>([]);
-const loading = ref(true);
-const error = ref<string | null>(null);
-const totalPages = ref(0);
-const totalItems = ref(0);
+// --- Router ---
+const router = useRouter();
 
-// Use internal current page state that syncs with props.page
-const currentPage = computed({
-  get: () => props.page,
+// --- Computed Properties ---
+
+// Aktuelle Seite für PaginationControls (oft 1-basiert)
+const paginationModel = computed({
+  get: () => props.currentPage + 1, // Konvertiere 0-basierte Prop zu 1-basierter Anzeige
   set: (value: number) => {
+    // Wenn das v-model von PaginationControls sich ändert, wird das Event nach oben emittiert
     emit('update:page', value);
   }
 });
 
-// Compute pagination info text for display
-const paginationInfo = computed(() => {
-  const startItem = (props.page * props.perPage) + 1;
-  const endItem = Math.min(startItem + props.perPage - 1, totalItems.value);
-  return `${startItem}-${endItem} of ${totalItems.value} mediaplans`;
-});
-
-// Use internal per-page state that syncs with props.perPage
-const perPage = computed({
-  get: () => props.perPage,
+// Aktuelle Items pro Seite für PaginationControls
+const itemsPerPageModel = computed({
+  get: () => props.itemsPerPage,
   set: (value: number) => {
-    emit('update:per-page', value);
+    emit('update:items-per-page', value);
   }
 });
 
-const fetchMediaplans = async () => {
-  loading.value = true;
-  error.value = null;
+// Info-Text für Paginierung
+const paginationInfo = computed(() => {
+  if (props.totalItems === 0) return '';
+  const startItem = (props.currentPage * props.itemsPerPage) + 1;
+  const endItem = Math.min(startItem + props.itemsPerPage - 1, props.totalItems);
+  return `${startItem}-${endItem} of ${props.totalItems} mediaplans`;
+});
 
-  try {
-    // Comment out the actual API call
-    /*
-    // Construct query parameters
-    const params = new URLSearchParams();
-    params.append('page', props.page.toString());
-    params.append('per_page', props.perPage.toString());
-    params.append('sort', props.sortBy);
-    params.append('order', props.sortOrder);
 
-    if (props.filters) {
-      const filterStr = JSON.stringify(props.filters);
-      params.append('filter', filterStr);
-    }
-
-    const data = await customFetch(`/mediaplans?${params.toString()}`);
-    */
-
-    // Use mock data service instead
-    const data = await mockFetchMediaplans(
-        props.page,
-        props.perPage,
-        props.filters,
-        props.sortBy,
-        props.sortOrder
-    );
-
-    mediaplans.value = data.items;
-    totalPages.value = data.total_pages;
-    totalItems.value = data.total_items;
-
-    // Emit events for pagination
-    emit('update:total-pages', data.total_pages);
-    emit('update:total-items', data.total_items);
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : 'Unknown error occurred';
-    console.error('Error fetching mediaplans:', err);
-  } finally {
-    loading.value = false;
-  }
-};
-
-// Import router
-import { useRouter } from 'vue-router';
-const router = useRouter();
-
+// --- Methods ---
 const viewMediaplan = (mediaplanId: string) => {
-  router.push({ name: 'MediaplanDetail', params: { id: mediaplanId } });
+  router.push({name: 'MediaplanDetail', params: {id: mediaplanId}});
 };
 
-const handleItemsPerPageChange = (value: number) => {
-  perPage.value = value;
-  currentPage.value = 0; // Reset to first page when changing items per page
-};
+// --- Interne Logik ---
+// Keine eigene Datenabfrage (fetchMediaplans) mehr
+// Kein eigener Ladezustand, Fehlerstatus, etc. - kommt alles über Props
 
-watch(() => [props.page, props.perPage, props.sortBy, props.sortOrder, props.filters],
-    () => {
-      fetchMediaplans();
-    },
-    {deep: true}
-);
-
-onMounted(() => {
-  fetchMediaplans();
-});
 </script>
+
 
 <style scoped>
 .mediaplan-col {
-  min-width: 350px;
-  max-width: 420px;
+  min-width: 300px; /* Etwas kleiner für bessere Anpassung */
+  /* max-width: 420px; */ /* Max-Breite kann oft weggelassen werden, wenn cols gesetzt sind */
+}
+
+.d-flex {
+  display: flex;
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
 }
 </style>

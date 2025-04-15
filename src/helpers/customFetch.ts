@@ -2,7 +2,7 @@
 
 import emitter from '@/helpers/emitter'
 
-const baseURL = `${import.meta.env.VITE_API_BASE_ONEBUILDER}`
+const baseURL = `${import.meta.env.VITE_API_BASE_MEDIAPLAN}`
 const baseURLCore4 = `${import.meta.env.VITE_API_BASE_CORE4}`
 let ti = null
 const customFetch = async (url: string, options: RequestInit = {}) => {

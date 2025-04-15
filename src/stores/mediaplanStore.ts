@@ -24,7 +24,7 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
     const totalItems = ref(0);
     const totalPages = ref(0);
     const currentPage = ref(0);
-    const perPage = ref(25);
+    const perPage = ref(10);
 
     // Filter and sort state
     const filters = ref<MediaplanFilter>({
