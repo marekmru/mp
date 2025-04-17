@@ -1,0 +1,2443 @@
+openapi: 3.0.3
+
+info:
+  title: Mediaplan API
+  version: 1.0.0
+  description: API for managing Mediaplans and Changelogs
+
+paths:
+  /changelog:
+    get:
+      summary: Get changelog entries
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Changelog
+      parameters:
+       - description: The tool for which to retrieve changelog entries.
+         in: query
+         name: tool
+         required: true
+         schema:
+           enum:
+             - CampaignBuilder
+             - Linkshortener
+             - Mediaplan
+           type: string
+      responses:
+        "200":
+         content:
+           application/json:
+             schema:
+               properties:
+                 data:
+                   description: List of changelog entries.
+                   items:
+                     $ref: "#/components/schemas/ChangelogEntry"
+                   type: array
+               type: object
+         description: Successful response - returns a list of changelog entries.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request (e.g., invalid 'tool' value)
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+  /mediaplans:
+    get:
+      summary: Get a list of Mediaplans (paginated, filtered, and sorted)
+      # ... (rest of definition including existing example - unchanged) ...
+      tags:
+       - Mediaplans
+      parameters:
+       - description: The number of items per page.
+         example: 10
+         in: query
+         name: per_page
+         schema:
+           default: 25
+           maximum: 100
+           minimum: 1
+           type: integer
+       - description: The page number to retrieve (0-based).
+         example: 0
+         in: query
+         name: page
+         schema:
+           default: 0
+           minimum: 0
+           type: integer
+       - content:
+           application/json:
+             example:
+               brand_id: brand-001
+               search: Campaign
+               status: Draft
+             schema:
+               $ref: "#/components/schemas/MediaplanFilter"
+         description: JSON formatted string for filtering resul ts.
+         in: query
+         name: filter
+       - description: The field to sort by.
+         example: updated_at
+         in: query
+         name: sort
+         schema:
+           type: string
+       - description: Sort order (ascending or descending).
+         example: desc
+         in: query
+         name: order
+         schema:
+           default: asc
+           enum:
+             - asc
+             - desc
+           type: string
+      responses:
+        "200":
+         content:
+           application/json:
+             example:
+               current_page: 0
+               items:
+                 - _id: f47ac10b-58cc-4372-a567-0e02b2c3d419
+                   brand:
+                     _id: brand-0
+                     name: MINI
+                   budget:
+                     available: 749.5
+                     total: 1500.0
+                     used: 750.5
+                   created_at: "2024-10-01T10:00:00Z"
+                   created_by:
+                     _id: user-001
+                     name: Fabian Krenzler
+                   end_date: "2025-05-31T00:00:00Z"
+                   name: MP 1 - Spring Campaign
+                   po_numbers:
+                     - _id: po-001
+                       name: "4700123456"
+                       value: 750.5
+                   start_date: "2025-03-15T00:00:00Z"
+                   status: in_planning
+                   updated_at: "2024-10-05T11:00:00Z"
+                 - _id: f47ac10b-58cc-4372-a567-0e02b2c3d429
+                   brand:
+                     _id: brand-1
+                     name: BMW
+                   budget:
+                     available: 2000.75
+                     total: 3200.75
+                     used: 1200.0
+                   created_at: "2024-10-15T14:30:00Z"
+                   created_by:
+                     _id: user-002
+                     name: Alice Smith
+                   end_date: "2025-07-15T00:00:00Z"
+                   name: MP 2 - Summer Sale
+                   po_numbers:
+                     - _id: po-002
+                       name: "4700987654"
+                       value: 1000.0
+                     - _id: po-003
+                       name: "4700112233"
+                       value: 200.0
+                   start_date: "2025-06-01T00:00:00Z"
+                   status: draft
+                   updated_at: "2024-10-18T09:15:00Z"
+                 - _id: f47ac10b-58cc-4372-a567-0e02b2c3d439
+                   brand:
+                     _id: brand-2
+                     name: Rolls-Royce
+                   budget:
+                     available: 500.0
+                     total: 5000.0
+                     used: 4500.0
+                   created_at: "2024-11-01T08:00:00Z"
+                   created_by:
+                     _id: user-003
+                     name: Bob Johnson
+                   end_date: "2025-10-31T00:00:00Z"
+                   name: MP 3 - Autumn Rollout
+                   po_numbers:
+                     - _id: po-004
+                       name: "4700555666"
+                       value: 4500.0
+                   start_date: "2025-09-01T00:00:00Z"
+                   status: for_approval
+                   updated_at: "2024-11-02T12:00:00Z"
+                 - _id: f47ac10b-58cc-4372-a567-0e02b2c3d449
+                   brand:
+                     _id: brand-1
+                     name: BMW
+                   budget:
+                     available: 1949.75
+                     total: 2100.0
+                     used: 150.25
+                   created_at: "2024-11-10T16:20:00Z"
+                   created_by:
+                     _id: user-004
+                     name: Charlie Brown
+                   end_date: "2025-12-31T00:00:00Z"
+                   name: MP 4 - Winter Special
+                   po_numbers:
+                     - _id: po-005
+                       name: "4700333444"
+                       value: 150.25
+                   start_date: "2025-11-15T00:00:00Z"
+                   status: draft
+                   updated_at: "2024-11-11T17:00:00Z"
+                 - _id: f47ac10b-58cc-4372-a567-0e02b2c3d459
+                   brand:
+                     _id: brand-0
+                     name: MINI
+                   budget:
+                     available: 850.0
+                     total: 850.0
+                     used: 0.0
+                   created_at: "2024-11-12T11:55:00Z"
+                   created_by:
+                     _id: user-001
+                     name: Fabian Krenzler
+                   end_date: "2025-11-30T00:00:00Z"
+                   name: MP 5 - Year End Review Prep
+                   po_numbers: []
+                   start_date: "2025-10-01T00:00:00Z"
+                   status: in_planning
+                   updated_at: "2024-11-12T11:55:00Z"
+                 - _id: f47ac10b-58cc-4372-a567-0e02b2c3d469
+                   brand:
+                     _id: brand-1
+                     name: BMW
+                   budget:
+                     available: 2000.01
+                     total: 4000.0
+                     used: 1999.99
+                   created_at: "2024-11-15T09:05:00Z"
+                   created_by:
+                     _id: user-002
+                     name: Alice Smith
+                   end_date: "2026-01-31T00:00:00Z"
+                   name: MP 6 - Q1 Planning 2026
+                   po_numbers:
+                     - _id: po-006
+                       name: "4700777888"
+                       value: 1999.99
+                   start_date: "2025-12-01T00:00:00Z"
+                   status: draft
+                   updated_at: "2024-11-20T14:25:00Z"
+                 - _id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                   brand:
+                     _id: brand-0
+                     name: MINI
+                   budget:
+                     available: 0.5
+                     total: 1800.5
+                     used: 1800.0
+                   created_at: "2024-11-22T13:00:00Z"
+                   created_by:
+                     _id: user-003
+                     name: Bob Johnson
+                   end_date: "2025-06-30T00:00:00Z"
+                   name: MP 7 - Brand Awareness Push
+                   po_numbers:
+                     - _id: po-007
+                       name: "4700224466"
+                       value: 1800.0
+                   start_date: "2025-04-01T00:00:00Z"
+                   status: for_approval
+                   updated_at: "2024-11-25T10:10:00Z"
+                 - _id: f47ac10b-58cc-4372-a567-0e02b2c3d489
+                   brand:
+                     _id: brand-1
+                     name: BMW
+                   budget:
+                     available: 1.0
+                     total: 550.0
+                     used: 549.0
+                   created_at: "2024-11-28T15:00:00Z"
+                   created_by:
+                     _id: user-004
+                     name: Charlie Brown
+                   end_date: "2025-05-15T00:00:00Z"
+                   name: MP 8 - Lead Generation Test
+                   po_numbers:
+                     - _id: po-008
+                       name: "4700121212"
+                       value: 549.0
+                   start_date: "2025-05-01T00:00:00Z"
+                   status: in_planning
+                   updated_at: "2024-11-29T15:00:00Z"
+                 - _id: f47ac10b-58cc-4372-a567-0e02b2c3d499
+                   brand:
+                     _id: brand-2
+                     name: Rolls-Royce
+                   budget:
+                     available: 2800.0
+                     total: 2900.0
+                     used: 100.0
+                   created_at: "2024-12-02T10:30:00Z"
+                   created_by:
+                     _id: user-001
+                     name: Fabian Krenzler
+                   end_date: "2025-09-30T00:00:00Z"
+                   name: MP 9 - Social Media Engagement
+                   po_numbers:
+                     - _id: po-009
+                       name: "4700998877"
+                       value: 100.0
+                   start_date: "2025-07-01T00:00:00Z"
+                   status: draft
+                   updated_at: "2024-12-03T11:30:00Z"
+                 - _id: f47ac10b-58cc-4372-a567-0e02b2c3d409
+                   brand:
+                     _id: brand-0
+                     name: MINI
+                   budget:
+                     available: 0.0
+                     total: 1150.8
+                     used: 1150.8
+                   created_at: "2024-12-05T16:00:00Z"
+                   created_by:
+                     _id: user-002
+                     name: Alice Smith
+                   end_date: "2025-10-15T00:00:00Z"
+                   name: MP 10 - Partner Co-Marketing
+                   po_numbers:
+                     - _id: po-010
+                       name: "4700101010"
+                       value: 1150.8
+                   start_date: "2025-08-15T00:00:00Z"
+                   status: in_planning
+                   updated_at: "2024-12-10T08:45:00Z"
+               total_items: 10
+               total_pages: 1
+             schema:
+               properties:
+                 current_page:
+                   description: The current page number (0-based).
+                   example: 0
+                   type: integer
+                 items:
+                   description: List of mediaplans on the current page.
+                   items:
+                     $ref: "#/components/schemas/Mediaplan"
+                   type: array
+                 total_items:
+                   description: Total number of mediaplans.
+                   example: 100
+                   type: integer
+                 total_pages:
+                   description: Total number of pages.
+                   example: 4
+                   type: integer
+               type: object
+         description: Successful response - returns a list of Mediaplans.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request (e.g., invalid query parameters, invalid JSON filter)
+        "422":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Validation Error (e.g., invalid date format)
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+    post:
+      summary: Create a new Mediaplan
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Mediaplans
+      requestBody:
+        content:
+          application/json:
+            example:
+              brand:
+                _id: brand-uuid-here
+                name: Example Brand
+              budget:
+                available: 100.0
+                total: 10000.0
+                used: 900.0
+              end_date: "2024-12-31T00:00:00Z"
+              name: My New Campaign
+              po_numbers:
+                - _id: 12837912864
+                  name: abc
+                  value: 123.0
+              start_date: "2024-11-15T00:00:00Z"
+              status: Draft
+            schema:
+              $ref: "#/components/schemas/MediaplanCreate"
+        required: true
+      responses:
+        "201":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Mediaplan"
+         description: Mediaplan created successfully.
+         headers:
+           Location:
+             description: URL of the newly created resource.
+             schema:
+               format: url
+               type: string
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request (e.g., invalid request body)
+        "422":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Unprocessable Entity (validation errors)
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+  /mediaplans/{id}:
+    get:
+      summary: Get a single Mediaplan by ID
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Mediaplans
+      parameters:
+       - description: The unique identifier of the Mediaplan.
+         in: path
+         name: id
+         required: true
+         schema:
+           format: uuid
+           type: string
+      responses:
+        "200":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Mediaplan"
+         description: Successful response - returns the Mediaplan.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request (e.g., invalid UUID format)
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan not found.
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+    put:
+      summary: Update a Mediaplan (replace entire resource)
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Mediaplans
+      parameters:
+       - description: The unique identifier of the Mediaplan.
+         in: path
+         name: id
+         required: true
+         schema:
+           format: uuid
+           type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Mediaplan"
+        required: true
+      responses:
+        "200":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Mediaplan"
+         description: Mediaplan updated successfully.
+        "204":
+         description: Mediaplan updated successfully.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan not found.
+        "422":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Unprocessable Entity
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+    delete:
+      summary: Delete a Mediaplan
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Mediaplans
+      parameters:
+       - description: The unique identifier of the Mediaplan.
+         in: path
+         name: id
+         required: true
+         schema:
+           format: uuid
+           type: string
+      responses:
+        "204":
+         description: Mediaplan deleted successfully.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan not found.
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+  /mediaplans/{mediaplanId}/projects:
+    get:
+      summary: Get all projects for a given Mediaplan
+      # ... (rest of definition including previous example - unchanged) ...
+      tags:
+       - Projects
+      parameters:
+       - description: The ID of the Mediaplan.
+         in: path
+         name: mediaplanId
+         required: true
+         schema:
+           format: uuid
+           type: string
+      responses:
+        "200":
+         content:
+           application/json:
+             example:
+               current_page: 0
+               items:
+                 - _id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+                   abbreviation: "NC-ALWAYS-ON-2024_Individ #1"
+                   created_at: "2024-10-02T09:15:00Z"
+                   default_vars:
+                     adtype: Banner
+                     campaigndetail: null
+                     campaigntype: Always On
+                     dimension: 300x250
+                     language: DEU
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: Always On 2024
+                     bmwponumber: PO12345
+                     brand: MINI
+                     campaigntype: Always On
+                     country: SE
+                     projectname: NC-ALWAYS-ON-2024_Individ
+                     subsegment: New Car
+                     year: 2024
+                   detail: To be defined might be very long
+                   duration:
+                     end_date: "2024-04-15T00:00:00Z"
+                     formatted: 15.01-15.04.2024
+                     start_date: "2024-01-15T00:00:00Z"
+                   is_locked: false
+                   labels: []
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-10-02T09:15:00Z"
+                   uploaded_at: "2024-10-02T09:15:00Z"
+                 - _id: a3b8d4e1-6c2f-4a1e-8b7d-9c1f0a3e2b1d
+                   abbreviation: "NC-SPECIAL-2024_Individ #2"
+                   created_at: "2024-10-03T11:30:00Z"
+                   default_vars:
+                     adtype: Banner
+                     campaigndetail: null
+                     campaigntype: Always On
+                     dimension: 300x250
+                     language: SWE
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: Always On 2024
+                     bmwponumber: PO67890
+                     brand: MINI
+                     campaigntype: Always On
+                     country: NL
+                     projectname: NC-ALWAYS-ON-2024_Individ
+                     subsegment: New Car
+                     year: 2024
+                   detail: This project focuses on the Dutch market.
+                   duration:
+                     end_date: "2024-04-15T00:00:00Z"
+                     formatted: 01.01-30.04.2024
+                     start_date: "2024-01-15T00:00:00Z"
+                   is_locked: false
+                   labels: []
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-10-03T11:30:00Z"
+                   uploaded_at: "2024-10-03T11:30:00Z"
+                 - _id: e1c7b6a0-8d3e-4f5a-9b8c-1d0e2f3a4b5c
+                   abbreviation: "NC-ALWAYS-ON-2024_Individ #3"
+                   created_at: "2024-10-04T15:20:00Z"
+                   default_vars:
+                     adtype: Banner
+                     campaigndetail: null
+                     campaigntype: Always On
+                     dimension: 300x250
+                     language: NLD
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: Always On 2024
+                     bmwponumber: PO12345
+                     brand: MINI
+                     campaigntype: Always On
+                     country: FR
+                     projectname: NC-ALWAYS-ON-2024_Individ
+                     subsegment: New Car
+                     year: 2024
+                   detail: To be defined might be very long
+                   duration:
+                     end_date: "2024-04-15T00:00:00Z"
+                     formatted: 01.03-30.04.2024
+                     start_date: "2024-01-15T00:00:00Z"
+                   is_locked: false
+                   labels: []
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-10-04T15:20:00Z"
+                   uploaded_at: "2024-10-04T15:20:00Z"
+                 - _id: b9d8c7e1-7a4f-4b6e-9c8d-0e1f2a3b4c5d
+                   abbreviation: "NC-SPECIAL-2024_Individ #4"
+                   created_at: "2024-10-05T10:45:00Z"
+                   default_vars:
+                     adtype: Banner
+                     campaigndetail: null
+                     campaigntype: Always On
+                     dimension: 300x250
+                     language: DEU
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: Always On 2024
+                     bmwponumber: PO67890
+                     brand: MINI
+                     campaigntype: Always On
+                     country: SE
+                     projectname: NC-ALWAYS-ON-2024_Individ
+                     subsegment: New Car
+                     year: 2024
+                   detail: This is a special project for the Swedish market.
+                   duration:
+                     end_date: "2024-04-15T00:00:00Z"
+                     formatted: 15.01-15.04.2024
+                     start_date: "2024-01-15T00:00:00Z"
+                   is_locked: false
+                   labels: []
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-10-05T10:45:00Z"
+                   uploaded_at: "2024-10-05T10:45:00Z"
+                 - _id: d3e4f5a0-8b7c-4a1e-8c7d-9f0a1b2c3d4e
+                   abbreviation: "NC-ALWAYS-ON-2024_Individ #5"
+                   created_at: "2024-10-06T13:15:00Z"
+                   default_vars:
+                     adtype: Banner
+                     campaigndetail: null
+                     campaigntype: Always On
+                     dimension: 300x250
+                     language: SWE
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: Always On 2024
+                     bmwponumber: PO12345
+                     brand: MINI
+                     campaigntype: Always On
+                     country: NL
+                     projectname: NC-ALWAYS-ON-2024_Individ
+                     subsegment: New Car
+                     year: 2024
+                   detail: To be defined might be very long
+                   duration:
+                     end_date: "2024-04-15T00:00:00Z"
+                     formatted: 01.01-15.04.2024
+                     start_date: "2024-01-15T00:00:00Z"
+                   is_locked: false
+                   labels: []
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-10-06T13:15:00Z"
+                   uploaded_at: "2024-10-06T13:15:00Z"
+                 - _id: c7b8a9e1-6d3f-4c2a-9a8b-1e0f2d3c4b5a
+                   abbreviation: "NC-ALWAYS-ON-2024_Individ #6"
+                   created_at: "2024-10-07T09:15:00Z"
+                   default_vars:
+                     adtype: Banner
+                     campaigndetail: null
+                     campaigntype: Always On
+                     dimension: 300x250
+                     language: DEU
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: Always On 2024
+                     bmwponumber: PO67890
+                     brand: MINI
+                     campaigntype: Always On
+                     country: FR
+                     projectname: NC-ALWAYS-ON-2024_Individ
+                     subsegment: New Car
+                     year: 2024
+                   detail: To be defined might be very long
+                   duration:
+                     end_date: "2024-04-15T00:00:00Z"
+                     formatted: 15.01-30.06.2024
+                     start_date: "2024-01-15T00:00:00Z"
+                   is_locked: false
+                   labels: []
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-10-07T09:15:00Z"
+                   uploaded_at: "2024-10-07T09:15:00Z"
+                 - _id: a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d
+                   abbreviation: "NC-SPECIAL-2024_Individ #7"
+                   created_at: "2024-10-08T11:30:00Z"
+                   default_vars:
+                     adtype: Banner
+                     campaigndetail: null
+                     campaigntype: Always On
+                     dimension: 300x250
+                     language: NLD
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: Always On 2024
+                     bmwponumber: PO12345
+                     brand: MINI
+                     campaigntype: Always On
+                     country: SE
+                     projectname: NC-ALWAYS-ON-2024_Individ
+                     subsegment: New Car
+                     year: 2024
+                   detail: To be defined might be very long
+                   duration:
+                     end_date: "2024-04-15T00:00:00Z"
+                     formatted: 01.04-30.06.2024
+                     start_date: "2024-01-15T00:00:00Z"
+                   is_locked: false
+                   labels: []
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-10-08T11:30:00Z"
+                   uploaded_at: "2024-10-08T11:30:00Z"
+                 - _id: f0e1d2c3-4b5a-4c6d-8e9f-0a1b2c3d4e5f
+                   abbreviation: "NC-ALWAYS-ON-2024_Individ #8"
+                   created_at: "2024-10-09T15:20:00Z"
+                   default_vars:
+                     adtype: Banner
+                     campaigndetail: null
+                     campaigntype: Always On
+                     dimension: 300x250
+                     language: DEU
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: Always On 2024
+                     bmwponumber: PO67890
+                     brand: MINI
+                     campaigntype: Always On
+                     country: NL
+                     projectname: NC-ALWAYS-ON-2024_Individ
+                     subsegment: New Car
+                     year: 2024
+                   detail: To be defined might be very long
+                   duration:
+                     end_date: "2024-04-15T00:00:00Z"
+                     formatted: 01.01-15.05.2024
+                     start_date: "2024-01-15T00:00:00Z"
+                   is_locked: false
+                   labels: []
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-10-09T15:20:00Z"
+                   uploaded_at: "2024-10-09T15:20:00Z"
+                 - _id: b4c5d6e7-8f9a-4b1c-9d0e-1f2a3b4c5d6e
+                   abbreviation: "NC-SPECIAL-2024_Individ #9"
+                   created_at: "2024-10-10T10:45:00Z"
+                   default_vars:
+                     adtype: Banner
+                     campaigndetail: null
+                     campaigntype: Always On
+                     dimension: 300x250
+                     language: SWE
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: Always On 2024
+                     bmwponumber: PO12345
+                     brand: MINI
+                     campaigntype: Always On
+                     country: FR
+                     projectname: NC-ALWAYS-ON-2024_Individ
+                     subsegment: New Car
+                     year: 2024
+                   detail: To be defined might be very long
+                   duration:
+                     end_date: "2024-04-15T00:00:00Z"
+                     formatted: 15.01-30.06.2024
+                     start_date: "2024-01-15T00:00:00Z"
+                   is_locked: false
+                   labels: []
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-10-10T10:45:00Z"
+                   uploaded_at: "2024-10-10T10:45:00Z"
+                 - _id: d8e9f0a1-b2c3-4d4e-8f5a-0b1c2d3e4f5a
+                   abbreviation: "NC-ALWAYS-ON-2024_Individ #10"
+                   created_at: "2024-10-11T13:15:00Z"
+                   default_vars:
+                     adtype: Banner
+                     campaigndetail: null
+                     campaigntype: Always On
+                     dimension: 300x250
+                     language: NLD
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: Always On 2024
+                     bmwponumber: PO67890
+                     brand: MINI
+                     campaigntype: Always On
+                     country: SE
+                     projectname: NC-ALWAYS-ON-2024_Individ
+                     subsegment: New Car
+                     year: 2024
+                   detail: To be defined might be very long
+                   duration:
+                     end_date: "2024-04-15T00:00:00Z"
+                     formatted: 01.05-30.06.2024
+                     start_date: "2024-01-15T00:00:00Z"
+                   is_locked: false
+                   labels: []
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-10-11T13:15:00Z"
+                   uploaded_at: "2024-10-11T13:15:00Z"
+                 - _id: 1f2a3b4c-5d6e-4f7a-8b9c-0d1e2f3a4b5c
+                   abbreviation: USED-CAR-Q3-2024_Campaign_11
+                   created_at: "2024-11-01T10:00:00Z"
+                   default_vars:
+                     adtype: Video
+                     campaigndetail: null
+                     campaigntype: Sales
+                     dimension: 1920x1080
+                     language: ENG
+                     subsegment: Used Car
+                     targeturls: https://example.com/used
+                   descriptive_vars:
+                     adobecampaignname: Used Car Q3
+                     bmwponumber: PO99887
+                     brand: BMW
+                     campaigntype: Sales
+                     country: GB
+                     projectname: USED-CAR-Q3-2024_Campaign
+                     subsegment: Used Car
+                     year: 2024
+                   detail: Focus on certified pre-owned vehicles.
+                   duration:
+                     end_date: "2024-09-30T00:00:00Z"
+                     formatted: 01.07-30.09.2024
+                     start_date: "2024-07-01T00:00:00Z"
+                   is_locked: true
+                   labels:
+                     - priority
+                     - video
+                   lock_state: 1
+                   owner: user456
+                   updated_at: "2024-11-05T14:00:00Z"
+                   uploaded_at: "2024-11-01T10:00:00Z"
+                 - _id: 2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d
+                   abbreviation: SERVICE-WINTER-CHECK_Promo_12
+                   created_at: "2024-11-02T11:20:00Z"
+                   default_vars:
+                     adtype: Social
+                     campaigndetail: Tyre Change
+                     campaigntype: Seasonal
+                     dimension: 1080x1080
+                     language: FRA
+                     subsegment: Aftersales
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: Winter Check 24
+                     bmwponumber: PO77665
+                     brand: BMW
+                     campaigntype: Seasonal
+                     country: FR
+                     projectname: SERVICE-WINTER-CHECK_Promo
+                     subsegment: Aftersales
+                     year: 2024
+                   detail: Promotional offer for winter service checks.
+                   duration:
+                     end_date: "2024-12-15T00:00:00Z"
+                     formatted: 15.10-15.12.2024
+                     start_date: "2024-10-15T00:00:00Z"
+                   is_locked: false
+                   labels:
+                     - aftersales
+                   lock_state: 0
+                   owner: user789
+                   updated_at: "2024-11-03T11:20:00Z"
+                   uploaded_at: "2024-11-02T11:20:00Z"
+                 - _id: 3b4c5d6e-7f8a-4b9c-0d1e-2f3a4b5c6d7e
+                   abbreviation: NC-LAUNCH-X5-2025_Awareness_13
+                   created_at: "2024-11-10T09:00:00Z"
+                   default_vars:
+                     adtype: Display
+                     campaigndetail: X5 Facelift
+                     campaigntype: Launch
+                     dimension: 728x90
+                     language: DEU
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: X5 Launch 2025
+                     bmwponumber: PO11223
+                     brand: BMW
+                     campaigntype: Launch
+                     country: DE
+                     projectname: NC-LAUNCH-X5-2025_Awareness
+                     subsegment: New Car
+                     year: 2025
+                   detail: Initial awareness phase for the new X5 model.
+                   duration:
+                     end_date: "2025-03-31T00:00:00Z"
+                     formatted: 01.02-31.03.2025
+                     start_date: "2025-02-01T00:00:00Z"
+                   is_locked: false
+                   labels:
+                     - launch
+                     - awareness
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-11-12T16:30:00Z"
+                   uploaded_at: "2024-11-10T09:00:00Z"
+                 - _id: 4c5d6e7f-8a9b-4c0d-1e2f-3a4b5c6d7e8f
+                   abbreviation: MINI-EV-TESTDRIVE_LeadGen_14
+                   created_at: "2024-11-15T13:45:00Z"
+                   default_vars:
+                     adtype: Search
+                     campaigndetail: Electric Cooper
+                     campaigntype: Lead Generation
+                     dimension: null
+                     language: NLD
+                     subsegment: New Car
+                     targeturls: https://mini.example.com/testdrive
+                   descriptive_vars:
+                     adobecampaignname: MINI EV Leads
+                     bmwponumber: PO44556
+                     brand: MINI
+                     campaigntype: Lead Generation
+                     country: NL
+                     projectname: MINI-EV-TESTDRIVE_LeadGen
+                     subsegment: New Car
+                     year: 2024
+                   detail: Campaign to generate test drive requests for MINI Electric.
+                   duration:
+                     end_date: "2024-12-20T00:00:00Z"
+                     formatted: 20.11-20.12.2024
+                     start_date: "2024-11-20T00:00:00Z"
+                   is_locked: false
+                   labels:
+                     - electric
+                     - leads
+                   lock_state: 0
+                   owner: user456
+                   updated_at: "2024-11-15T13:45:00Z"
+                   uploaded_at: "2024-11-15T13:45:00Z"
+                 - _id: 5d6e7f8a-9b0c-4d1e-2f3a-4b5c6d7e8f9a
+                   abbreviation: BMW-M-PERFORMANCE_Consideration_15
+                   created_at: "2024-11-20T10:10:00Z"
+                   default_vars:
+                     adtype: Video
+                     campaigndetail: M Models
+                     campaigntype: Consideration
+                     dimension: 1920x1080
+                     language: ITA
+                     subsegment: New Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: M Power Consideration
+                     bmwponumber: PO66778
+                     brand: BMW
+                     campaigntype: Consideration
+                     country: IT
+                     projectname: BMW-M-PERFORMANCE_Consideration
+                     subsegment: New Car
+                     year: 2024
+                   detail: Highlighting M performance parts and models.
+                   duration:
+                     end_date: "2024-11-30T00:00:00Z"
+                     formatted: 01.09-30.11.2024
+                     start_date: "2024-09-01T00:00:00Z"
+                   is_locked: false
+                   labels:
+                     - performance
+                     - M
+                   lock_state: 0
+                   owner: user789
+                   updated_at: "2024-11-21T12:00:00Z"
+                   uploaded_at: "2024-11-20T10:10:00Z"
+                 - _id: 6e7f8a9b-0c1d-4e2f-3a4b-5c6d7e8f9a0b
+                   abbreviation: FINANCIAL-SERVICES-Q1-25_Offer_16
+                   created_at: "2024-11-25T15:00:00Z"
+                   default_vars:
+                     adtype: Display
+                     campaigndetail: Leasing 0%
+                     campaigntype: Offer
+                     dimension: 300x600
+                     language: ESP
+                     subsegment: Financial Services
+                     targeturls: https://bmw-fs.example.com/offers
+                   descriptive_vars:
+                     adobecampaignname: FS Q1 Offers
+                     bmwponumber: PO22334
+                     brand: BMW
+                     campaigntype: Offer
+                     country: ES
+                     projectname: FINANCIAL-SERVICES-Q1-25_Offer
+                     subsegment: Financial Services
+                     year: 2025
+                   detail: Special financing offers for Q1 2025.
+                   duration:
+                     end_date: "2025-03-31T00:00:00Z"
+                     formatted: 10.01-31.03.2025
+                     start_date: "2025-01-10T00:00:00Z"
+                   is_locked: false
+                   labels:
+                     - financing
+                     - FS
+                   lock_state: 0
+                   owner: user123
+                   updated_at: "2024-11-28T10:00:00Z"
+                   uploaded_at: "2024-11-25T15:00:00Z"
+                 - _id: 7f8a9b0c-1d2e-4f3a-4b5c-6d7e8f9a0b1c
+                   abbreviation: MINI-USED-NEXT_Q4_Sales_17
+                   created_at: "2024-12-01T12:12:12Z"
+                   default_vars:
+                     adtype: Search
+                     campaigndetail: MINI Next
+                     campaigntype: Sales
+                     dimension: null
+                     language: DEU
+                     subsegment: Used Car
+                     targeturls: null
+                   descriptive_vars:
+                     adobecampaignname: MINI Used Q4 AT
+                     bmwponumber: PO55667
+                     brand: MINI
+                     campaigntype: Sales
+                     country: AT
+                     projectname: MINI-USED-NEXT_Q4_Sales
+                     subsegment: Used Car
+                     year: 2024
+                   detail: Promoting MINI Next certified used cars in Austria.
+                   duration:
+                     end_date: "2024-12-31T00:00:00Z"
+                     formatted: 01.10-31.12.2024
+                     start_date: "2024-10-01T00:00:00Z"
+                   is_locked: false
+                   labels:
+                     - used
+                     - mini next
+                   lock_state: 0
+                   owner: user456
+                   updated_at: "2024-12-01T12:12:12Z"
+                   uploaded_at: "2024-12-01T12:12:12Z"
+                 - _id: 8a9b0c1d-2e3f-4a4b-5c6d-7e8f9a0b1c2d
+                   abbreviation: BMW-I4-SUSTAINABILITY_Brand_18
+                   created_at: "2024-12-05T08:30:00Z"
+                   default_vars:
+                     adtype: Social
+                     campaigndetail: i4 Electric
+                     campaigntype: Brand
+                     dimension: 1080x1920
+                     language: ENG
+                     subsegment: Corporate
+                     targeturls: https://bmw.example.com/sustainability
+                   descriptive_vars:
+                     adobecampaignname: BMW Sustainability i4
+                     bmwponumber: PO88990
+                     brand: BMW
+                     campaigntype: Brand
+                     country: US
+                     projectname: BMW-I4-SUSTAINABILITY_Brand
+                     subsegment: Corporate
+                     year: 2024
+                   detail: Brand campaign focusing on the sustainability aspects of the BMW i4.
+                   duration:
+                     end_date: "2025-01-31T00:00:00Z"
+                     formatted: 01.11-31.01.2025
+                     start_date: "2024-11-01T00:00:00Z"
+                   is_locked: true
+                   labels:
+                     - brand
+                     - sustainability
+                     - electric
+                     - i4
+                   lock_state: 1
+                   owner: user789
+                   updated_at: "2024-12-10T11:00:00Z"
+                   uploaded_at: "2024-12-05T08:30:00Z"
+               total_items: 18
+               total_pages: 1
+             schema:
+               items:
+                 $ref: "#/components/schemas/Project"
+               type: array
+         description: Successful response - returns a list of projects.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request (e.g., invalid Mediaplan ID format)
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan not found.
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+    post:
+      summary: Create a new Project for a Mediaplan
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Projects
+      parameters:
+       - description: The ID of the Mediaplan to which the project belongs.
+         in: path
+         name: mediaplanId
+         required: true
+         schema:
+           format: uuid
+           type: string
+      requestBody:
+        content:
+          application/json:
+            example:
+              abbreviation: MyNewProject
+              default_vars:
+                adtype: Banner
+                campaigndetail: null
+                campaigntype: Awareness
+                dimension: 300x250
+                language: en
+                subsegment: OT
+                targeturls: null
+              descriptive_vars:
+                adobecampaignname: SummerSale
+                bmwponumber: PO12345
+                brand: BMW
+                campaigntype: Awareness
+                country: US
+                projectname: SummerSale_OT
+                subsegment: OT
+                year: 2025
+              is_locked: false
+              labels: []
+              lock_state: 0
+              message: OK
+              owner: user123
+              version: v1
+            schema:
+              $ref: "#/components/schemas/ProjectCreate"
+        required: true
+      responses:
+        "201":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Project"
+         description: Project created successfully.
+         headers:
+           Location:
+             description: URL of the newly created Project.
+             schema:
+               format: url
+               type: string
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request (e.g., invalid request body or Mediaplan ID)
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan not found.
+        "422":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Unprocessable Entity (validation errors)
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+  /mediaplans/{mediaplanId}/projects/{projectId}:
+    get:
+      summary: Get a Project
+      tags:
+        - Projects
+      parameters:
+        - in: path
+          name: mediaplanId
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: The ID of the Mediaplan.
+        - in: path
+          name: projectId
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: The ID of the Project to get.
+      responses:
+        '200':
+          description: Project fetched successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+              # --- START EXAMPLE ---
+              example:
+                _id: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Use a valid UUID
+                abbreviation: "NC-ALWAYS-ON-2024_Individ #1"
+                created_at: "2024-10-02T09:15:00Z"
+                default_vars:
+                  targeturls: null
+                  subsegment: "New Car"
+                  campaigntype: "Always On"
+                  language: "DEU"
+                  campaigndetail: null
+                  adtype: "Banner"
+                  dimension: "300x250"
+                descriptive_vars:
+                  brand: "MINI"
+                  country: "SE"
+                  bmwponumber: "PO12345"
+                  adobecampaignname: "Always On 2024"
+                  subsegment: "New Car"
+                  campaigntype: "Always On"
+                  projectname: "NC-ALWAYS-ON-2024_Individ"
+                  year: 2024
+                is_locked: false
+                labels: []
+                lock_state: 0
+                owner: "user123"
+                updated_at: "2024-10-02T09:15:00Z"
+                uploaded_at: "2024-10-02T09:15:00Z"
+                duration:
+                  start_date: "2024-01-15T00:00:00Z"
+                  end_date: "2024-04-15T00:00:00Z"
+                  formatted: "15.01-15.04.2024"
+                detail: "This is the first project, focusing on Sweden."
+              # --- END EXAMPLE ---
+        '400':
+          description: Bad Request
+          # ... (rest unchanged)
+        '404':
+          description: Mediaplan or Project not found.
+          # ... (rest unchanged)
+        '500':
+          description: Internal Server Error
+          # ... (rest unchanged)
+
+    put:
+      summary: Update a Project (replace entire resource)
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Projects
+      parameters:
+       - description: The ID of the Mediaplan.
+         in: path
+         name: mediaplanId
+         required: true
+         schema:
+           format: uuid
+           type: string
+       - description: The ID of the Project to update.
+         in: path
+         name: projectId
+         required: true
+         schema:
+           format: uuid
+           type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Project"
+        required: true
+      responses:
+        "200":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Project"
+         description: Project updated successfully.
+        "204":
+         description: Project updated successfully.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan or Project not found.
+        "422":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Unprocessable Entity
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+    delete:
+      summary: Delete a Project
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Projects
+      parameters:
+       - description: The ID of the Mediaplan.
+         in: path
+         name: mediaplanId
+         required: true
+         schema:
+           format: uuid
+           type: string
+       - description: The ID of the Project to delete.
+         in: path
+         name: projectId
+         required: true
+         schema:
+           format: uuid
+           type: string
+      responses:
+        "204":
+         description: Project deleted successfully.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan or Project not found.
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+  /mediaplans/{mediaplanId}/projects/{projectId}/campaigns:
+    get:
+      summary: Get all campaigns for a given Project within a Mediaplan
+      tags:
+        - Campaigns
+      parameters:
+        - in: path
+          name: mediaplanId
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: The ID of the Mediaplan.
+        - in: path
+          name: projectId
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: The ID of the Project.
+        # --- ADD Pagination parameters ---
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: The page number to retrieve (0-based).
+        - in: query
+          name: per_page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 15 # Match store default
+          description: The number of items per page.
+        # Optional: Add sort/order parameters if API supports them
+        # - in: query
+        #   name: sort
+        #   schema: { type: string }
+        # - in: query
+        #   name: order
+        #   schema: { type: string, enum: [asc, desc] }
+      responses:
+        '200':
+          description: Successful response - returns a list of campaigns.
+          content:
+            application/json:
+              # --- ASSUME PAGINATED RESPONSE SCHEMA ---
+              schema:
+                type: object
+                properties:
+                  total_items:
+                    type: integer
+                  total_pages:
+                    type: integer
+                  current_page:
+                    type: integer
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Campaign'
+              # --- START EXAMPLE for Campaigns (Paginated) ---
+              example:
+                total_items: 5 # Example total
+                total_pages: 1 # Example pages
+                current_page: 0 # Example current page
+                items:
+                  - _id: "c1f0a3e2-b1d9-4a1e-8b7d-a3b8d4e16c2f" # UUID
+                    campaignname: "SE_MINI_NC-AO-24_Summer_Display_DEU_Generic"
+                    pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID from example above
+                    campaigndetail: "Generic Summer Banner Ads"
+                    campaigntype: "Always On"
+                    created_at: "2024-10-15T10:00:00Z"
+                    language: "DEU"
+                    product: "Generic" # Example Product
+                    subsegment: "New Car"
+                    type: "display"
+                    updated_at: "2024-10-16T11:00:00Z"
+                  - _id: "d4e16c2f-9b8c-4f5a-8d3e-e1c7b6a08d3e" # UUID
+                    campaignname: "SE_MINI_NC-AO-24_Summer_Video_DEU_Brand"
+                    pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
+                    campaigndetail: "Brand Awareness Video"
+                    campaigntype: "Always On"
+                    created_at: "2024-10-15T11:00:00Z"
+                    language: "DEU"
+                    product: "Brand" # Example Product
+                    subsegment: "New Car"
+                    type: "video"
+                    updated_at: "2024-10-17T09:30:00Z"
+                  - _id: "1d0e2f3a-4b5c-4a1e-8c7d-b9d8c7e17a4f" # UUID
+                    campaignname: "SE_MINI_NC-AO-24_Q3_Search_DEU_Electric"
+                    pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
+                    campaigndetail: "Search Ads for Electric Models"
+                    campaigntype: "Always On"
+                    created_at: "2024-10-18T14:00:00Z"
+                    language: "DEU"
+                    product: "Electric" # Example Product
+                    subsegment: "New Car"
+                    type: "search"
+                    updated_at: null # Example with null updated_at
+                  - _id: "9f0a1b2c-3d4e-4a1e-8b7c-d3e4f5a08b7c" # UUID
+                    campaignname: "SE_MINI_NC-AO-24_Q3_Social_DEU_Cooper"
+                    pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
+                    campaigndetail: "Social Media Ads Cooper"
+                    campaigntype: "Always On"
+                    created_at: "2024-10-20T09:15:00Z"
+                    language: "DEU"
+                    product: "Cooper" # Example Product
+                    subsegment: "New Car"
+                    type: "social"
+                    updated_at: "2024-10-20T09:15:00Z"
+                  - _id: "1e0f2d3c-4b5a-4c2a-9a8b-c7b8a9e16d3f" # UUID
+                    campaignname: "SE_MINI_NC-AO-24_Q4_Display_DEU_Countryman"
+                    pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
+                    campaigndetail: "Q4 Display Countryman"
+                    campaigntype: "Always On"
+                    created_at: "2024-10-25T16:30:00Z"
+                    language: "DEU"
+                    product: "Countryman" # Example Product
+                    subsegment: "New Car"
+                    type: "display"
+                    updated_at: "2024-10-26T10:00:00Z"
+              # --- END EXAMPLE ---
+        '400':
+          description: Bad Request
+          # ... (rest unchanged)
+        '404':
+          description: Mediaplan or Project not found.
+          # ... (rest unchanged)
+        '500':
+          description: Internal Server Error
+          # ... (rest unchanged)
+    post:
+      summary: Create new Campaing
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Campaigns
+      parameters:
+       - description: The ID of the Mediaplan.
+         in: path
+         name: mediaplanId
+         required: true
+         schema:
+           format: uuid
+           type: string
+       - description: The ID of the Project.
+         in: path
+         name: projectId
+         required: true
+         schema:
+           format: uuid
+           type: string
+      requestBody:
+        content:
+          application/json:
+            example:
+              campaignname: PL_BMW_NC_NC-AO-2025-weq_AMSF_2025_AO_POL_eqfwefw
+              campaigndetail: eqfwefw
+              campaigntype: AO
+              language: POL
+              pid: 6780ed13ea3ea0016ff8975e
+              product: AMSF
+              subsegment: NC
+              type: display
+            schema:
+              $ref: "#/components/schemas/CampaignCreate"
+        required: true
+      responses:
+        "201":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Campaign"
+         description: Campaign created successfully.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan or Project not found.
+        "422":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Unprocessable Entity
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+  /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}:
+    get:
+      summary: Get a single Campaign by ID
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Campaigns
+      parameters:
+       - description: The ID of the Mediaplan.
+         in: path
+         name: mediaplanId
+         required: true
+         schema:
+           format: uuid
+           type: string
+       - description: The ID of the Project.
+         in: path
+         name: projectId
+         required: true
+         schema:
+           format: uuid
+           type: string
+       - description: The ID of the Campaign.
+         in: path
+         name: campaignId
+         required: true
+         schema:
+           format: uuid
+           type: string
+      responses:
+        "200":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Campaign"
+         description: Successful response - returns the Campaign.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request (e.g., invalid ID format)
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan, Project, or Campaign not found.
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+    put:
+      summary: Update a Campaign (replace entire resource)
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Campaigns
+      parameters:
+       - description: The ID of the Mediaplan.
+         in: path
+         name: mediaplanId
+         required: true
+         schema:
+           format: uuid
+           type: string
+       - description: The ID of the Project.
+         in: path
+         name: projectId
+         required: true
+         schema:
+           format: uuid
+           type: string
+       - description: The ID of the Campaign to update.
+         in: path
+         name: campaignId
+         required: true
+         schema:
+           format: uuid
+           type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Campaign"
+        required: true
+      responses:
+        "200":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Campaign"
+         description: Campaign updated successfully.
+        "204":
+         description: Campaign updated successfully.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan, Project, or Campaign not found
+        "422":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Unprocessable Entity
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+    delete:
+      summary: Delete a Campaign
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - Campaigns
+      parameters:
+       - description: The ID of the Mediaplan.
+         in: path
+         name: mediaplanId
+         required: true
+         schema:
+           format: uuid
+           type: string
+       - description: The ID of the Project.
+         in: path
+         name: projectId
+         required: true
+         schema:
+           format: uuid
+           type: string
+       - description: The ID of the Campaign to delete.
+         in: path
+         name: campaignId
+         required: true
+         schema:
+           format: uuid
+           type: string
+      responses:
+        "204":
+         description: Campaign deleted successfully.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan, Project, or Campaign not found
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+  /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}/lineitems:
+    get:
+      summary: Get all line items for a given Campaign
+      # ... (rest of definition - unchanged) ...
+      tags:
+       - LineItems
+      parameters:
+       - description: The ID of the Mediaplan.
+         in: path
+         name: mediaplanId
+         required: true
+         schema:
+           format: uuid
+           type: string
+       - description: The ID of the Project.
+         in: path
+         name: projectId
+         required: true
+         schema:
+           format: uuid
+           type: string
+       - description: The ID of the Campaign.
+         in: path
+         name: campaignId
+         required: true
+         schema:
+           format: uuid
+           type: string
+      responses:
+        "200":
+         content:
+           application/json:
+             schema:
+               items:
+                 $ref: "#/components/schemas/LineItem"
+               type: array
+         description: Successful response - returns a list of line items.
+        "400":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Bad Request
+        "404":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Mediaplan, Project, or Campaign not found.
+        "500":
+         content:
+           application/json:
+             schema:
+               $ref: "#/components/schemas/Error"
+         description: Internal Server Error
+
+components:
+  schemas:
+    # ... (Error, ChangelogEntry, EntityReference, MediaplanFilter, MediaplanCreate, PONumber, Mediaplan - unchanged) ...
+    Error:
+      properties:
+        _id:
+          description: Unique identifier for this error instance.
+          example: 1@mediaplan-app-2025-6d57887bb4-8t9z7
+          type: string
+        code:
+          description: HTTP status code.
+          example: 400
+          type: integer
+        error:
+          description: Specific error details.
+          example: Somethin went wrong.
+          type: string
+        message:
+          description: A general message describing the error category.
+          example: Bad Request
+          type: string
+        timestamp:
+          description: Timestamp of when the error occurred.
+          example: "2025-03-11T13:31:06.443086Z"
+          format: date-time
+          type: string
+        version:
+          description: Application version where the error occurred.
+          example: mediaplan/0.1.45
+          type: string
+      type: object
+    ChangelogEntry:
+      properties:
+        date:
+          description: Date and time of the changelog entry.
+          example: "2024-10-27T14:30:00Z"
+          format: date-time
+          type: string
+        text:
+          description: Description of the change.
+          example: Added new feature for campaign optimization.
+          type: string
+        tool:
+          description: The tool associated with this changelog entry.
+          enum:
+            - CampaignBuilder
+            - Linkshortener
+            - Mediaplan
+          example: CampaignBuilder
+          type: string
+      required:
+        - date
+        - tool
+        - text
+      type: object
+    EntityReference:
+      properties:
+        _id:
+          description: Unique identifier.
+          example: user-002
+          format: uuid
+          type: string
+        name:
+          description: Name of the entity.
+          example: Alice Smith
+          type: string
+      required:
+        - _id
+        - name
+      type: object
+    MediaplanFilter:
+      properties:
+        brand_id:
+          description: Filter by Brand ID.
+          format: uuid
+          type: string
+        search:
+          description: Search term for filtering by name or other relevant fields.
+          type: string
+        start_date_after:
+          description: Filter for mediaplans starting after this date.
+          format: date-time
+          type: string
+        start_date_before:
+          description: Filter for mediaplans starting before this date.
+          format: date-time
+          type: string
+        status:
+          description: Filter by status.
+          enum:
+            - In Planning
+            - Draft
+            - For Approval
+          type: string
+      type: object
+    MediaplanCreate:
+      properties:
+        brand:
+          properties:
+            _id:
+              description: ID of the associated brand.
+              format: uuid
+              type: string
+          required:
+            - _id
+          type: object
+        budget:
+          properties:
+            total:
+              description: Total budget allocated.
+              format: double
+              type: number
+          type: object
+        end_date:
+          description: End date of the Mediaplan.
+          example: "2024-08-31T18:00:00Z"
+          format: date-time
+          type: string
+        name:
+          description: Name of the Mediaplan.
+          example: Summer Campaign 2024
+          type: string
+        po_numbers:
+          items:
+            $ref: "#/components/schemas/PONumber"
+          type: array
+        start_date:
+          description: Start date of the Mediaplan.
+          example: "2024-07-15T10:00:00Z"
+          format: date-time
+          type: string
+        status:
+          description: Status of the Mediaplan.
+          enum:
+            - In Planning
+            - Draft
+            - For Approval
+          example: Draft
+          type: string
+      required:
+        - name
+        - status
+        - start_date
+        - end_date
+        - brand
+        - budget
+      type: object
+    PONumber:
+      properties:
+        _id:
+          description: Unique identifier of the PO Number.
+          example: po-001
+          type: string
+        name:
+          description: Name or description of the PO Number.
+          example: "4700551823"
+          type: string
+        value:
+          description: The numerical value of the PO Number.
+          example: 450.0
+          format: float
+          type: number
+      required:
+        - _id
+        - name
+        - value
+      type: object
+    Mediaplan:
+      properties:
+        _id:
+          description: Unique identifier of the Mediaplan.
+          example: mp-001
+          format: uuid
+          type: string
+        brand:
+          $ref: "#/components/schemas/EntityReference"
+          description: Reference to the Brand information.
+        budget:
+          description: Budget details for the Mediaplan.
+          properties:
+            available:
+              description: Budget remaining.
+              example: 374.5
+              format: double
+              type: number
+            total:
+              description: Total budget allocated.
+              example: 1250.0
+              format: double
+              type: number
+            used:
+              description: Amount of budget used.
+              example: 875.5
+              format: double
+              type: number
+          required:
+            - total
+            - used
+            - available
+          type: object
+        created_at:
+          description: Timestamp of creation.
+          example: "2024-11-28T14:15:00Z"
+          format: date-time
+          type: string
+        created_by:
+          $ref: "#/components/schemas/EntityReference"
+          description: Reference to the user who created the Mediaplan.
+        end_date:
+          description: End date of the Mediaplan.
+          example: "2025-03-25T00:00:00Z"
+          format: date-time
+          type: string
+        name:
+          description: Name of the Mediaplan.
+          example: Campaign Launch Q1
+          type: string
+        po_numbers:
+          description: List of associated Purchase Order numbers.
+          example:
+            - _id: po-001
+              name: "4700551823"
+              value: 450.0
+            - _id: po-002
+              name: "4700551911"
+              value: 425.5
+          items:
+            $ref: "#/components/schemas/PONumber"
+          type: array
+        start_date:
+          description: Start date of the Mediaplan.
+          example: "2025-02-10T00:00:00Z"
+          format: date-time
+          type: string
+        status:
+          description: Status of the Mediaplan.
+          enum:
+            - In Planning
+            - Draft
+            - For Approval
+          example: In Planning
+          type: string
+        updated_at:
+          description: Timestamp of last update.
+          example: "2024-12-05T09:30:00Z"
+          format: date-time
+          type: string
+      required:
+        - _id
+        - name
+        - status
+        - start_date
+        - end_date
+        - brand
+        - budget
+        - created_by
+        - created_at
+        - updated_at
+      type: object
+
+    Project:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: uuid
+          description: Unique identifier of the Project.
+        abbreviation:
+          type: string
+          description: Abbreviation for the project.
+        created_at:
+          type: string
+          format: date-time
+          description: Project creation timestamp.
+        default_vars:
+          type: object
+          description: Default variables for the project.
+          properties:
+            targeturls:
+              type: string
+              nullable: true
+              description: Target URLs (can be null).
+            subsegment:
+              type: string
+              nullable: true
+              description: Subsegment (can be null).
+            campaigntype:
+              type: string
+              nullable: true
+              description: Campaign type (can be null).
+            language:
+              type: string
+              nullable: true
+              description: Language (can be null).
+            campaigndetail:
+              type: string
+              nullable: true
+              description: Campaign detail (can be null).
+            adtype:
+              type: string
+              nullable: true
+              description: Ad type (can be null).
+            dimension:
+              type: string
+              nullable: true
+              description: Dimension (can be null).
+        descriptive_vars:
+          type: object
+          description: Descriptive variables for the project.
+          properties:
+            brand:
+              type: string
+              description: Brand name.
+            country:
+              type: string
+              description: Country code.
+            bmwponumber:
+              type: string
+              description: BMW purchase order number.
+            adobecampaignname:
+              type: string
+              description: Adobe campaign name.
+            subsegment:
+              type: string
+              description: Subsegment.
+            campaigntype:
+              type: string
+              description: Campaign type.
+            projectname:
+              type: string
+              description: Project name.
+            year:
+              type: integer
+              description: Year.
+        is_locked:
+          type: boolean
+          description: Indicates if the project is locked.
+        labels:
+          type: array
+          items:
+            type: string
+          description: Labels associated with project
+        lock_state:
+          type: integer
+          description: Lock state of the project.
+        owner:
+          type: string
+          description: Owner of the project.
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Project last update timestamp.
+        uploaded_at:
+          type: string
+          format: date-time
+          description: Project upload timestamp.
+        # Optional fields based on mock data (add here if part of schema)
+        duration:
+           type: object
+           properties:
+             start_date:
+               type: string
+               format: date-time
+             end_date:
+               type: string
+               format: date-time
+             formatted:
+               type: string
+        detail:
+           type: string
+           nullable: true
+      required:
+        - _id
+        - abbreviation
+        - created_at
+        - default_vars
+        - descriptive_vars
+        - is_locked
+        - lock_state
+        # Removed message, version, timestamp from required
+        - owner
+        - uploaded_at
+        # updated_at is nullable
+
+    ProjectCreate:
+      # ... (unchanged) ...
+      properties:
+        default_vars:
+          description: Default variables for the project.
+          properties:
+            adtype:
+              description: Ad type (can be null).
+              nullable: true
+              type: string
+            campaigndetail:
+              description: Campaign detail (can be null).
+              nullable: true
+              type: string
+            campaigntype:
+              description: Campaign type (can be null).
+              nullable: true
+              type: string
+            dimension:
+              description: Dimension (can be null).
+              nullable: true
+              type: string
+            language:
+              description: Language (can be null).
+              nullable: true
+              type: string
+            subsegment:
+              description: Subsegment (can be null).
+              nullable: true
+              type: string
+            targeturls:
+              description: Target URLs (can be null).
+              nullable: true
+              type: string
+          type: object
+        descriptive_vars:
+          description: Descriptive variables for the project.
+          properties:
+            adobecampaignname:
+              description: Adobe campaign name.
+              type: string
+            bmwponumber:
+              description: BMW purchase order number.
+              type: string
+            brand:
+              description: Brand name.
+              type: string
+            campaigntype:
+              description: Campaign type.
+              type: string
+            country:
+              description: Country code.
+              type: string
+            subsegment:
+              description: Subsegment.
+              type: string
+          type: object
+        labels:
+          description: Labels associated with project
+          items:
+            type: string
+          type: array
+      type: object
+
+    CampaignCreate:
+      # ... (unchanged) ...
+      properties:
+        campaignname:
+          description: Name of the campaign.
+          type: string
+        campaigndetail:
+          description: Details about the campaign.
+          nullable: true
+          type: string
+        campaigntype:
+          description: Type of the campaign.
+          type: string
+        language:
+          description: Language of the campaign.
+          type: string
+        pid:
+          description: ID of the parent Project.  IMPORTANT!
+          format: uuid
+          type: string
+        product:
+          description: Product associated with the campaign.
+          type: string
+        subsegment:
+          description: Subsegment of the campaign.
+          type: string
+        type:
+          description: Campaign type (e.g., display, video).
+          type: string
+      required:
+        - campaignname
+        - pid
+        - campaigntype
+      type: object
+
+    Campaign:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: uuid
+          description: Unique identifier of the Campaign.
+        campaignname:
+          type: string
+          description: Name of the campaign.
+        pid:
+          type: string
+          format: uuid
+          description: ID of the parent Project.
+        campaigndetail:
+          type: string
+          nullable: true
+          description: Details about the campaign.
+        campaigntype:
+          type: string
+          description: Type of the campaign.
+        created_at:
+          type: string
+          format: date-time
+          description: Campaign creation timestamp.
+        language:
+          type: string
+          description: Language of the campaign.
+        product:
+          type: string
+          description: Product associated with the campaign.
+        subsegment:
+          type: string
+          description: Subsegment of the campaign.
+        type:
+          type: string
+          description: Campaign type (e.g., display, video).
+        updated_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: Campaign last update timestamp.
+      required:
+        - _id
+        - campaignname
+        - pid
+        - campaigntype
+        - created_at
+        - language
+        - product
+        - subsegment
+        - type
+
+    LineItem:
+      # ... (unchanged) ...
+      properties:
+        _id:
+          description: Unique identifier of the Line Item.
+          format: uuid
+          type: string
+        created_at:
+          description: Line item creation timestamp.
+          format: date-time
+          type: string
+        creatives:
+          description: Array of creative IDs.
+          items:
+            type: string
+          type: array
+        goals:
+          description: Goal of the line item.
+          type: string
+        lineitem:
+          description: (Clarify purpose)
+          type: string
+        lineitemname:
+          description: Name of the line item.
+          type: string
+        mid:
+          description: (Clarify purpose)
+          type: string
+        phase:
+          description: Phase of the line item.
+          type: string
+        pid:
+          description: ID of the parent Project.
+          format: uuid
+          type: string
+        product:
+          description: Product associated with the line item.
+          type: string
+        targetingtactic:
+          description: Targeting tactic.
+          type: string
+        updated_at:
+          description: Line item last update timestamp.
+          format: date-time
+          type: string
+      required:
+        - _id
+        - pid
+        - lineitemname
+        - created_at
+        - goals
+        - phase
+        - product
+        - targetingtactic
+      type: object

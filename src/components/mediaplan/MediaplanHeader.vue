@@ -18,7 +18,6 @@
     <v-text-field
         v-model="search"
         placeholder="Search..."
-        xvariant="underlined"
         hide-details
         class="mr-2"
         append-inner-icon="mdi-magnify"

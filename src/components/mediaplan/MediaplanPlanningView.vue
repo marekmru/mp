@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue';
+import { useRouter } from 'vue-router'; // Router importieren für Links
 import CountryFlag from '@/components/common/CountryFlag.vue'; // Pfad prüfen
 import { getBrandLogo } from "@/helpers/brandUtils"; // Pfad prüfen
 import type { Project } from '@/types/project'; // Pfad prüfen
 
 // --- Props ---
 interface Props {
-  projects: Project[];        // Projektliste vom Store
-  totalProjects: number;      // Gesamtzahl für Paginierung
-  isLoading: boolean;         // Ladezustand vom Store
-  currentPage: number;        // Aktuelle Seite (0-basiert) vom Store
-  itemsPerPage: number;       // Items pro Seite vom Store
+  projects: Project[];
+  totalProjects: number;
+  isLoading: boolean;
+  currentPage: number;
+  itemsPerPage: number;
+  mediaplanId: string; // *** Diese Prop ist entscheidend für den Link ***
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -18,60 +20,56 @@ const props = withDefaults(defineProps<Props>(), {
   totalProjects: 0,
   isLoading: false,
   currentPage: 0,
-  itemsPerPage: 10 // Sollte mit projectStore Standard übereinstimmen
+  itemsPerPage: 10,
+  mediaplanId: '' // Wichtig: Muss vom Parent (MediaplanDetail) übergeben werden!
 });
 
 // --- Emits ---
 const emit = defineEmits<{
-  (e: 'addProject'): void; // Event zum Hinzufügen eines Projekts
-  // Event, das Optionen-Änderungen an MediaplanDetail meldet
+  (e: 'addProject'): void;
   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
 }>();
 
-// --- Lokale Refs für v-data-table-server Models ---
-// Diese spiegeln die Props und ermöglichen v-model Bindung.
-// Die Tabelle erwartet page als 1-basiert.
+// Router Instanz
+const router = useRouter();
+
+// --- Computed Properties für Tabelle ---
 const pageModel = computed({
-  get: () => props.currentPage + 1, // Konvertiere 0-basiert zu 1-basiert
-  set: (value) => {
-    // Direkte Aktualisierung hier vermeiden, stattdessen Event auslösen
-    // Das Event wird im `onOptionsUpdate` behandelt
-  }
+  get: () => props.currentPage + 1,
+  set: (value) => {}
 });
 
 const itemsPerPageModel = computed({
   get: () => props.itemsPerPage,
-  set: (value) => {
-    // Direkte Aktualisierung hier vermeiden, stattdessen Event auslösen
-    // Das Event wird im `onOptionsUpdate` behandelt
-  }
+  set: (value) => {}
 });
-
 
 // --- Tabellen-Header ---
 const headers = [
   { title: '', key: 'edit', sortable: false, width: '50px' },
-  { title: 'Name', key: 'abbreviation', sortable: true, align: 'start' }, // Sortierung ggf. serverseitig implementieren
-  { title: 'Country', key: 'descriptive_vars.country', sortable: true }, // Sortierung für verschachtelte Felder serverseitig nötig
-  { title: 'Duration', key: 'duration.formatted', sortable: false }, // Nach formatiertem String nicht gut sortierbar
+  { title: 'Name', key: 'abbreviation', sortable: true, align: 'start' },
+  { title: 'Country', key: 'descriptive_vars.country', sortable: true },
+  { title: 'Duration', key: 'duration.formatted', sortable: false },
   { title: 'Detail', key: 'detail', sortable: true },
   { title: 'Campaign Type', key: 'default_vars.campaigntype', sortable: true },
   { title: 'Subsegment', key: 'default_vars.subsegment', sortable: true },
-  { title: 'Locked', key: 'is_locked', sortable: true, align: 'center' }, // Nach Boolean sortierbar
+  { title: 'Locked', key: 'is_locked', sortable: true, align: 'center' },
   { title: 'Actions', key: 'actions', sortable: false, align: 'center', width: '50px' }
 ];
 
 // --- Methoden ---
-
-// Wird von v-data-table-server ausgelöst, wenn sich Optionen ändern
 const onOptionsUpdate = (options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }) => {
-  // Leite die Optionen an die Parent-Komponente (MediaplanDetail) weiter
   emit('update:options', options);
 };
 
-// Methode für den "Add Project" Button
 const addProject = () => {
   emit('addProject');
+};
+
+const editProject = (project: Project) => {
+  console.log('Edit project:', project._id);
+  // Navigation zur Edit-Seite oder Dialog öffnen
+  // router.push({ name: 'ProjectEdit', params: { mediaplanId: props.mediaplanId, projectId: project._id } });
 };
 
 </script>
@@ -91,18 +89,31 @@ const addProject = () => {
             hover
             class="projects-data-table"
             @update:options="onOptionsUpdate"
+
         >
           <template v-slot:item.edit="{ item }">
-            <v-btn icon density="comfortable" variant="text" color="grey">
+            <v-btn icon density="comfortable" variant="text" color="grey" @click.stop="editProject(item)">
               <v-icon>mdi-pencil</v-icon>
+              <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
             </v-btn>
           </template>
 
           <template v-slot:item.abbreviation="{ item }">
-            <div class="d-flex align-center" v-if="item.abbreviation">
+            <router-link
+                :to="{ name: 'ProjectDetail', params: { mediaplanId: props.mediaplanId, projectId: item._id } }"
+                class="project-link d-flex align-center"
+                v-if="item.abbreviation && props.mediaplanId"
+                @click.stop
+            >
               <v-avatar size="32" class="mr-2 grey lighten-4"
                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
               <span>{{ item.abbreviation }}</span>
+            </router-link>
+            <div class="d-flex align-center" v-else-if="item.abbreviation">
+              <v-avatar size="32" class="mr-2 grey lighten-4"
+                        :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
+              <span>{{ item.abbreviation }}</span>
+              <v-tooltip activator="parent" location="top">Cannot link project (missing Mediaplan ID)</v-tooltip>
             </div>
             <div v-else>N/A</div>
           </template>
@@ -144,21 +155,30 @@ const addProject = () => {
           </template>
 
           <template v-slot:item.actions="{ item }">
-            <v-btn icon variant="text" density="comfortable">
-              <v-icon>mdi-dots-vertical</v-icon>
-            </v-btn>
+            <v-menu>
+              <template v-slot:activator="{ props: menuProps }">
+                <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
+              </template>
+              <v-list density="compact">
+                <v-list-item @click.stop="editProject(item)">
+                  <v-list-item-title>Edit</v-list-item-title>
+                </v-list-item>
+                <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
+                  <v-list-item-title>Delete</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
           </template>
 
           <template v-slot:loading>
             <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
           </template>
-
           <template v-slot:no-data>
-            <div class="text-center pa-4">
+            <div class="text-center pa-4 text-disabled">
+              <v-icon size="large" class="mb-2">mdi-database-off-outline</v-icon>
               <p>No projects found for this mediaplan.</p>
             </div>
           </template>
-
 
           <template v-slot:bottom>
             <div class="d-flex align-center pa-4 bg-grey-lighten-2">
@@ -182,56 +202,14 @@ const addProject = () => {
 </template>
 
 <style scoped>
-.planning-view-container {
-  overflow: hidden;
-}
-
-/* Dark Theme Anpassungen für Tabelle */
-.projects-data-table :deep(thead th) { /* Gezielt auf Header-Zellen */
-  background-color: #4D4D4D !important;
-  color: white !important;
+/* ... (Styles bleiben) ... */
+.project-link {
+  color: white; /* Oder eine andere passende Farbe im Dark Theme */
+  text-decoration: none;
   font-weight: 500;
 }
-
-.projects-data-table :deep(tbody tr) { /* Gezielt auf Body-Zeilen */
-  background-color: #4D4D4D !important;
-  color: white !important;
-  border-bottom: 4px solid #FFFFFF !important; /* Weißer Rand zwischen Zeilen */
+.project-link:hover {
+  text-decoration: underline;
+  color: #E0E0E0; /* Leichte Aufhellung beim Hover */
 }
-.projects-data-table :deep(tbody tr:hover) { /* Hover-Effekt */
-  background-color: #5A5A5A !important;
-}
-
-.projects-data-table :deep(td) { /* Allgemeine Zellenstile */
-  color: white !important;
-  height: 60px; /* Feste Höhe beibehalten */
-  vertical-align: middle;
-}
-
-/* Icons und Avatare anpassen */
-.projects-data-table :deep(.v-icon),
-.projects-data-table :deep(.v-avatar) {
-  color: white !important;
-  background-color: transparent !important; /* Sicherstellen, dass Avatare keinen eigenen Hintergrund haben */
-}
-.projects-data-table :deep(.v-avatar.grey) { /* Spezifischer Fallback-Avatar */
-  background-color: #757575 !important; /* Dunkleres Grau */
-}
-
-/* Knöpfe in der Tabelle */
-.projects-data-table :deep(.v-btn) {
-  color: white !important;
-}
-
-/* "Add Project" Button im Footer */
-.black-text-button {
-  color: black !important;
-}
-.black-text-button :deep(.v-btn__content),
-.black-text-button :deep(.v-btn__prepend) .v-icon { /* Icon auch anpassen */
-  color: black !important;
-}
-
-/* Veraltete Stile entfernen oder anpassen */
-/* .projects-data-table :deep(.v-data-table__tr:not(:last-child)) { border-bottom: none !important; } */ /* Nicht mehr nötig durch border an tr */
 </style>

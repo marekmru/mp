@@ -14,8 +14,8 @@
         <v-row class="mb-0">
           <v-col cols="12" md="5" class="d-flex align-center">
             <MediaplanBreadcrumb
-                :mediaplan-name="mediaplan.name || 'Mediaplan Details'"
                 :mediaplan="mediaplan"
+                :project="null"
             />
           </v-col>
           <v-col cols="12" md="7">
@@ -44,6 +44,7 @@
               :is-loading="isLoadingProjects"
               :current-page="projectCurrentPage"
               :items-per-page="projectItemsPerPage"
+              :mediaplan-id="mediaplanId"
               @update:options="handleProjectOptionsUpdate"
               @add-project="openCreateProjectDialog"
           />
@@ -101,7 +102,7 @@ const props = defineProps<{
 const route = useRoute();
 const router = useRouter();
 // Verwende die ID aus der Route als primäre Quelle
-const mediaplanId = ref(props.id || route.params.id as string);
+const mediaplanId = ref(props.id || route.params.id as string); // Diese Variable hält die ID
 
 // --- Stores ---
 const mediaplanStore = useMediaplanStore();
@@ -225,7 +226,6 @@ watch(projectError, (newError) => {
 });
 
 </script>
-
 
 <style scoped>
 .mediaplan-detail {

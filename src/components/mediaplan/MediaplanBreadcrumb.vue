@@ -83,7 +83,8 @@ const handleBack = () => {
         @click="handleBack"
         aria-label="Go back to overview"
     >
-      <v-icon>mdi-arrow-left</v-icon>
+      <v-icon> mdi-arrow-u-left-top
+      </v-icon>
       <v-tooltip activator="parent" location="bottom">Back to Overview</v-tooltip>
     </v-btn>
 
@@ -99,9 +100,6 @@ const handleBack = () => {
       </div>
 
       <v-breadcrumbs :items="breadcrumbItems" class="pa-0">
-        <template v-slot:divider>
-          <v-icon size="small">mdi-chevron-right</v-icon>
-        </template>
         <template v-slot:title="{ item }">
               <span :class="{ 'text-disabled': item.disabled }">
                   {{ item.title }}
