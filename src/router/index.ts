@@ -19,11 +19,13 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../views/MediaplanDetail.vue'),
         props: true,
     },
+    // *** NEUE ROUTE für Project Detail ***
     {
-        path: '/mediaplans/:id/edit',
-        name: 'MediaplanEdit',
-        component: () => import('../views/MediaplanEdit.vue'),
-        props: true,
+        path: '/mediaplans/:mediaplanId/projects/:projectId',
+        name: 'ProjectDetail',
+        component: () => import('../views/ProjectDetail.vue'), // Pfad zur neuen Komponente prüfen
+        props: true, // Übergibt mediaplanId und projectId als Props
+        meta: { requiresAuth: true } // Annahme: Detail erfordert Login
     },
     // Additional routes here
 ]
