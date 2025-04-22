@@ -135,8 +135,8 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
                 };
             }
         } catch (err) {
-            error.value = err instanceof Error ? err.message : 'An error occurred while fetching sources';
-            console.error('Error fetching sources:', err);
+            //error.value = err instanceof Error ? err.message : 'An error occurred while fetching sources';
+           // console.error('Error fetching sources:', err);
             sources.value = {
                 brands: [],
                 countries: [],

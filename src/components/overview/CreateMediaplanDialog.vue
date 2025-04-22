@@ -10,10 +10,8 @@
       <v-form ref="form" @submit.prevent="submitForm">
         <WithFormDefaults>
           <v-card-text class="pa-0">
-
             <!-- Brand Selection -->
-            <FormElementVrowVcol>
-              <div class="text-caption text-medium-emphasis mb-1">Brand Output*</div>
+            <FormElementVrowVcol label="Brand Output" required>
               <v-select
                   id="brand-select"
                   v-model="formData.brand._id"
@@ -26,8 +24,7 @@
             </FormElementVrowVcol>
 
             <!-- Mediaplan Type -->
-            <FormElementVrowVcol pb="pb-3">
-              <div class="text-caption text-medium-emphasis mb-1">Mediaplan Type</div>
+            <FormElementVrowVcol pb="pb-3" label="Mediaplan Type" required>
               <v-radio-group v-model="mediaplanType" inline>
                 <v-radio value="po" label="PO Based"/>
                 <v-radio value="draft" label="Draft"/>
@@ -35,8 +32,7 @@
             </FormElementVrowVcol>
 
             <!-- Mediaplan Name -->
-            <FormElementVrowVcol>
-              <div class="text-caption text-medium-emphasis mb-1">Individual Name*</div>
+            <FormElementVrowVcol label="Individual Name">
               <v-text-field
                   id="mediaplan-name"
                   v-model="formData.name"
@@ -46,8 +42,7 @@
             </FormElementVrowVcol>
 
             <!-- PO Selection -->
-            <FormElementVrowVcol>
-              <div class="text-caption text-medium-emphasis mb-1">Select existing PO*</div>
+            <FormElementVrowVcol label="Select existing PO" required>
               <v-row no-gutters>
                 <v-col class="mr-2">
                   <v-select
@@ -77,9 +72,8 @@
             </FormElementVrowVcol>
 
             <!-- Creator and Department -->
-            <FormElementVrowVcol>
+            <FormElementVrowVcol label="Creator" required>
 
-              <div class="text-caption text-medium-emphasis mb-1">Creator*</div>
               <v-text-field
                   id="creator-name"
                   v-model="creatorName"
@@ -90,9 +84,7 @@
               />
             </FormElementVrowVcol>
 
-            <FormElementVrowVcol>
-
-              <div class="text-caption text-medium-emphasis mb-1">Department</div>
+            <FormElementVrowVcol label="Department">
               <v-text-field
                   id="department"
                   v-model="department"
@@ -102,9 +94,7 @@
 
 
             <!-- Date Range -->
-            <FormElementVrowVcol>
-
-              <div class="text-caption text-medium-emphasis mb-1">Start date* - End date*</div>
+            <FormElementVrowVcol label="Start date - End date" required>
               <DateRangePicker
                   id="date-range"
                   v-model="dateRange"
@@ -141,7 +131,7 @@
 
   <!-- Project Creation Dialog (shown after mediaplan creation) -->
   <CreateProjectDialog
-      mode="create"
+      mode="create-mediaplan"
       v-if="showProjectDialog"
       v-model="showProjectDialog"
       :mediaplan-id="createdMediaplanId"

@@ -12,7 +12,6 @@
             @update:filter="handleFilterUpdate"
             @update:sort="handleSortUpdate"
             @clear="handleClearFilters"
-            @create-mediaplan="openCreateMediaplanDialog"
         />
       </v-col>
     </v-row>

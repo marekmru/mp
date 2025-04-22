@@ -82,14 +82,6 @@
     <!-- Create button - will stay right aligned -->
     <div class="filter-item create-button">
       <create-mediaplan-button />
-<!--      <v-btn
-          color="black"
-          class="text-white px-4"
-          prepend-icon="mdi-plus"
-          @click="$emit('create-mediaplan')"
-      >
-        Mediaplan
-      </v-btn>-->
     </div>
   </div>
 
@@ -223,7 +215,6 @@ const emit = defineEmits([
   'update:country',
   'update:sort-by',
   'update:sort-order',
-  'create-mediaplan',
   'update:brand'
 ]);
 
