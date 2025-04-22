@@ -6,35 +6,25 @@
       </v-alert>
 
       <div v-if="isLoadingMediaplan && !mediaplan" class="text-center my-10">
-        <v-progress-circular indeterminate color="primary" size="40"></v-progress-circular>
+        <v-progress-circular indeterminate color="primary" size="40" />
         <p class="mt-2 text-disabled">Loading Mediaplan...</p>
       </div>
 
       <template v-if="!isLoadingMediaplan && mediaplan">
-        <v-row class="mb-0">
-          <v-col cols="12" md="5" class="d-flex align-center">
-            <MediaplanBreadcrumb
-                :mediaplan="mediaplan"
-                :project="null"
-            />
-          </v-col>
-          <v-col cols="12" md="7">
-            <MediaplanHeader
-                :plan-budget="mediaplan.budget?.total || 0"
-                :used-percentage="calculatePercentage(mediaplan.budget?.used, mediaplan.budget?.total)"
-                :search="search"
-                @update:search="updateSearch"
-            />
-          </v-col>
-        </v-row>
-
-        <v-row class="mb-4">
-          <v-col cols="12" sm="auto">
-            <MediaplanViewToggle
-                v-model="currentView"
-            />
-          </v-col>
-        </v-row>
+        <MediaplanTopSection
+            :mediaplan="mediaplan"
+            :project="null"
+            :search="search"
+            :is-loading="isLoadingMediaplan"
+            :current-view="currentView"
+            @update:search="updateSearch"
+            @update:current-view="val => currentView = val"
+        >
+          <!-- Slot für späteren Campaign-Type-Select, falls benötigt -->
+          <template #campaign-type-select>
+            <!-- ggf. v-select hier -->
+          </template>
+        </MediaplanTopSection>
 
         <div class="main-content">
           <MediaplanPlanningView
@@ -49,14 +39,20 @@
               @add-project="openCreateProjectDialog"
           />
 
-          <MediaplanBudgetView v-else :mediaplan="mediaplan"/>
+          <MediaplanBudgetView v-else :mediaplan="mediaplan" />
 
-          <v-alert v-if="projectError && currentView === 'planning'" type="error" density="compact" class="mt-4"
-                   closable>
+          <v-alert
+              v-if="projectError && currentView === 'planning'"
+              type="error"
+              density="compact"
+              class="mt-4"
+              closable
+          >
             Failed to load projects: {{ projectError }}
           </v-alert>
         </div>
       </template>
+
       <template v-else-if="!isLoadingMediaplan && !mediaplan && errorMediaplan">
         <div class="text-center my-10 text-disabled">
           <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
@@ -77,161 +73,108 @@
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted, reactive, watch } from 'vue'
+import { useRoute } from 'vue-router'
 
-
-import {ref, computed, onMounted, reactive, watch} from 'vue';
-import {useRouter, useRoute} from 'vue-router';
-import MainLayout from '@/layouts/MainLayout.vue'; // Pfad prüfen
-import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue'; // Pfad prüfen
-import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue'; // Pfad prüfen
-import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue'; // Pfad prüfen
-import MediaplanPlanningView from '@/components/mediaplan/MediaplanPlanningView.vue'; // Pfad prüfen
-import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue'; // Pfad prüfen
-import {useMediaplanStore} from '@/stores/mediaplanStore'; // Pfad prüfen
-import {useProjectStore} from '@/stores/projectStore'; // Pfad prüfen
-import type {Mediaplan} from '@/types/mediaplan'; // Pfad prüfen
-import type {Project} from '@/types/project'; // Pfad prüfen
-// Importiere den Helper direkt, wenn er nicht global ist
-import {calculatePercentage} from '@/helpers/currencyUtils'; // Pfad prüfen
+import MainLayout from '@/layouts/MainLayout.vue'
+import MediaplanPlanningView from '@/components/mediaplan/MediaplanPlanningView.vue'
+import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue'
+import { useMediaplanStore } from '@/stores/mediaplanStore'
+import { useProjectStore } from '@/stores/projectStore'
+import type { Mediaplan } from '@/types/mediaplan'
+import type { Project } from '@/types/project'
+import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
 
 // --- Props & Route ---
-const props = defineProps<{
-  id?: string; // Accept the id from the router
-}>();
-
-const route = useRoute();
-const router = useRouter();
-// Verwende die ID aus der Route als primäre Quelle
-const mediaplanId = ref(props.id || route.params.id as string); // Diese Variable hält die ID
+const props = defineProps<{ id?: string }>()
+const route = useRoute()
+const mediaplanId = ref(props.id || (route.params.id as string))
 
 // --- Stores ---
-const mediaplanStore = useMediaplanStore();
-const projectStore = useProjectStore();
+const mediaplanStore = useMediaplanStore()
+const projectStore = useProjectStore()
 
-// --- Computed Properties from Stores ---
-// Mediaplan Details (Annahme: Store hat 'selectedMediaplan' und 'isLoading')
-const mediaplan = computed(() => mediaplanStore.selectedMediaplan);
-const isLoadingMediaplan = computed(() => mediaplanStore.isLoading); // Nutzt generisches isLoading oder ein spezifisches
-const errorMediaplan = computed(() => mediaplanStore.error);
+// --- Computed Properties ---
+const mediaplan = computed<Mediaplan | null>(() => mediaplanStore.selectedMediaplan)
+const isLoadingMediaplan = computed(() => mediaplanStore.isLoading)
+const errorMediaplan = computed(() => mediaplanStore.error)
 
-// Projects (Verwendet States aus dem projectStore)
-const projects = computed(() => projectStore.projects);
-const totalProjects = computed(() => projectStore.totalItems);
-const isLoadingProjects = computed(() => projectStore.isLoading);
-const projectError = computed(() => projectStore.error);
-const projectCurrentPage = computed(() => projectStore.currentPage); // 0-basiert
-const projectItemsPerPage = computed(() => projectStore.perPage);
-const projectTotalPages = computed(() => projectStore.totalPages); // Wird für die Paginierungsinfo benötigt
+const projects = computed<Project[]>(() => projectStore.projects)
+const totalProjects = computed(() => projectStore.totalItems)
+const isLoadingProjects = computed(() => projectStore.isLoading)
+const projectError = computed(() => projectStore.error)
+const projectCurrentPage = computed(() => projectStore.currentPage)
+const projectItemsPerPage = computed(() => projectStore.perPage)
 
 // --- UI State ---
-const currentView = ref<string>('planning'); // 'planning' or 'budget'
-const search = ref<string>(''); // Such-State für MediaplanHeader (kann später auch an Project-Filterung gekoppelt werden)
+const currentView = ref<'planning' | 'budget'>('planning')
+const search = ref('')
 
 // --- Snackbar ---
-const snackbar = reactive({
-  show: false,
-  text: '',
-  color: 'success'
-});
+const snackbar = reactive({ show: false, text: '', color: 'success' })
 
 // --- Methods ---
-
-// Handler für Optionen-Updates von MediaplanPlanningView (v-data-table-server)
-// Diese Funktion wird aufgerufen, wenn Seite, Items pro Seite oder Sortierung sich ändern
 const handleProjectOptionsUpdate = (options: {
-  page: number;
-  itemsPerPage: number;
-  sortBy?: any[];
+  page: number
+  itemsPerPage: number
+  sortBy?: any[]
   sortDesc?: boolean[]
 }) => {
-  const newZeroBasedPage = options.page - 1; // Tabelle ist 1-basiert, Store 0-basiert
-
-  // Paginierung aktualisieren, falls geändert
-  if (newZeroBasedPage !== projectCurrentPage.value) {
-    projectStore.currentPage = newZeroBasedPage; // Direkte Zuweisung oder Aktion
-    projectStore.fetchProjects(mediaplanId.value); // Neu laden für die neue Seite
+  const newPage = options.page - 1
+  if (newPage !== projectCurrentPage.value) {
+    projectStore.currentPage = newPage
+    projectStore.fetchProjects(mediaplanId.value)
   }
   if (options.itemsPerPage !== projectItemsPerPage.value) {
-    projectStore.perPage = options.itemsPerPage; // Direkte Zuweisung oder Aktion
-    // Wenn Items pro Seite geändert werden, normalerweise zur ersten Seite zurückkehren
-    if (projectStore.currentPage !== 0) {
-      projectStore.currentPage = 0;
-    }
-    projectStore.fetchProjects(mediaplanId.value); // Neu laden mit neuer Seitengröße
+    projectStore.perPage = options.itemsPerPage
+    projectStore.currentPage = 0
+    projectStore.fetchProjects(mediaplanId.value)
   }
-
-  // Optional: Sortierung aktualisieren, falls implementiert
-  // if (options.sortBy && options.sortBy.length > 0) {
-  //     const sortConfig = options.sortBy[0];
-  //     if (sortConfig.key !== projectStore.sortBy || (sortConfig.order !== projectStore.sortOrder)) {
-  //        // Annahme: projectStore hat setSorting(field, order) Aktion
-  //        projectStore.setSorting(sortConfig.key, sortConfig.order);
-  //     }
-  // } else {
-  //    // Ggf. Standard-Sortierung wiederherstellen
-  // }
-};
-
+}
 
 const openCreateProjectDialog = () => {
-  // Navigation oder Dialog zum Erstellen eines Projekts
-  console.log('Trigger create project for Mediaplan ID:', mediaplanId.value);
-  // Beispiel Navigation:
-  // router.push({ name: 'CreateProject', params: { mediaplanId: mediaplanId.value } });
-  // Beispiel Dialog:
-  // showCreateProjectDialog.value = true; // Benötigt ref und Dialog-Komponente im Template
-};
+  console.log('Trigger create project for Mediaplan ID:', mediaplanId.value)
+  // router.push or dialog logic here
+}
 
-// Wird von MediaplanHeader aufgerufen
-const updateSearch = (value: string) => {
-  search.value = value;
-  // TODO: Hier könnte man die Projektliste filtern, wenn die Suche darauf angewendet werden soll
-  // Entweder Client-seitig (projects.value filtern) oder Server-seitig (projectStore.setFilter('search', value))
-};
+const updateSearch = (val: string) => {
+  search.value = val
+  // ggf. Filter-Logik hier
+}
 
 const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => {
-  snackbar.text = text;
-  snackbar.color = color;
-  snackbar.show = true;
-};
+  snackbar.text = text
+  snackbar.color = color
+  snackbar.show = true
+}
 
-// --- Lifecycle Hooks ---
+// --- Lifecycle ---
 onMounted(() => {
   if (!mediaplanId.value) {
-    console.error('No mediaplan ID provided');
-    mediaplanStore.error = 'No mediaplan ID provided'; // Setze Fehler im Store
-    return;
+    mediaplanStore.error = 'No mediaplan ID provided'
+    return
   }
-  // Lade Mediaplan-Details und Projekte über die Stores
-  mediaplanStore.fetchMediaplan(mediaplanId.value);
-  projectStore.fetchProjects(mediaplanId.value); // Lädt die erste Seite der Projekte
-});
+  mediaplanStore.fetchMediaplan(mediaplanId.value)
+  projectStore.fetchProjects(mediaplanId.value)
+})
 
 // --- Watchers ---
-// Wenn sich die ID ändert (z.B. durch Navigation), Daten neu laden
 watch(() => route.params.id, (newId) => {
-  if (newId && typeof newId === 'string' && newId !== mediaplanId.value) {
-    mediaplanId.value = newId;
-    mediaplanStore.fetchMediaplan(newId);
-    projectStore.fetchProjects(newId);
+  if (typeof newId === 'string' && newId !== mediaplanId.value) {
+    mediaplanId.value = newId
+    mediaplanStore.fetchMediaplan(newId)
+    projectStore.fetchProjects(newId)
   }
-});
+})
 
-// Fehlerbehandlung beobachten
-watch(errorMediaplan, (newError) => {
-  if (newError) showSnackbar(`Error loading mediaplan: ${newError}`, 'error');
-});
-watch(projectError, (newError) => {
-  if (newError) showSnackbar(`Error loading projects: ${newError}`, 'error');
-});
-
+watch(errorMediaplan, (err) => err && showSnackbar(`Error loading mediaplan: ${err}`, 'error'))
+watch(projectError, (err) => err && showSnackbar(`Error loading projects: ${err}`, 'error'))
 </script>
 
 <style scoped>
 .mediaplan-detail {
-  min-height: calc(100vh - 64px); /* Adjust for the navbar height */
+  min-height: calc(100vh - 64px);
 }
-
 .main-content {
   min-height: 60vh;
 }

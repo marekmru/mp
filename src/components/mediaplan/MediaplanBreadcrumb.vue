@@ -130,7 +130,7 @@ const handleBack = () => {
 }
 
 .v-breadcrumbs :deep(.v-breadcrumbs-item) {
-  font-size: 0.9rem; /* Etwas kleinere Schrift */
+  font-size: 0.86rem; /* Etwas kleinere Schrift */
 }
 
 .text-disabled {

@@ -2020,7 +2020,7 @@ components:
       properties:
         _id:
           description: Unique identifier of the Mediaplan.
-          example: mp-001
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d399
           format: uuid
           type: string
         brand:
