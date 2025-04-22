@@ -17,7 +17,8 @@ import { useCampaignStore } from '@/stores/campaignStore';
 import type { Project } from '@/types/project';
 import { formatDateRange } from '@/helpers/dateUtils';
 // Importiere den Helper für die Prozentrechnung
-import { calculatePercentage } from '@/helpers/currencyUtils'; // Pfad prüfen
+import { calculatePercentage } from '@/helpers/currencyUtils';
+import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue"; // Pfad prüfen
 
 // --- Props & Route ---
 const props = defineProps<{ mediaplanId?: string; projectId?: string; }>();
@@ -129,7 +130,6 @@ watch(errorCampaigns, (newError) => {
 
 // Optional: Watch search changes for immediate filtering
 // watch(search, (newValue) => { ... });
-
 </script>
 
 <template>
@@ -144,28 +144,19 @@ watch(errorCampaigns, (newError) => {
       </div>
 
       <template v-if="!isLoadingProject && project">
-        <v-row class="mb-0">
-          <v-col cols="12" md="5" class="d-flex align-center pt-0 pb-0">
-            <MediaplanBreadcrumb :mediaplan="parentMediaplan" :project="project" />
-          </v-col>
-          <v-col cols="12" md="7">
-            <MediaplanHeader
-                :plan-budget="parentMediaplan?.budget?.total || 0"
-                :used-percentage="calculatePercentage(parentMediaplan?.budget?.used, parentMediaplan?.budget?.total)"
-                :search="search"
-                @update:search="updateSearchHandler"
-                :is-loading="isLoadingProject || mediaplanStore.isLoading" />
-          </v-col>
-        </v-row>
-
-        <v-row class="mb-4">
-          <v-col cols="12" sm="auto">
-            <MediaplanViewToggle v-model="currentView" />
-          </v-col>
-          <v-col>
-              <!--TODO v-select - select campaigntyppe-->
-          </v-col>
-        </v-row>
+        <MediaplanTopSection
+            :mediaplan="parentMediaplan"
+            :project="project"
+            :search="search"
+            :is-loading="isLoadingProject || mediaplanStore.isLoading"
+            :current-view="currentView"
+            @update:search="updateSearchHandler"
+            @update:current-view="val => currentView = val"
+        >
+          <template #campaign-type-select>
+            <!-- TODO v-select - select campaigntyppe -->
+          </template>
+        </MediaplanTopSection>
         <v-row v-if="project" class="mb-4">
           <v-col>
             <v-card variant="outlined">
