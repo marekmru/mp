@@ -12,120 +12,110 @@
           <v-card-text class="pa-0">
 
             <!-- Brand Selection -->
-            <v-row>
-              <v-col cols="12">
-                <div class="text-caption text-medium-emphasis mb-1">Brand Output*</div>
-                <v-select
-                    id="brand-select"
-                    v-model="formData.brand._id"
-                    :items="brands"
-                    item-title="name"
-                    item-value="_id"
-                    placeholder="Please Select a brand"
-                    :rules="[v => !!v || 'Brand is required']"
-                />
-              </v-col>
-            </v-row>
+            <FormElementVrowVcol>
+              <div class="text-caption text-medium-emphasis mb-1">Brand Output*</div>
+              <v-select
+                  id="brand-select"
+                  v-model="formData.brand._id"
+                  :items="brands"
+                  item-title="name"
+                  item-value="_id"
+                  placeholder="Please Select a brand"
+                  :rules="[v => !!v || 'Brand is required']"
+              />
+            </FormElementVrowVcol>
 
             <!-- Mediaplan Type -->
-            <v-row>
-              <v-col cols="12">
-                <div class="text-caption text-medium-emphasis mb-1">Mediaplan Type</div>
-                <v-radio-group v-model="mediaplanType" inline>
-                  <v-radio value="po" label="PO Based" />
-                  <v-radio value="draft" label="Draft" />
-                </v-radio-group>
-              </v-col>
-            </v-row>
+            <FormElementVrowVcol pb="pb-3">
+              <div class="text-caption text-medium-emphasis mb-1">Mediaplan Type</div>
+              <v-radio-group v-model="mediaplanType" inline>
+                <v-radio value="po" label="PO Based"/>
+                <v-radio value="draft" label="Draft"/>
+              </v-radio-group>
+            </FormElementVrowVcol>
 
             <!-- Mediaplan Name -->
-            <v-row>
-              <v-col cols="12">
-                <div class="text-caption text-medium-emphasis mb-1">Individual Name*</div>
-                <v-text-field
-                    id="mediaplan-name"
-                    v-model="formData.name"
-                    placeholder="please type in an individual title"
-                    :rules="[v => !!v || 'Name is required']"
-                />
-              </v-col>
-            </v-row>
+            <FormElementVrowVcol>
+              <div class="text-caption text-medium-emphasis mb-1">Individual Name*</div>
+              <v-text-field
+                  id="mediaplan-name"
+                  v-model="formData.name"
+                  placeholder="please type in an individual title"
+                  :rules="[v => !!v || 'Name is required']"
+              />
+            </FormElementVrowVcol>
 
             <!-- PO Selection -->
-            <v-row v-if="mediaplanType === 'po'">
-              <v-col cols="12">
-                <div class="text-caption text-medium-emphasis mb-1">Select existing PO*</div>
-                <v-row no-gutters>
-                  <v-col class="mr-2">
-                    <v-select
-                        id="po-select"
-                        v-model="selectedPOs"
-                        :items="poNumbers"
-                        item-title="name"
-                        item-value="_id"
-                        placeholder="Select POs"
-                        :rules="[v => mediaplanType !== 'po' || (v && v.length > 0) || 'At least one PO is required']"
-                        multiple
-                        chips
-                        closable-chips
-                    />
-                  </v-col>
-                  <v-col cols="auto">
-                    <v-btn
-                        color="primary"
-                        variant="outlined"
-                        @click="openCreatePODialog"
-                        style="height: 56px"
-                    >
-                      Create PO
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-col>
-            </v-row>
+            <FormElementVrowVcol>
+              <div class="text-caption text-medium-emphasis mb-1">Select existing PO*</div>
+              <v-row no-gutters>
+                <v-col class="mr-2">
+                  <v-select
+                      id="po-select"
+                      v-model="selectedPOs"
+                      :items="poNumbers"
+                      item-title="name"
+                      item-value="_id"
+                      placeholder="Select POs"
+                      :rules="[v => mediaplanType !== 'po' || (v && v.length > 0) || 'At least one PO is required']"
+                      multiple
+                      chips
+                      closable-chips
+                  />
+                </v-col>
+                <v-col cols="auto">
+                  <v-btn
+                      color="primary"
+                      variant="outlined"
+                      @click="openCreatePODialog"
+                      style="height: 56px"
+                  >
+                    Create PO
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </FormElementVrowVcol>
 
             <!-- Creator and Department -->
-            <template v-if="mediaplanType === 'po'">
-              <v-row>
-                <v-col cols="12">
-                  <div class="text-caption text-medium-emphasis mb-1">Creator*</div>
-                  <v-text-field
-                      id="creator-name"
-                      v-model="creatorName"
-                      placeholder="Your name"
-                      :rules="[v => !!v || 'Creator name is required']"
-                      readonly
-                      disabled
-                  />
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col cols="12">
-                  <div class="text-caption text-medium-emphasis mb-1">Department</div>
-                  <v-text-field
-                      id="department"
-                      v-model="department"
-                      placeholder="Department name"
-                  />
-                </v-col>
-              </v-row>
-            </template>
+            <FormElementVrowVcol>
+
+              <div class="text-caption text-medium-emphasis mb-1">Creator*</div>
+              <v-text-field
+                  id="creator-name"
+                  v-model="creatorName"
+                  placeholder="Your name"
+                  :rules="[v => !!v || 'Creator name is required']"
+                  readonly
+                  disabled
+              />
+            </FormElementVrowVcol>
+
+            <FormElementVrowVcol>
+
+              <div class="text-caption text-medium-emphasis mb-1">Department</div>
+              <v-text-field
+                  id="department"
+                  v-model="department"
+                  placeholder="Department name"
+              />
+            </FormElementVrowVcol>
+
 
             <!-- Date Range -->
-            <v-row>
-              <v-col cols="12">
-                <div class="text-caption text-medium-emphasis mb-1">Start date* - End date*</div>
-                <DateRangePicker
-                    id="date-range"
-                    v-model="dateRange"
-                    placeholder="Select start and end dates"
-                    :rules="[v => !!v || 'Date range is required']"
-                    :required="true"
-                    dialog-title="Choose a date range"
-                    @update:model-value="handleDateRangeChange"
-                />
-              </v-col>
-            </v-row>
+            <FormElementVrowVcol>
+
+              <div class="text-caption text-medium-emphasis mb-1">Start date* - End date*</div>
+              <DateRangePicker
+                  id="date-range"
+                  v-model="dateRange"
+                  placeholder="Select start and end dates"
+                  :rules="[v => !!v || 'Date range is required']"
+                  :required="true"
+                  dialog-title="Choose a date range"
+                  @update:model-value="handleDateRangeChange"
+              />
+            </FormElementVrowVcol>
+
 
           </v-card-text>
         </WithFormDefaults>
@@ -151,6 +141,7 @@
 
   <!-- Project Creation Dialog (shown after mediaplan creation) -->
   <CreateProjectDialog
+      mode="create"
       v-if="showProjectDialog"
       v-model="showProjectDialog"
       :mediaplan-id="createdMediaplanId"
@@ -162,7 +153,6 @@
       @created="handleProjectCreated"
   />
 </template>
-
 
 
 <script setup lang="ts">
@@ -177,6 +167,7 @@ import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
 import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
 import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
 import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
+import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
 
 // Props
 const props = defineProps<{

@@ -64,12 +64,6 @@ const totalItems = computed(() => mediaplanStore.totalItems);
 const mediaplans = computed(() => mediaplanStore.mediaplans);
 const isLoading = computed(() => mediaplanStore.isLoading);
 const sources = computed(() => mediaplanStore.sources); // Für Filter-Optionen
-console.log('--- Environment Test ---');
-console.log('Mode:', import.meta.env.MODE); // Should be 'development'
-console.log('Test Variable:', import.meta.env.VITE_API_BASE_CORE4);
-console.log('Dev Only Var:', import.meta.env.VITE_API_BASE_MEDIAPLAN);
-console.log('All Env:', JSON.stringify(import.meta.env, null, 2)); // See everything Vite exposes
-console.log('--- End Environment Test ---');
 // --- Dialog control ---
 const showCreateMediaplanDialog = ref(false);
 

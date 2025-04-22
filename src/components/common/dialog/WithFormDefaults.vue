@@ -9,14 +9,16 @@ const defaults = {
   VTextField: {
     variant: 'outlined',
     density: 'comfortable',
-    hideDetails: true,
     class: 'rounded-lg'
   },
   VSelect: {
     variant: 'outlined',
     density: 'comfortable',
-    hideDetails: true,
     class: 'rounded-lg'
+  },
+  VDatePicker: {
+    variant: 'outlined',
+    density: 'comfortable',
   },
   VRadioGroup: {
     density: 'comfortable',

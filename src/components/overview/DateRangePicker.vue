@@ -8,8 +8,6 @@
         :rules="rules"
         :hint="hint"
         :disabled="disabled"
-        :density="density"
-        :variant="variant"
         readonly
         @click="openDialog"
         append-inner-icon="mdi-calendar-month-outline"
@@ -81,8 +79,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import { formatDate } from '@/helpers/dateUtils';
+import {ref, computed, watch} from 'vue';
+import {formatDate} from '@/helpers/dateUtils';
+import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
 
 // Define props with TypeScript interface
 interface Props {
@@ -96,8 +95,6 @@ interface Props {
   dateFormat?: string;
   minDate?: string;
   maxDate?: string;
-  density?: 'default' | 'comfortable' | 'compact';
-  variant?: 'filled' | 'outlined' | 'plain' | 'underlined' | 'solo';
 }
 
 const props = withDefaults(defineProps<Props>(), {
