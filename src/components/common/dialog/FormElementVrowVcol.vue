@@ -25,7 +25,7 @@ const props = defineProps({
   /** Padding-bottom utility class, e.g. 'pb-0', 'pb-3' */
   pb: {
     type: String,
-    default: 'pb-0'
+    default: 'pb-1'
   }
 });
 </script>

@@ -9,12 +9,10 @@ const defaults = {
   VTextField: {
     variant: 'outlined',
     density: 'comfortable',
-    class: 'rounded-lg'
   },
   VSelect: {
     variant: 'outlined',
     density: 'comfortable',
-    class: 'rounded-lg'
   },
   VDatePicker: {
     variant: 'outlined',
@@ -25,7 +23,6 @@ const defaults = {
     hideDetails: true
   },
   VBtn: {
-    class: 'rounded-lg'
   }
 };
 </script>
