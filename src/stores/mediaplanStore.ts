@@ -1,236 +1,153 @@
-// src/stores/mediaplanStore.ts
-import {defineStore} from 'pinia';
-import {ref, computed} from 'vue';
-import customFetch from '@/helpers/customFetch'; // Pfad prüfen
+// File: src/stores/mediaplanStore.ts
+import { defineStore } from 'pinia';
+import { ref, computed } from 'vue';
+import customFetch from '@/helpers/customFetch';
 import type {
-    FilterSources, Mediaplan, MediaplanFilter, MediaplanListResponse, SourcesResponse
-} from "../types"; // Pfad prüfen
+    FilterSources,
+    Mediaplan,
+    MediaplanFilter,
+    MediaplanListResponse,
+    SourcesResponse
+} from '@/types';
 
 export const useMediaplanStore = defineStore('mediaplan', () => {
-    // State
-    const mediaplans = ref<Mediaplan[]>([]);
+    // --- State ---
     const sources = ref<FilterSources>({
-        brands: [],
-        countries: [],
+        brands: [
+            { _id: 'bmw', name: 'BMW' },
+            { _id: 'mini', name: 'MINI' }
+        ],
+        countries: [
+            { abbreviation: 'DE', value: 'Germany', category: null },
+            { abbreviation: 'AT', value: 'Austria', category: null },
+            // …other mock countries…
+        ],
         subsegments: [],
         products: [],
         campaigntypes: [],
         languages: []
     });
-    const isLoading = ref(false); // Generisches Loading für Listen/Quellen
-    const error = ref<string | null>(null); // Generischer Fehler
+    const mediaplans  = ref<Mediaplan[]>([]);
+    const isLoading   = ref(false);
+    const error       = ref<string | null>(null);
 
-    // *** NEU: State für das einzelne Mediaplan-Detail ***
-    const selectedMediaplan = ref<Mediaplan | null>(null);
-    // *** Optional: Separates Loading/Error für Detail ***
-    // const isLoadingDetail = ref(false);
-    // const errorDetail = ref<string | null>(null);
-
-
-    // Pagination state
-    const totalItems = ref(0);
-    const totalPages = ref(0);
+    // Pagination
+    const totalItems  = ref(0);
+    const totalPages  = ref(0);
     const currentPage = ref(0);
-    const perPage = ref(10); // Standardwert konsistent halten
+    const perPage     = ref(10);
 
-    // Filter and sort state
-    const filters = ref<MediaplanFilter>({
-        search: '',
-        status: '',
-    });
-    const sortBy = ref('updated_at');
+    // Filters & Sorting
+    const filters   = ref<MediaplanFilter>({ search: '', status: '' });
+    const sortBy    = ref('updated_at');
     const sortOrder = ref<'asc' | 'desc'>('desc');
 
-    // Getters
-    const hasFilters = computed(() => {
-        // Überprüft, ob relevante Filter aktiv sind
-        return !!(
+    const hasFilters = computed(() =>
+        !!(
             filters.value.search ||
             filters.value.status ||
             filters.value.brand_id ||
-            filters.value.country ||
-            filters.value.created_by_me ||
-            filters.value.currently_running ||
-            filters.value.start_date_after ||
-            filters.value.start_date_before
-        );
-    });
+            filters.value.country
+        )
+    );
 
-    // Actions
+    // --- Actions ---
+    /** Load real source‐lists (when API is available) */
+    async function fetchSources() {
+        isLoading.value = true;
+        try {
+            const res = await customFetch('/mediaplans/sources?type=overview') as SourcesResponse;
+            sources.value = {
+                brands:       res.data.brand       ?? [],
+                countries:    res.data.country     ?? [],
+                subsegments:  res.data.subsegment  ?? [],
+                products:     res.data.product     ?? [],
+                campaigntypes:res.data.campaigntype ?? [],
+                languages:    res.data.language    ?? []
+            };
+        } catch {
+            // keep the mock data
+        } finally {
+            isLoading.value = false;
+        }
+    }
+
+    /** Fetch paginated & filtered list */
     async function fetchMediaplans() {
         isLoading.value = true;
         error.value = null;
-        // console.log('fetchMediaplans'); // Logging kann drin bleiben
         try {
-            const queryParams = new URLSearchParams();
-            queryParams.append('page', currentPage.value.toString());
-            queryParams.append('per_page', perPage.value.toString());
+            const params = new URLSearchParams({
+                page:        currentPage.value.toString(),
+                per_page:    perPage.value.toString(),
+                sort:        sortBy.value,
+                order:       sortOrder.value,
+            });
 
-            if (sortBy.value) {
-                queryParams.append('sort', sortBy.value);
-                queryParams.append('order', sortOrder.value);
-            }
-
-            const activeFilters: Record<string, any> = {};
-            for (const key in filters.value) {
-                const filterKey = key as keyof MediaplanFilter;
-                if (filters.value[filterKey] !== '' && filters.value[filterKey] !== null && filters.value[filterKey] !== undefined) {
-                    if (typeof filters.value[filterKey] === 'boolean') {
-                        activeFilters[filterKey] = String(filters.value[filterKey]);
-                    } else {
-                        activeFilters[filterKey] = filters.value[filterKey];
-                    }
+            // apply filters
+            const active: Record<string, any> = {};
+            Object.entries(filters.value).forEach(([k, v]) => {
+                if (v !== '' && v != null) {
+                    active[k] = v;
                 }
+            });
+            if (Object.keys(active).length) {
+                params.append('filter', JSON.stringify(active));
             }
-            if (Object.keys(activeFilters).length > 0) {
-                queryParams.append('filter', JSON.stringify(activeFilters));
-            }
 
-            const url = `/mediaplans?${queryParams.toString()}`;
-            const response = await customFetch(url) as MediaplanListResponse;
+            const url = `/mediaplans?${params.toString()}`;
+            const resp = await customFetch(url) as MediaplanListResponse;
 
-            mediaplans.value = response.items;
-            totalItems.value = response.total_items;
-            totalPages.value = response.total_pages;
-            currentPage.value = response.current_page;
-
+            mediaplans.value  = resp.items;
+            totalItems.value  = resp.total_items;
+            totalPages.value  = resp.total_pages;
+            currentPage.value = resp.current_page;
         } catch (err) {
-            const message = err instanceof Error ? err.message : 'An error occurred while fetching mediaplans';
-            error.value = message;
-            console.error('Error fetching mediaplans:', err);
-            // Reset state on error
+            error.value = err instanceof Error ? err.message : 'Error fetching mediaplans';
             mediaplans.value = [];
-            totalItems.value = 0;
-            totalPages.value = 0;
-            // currentPage nicht unbedingt zurücksetzen, evtl. will der User es nochmal versuchen
+            totalItems.value = totalPages.value = 0;
         } finally {
             isLoading.value = false;
         }
     }
 
-    async function fetchSources() {
-        // Diese Funktion bleibt unverändert
-        isLoading.value = true; // Oder separates Loading für Quellen?
-        error.value = null;
-        try {
-            const response = await customFetch('/mediaplans/sources?type=overview') as SourcesResponse;
-            if (response && response.data) {
-                sources.value.subsegments = response.data.subsegment ?? [];
-                sources.value.products = response.data.product ?? [];
-                sources.value.campaigntypes = response.data.campaigntype ?? [];
-                sources.value.languages = response.data.language ?? [];
-                sources.value.countries = response.data.language ?? []; // Annahme beibehalten
-                sources.value.brands = [ // Mock-Daten beibehalten
-                    {_id: 'bmw', name: 'BMW'},
-                    {_id: 'mini', name: 'Mini'}
-                ];
-            } else {
-                sources.value = {
-                    brands: [],
-                    countries: [],
-                    subsegments: [],
-                    products: [],
-                    campaigntypes: [],
-                    languages: []
-                };
-            }
-        } catch (err) {
-            //error.value = err instanceof Error ? err.message : 'An error occurred while fetching sources';
-           // console.error('Error fetching sources:', err);
-            sources.value = {
-                brands: [],
-                countries: [],
-                subsegments: [],
-                products: [],
-                campaigntypes: [],
-                languages: []
-            };
-        } finally {
-            isLoading.value = false; // Annahme: Teil des generischen Loadings
-        }
+    /** Update a single filter and reload */
+    function setFilter(key: keyof MediaplanFilter, value: unknown) {
+        filters.value = { ...filters.value, [key]: value };
+        currentPage.value = 0;
+        fetchMediaplans();
     }
 
-    // *** NEUE ACTION: Einzelnen Mediaplan laden ***
-    async function fetchMediaplan(id: string) {
-        isLoading.value = true; // Nutze generisches isLoading
-        error.value = null;     // Nutze generisches error
-        selectedMediaplan.value = null; // Zurücksetzen
-
-        // Validierung der ID (optional aber gut)
-        if (!id) {
-            error.value = "Mediaplan ID is missing.";
-            isLoading.value = false;
-            return;
-        }
-
-        try {
-            const url = `/mediaplans/${id}`; // API Endpunkt gemäß Spec
-            const response = await customFetch(url) as Mediaplan;
-            selectedMediaplan.value = response;
-        } catch (err) {
-            const message = err instanceof Error ? err.message : 'Failed to load mediaplan details';
-            console.error(`Error fetching mediaplan ${id}:`, err);
-            error.value = message;
-            selectedMediaplan.value = null; // Sicherstellen, dass bei Fehler kein alter Plan angezeigt wird
-        } finally {
-            isLoading.value = false;
-        }
-    }
-
-
-    function setFilter(key: keyof MediaplanFilter, value: any) {
-        // Erstelle eine Kopie, um Reaktivitätsprobleme zu vermeiden
-        const newFilters = {...filters.value, [key]: value};
-        // Entferne leere Werte, um die Query sauber zu halten (optional)
-        // if (value === '' || value === null || value === undefined) {
-        //     delete newFilters[key];
-        // }
-        filters.value = newFilters;
-        currentPage.value = 0; // Zurück zur ersten Seite bei Filteränderung
-        fetchMediaplans();    // Daten neu laden
-    }
-
-
+    /** Clear all filters back to defaults */
     function clearFilters() {
-        filters.value = { // Setze alle definierten Filter zurück
-            search: '',
-            status: '',
-            brand_id: undefined,
-            country: undefined,
-            start_date_after: undefined,
-            start_date_before: undefined,
-            created_by_me: undefined,
-            currently_running: undefined
-        };
-        currentPage.value = 0; // Zurück zur ersten Seite
-        fetchMediaplans();    // Daten neu laden
+        filters.value = { search: '', status: '' };
+        currentPage.value = 0;
+        fetchMediaplans();
     }
 
+    /** Change sorting and reload */
     function setSorting(field: string, order: 'asc' | 'desc') {
-        sortBy.value = field;
+        sortBy.value    = field;
         sortOrder.value = order;
-        // Paginierung muss *nicht* zurückgesetzt werden bei Sortierung
-        fetchMediaplans(); // Daten neu laden mit neuer Sortierung
+        fetchMediaplans();
     }
 
+    /** Change page and reload */
     function setPage(page: number) {
-        // Stelle sicher, dass die Seite im gültigen Bereich liegt (optional)
-        // if (page >= 0 && page < totalPages.value) {
         currentPage.value = page;
-        fetchMediaplans(); // Daten für die neue Seite laden
-        // }
+        fetchMediaplans();
     }
 
-    // Initialize data (lädt Liste und Quellen)
+    /** Initialize both sources and list */
     function init() {
         fetchSources();
         fetchMediaplans();
     }
 
     return {
-        // State
-        mediaplans,
+        // state
         sources,
+        mediaplans,
         isLoading,
         error,
         totalItems,
@@ -240,19 +157,14 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
         filters,
         sortBy,
         sortOrder,
-        selectedMediaplan, // *** NEU: Exportiere den State ***
-
-        // Getters
         hasFilters,
-
-        // Actions
-        fetchMediaplans,
+        // actions
         fetchSources,
+        fetchMediaplans,
         setFilter,
         clearFilters,
         setSorting,
         setPage,
-        init,
-        fetchMediaplan, // *** NEU: Exportiere die Action ***
+        init
     };
 });

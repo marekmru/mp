@@ -61,9 +61,10 @@
                 <v-col cols="auto">
                   <v-btn
                       color="primary"
+                      size="large"
+                      style="height: 48px;"
                       variant="outlined"
                       @click="openCreatePODialog"
-                      style="height: 56px"
                   >
                     Create PO
                   </v-btn>
