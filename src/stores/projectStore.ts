@@ -10,6 +10,7 @@ import type {
     ProjectCampaignType,
     ProjectPhase,
     ProjectGoal,
+    ProjectBuilder,
     ProjectListResponse
 } from '@/types/project';
 
@@ -26,6 +27,7 @@ export const useProjectStore = defineStore('project', () => {
     const campaignTypes = ref<ProjectCampaignType[]>([]);
     const phases = ref<ProjectPhase[]>([]);
     const goals = ref<ProjectGoal[]>([]);
+    const builders = ref<ProjectBuilder[]>([]);
 
     // Pagination state
     const totalItems = ref(0);
@@ -195,6 +197,13 @@ export const useProjectStore = defineStore('project', () => {
                 {id: 'conversion', name: 'Conversion'}
             ];
 
+            // Mock builders
+            builders.value = [
+                {id: 'sea', name: 'SEA'},
+                {id: 'social', name: 'Social'},
+                {id: 'display-2layer', name: 'Display 2Layer'}
+            ];
+
         } catch (err) {
             error.value = err instanceof Error ? err.message : 'An error occurred while fetching project options';
             console.error('Error fetching project options:', err);
@@ -214,6 +223,7 @@ export const useProjectStore = defineStore('project', () => {
         campaignTypes,
         phases,
         goals,
+        builders,
         totalItems,
         totalPages,
         currentPage,
