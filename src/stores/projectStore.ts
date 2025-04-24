@@ -169,12 +169,14 @@ export const useProjectStore = defineStore('project', () => {
                 {code: 'US', name: 'United States'}
             ];
 
-            // Mock languages
+            // --- CORRECTED Mock languages ---
             languages.value = [
-                {code: 'DEU', name: 'German'},
-                {code: 'ENG', name: 'English'},
-                {code: 'POL', name: 'Polish'}
+                {code: 'DEU', name: 'German', country_codes: ['DE', 'AT']}, // Added country_codes
+                {code: 'ENG', name: 'English', country_codes: ['US']},      // Added country_codes
+                {code: 'POL', name: 'Polish', country_codes: ['PL']}       // Added country_codes
+                // Add other languages and their associated country codes as needed
             ];
+            // --- END CORRECTION ---
 
             // Mock campaign types
             campaignTypes.value = [
@@ -201,7 +203,8 @@ export const useProjectStore = defineStore('project', () => {
             builders.value = [
                 {id: 'sea', name: 'SEA'},
                 {id: 'social', name: 'Social'},
-                {id: 'display-2layer', name: 'Display 2Layer'}
+                {id: 'display', name: 'Display'},
+                {id: '2layer', name: '2Layer'}
             ];
 
         } catch (err) {
@@ -211,7 +214,6 @@ export const useProjectStore = defineStore('project', () => {
             isLoading.value = false;
         }
     }
-
     return {
         // State
         projects,

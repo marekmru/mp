@@ -22,7 +22,7 @@
           </template>
           <span>{{ mediaplan.name }}</span>
         </v-tooltip>
-        <v-icon size="x-small" color="primary" icon="mdi-pencil" class="mr-3"/>
+        <v-icon size="x-small" color="primary" icon="mdi-pencil-outline" class="mr-3"/>
 
         <!-- Brand logo -->
         <v-img

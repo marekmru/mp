@@ -30,6 +30,8 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
     const mediaplans  = ref<Mediaplan[]>([]);
     const isLoading   = ref(false);
     const error       = ref<string | null>(null);
+    const selectedMediaplan = ref<Mediaplan | null>(null)
+
 
     // Pagination
     const totalItems  = ref(0);
@@ -71,7 +73,25 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
             isLoading.value = false;
         }
     }
+// Inside defineStore in mediaplanStore.ts
 
+
+    /**
+     * Fetch a single Mediaplan by ID
+     */
+    async function fetchMediaplan(id: string) {
+        isLoading.value = true
+        error.value = null
+        try {
+            const res = await customFetch(`/mediaplans/${id}`) as Mediaplan
+            selectedMediaplan.value = res
+        } catch (err) {
+            selectedMediaplan.value = null
+            error.value = err instanceof Error ? err.message : 'Error fetching mediaplan'
+        } finally {
+            isLoading.value = false
+        }
+    }
     /** Fetch paginated & filtered list */
     async function fetchMediaplans() {
         isLoading.value = true;
@@ -148,6 +168,7 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
         // state
         sources,
         mediaplans,
+        selectedMediaplan,
         isLoading,
         error,
         totalItems,
@@ -161,10 +182,11 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
         // actions
         fetchSources,
         fetchMediaplans,
+        fetchMediaplan,
         setFilter,
         clearFilters,
         setSorting,
         setPage,
         init
-    };
+    }
 });

@@ -3,11 +3,8 @@ import { ref, computed, onMounted, reactive, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import MainLayout from '@/layouts/MainLayout.vue';
 import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue';
-// Entferne den Import von ProjectToolbar
 // import ProjectToolbar from '@/components/project/ProjectToolbar.vue';
-// Füge den Import von MediaplanHeader hinzu
 import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue';
-// Füge den Import von MediaplanViewToggle hinzu (falls noch nicht vorhanden)
 import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue';
 import CampaignListView from '@/components/project/CampaignListView.vue';
 import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue';
@@ -16,9 +13,9 @@ import { useProjectStore } from '@/stores/projectStore';
 import { useCampaignStore } from '@/stores/campaignStore';
 import type { Project } from '@/types/project';
 import { formatDateRange } from '@/helpers/dateUtils';
-// Importiere den Helper für die Prozentrechnung
 import { calculatePercentage } from '@/helpers/currencyUtils';
-import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue"; // Pfad prüfen
+import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
+import ProjectDetailTable from "@/components/project/ProjectDetailTable.vue"; // Pfad prüfen
 
 // --- Props & Route ---
 const props = defineProps<{ mediaplanId?: string; projectId?: string; }>();
@@ -157,40 +154,8 @@ watch(errorCampaigns, (newError) => {
             <!-- TODO v-select - select campaigntyppe -->
           </template>
         </MediaplanTopSection>
-        <v-row v-if="project" class="mb-4">
-          <v-col>
-            <v-card variant="outlined">
-              <v-card-title class="d-flex align-center text-h6">
-                <span>Project: {{ project.abbreviation }}</span>
-                <v-spacer></v-spacer>
-                <v-chip size="small" class="ml-2" :color="project.is_locked ? 'orange' : 'grey-lighten-1'" label>
-                  <v-icon start :icon="project.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant'"></v-icon>
-                  {{ project.is_locked ? 'Locked' : 'Unlocked' }}
-                </v-chip>
-              </v-card-title>
-              <v-card-subtitle class="pb-2">
-                {{ project.descriptive_vars?.projectname }}
-              </v-card-subtitle>
-              <v-card-text class="pt-2">
-                <v-chip size="small" class="mr-2 mb-1" label prepend-icon="mdi-flag">
-                  {{ project.descriptive_vars?.country || 'N/A' }}
-                </v-chip>
-                <v-chip size="small" class="mr-2 mb-1" label prepend-icon="mdi-tag-outline">
-                  {{ project.default_vars?.campaigntype || 'N/A' }}
-                </v-chip>
-                <v-chip size="small" class="mr-2 mb-1" label prepend-icon="mdi-account-outline">
-                  {{ project.owner || 'N/A' }}
-                </v-chip>
-                <v-chip v-if="project.duration" size="small" class="mr-2 mb-1" label prepend-icon="mdi-calendar-range">
-                  {{
-                    project.duration.formatted || formatDateRange(project.duration.start_date, project.duration.end_date)
-                  }}
-                </v-chip>
-                <p v-if="project.detail" class="text-body-2 mt-3">{{ project.detail }}</p>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
+
+        <ProjectDetailTable :project="project" class="pb-3"/>
 
         <template v-if="project">
           <div class="main-content">

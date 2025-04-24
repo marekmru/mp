@@ -3,7 +3,8 @@ import { ref, watch, computed } from 'vue';
 import { useRouter } from 'vue-router'; // Router importieren für Links
 import CountryFlag from '@/components/common/CountryFlag.vue'; // Pfad prüfen
 import { getBrandLogo } from "@/helpers/brandUtils"; // Pfad prüfen
-import type { Project } from '@/types/project'; // Pfad prüfen
+import type { Project } from '@/types/project';
+import {projectHeaders} from "@/constants/project.ts"; // Pfad prüfen
 
 // --- Props ---
 interface Props {
@@ -44,18 +45,6 @@ const itemsPerPageModel = computed({
   set: (value) => {}
 });
 
-// --- Tabellen-Header ---
-const headers = [
-  { title: '', key: 'edit', sortable: false, width: '50px' },
-  { title: 'Name', key: 'abbreviation', sortable: true, align: 'start' },
-  { title: 'Country', key: 'descriptive_vars.country', sortable: true },
-  { title: 'Duration', key: 'duration.formatted', sortable: false },
-  { title: 'Detail', key: 'detail', sortable: true },
-  { title: 'Campaign Type', key: 'default_vars.campaigntype', sortable: true },
-  { title: 'Subsegment', key: 'default_vars.subsegment', sortable: true },
-  { title: 'Locked', key: 'is_locked', sortable: true, align: 'center' },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'center', width: '50px' }
-];
 
 // --- Methoden ---
 const onOptionsUpdate = (options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }) => {
@@ -81,7 +70,7 @@ const editProject = (project: Project) => {
         <v-data-table-server
             v-model:items-per-page="itemsPerPageModel"
             v-model:page="pageModel"
-            :headers="headers"
+            :headers="projectHeaders"
             :items="projects"
             :items-length="totalProjects"
             :loading="isLoading"
@@ -92,8 +81,8 @@ const editProject = (project: Project) => {
 
         >
           <template v-slot:item.edit="{ item }">
-            <v-btn icon density="comfortable" variant="text" color="grey" @click.stop="editProject(item)">
-              <v-icon>mdi-pencil</v-icon>
+            <v-btn icon density="compact" variant="text"  @click.stop="editProject(item)">
+              <v-icon>mdi-pencil-outline</v-icon>
               <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
             </v-btn>
           </template>
@@ -108,6 +97,7 @@ const editProject = (project: Project) => {
               <v-avatar size="32" class="mr-2 grey lighten-4"
                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
               <span>{{ item.abbreviation }}</span>
+              <v-tooltip activator="parent" location="top">Open project</v-tooltip>
             </router-link>
             <div class="d-flex align-center" v-else-if="item.abbreviation">
               <v-avatar size="32" class="mr-2 grey lighten-4"

@@ -16,7 +16,7 @@
       <v-btn 
         color="primary" 
         variant="flat" 
-        prepend-icon="mdi-pencil"
+        prepend-icon="mdi-pencil-outline"
         :to="`/mediaplans/${mediaplanId}/edit`"
       >
         Edit

@@ -76,7 +76,7 @@
           density="comfortable"
           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
         >
-          <v-icon>mdi-pencil</v-icon>
+          <v-icon>mdi-pencil-outline</v-icon>
         </v-btn>
         <v-btn
           icon

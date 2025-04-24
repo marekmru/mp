@@ -63,7 +63,7 @@ export const getMediaplanStatusIcon = (status?: string): string => {
   
   switch (status.toLowerCase()) {
     case 'draft':
-      return 'mdi-pencil-outline';
+      return 'mdi-pencil-outline-outline';
     case 'in_planning':
     case 'in planning':
       return 'mdi-clock-outline';

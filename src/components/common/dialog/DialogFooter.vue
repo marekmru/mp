@@ -1,5 +1,5 @@
 <template>
-  <v-card-actions class="pt-6 px-0 d-flex justify-end">
+  <v-card-actions class="pt-4 px-0 d-flex justify-end">
     <v-btn
         size="large"
         min-width="120"

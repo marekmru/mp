@@ -94,7 +94,7 @@ const deleteCampaign = (item: Campaign) => {
             <v-list density="compact">
               <v-list-item @click.stop="editCampaign(item)">
                 <template v-slot:prepend>
-                  <v-icon size="small">mdi-pencil</v-icon>
+                  <v-icon size="small">mdi-pencil-outline</v-icon>
                 </template>
                 <v-list-item-title>Edit</v-list-item-title>
               </v-list-item>
