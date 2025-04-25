@@ -2,6 +2,7 @@
 import {ref, computed} from 'vue';
 import type {Campaign} from '@/types/campaign';
 import {useRouter} from 'vue-router';
+import {campaignHeaders} from "@/constants/campaign.ts";
 
 // --- Props ---
 interface Props {
@@ -32,17 +33,6 @@ const itemsPerPageModel = computed({
   get: () => props.itemsPerPage, set: () => {
   }
 });
-const headers = ref([
-  {title: 'Campaign Name', key: 'campaignname', sortable: true},
-  {title: 'Type', key: 'type', sortable: true},
-  {title: 'Subsegment', key: 'subsegment', sortable: true},
-  {title: 'Product', key: 'product', sortable: true},
-  {title: 'Language', key: 'language', sortable: true},
-  {title: 'Campaign Type', key: 'campaigntype', sortable: true},
-  {title: 'Detail', key: 'campaigndetail', sortable: false, width: '200px'},
-  {title: 'Created', key: 'created_at', sortable: true},
-  {title: 'Actions', key: 'actions', sortable: false, align: 'center', width: '60px'}
-]);
 
 // --- Methoden ---
 const onOptionsUpdate = (options: any) => {
@@ -62,11 +52,11 @@ const deleteCampaign = (item: Campaign) => {
 
 <template>
   <div class="campaign-list-container">
-    <v-card class="campaigns-table elevation-1" variant="outlined">
+    <v-card class="campaigns-table elevation-1">
       <v-data-table-server
           v-model:items-per-page="itemsPerPageModel"
           v-model:page="pageModel"
-          :headers="headers"
+          :headers="campaignHeaders"
           :items="campaigns"
           :items-length="totalCampaigns"
           :loading="isLoading"
@@ -76,6 +66,12 @@ const deleteCampaign = (item: Campaign) => {
           class="campaigns-data-table"
           @update:options="onOptionsUpdate"
       >
+        <template v-slot:item.edit="{ item }">
+          <v-btn icon density="compact" variant="text" @click.stop="editCampaign(item)">
+            <v-icon>mdi-pencil-outline</v-icon>
+            <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+          </v-btn>
+        </template>
         <template v-slot:item.campaignname="{ item }"> {{ item.campaignname }}</template>
         <template v-slot:item.created_at="{ item }">
           {{ item.created_at ? new Date(item.created_at).toLocaleDateString('de-DE') : '-' }}

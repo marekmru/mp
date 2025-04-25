@@ -131,7 +131,7 @@
   />
 
   <!-- Project Creation Dialog (shown after mediaplan creation) -->
-  <CreateProjectDialog
+  <CreateFirstProjectDialog
       mode="create-mediaplan"
       v-if="showProjectDialog"
       v-model="showProjectDialog"
@@ -153,7 +153,7 @@ import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
 import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
 import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
 import DateRangePicker from './DateRangePicker.vue';
-import CreateProjectDialog from '@/components/overview/CreateFirstProjectDialog.vue';
+import CreateFirstProjectDialog from '@/components/overview/CreateFirstProjectDialog.vue';
 import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
 import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
 import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';

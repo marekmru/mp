@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
-import { useRouter } from 'vue-router'; // Router importieren für Links
+import {ref, watch, computed} from 'vue';
+import {useRouter} from 'vue-router'; // Router importieren für Links
 import CountryFlag from '@/components/common/CountryFlag.vue'; // Pfad prüfen
-import { getBrandLogo } from "@/helpers/brandUtils"; // Pfad prüfen
-import type { Project } from '@/types/project';
-import {projectHeaders} from "@/constants/project.ts"; // Pfad prüfen
+import {getBrandLogo} from "@/helpers/brandUtils"; // Pfad prüfen
+import type {Project} from '@/types/project';
+import {projectHeaders} from "@/constants/project.ts";
+import {formatPercentage, percentage} from "../../helpers/format.ts"; // Pfad prüfen
+import EditOrCreateProjectDialog from "@/components/project/EditOrCreateProjectDialog.vue";
+
 
 // --- Props ---
 interface Props {
@@ -37,12 +40,14 @@ const router = useRouter();
 // --- Computed Properties für Tabelle ---
 const pageModel = computed({
   get: () => props.currentPage + 1,
-  set: (value) => {}
+  set: (value) => {
+  }
 });
 
 const itemsPerPageModel = computed({
   get: () => props.itemsPerPage,
-  set: (value) => {}
+  set: (value) => {
+  }
 });
 
 
@@ -55,16 +60,35 @@ const addProject = () => {
   emit('addProject');
 };
 
-const editProject = (project: Project) => {
-  console.log('Edit project:', project._id);
-  // Navigation zur Edit-Seite oder Dialog öffnen
-  // router.push({ name: 'ProjectEdit', params: { mediaplanId: props.mediaplanId, projectId: project._id } });
+const isProjectDialogOpen = ref(false);
+const selectedProject = ref<Project | null>(null);
+
+const openCreateProject = () => {
+  selectedProject.value = null;
+  isProjectDialogOpen.value = true;
 };
 
+const openEditProject = (project: Project) => {
+  selectedProject.value = project;
+  isProjectDialogOpen.value = true;
+};
+
+const onProjectSaved = (project: Project) => {
+  isProjectDialogOpen.value = false;
+  console.log(project)
+  // Example: refetch list here if needed
+  // await fetchProjects()
+};
 </script>
 
 <template>
   <div class="planning-view-container mt-4">
+    <EditOrCreateProjectDialog
+        v-model="isProjectDialogOpen"
+        :is-edit="!!selectedProject"
+        :initial-data="selectedProject || undefined"
+        @saved="onProjectSaved"
+    />
     <v-card class="projects-table elevation-0" variant="flat">
       <v-theme-provider theme="dark">
         <v-data-table-server
@@ -81,7 +105,7 @@ const editProject = (project: Project) => {
 
         >
           <template v-slot:item.edit="{ item }">
-            <v-btn icon density="compact" variant="text"  @click.stop="editProject(item)">
+            <v-btn icon density="compact" variant="text" @click.stop="openEditProject(item)">
               <v-icon>mdi-pencil-outline</v-icon>
               <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
             </v-btn>
@@ -126,7 +150,9 @@ const editProject = (project: Project) => {
 
           <template v-slot:item.detail="{ item }">
             <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
-            <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top" max-width="300px">{{ item.detail }}</v-tooltip>
+            <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top"
+                       max-width="300px">{{ item.detail }}
+            </v-tooltip>
           </template>
 
           <template v-slot:item.default_vars.campaigntype="{ item }">
@@ -135,6 +161,18 @@ const editProject = (project: Project) => {
 
           <template v-slot:item.default_vars.subsegment="{ item }">
             {{ item.default_vars?.subsegment || 'N/A' }}
+          </template>
+          <template v-slot:item.budget="{ item }">
+            <v-row no-gutters>
+                <v-progress-linear
+                  :model-value="percentage(item?.budget?.used , item?.budget?.total )"
+                  color="success"
+                  height="8"
+                  class="ml-2 mr-4"
+                  style="width: 120px"
+              ></v-progress-linear>
+              {{ formatPercentage(item?.budget?.used, item?.budget?.total) }}
+            </v-row>
           </template>
 
           <template v-slot:item.is_locked="{ item }">
@@ -198,6 +236,7 @@ const editProject = (project: Project) => {
   text-decoration: none;
   font-weight: 500;
 }
+
 .project-link:hover {
   text-decoration: underline;
   color: #E0E0E0; /* Leichte Aufhellung beim Hover */

@@ -13,7 +13,7 @@ const props = defineProps<{
 
 const flagStyle = computed(() => {
   return {
-    fontSize: props.size || '1.5em',
+    fontSize: props.size || '1rem',
     lineHeight: 1,
     verticalAlign: 'middle',
     display: 'inline-block'
@@ -25,6 +25,7 @@ const flagStyle = computed(() => {
 
 
 span[class^="fi"] {
+
 }
 
 </style>

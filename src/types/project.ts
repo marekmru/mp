@@ -1,6 +1,8 @@
 // src/types/project.ts
 
 // Country reference
+import type {Budget} from "./mediaplan.ts";
+
 export interface Country {
   code: string;
   name: string;
@@ -54,6 +56,7 @@ export interface Project {
   version: string;
   duration?: ProjectDuration;
   detail?: string;
+  budget?: Budget;
   mediaplanId?: string;
 }
 

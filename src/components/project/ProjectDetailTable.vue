@@ -7,6 +7,12 @@ import { projectHeaders } from '@/constants/project.ts'
 
 const props = defineProps<{ project: Project }>()
 const items = computed(() => props.project ? [props.project] : [])
+
+const editProject = (project: Project) => {
+  console.log('Edit project:', project._id);
+  // Navigation zur Edit-Seite oder Dialog öffnen
+  // router.push({ name: 'ProjectEdit', params: { mediaplanId: props.mediaplanId, projectId: project._id } });
+};
 </script>
 
 <template>
@@ -21,6 +27,12 @@ const items = computed(() => props.project ? [props.project] : [])
           item-value="_id"
           density="compact"
       >
+        <template v-slot:item.edit="{ item }">
+          <v-btn icon density="compact" variant="text"  @click.stop="editProject(item)">
+            <v-icon>mdi-pencil-outline</v-icon>
+            <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+          </v-btn>
+        </template>
         <template #item.abbreviation="{ item }">
           <div class="d-flex align-center">
             <v-avatar size="32" class="mr-2 grey lighten-4" :image="getBrandLogo(item.descriptive_vars?.brand)" />

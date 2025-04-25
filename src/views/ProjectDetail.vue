@@ -116,7 +116,7 @@ watch(() => [route.params.mediaplanId, route.params.projectId], ([newMpId, newPI
     projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
   }
-}, { deep: true }); // deep watch might be needed if params object changes identity
+}, { deep: true });
 
 watch(errorProject, (newError) => {
   if (newError) showSnackbar(`Error loading project: ${newError}`, 'error');

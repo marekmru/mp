@@ -61,14 +61,14 @@
                 >
                   <template v-slot:selection="{ item }">
                     <div class="d-flex align-center">
-                      <country-flag :country="item.raw.code" class="mr-2"/>
-                      {{ item.raw.code }} - {{ item.raw.name }}
+                      <country-flag :country="item.code" class="mr-2"/>
+                      {{ item.code }} - {{ item.name }}
                     </div>
                   </template>
                   <template v-slot:item="{ item, props }">
-                    <v-list-item v-bind="props" :title="`${item.raw.code} - ${item.raw.name}`">
+                    <v-list-item v-bind="props" :title="`${item.code} - ${item.name}`">
                       <template v-slot:prepend>
-                        <country-flag :country="item.raw.code" class="mr-2"/>
+                        <country-flag :country="item.code" class="mr-2"/>
                       </template>
                     </v-list-item>
                   </template>

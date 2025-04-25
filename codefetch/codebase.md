@@ -224,27 +224,99 @@ src/style.css
 19 | 
 20 | /* --- Campaign --- */
 21 | .v-table.campaigns-data-table .v-table__wrapper > table > thead > tr > th {
-22 |     background-color: #666666 !important;
-23 |     color: #fff;
-24 | }
-25 | 
-26 | .v-table.campaigns-data-table .v-table__wrapper > table > tbody > tr > td {
-27 |     background-color: #E6E6E6 !important;
-28 | }
-29 | 
-30 | /* --- Lineitem --- */
-31 | .v-table.lineitem-data-table .v-table__wrapper > table > thead > tr > th {
-32 |     background-color: #E6E6E6 !important;
-33 | }
-34 | 
-35 | .v-table.lineitem-data-table .v-table__wrapper > table > tbody > tr > td {
-36 |     background-color: #ffffff !important;
-37 | }
+22 |     background-color: #BBBBBB !important;
+23 | }
+24 | 
+25 | .v-table.campaigns-data-table .v-table__wrapper > table > tbody > tr > td {
+26 |     background-color: #E6E6E6 !important;
+27 | }
+28 | 
+29 | /* --- Lineitem --- */
+30 | .v-table.lineitem-data-table .v-table__wrapper > table > thead > tr > th {
+31 |     background-color: #E6E6E6 !important;
+32 | }
+33 | 
+34 | .v-table.lineitem-data-table .v-table__wrapper > table > tbody > tr > td {
+35 |     background-color: #ffffff !important;
+36 | }
 ```
 
 src/vite-env.d.ts
 ```
 1 | /// <reference types="vite/client" />
+```
+
+src/components/TopBar.vue
+```
+1 | <template>
+2 |   <v-app-bar app color="white" class="px-5" fixed height="68" scroll-behavior="elevate" scroll-threshold="200" px-7>
+3 |     <v-menu>
+4 |       <template #activator="{ props }">
+5 |         <v-btn size="x-large" class="mr-2" icon="mdi-dots-grid" :="props"></v-btn>
+6 |       </template>
+7 |       <v-list class="pt-0 pb-0">
+8 |         <v-list-item color="primary" to="/">
+9 |           <template #prepend>
+10 |             <v-icon icon="mdi-view-dashboard" color="primary"></v-icon>
+11 |           </template>
+12 |           <v-list-item-title>Overview</v-list-item-title>
+13 |         </v-list-item>
+14 |       </v-list>
+15 |     </v-menu>
+16 |     <router-link to="/">
+17 |       <v-row align="center" no-gutters>
+18 |         <h4 class="text-h5 mr-4">Mediaplan</h4>
+19 |         <img alt="BMW Logo" class="mr-3" src="/img/brands/BMW.svg" width="35" />
+20 |         <img alt="MINI Logo" class="mr-3" src="/img/brands/MINI.svg" width="76" />
+21 |         <img alt="MINI Logo" class="mr-3" src="/img/the-marcom-engine.png" width="240" />
+22 |       </v-row>
+23 |     </router-link>
+24 |     <v-spacer />
+25 |   </v-app-bar>
+26 | </template>
+27 | 
+28 | <script setup>
+29 | // No script setup needed
+30 | </script>
+31 | 
+32 | <style scoped>
+33 | h4 {
+34 |   text-decoration: none !important;
+35 |   color: rgba(0, 0, 0, 0.87);
+36 | }
+37 | 
+38 | .router-link-active,
+39 | a,
+40 | .router-link {
+41 |   text-decoration: none !important;
+42 | 
+43 |   &:visited {
+44 |     color: inherit;
+45 |   }
+46 | }
+47 | </style>
+```
+
+src/constants/campaign.ts
+```
+1 | // src/constants/campaign.ts
+2 | import { ref } from 'vue';
+3 | 
+4 | export const campaignHeaders = ref([
+5 |     { title: '', key: 'edit', sortable: false },
+6 |     { title: 'Product', key: 'product', sortable: true },
+7 |     { title: 'Lang', key: 'language', sortable: true },
+8 |     { title: 'Detail', key: 'campaigndetail', sortable: false },
+9 |     { title: 'Phase', key: 'phase', sortable: true },
+10 |     { title: 'Channel Type', key: 'channeltype', sortable: true },
+11 |     { title: 'Channel Name', key: 'channelname', sortable: true },
+12 |     { title: 'Goal', key: 'goal', sortable: true },
+13 |     { title: 'Tactic', key: 'tactic', sortable: true },
+14 |     { title: 'Device', key: 'device', sortable: true },
+15 |     { title: 'Budget', key: 'budget', sortable: false },
+16 |     { title: '', key: 'lock', sortable: false, align: 'center' },
+17 |     { title: '', key: 'actions', sortable: false, align: 'center'}
+18 | ]);
 ```
 
 src/constants/mediaplanStatuses.ts
@@ -305,55 +377,20 @@ src/constants/mediaplanStatuses.ts
 54 | };
 ```
 
-src/components/TopBar.vue
+src/constants/project.ts
 ```
-1 | <template>
-2 |   <v-app-bar app color="white" class="px-5" fixed height="68" scroll-behavior="elevate" scroll-threshold="200" px-7>
-3 |     <v-menu>
-4 |       <template #activator="{ props }">
-5 |         <v-btn size="x-large" class="mr-2" icon="mdi-dots-grid" :="props"></v-btn>
-6 |       </template>
-7 |       <v-list class="pt-0 pb-0">
-8 |         <v-list-item color="primary" to="/">
-9 |           <template #prepend>
-10 |             <v-icon icon="mdi-view-dashboard" color="primary"></v-icon>
-11 |           </template>
-12 |           <v-list-item-title>Overview</v-list-item-title>
-13 |         </v-list-item>
-14 |       </v-list>
-15 |     </v-menu>
-16 |     <router-link to="/">
-17 |       <v-row align="center" no-gutters>
-18 |         <h4 class="text-h5 mr-4">Mediaplan</h4>
-19 |         <img alt="BMW Logo" class="mr-3" src="/img/brands/BMW.svg" width="35" />
-20 |         <img alt="MINI Logo" class="mr-3" src="/img/brands/MINI.svg" width="76" />
-21 |         <img alt="MINI Logo" class="mr-3" src="/img/the-marcom-engine.png" width="240" />
-22 |       </v-row>
-23 |     </router-link>
-24 |     <v-spacer />
-25 |   </v-app-bar>
-26 | </template>
-27 | 
-28 | <script setup>
-29 | // No script setup needed
-30 | </script>
-31 | 
-32 | <style scoped>
-33 | h4 {
-34 |   text-decoration: none !important;
-35 |   color: rgba(0, 0, 0, 0.87);
-36 | }
-37 | 
-38 | .router-link-active,
-39 | a,
-40 | .router-link {
-41 |   text-decoration: none !important;
-42 | 
-43 |   &:visited {
-44 |     color: inherit;
-45 |   }
-46 | }
-47 | </style>
+1 | export const projectHeaders = [
+2 |     { title: '', key: 'edit', sortable: false, width: '50px' },
+3 |     { title: 'Name', key: 'abbreviation', sortable: true, align: 'start' },
+4 |     { title: 'Country', key: 'descriptive_vars.country', sortable: true },
+5 |     { title: 'Duration', key: 'duration.formatted', sortable: false },
+6 |     { title: 'Detail', key: 'detail', sortable: true },
+7 |     { title: 'Campaign Type', key: 'default_vars.campaigntype', sortable: true },
+8 |     { title: 'Subsegment', key: 'default_vars.subsegment', sortable: true },
+9 |     { title: 'Budget', key: 'budget', sortable: true },
+10 |     { title: '', key: 'is_locked', sortable: true, align: 'center' },
+11 |     { title: '', key: 'actions', sortable: false, align: 'center' }
+12 | ];
 ```
 
 src/helpers/brandUtils.ts
@@ -690,6 +727,86 @@ src/helpers/emitter.ts
 5 | export default emitter
 ```
 
+src/helpers/format.ts
+```
+1 | /**
+2 |  * Performs the core percentage calculation with validation.
+3 |  * Checks for valid finite number inputs and handles division by zero.
+4 |  * Returns NaN if inputs are invalid or division by zero occurs (except potentially 0/0).
+5 |  * Useful when needing the raw calculation result with built-in safety checks.
+6 |  *
+7 |  * @param {number} used - The amount used.
+8 |  * @param {number} total - The total amount.
+9 |  * @returns {number} The raw calculated percentage, or NaN if the operation is invalid.
+10 |  */
+11 | export const calculateRawPercentage = (used, total) => {
+12 |     // 1. Input validation: Check if inputs are valid, finite numbers
+13 |     if (typeof used !== 'number' || typeof total !== 'number' || !isFinite(used) || !isFinite(total)) {
+14 |         console.error("calculateRawPercentage: Invalid input. 'used' and 'total' must be finite numbers.", { used, total });
+15 |         return NaN;
+16 |     }
+17 | 
+18 |     // 2. Handle division by zero
+19 |     if (total === 0) {
+20 |         // Mathematically, x/0 is undefined/infinite, 0/0 is indeterminate.
+21 |         // Return NaN for both cases during raw calculation.
+22 |         // Formatting function can later interpret 0/0 specifically if needed.
+23 |         if (used !== 0) {
+24 |             console.warn("calculateRawPercentage: Division by zero (used != 0).", { used, total });
+25 |         }
+26 |         return NaN;
+27 |     }
+28 | 
+29 |     // 3. Calculate percentage
+30 |     const percentage = (used / total) * 100;
+31 | 
+32 |     // 4. Ensure finite result
+33 |     return isFinite(percentage) ? percentage : NaN;
+34 | };
+35 | 
+36 | /**
+37 |  * Calculates the raw percentage value.
+38 |  * Provides the same result as calculateRawPercentage. Can be used interchangeably.
+39 |  * Returns NaN if inputs are invalid or division by zero occurs.
+40 |  *
+41 |  * @param {number} used - The amount used.
+42 |  * @param {number} total - The total amount.
+43 |  * @returns {number} The raw percentage number, or NaN on error/invalid operation.
+44 |  */
+45 | export const percentage = (used, total) => {
+46 |     // This function now directly uses the exported raw calculation function.
+47 |     return calculateRawPercentage(used, total);
+48 | };
+49 | 
+50 | /**
+51 |  * Calculates and formats a percentage from used and total values to "xx,yy %".
+52 |  * Handles errors gracefully based on the result from calculateRawPercentage.
+53 |  *
+54 |  * @param {number} used - The amount used.
+55 |  * @param {number} total - The total amount.
+56 |  * @returns {string} The formatted percentage string "xx,yy %" or an error string ('N/A %' or '0,00 %').
+57 |  */
+58 | export const formatPercentage = (used, total) => {
+59 |     // Use the exported raw calculation function
+60 |     const rawPercentage = calculateRawPercentage(used, total);
+61 | 
+62 |     // Check if the calculation resulted in NaN
+63 |     if (isNaN(rawPercentage)) {
+64 |         // Check original inputs specifically for the 0/0 case for special formatting.
+65 |         if (typeof used === 'number' && used === 0 && typeof total === 'number' && total === 0) {
+66 |             return '0,00 %'; // Display 0/0 as '0,00 %'
+67 |         }
+68 |         // Otherwise (invalid input, x/0 division), return 'N/A %'
+69 |         return 'N/A %';
+70 |     }
+71 | 
+72 |     // If rawPercentage is a valid number, proceed with formatting:
+73 |     const fixedPercentage = rawPercentage.toFixed(2);
+74 |     const formattedString = fixedPercentage.replace('.', ',');
+75 |     return `${formattedString} %`; // Ensure space before %
+76 | };
+```
+
 src/helpers/notificationUtils.ts
 ```
 1 | // src/helpers/notificationUtils.ts
@@ -877,7 +994,7 @@ src/helpers/statusUtils.ts
 63 |   
 64 |   switch (status.toLowerCase()) {
 65 |     case 'draft':
-66 |       return 'mdi-pencil-outline';
+66 |       return 'mdi-pencil-outline-outline';
 67 |     case 'in_planning':
 68 |     case 'in planning':
 69 |       return 'mdi-clock-outline';
@@ -1343,359 +1460,359 @@ src/mocks/swagger_mp.yaml
 11 |       summary: Get changelog entries
 12 |       # ... (rest of definition - unchanged) ...
 13 |       tags:
-14 |        - Changelog
+14 |         - Changelog
 15 |       parameters:
-16 |        - description: The tool for which to retrieve changelog entries.
-17 |          in: query
-18 |          name: tool
-19 |          required: true
-20 |          schema:
-21 |            enum:
-22 |              - CampaignBuilder
-23 |              - Linkshortener
-24 |              - Mediaplan
-25 |            type: string
+16 |         - description: The tool for which to retrieve changelog entries.
+17 |           in: query
+18 |           name: tool
+19 |           required: true
+20 |           schema:
+21 |             enum:
+22 |               - CampaignBuilder
+23 |               - Linkshortener
+24 |               - Mediaplan
+25 |             type: string
 26 |       responses:
 27 |         "200":
-28 |          content:
-29 |            application/json:
-30 |              schema:
-31 |                properties:
-32 |                  data:
-33 |                    description: List of changelog entries.
-34 |                    items:
-35 |                      $ref: "#/components/schemas/ChangelogEntry"
-36 |                    type: array
-37 |                type: object
-38 |          description: Successful response - returns a list of changelog entries.
+28 |           content:
+29 |             application/json:
+30 |               schema:
+31 |                 properties:
+32 |                   data:
+33 |                     description: List of changelog entries.
+34 |                     items:
+35 |                       $ref: "#/components/schemas/ChangelogEntry"
+36 |                     type: array
+37 |                 type: object
+38 |           description: Successful response - returns a list of changelog entries.
 39 |         "400":
-40 |          content:
-41 |            application/json:
-42 |              schema:
-43 |                $ref: "#/components/schemas/Error"
-44 |          description: Bad Request (e.g., invalid 'tool' value)
+40 |           content:
+41 |             application/json:
+42 |               schema:
+43 |                 $ref: "#/components/schemas/Error"
+44 |           description: Bad Request (e.g., invalid 'tool' value)
 45 |         "500":
-46 |          content:
-47 |            application/json:
-48 |              schema:
-49 |                $ref: "#/components/schemas/Error"
-50 |          description: Internal Server Error
+46 |           content:
+47 |             application/json:
+48 |               schema:
+49 |                 $ref: "#/components/schemas/Error"
+50 |           description: Internal Server Error
 51 | 
 52 |   /mediaplans:
 53 |     get:
 54 |       summary: Get a list of Mediaplans (paginated, filtered, and sorted)
 55 |       # ... (rest of definition including existing example - unchanged) ...
 56 |       tags:
-57 |        - Mediaplans
+57 |         - Mediaplans
 58 |       parameters:
-59 |        - description: The number of items per page.
-60 |          example: 10
-61 |          in: query
-62 |          name: per_page
-63 |          schema:
-64 |            default: 25
-65 |            maximum: 100
-66 |            minimum: 1
-67 |            type: integer
-68 |        - description: The page number to retrieve (0-based).
-69 |          example: 0
-70 |          in: query
-71 |          name: page
-72 |          schema:
-73 |            default: 0
-74 |            minimum: 0
-75 |            type: integer
-76 |        - content:
-77 |            application/json:
-78 |              example:
-79 |                brand_id: brand-001
-80 |                search: Campaign
-81 |                status: Draft
-82 |              schema:
-83 |                $ref: "#/components/schemas/MediaplanFilter"
-84 |          description: JSON formatted string for filtering resul ts.
-85 |          in: query
-86 |          name: filter
-87 |        - description: The field to sort by.
-88 |          example: updated_at
-89 |          in: query
-90 |          name: sort
-91 |          schema:
-92 |            type: string
-93 |        - description: Sort order (ascending or descending).
-94 |          example: desc
-95 |          in: query
-96 |          name: order
-97 |          schema:
-98 |            default: asc
-99 |            enum:
-100 |              - asc
-101 |              - desc
-102 |            type: string
+59 |         - description: The number of items per page.
+60 |           example: 10
+61 |           in: query
+62 |           name: per_page
+63 |           schema:
+64 |             default: 25
+65 |             maximum: 100
+66 |             minimum: 1
+67 |             type: integer
+68 |         - description: The page number to retrieve (0-based).
+69 |           example: 0
+70 |           in: query
+71 |           name: page
+72 |           schema:
+73 |             default: 0
+74 |             minimum: 0
+75 |             type: integer
+76 |         - content:
+77 |             application/json:
+78 |               example:
+79 |                 brand_id: brand-001
+80 |                 search: Campaign
+81 |                 status: Draft
+82 |               schema:
+83 |                 $ref: "#/components/schemas/MediaplanFilter"
+84 |           description: JSON formatted string for filtering resul ts.
+85 |           in: query
+86 |           name: filter
+87 |         - description: The field to sort by.
+88 |           example: updated_at
+89 |           in: query
+90 |           name: sort
+91 |           schema:
+92 |             type: string
+93 |         - description: Sort order (ascending or descending).
+94 |           example: desc
+95 |           in: query
+96 |           name: order
+97 |           schema:
+98 |             default: asc
+99 |             enum:
+100 |               - asc
+101 |               - desc
+102 |             type: string
 103 |       responses:
 104 |         "200":
-105 |          content:
-106 |            application/json:
-107 |              example:
-108 |                current_page: 0
-109 |                items:
-110 |                  - _id: f47ac10b-58cc-4372-a567-0e02b2c3d419
-111 |                    brand:
-112 |                      _id: brand-0
-113 |                      name: MINI
-114 |                    budget:
-115 |                      available: 749.5
-116 |                      total: 1500.0
-117 |                      used: 750.5
-118 |                    created_at: "2024-10-01T10:00:00Z"
-119 |                    created_by:
-120 |                      _id: user-001
-121 |                      name: Fabian Krenzler
-122 |                    end_date: "2025-05-31T00:00:00Z"
-123 |                    name: MP 1 - Spring Campaign
-124 |                    po_numbers:
-125 |                      - _id: po-001
-126 |                        name: "4700123456"
-127 |                        value: 750.5
-128 |                    start_date: "2025-03-15T00:00:00Z"
-129 |                    status: in_planning
-130 |                    updated_at: "2024-10-05T11:00:00Z"
-131 |                  - _id: f47ac10b-58cc-4372-a567-0e02b2c3d429
-132 |                    brand:
-133 |                      _id: brand-1
-134 |                      name: BMW
-135 |                    budget:
-136 |                      available: 2000.75
-137 |                      total: 3200.75
-138 |                      used: 1200.0
-139 |                    created_at: "2024-10-15T14:30:00Z"
-140 |                    created_by:
-141 |                      _id: user-002
-142 |                      name: Alice Smith
-143 |                    end_date: "2025-07-15T00:00:00Z"
-144 |                    name: MP 2 - Summer Sale
-145 |                    po_numbers:
-146 |                      - _id: po-002
-147 |                        name: "4700987654"
-148 |                        value: 1000.0
-149 |                      - _id: po-003
-150 |                        name: "4700112233"
-151 |                        value: 200.0
-152 |                    start_date: "2025-06-01T00:00:00Z"
-153 |                    status: draft
-154 |                    updated_at: "2024-10-18T09:15:00Z"
-155 |                  - _id: f47ac10b-58cc-4372-a567-0e02b2c3d439
-156 |                    brand:
-157 |                      _id: brand-2
-158 |                      name: Rolls-Royce
-159 |                    budget:
-160 |                      available: 500.0
-161 |                      total: 5000.0
-162 |                      used: 4500.0
-163 |                    created_at: "2024-11-01T08:00:00Z"
-164 |                    created_by:
-165 |                      _id: user-003
-166 |                      name: Bob Johnson
-167 |                    end_date: "2025-10-31T00:00:00Z"
-168 |                    name: MP 3 - Autumn Rollout
-169 |                    po_numbers:
-170 |                      - _id: po-004
-171 |                        name: "4700555666"
-172 |                        value: 4500.0
-173 |                    start_date: "2025-09-01T00:00:00Z"
-174 |                    status: for_approval
-175 |                    updated_at: "2024-11-02T12:00:00Z"
-176 |                  - _id: f47ac10b-58cc-4372-a567-0e02b2c3d449
-177 |                    brand:
-178 |                      _id: brand-1
-179 |                      name: BMW
-180 |                    budget:
-181 |                      available: 1949.75
-182 |                      total: 2100.0
-183 |                      used: 150.25
-184 |                    created_at: "2024-11-10T16:20:00Z"
-185 |                    created_by:
-186 |                      _id: user-004
-187 |                      name: Charlie Brown
-188 |                    end_date: "2025-12-31T00:00:00Z"
-189 |                    name: MP 4 - Winter Special
-190 |                    po_numbers:
-191 |                      - _id: po-005
-192 |                        name: "4700333444"
-193 |                        value: 150.25
-194 |                    start_date: "2025-11-15T00:00:00Z"
-195 |                    status: draft
-196 |                    updated_at: "2024-11-11T17:00:00Z"
-197 |                  - _id: f47ac10b-58cc-4372-a567-0e02b2c3d459
-198 |                    brand:
-199 |                      _id: brand-0
-200 |                      name: MINI
-201 |                    budget:
-202 |                      available: 850.0
-203 |                      total: 850.0
-204 |                      used: 0.0
-205 |                    created_at: "2024-11-12T11:55:00Z"
-206 |                    created_by:
-207 |                      _id: user-001
-208 |                      name: Fabian Krenzler
-209 |                    end_date: "2025-11-30T00:00:00Z"
-210 |                    name: MP 5 - Year End Review Prep
-211 |                    po_numbers: []
-212 |                    start_date: "2025-10-01T00:00:00Z"
-213 |                    status: in_planning
-214 |                    updated_at: "2024-11-12T11:55:00Z"
-215 |                  - _id: f47ac10b-58cc-4372-a567-0e02b2c3d469
-216 |                    brand:
-217 |                      _id: brand-1
-218 |                      name: BMW
-219 |                    budget:
-220 |                      available: 2000.01
-221 |                      total: 4000.0
-222 |                      used: 1999.99
-223 |                    created_at: "2024-11-15T09:05:00Z"
-224 |                    created_by:
-225 |                      _id: user-002
-226 |                      name: Alice Smith
-227 |                    end_date: "2026-01-31T00:00:00Z"
-228 |                    name: MP 6 - Q1 Planning 2026
-229 |                    po_numbers:
-230 |                      - _id: po-006
-231 |                        name: "4700777888"
-232 |                        value: 1999.99
-233 |                    start_date: "2025-12-01T00:00:00Z"
-234 |                    status: draft
-235 |                    updated_at: "2024-11-20T14:25:00Z"
-236 |                  - _id: f47ac10b-58cc-4372-a567-0e02b2c3d479
-237 |                    brand:
-238 |                      _id: brand-0
-239 |                      name: MINI
-240 |                    budget:
-241 |                      available: 0.5
-242 |                      total: 1800.5
-243 |                      used: 1800.0
-244 |                    created_at: "2024-11-22T13:00:00Z"
-245 |                    created_by:
-246 |                      _id: user-003
-247 |                      name: Bob Johnson
-248 |                    end_date: "2025-06-30T00:00:00Z"
-249 |                    name: MP 7 - Brand Awareness Push
-250 |                    po_numbers:
-251 |                      - _id: po-007
-252 |                        name: "4700224466"
-253 |                        value: 1800.0
-254 |                    start_date: "2025-04-01T00:00:00Z"
-255 |                    status: for_approval
-256 |                    updated_at: "2024-11-25T10:10:00Z"
-257 |                  - _id: f47ac10b-58cc-4372-a567-0e02b2c3d489
-258 |                    brand:
-259 |                      _id: brand-1
-260 |                      name: BMW
-261 |                    budget:
-262 |                      available: 1.0
-263 |                      total: 550.0
-264 |                      used: 549.0
-265 |                    created_at: "2024-11-28T15:00:00Z"
-266 |                    created_by:
-267 |                      _id: user-004
-268 |                      name: Charlie Brown
-269 |                    end_date: "2025-05-15T00:00:00Z"
-270 |                    name: MP 8 - Lead Generation Test
-271 |                    po_numbers:
-272 |                      - _id: po-008
-273 |                        name: "4700121212"
-274 |                        value: 549.0
-275 |                    start_date: "2025-05-01T00:00:00Z"
-276 |                    status: in_planning
-277 |                    updated_at: "2024-11-29T15:00:00Z"
-278 |                  - _id: f47ac10b-58cc-4372-a567-0e02b2c3d499
-279 |                    brand:
-280 |                      _id: brand-2
-281 |                      name: Rolls-Royce
-282 |                    budget:
-283 |                      available: 2800.0
-284 |                      total: 2900.0
-285 |                      used: 100.0
-286 |                    created_at: "2024-12-02T10:30:00Z"
-287 |                    created_by:
-288 |                      _id: user-001
-289 |                      name: Fabian Krenzler
-290 |                    end_date: "2025-09-30T00:00:00Z"
-291 |                    name: MP 9 - Social Media Engagement
-292 |                    po_numbers:
-293 |                      - _id: po-009
-294 |                        name: "4700998877"
-295 |                        value: 100.0
-296 |                    start_date: "2025-07-01T00:00:00Z"
-297 |                    status: draft
-298 |                    updated_at: "2024-12-03T11:30:00Z"
-299 |                  - _id: f47ac10b-58cc-4372-a567-0e02b2c3d409
-300 |                    brand:
-301 |                      _id: brand-0
-302 |                      name: MINI
-303 |                    budget:
-304 |                      available: 0.0
-305 |                      total: 1150.8
-306 |                      used: 1150.8
-307 |                    created_at: "2024-12-05T16:00:00Z"
-308 |                    created_by:
-309 |                      _id: user-002
-310 |                      name: Alice Smith
-311 |                    end_date: "2025-10-15T00:00:00Z"
-312 |                    name: MP 10 - Partner Co-Marketing
-313 |                    po_numbers:
-314 |                      - _id: po-010
-315 |                        name: "4700101010"
-316 |                        value: 1150.8
-317 |                    start_date: "2025-08-15T00:00:00Z"
-318 |                    status: in_planning
-319 |                    updated_at: "2024-12-10T08:45:00Z"
-320 |                total_items: 10
-321 |                total_pages: 1
-322 |              schema:
-323 |                properties:
-324 |                  current_page:
-325 |                    description: The current page number (0-based).
-326 |                    example: 0
-327 |                    type: integer
-328 |                  items:
-329 |                    description: List of mediaplans on the current page.
-330 |                    items:
-331 |                      $ref: "#/components/schemas/Mediaplan"
-332 |                    type: array
-333 |                  total_items:
-334 |                    description: Total number of mediaplans.
-335 |                    example: 100
-336 |                    type: integer
-337 |                  total_pages:
-338 |                    description: Total number of pages.
-339 |                    example: 4
-340 |                    type: integer
-341 |                type: object
-342 |          description: Successful response - returns a list of Mediaplans.
+105 |           content:
+106 |             application/json:
+107 |               example:
+108 |                 current_page: 0
+109 |                 items:
+110 |                   - _id: f47ac10b-58cc-4372-a567-0e02b2c3d419
+111 |                     brand:
+112 |                       _id: brand-0
+113 |                       name: MINI
+114 |                     budget:
+115 |                       available: 749.5
+116 |                       total: 1500.0
+117 |                       used: 750.5
+118 |                     created_at: "2024-10-01T10:00:00Z"
+119 |                     created_by:
+120 |                       _id: user-001
+121 |                       name: Fabian Krenzler
+122 |                     end_date: "2025-05-31T00:00:00Z"
+123 |                     name: MP 1 - Spring Campaign
+124 |                     po_numbers:
+125 |                       - _id: po-001
+126 |                         name: "4700123456"
+127 |                         value: 750.5
+128 |                     start_date: "2025-03-15T00:00:00Z"
+129 |                     status: in_planning
+130 |                     updated_at: "2024-10-05T11:00:00Z"
+131 |                   - _id: f47ac10b-58cc-4372-a567-0e02b2c3d429
+132 |                     brand:
+133 |                       _id: brand-1
+134 |                       name: BMW
+135 |                     budget:
+136 |                       available: 2000.75
+137 |                       total: 3200.75
+138 |                       used: 1200.0
+139 |                     created_at: "2024-10-15T14:30:00Z"
+140 |                     created_by:
+141 |                       _id: user-002
+142 |                       name: Alice Smith
+143 |                     end_date: "2025-07-15T00:00:00Z"
+144 |                     name: MP 2 - Summer Sale
+145 |                     po_numbers:
+146 |                       - _id: po-002
+147 |                         name: "4700987654"
+148 |                         value: 1000.0
+149 |                       - _id: po-003
+150 |                         name: "4700112233"
+151 |                         value: 200.0
+152 |                     start_date: "2025-06-01T00:00:00Z"
+153 |                     status: draft
+154 |                     updated_at: "2024-10-18T09:15:00Z"
+155 |                   - _id: f47ac10b-58cc-4372-a567-0e02b2c3d439
+156 |                     brand:
+157 |                       _id: brand-2
+158 |                       name: Rolls-Royce
+159 |                     budget:
+160 |                       available: 500.0
+161 |                       total: 5000.0
+162 |                       used: 4500.0
+163 |                     created_at: "2024-11-01T08:00:00Z"
+164 |                     created_by:
+165 |                       _id: user-003
+166 |                       name: Bob Johnson
+167 |                     end_date: "2025-10-31T00:00:00Z"
+168 |                     name: MP 3 - Autumn Rollout
+169 |                     po_numbers:
+170 |                       - _id: po-004
+171 |                         name: "4700555666"
+172 |                         value: 4500.0
+173 |                     start_date: "2025-09-01T00:00:00Z"
+174 |                     status: for_approval
+175 |                     updated_at: "2024-11-02T12:00:00Z"
+176 |                   - _id: f47ac10b-58cc-4372-a567-0e02b2c3d449
+177 |                     brand:
+178 |                       _id: brand-1
+179 |                       name: BMW
+180 |                     budget:
+181 |                       available: 1949.75
+182 |                       total: 2100.0
+183 |                       used: 150.25
+184 |                     created_at: "2024-11-10T16:20:00Z"
+185 |                     created_by:
+186 |                       _id: user-004
+187 |                       name: Charlie Brown
+188 |                     end_date: "2025-12-31T00:00:00Z"
+189 |                     name: MP 4 - Winter Special
+190 |                     po_numbers:
+191 |                       - _id: po-005
+192 |                         name: "4700333444"
+193 |                         value: 150.25
+194 |                     start_date: "2025-11-15T00:00:00Z"
+195 |                     status: draft
+196 |                     updated_at: "2024-11-11T17:00:00Z"
+197 |                   - _id: f47ac10b-58cc-4372-a567-0e02b2c3d459
+198 |                     brand:
+199 |                       _id: brand-0
+200 |                       name: MINI
+201 |                     budget:
+202 |                       available: 850.0
+203 |                       total: 850.0
+204 |                       used: 0.0
+205 |                     created_at: "2024-11-12T11:55:00Z"
+206 |                     created_by:
+207 |                       _id: user-001
+208 |                       name: Fabian Krenzler
+209 |                     end_date: "2025-11-30T00:00:00Z"
+210 |                     name: MP 5 - Year End Review Prep
+211 |                     po_numbers: [ ]
+212 |                     start_date: "2025-10-01T00:00:00Z"
+213 |                     status: in_planning
+214 |                     updated_at: "2024-11-12T11:55:00Z"
+215 |                   - _id: f47ac10b-58cc-4372-a567-0e02b2c3d469
+216 |                     brand:
+217 |                       _id: brand-1
+218 |                       name: BMW
+219 |                     budget:
+220 |                       available: 2000.01
+221 |                       total: 4000.0
+222 |                       used: 1999.99
+223 |                     created_at: "2024-11-15T09:05:00Z"
+224 |                     created_by:
+225 |                       _id: user-002
+226 |                       name: Alice Smith
+227 |                     end_date: "2026-01-31T00:00:00Z"
+228 |                     name: MP 6 - Q1 Planning 2026
+229 |                     po_numbers:
+230 |                       - _id: po-006
+231 |                         name: "4700777888"
+232 |                         value: 1999.99
+233 |                     start_date: "2025-12-01T00:00:00Z"
+234 |                     status: draft
+235 |                     updated_at: "2024-11-20T14:25:00Z"
+236 |                   - _id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+237 |                     brand:
+238 |                       _id: brand-0
+239 |                       name: MINI
+240 |                     budget:
+241 |                       available: 0.5
+242 |                       total: 1800.5
+243 |                       used: 1800.0
+244 |                     created_at: "2024-11-22T13:00:00Z"
+245 |                     created_by:
+246 |                       _id: user-003
+247 |                       name: Bob Johnson
+248 |                     end_date: "2025-06-30T00:00:00Z"
+249 |                     name: MP 7 - Brand Awareness Push
+250 |                     po_numbers:
+251 |                       - _id: po-007
+252 |                         name: "4700224466"
+253 |                         value: 1800.0
+254 |                     start_date: "2025-04-01T00:00:00Z"
+255 |                     status: for_approval
+256 |                     updated_at: "2024-11-25T10:10:00Z"
+257 |                   - _id: f47ac10b-58cc-4372-a567-0e02b2c3d489
+258 |                     brand:
+259 |                       _id: brand-1
+260 |                       name: BMW
+261 |                     budget:
+262 |                       available: 1.0
+263 |                       total: 550.0
+264 |                       used: 549.0
+265 |                     created_at: "2024-11-28T15:00:00Z"
+266 |                     created_by:
+267 |                       _id: user-004
+268 |                       name: Charlie Brown
+269 |                     end_date: "2025-05-15T00:00:00Z"
+270 |                     name: MP 8 - Lead Generation Test
+271 |                     po_numbers:
+272 |                       - _id: po-008
+273 |                         name: "4700121212"
+274 |                         value: 549.0
+275 |                     start_date: "2025-05-01T00:00:00Z"
+276 |                     status: in_planning
+277 |                     updated_at: "2024-11-29T15:00:00Z"
+278 |                   - _id: f47ac10b-58cc-4372-a567-0e02b2c3d499
+279 |                     brand:
+280 |                       _id: brand-2
+281 |                       name: Rolls-Royce
+282 |                     budget:
+283 |                       available: 2800.0
+284 |                       total: 2900.0
+285 |                       used: 100.0
+286 |                     created_at: "2024-12-02T10:30:00Z"
+287 |                     created_by:
+288 |                       _id: user-001
+289 |                       name: Fabian Krenzler
+290 |                     end_date: "2025-09-30T00:00:00Z"
+291 |                     name: MP 9 - Social Media Engagement
+292 |                     po_numbers:
+293 |                       - _id: po-009
+294 |                         name: "4700998877"
+295 |                         value: 100.0
+296 |                     start_date: "2025-07-01T00:00:00Z"
+297 |                     status: draft
+298 |                     updated_at: "2024-12-03T11:30:00Z"
+299 |                   - _id: f47ac10b-58cc-4372-a567-0e02b2c3d409
+300 |                     brand:
+301 |                       _id: brand-0
+302 |                       name: MINI
+303 |                     budget:
+304 |                       available: 0.0
+305 |                       total: 1150.8
+306 |                       used: 1150.8
+307 |                     created_at: "2024-12-05T16:00:00Z"
+308 |                     created_by:
+309 |                       _id: user-002
+310 |                       name: Alice Smith
+311 |                     end_date: "2025-10-15T00:00:00Z"
+312 |                     name: MP 10 - Partner Co-Marketing
+313 |                     po_numbers:
+314 |                       - _id: po-010
+315 |                         name: "4700101010"
+316 |                         value: 1150.8
+317 |                     start_date: "2025-08-15T00:00:00Z"
+318 |                     status: in_planning
+319 |                     updated_at: "2024-12-10T08:45:00Z"
+320 |                 total_items: 10
+321 |                 total_pages: 1
+322 |               schema:
+323 |                 properties:
+324 |                   current_page:
+325 |                     description: The current page number (0-based).
+326 |                     example: 0
+327 |                     type: integer
+328 |                   items:
+329 |                     description: List of mediaplans on the current page.
+330 |                     items:
+331 |                       $ref: "#/components/schemas/Mediaplan"
+332 |                     type: array
+333 |                   total_items:
+334 |                     description: Total number of mediaplans.
+335 |                     example: 100
+336 |                     type: integer
+337 |                   total_pages:
+338 |                     description: Total number of pages.
+339 |                     example: 4
+340 |                     type: integer
+341 |                 type: object
+342 |           description: Successful response - returns a list of Mediaplans.
 343 |         "400":
-344 |          content:
-345 |            application/json:
-346 |              schema:
-347 |                $ref: "#/components/schemas/Error"
-348 |          description: Bad Request (e.g., invalid query parameters, invalid JSON filter)
+344 |           content:
+345 |             application/json:
+346 |               schema:
+347 |                 $ref: "#/components/schemas/Error"
+348 |           description: Bad Request (e.g., invalid query parameters, invalid JSON filter)
 349 |         "422":
-350 |          content:
-351 |            application/json:
-352 |              schema:
-353 |                $ref: "#/components/schemas/Error"
-354 |          description: Validation Error (e.g., invalid date format)
+350 |           content:
+351 |             application/json:
+352 |               schema:
+353 |                 $ref: "#/components/schemas/Error"
+354 |           description: Validation Error (e.g., invalid date format)
 355 |         "500":
-356 |          content:
-357 |            application/json:
-358 |              schema:
-359 |                $ref: "#/components/schemas/Error"
-360 |          description: Internal Server Error
+356 |           content:
+357 |             application/json:
+358 |               schema:
+359 |                 $ref: "#/components/schemas/Error"
+360 |           description: Internal Server Error
 361 | 
 362 |     post:
 363 |       summary: Create a new Mediaplan
 364 |       # ... (rest of definition - unchanged) ...
 365 |       tags:
-366 |        - Mediaplans
+366 |         - Mediaplans
 367 |       requestBody:
 368 |         content:
 369 |           application/json:
@@ -1720,89 +1837,89 @@ src/mocks/swagger_mp.yaml
 388 |         required: true
 389 |       responses:
 390 |         "201":
-391 |          content:
-392 |            application/json:
-393 |              schema:
-394 |                $ref: "#/components/schemas/Mediaplan"
-395 |          description: Mediaplan created successfully.
-396 |          headers:
-397 |            Location:
-398 |              description: URL of the newly created resource.
-399 |              schema:
-400 |                format: url
-401 |                type: string
+391 |           content:
+392 |             application/json:
+393 |               schema:
+394 |                 $ref: "#/components/schemas/Mediaplan"
+395 |           description: Mediaplan created successfully.
+396 |           headers:
+397 |             Location:
+398 |               description: URL of the newly created resource.
+399 |               schema:
+400 |                 format: url
+401 |                 type: string
 402 |         "400":
-403 |          content:
-404 |            application/json:
-405 |              schema:
-406 |                $ref: "#/components/schemas/Error"
-407 |          description: Bad Request (e.g., invalid request body)
+403 |           content:
+404 |             application/json:
+405 |               schema:
+406 |                 $ref: "#/components/schemas/Error"
+407 |           description: Bad Request (e.g., invalid request body)
 408 |         "422":
-409 |          content:
-410 |            application/json:
-411 |              schema:
-412 |                $ref: "#/components/schemas/Error"
-413 |          description: Unprocessable Entity (validation errors)
+409 |           content:
+410 |             application/json:
+411 |               schema:
+412 |                 $ref: "#/components/schemas/Error"
+413 |           description: Unprocessable Entity (validation errors)
 414 |         "500":
-415 |          content:
-416 |            application/json:
-417 |              schema:
-418 |                $ref: "#/components/schemas/Error"
-419 |          description: Internal Server Error
+415 |           content:
+416 |             application/json:
+417 |               schema:
+418 |                 $ref: "#/components/schemas/Error"
+419 |           description: Internal Server Error
 420 | 
 421 |   /mediaplans/{id}:
 422 |     get:
 423 |       summary: Get a single Mediaplan by ID
 424 |       # ... (rest of definition - unchanged) ...
 425 |       tags:
-426 |        - Mediaplans
+426 |         - Mediaplans
 427 |       parameters:
-428 |        - description: The unique identifier of the Mediaplan.
-429 |          in: path
-430 |          name: id
-431 |          required: true
-432 |          schema:
-433 |            format: uuid
-434 |            type: string
+428 |         - description: The unique identifier of the Mediaplan.
+429 |           in: path
+430 |           name: id
+431 |           required: true
+432 |           schema:
+433 |             format: uuid
+434 |             type: string
 435 |       responses:
 436 |         "200":
-437 |          content:
-438 |            application/json:
-439 |              schema:
-440 |                $ref: "#/components/schemas/Mediaplan"
-441 |          description: Successful response - returns the Mediaplan.
+437 |           content:
+438 |             application/json:
+439 |               schema:
+440 |                 $ref: "#/components/schemas/Mediaplan"
+441 |           description: Successful response - returns the Mediaplan.
 442 |         "400":
-443 |          content:
-444 |            application/json:
-445 |              schema:
-446 |                $ref: "#/components/schemas/Error"
-447 |          description: Bad Request (e.g., invalid UUID format)
+443 |           content:
+444 |             application/json:
+445 |               schema:
+446 |                 $ref: "#/components/schemas/Error"
+447 |           description: Bad Request (e.g., invalid UUID format)
 448 |         "404":
-449 |          content:
-450 |            application/json:
-451 |              schema:
-452 |                $ref: "#/components/schemas/Error"
-453 |          description: Mediaplan not found.
+449 |           content:
+450 |             application/json:
+451 |               schema:
+452 |                 $ref: "#/components/schemas/Error"
+453 |           description: Mediaplan not found.
 454 |         "500":
-455 |          content:
-456 |            application/json:
-457 |              schema:
-458 |                $ref: "#/components/schemas/Error"
-459 |          description: Internal Server Error
+455 |           content:
+456 |             application/json:
+457 |               schema:
+458 |                 $ref: "#/components/schemas/Error"
+459 |           description: Internal Server Error
 460 | 
 461 |     put:
 462 |       summary: Update a Mediaplan (replace entire resource)
 463 |       # ... (rest of definition - unchanged) ...
 464 |       tags:
-465 |        - Mediaplans
+465 |         - Mediaplans
 466 |       parameters:
-467 |        - description: The unique identifier of the Mediaplan.
-468 |          in: path
-469 |          name: id
-470 |          required: true
-471 |          schema:
-472 |            format: uuid
-473 |            type: string
+467 |         - description: The unique identifier of the Mediaplan.
+468 |           in: path
+469 |           name: id
+470 |           required: true
+471 |           schema:
+472 |             format: uuid
+473 |             type: string
 474 |       requestBody:
 475 |         content:
 476 |           application/json:
@@ -1811,1968 +1928,2069 @@ src/mocks/swagger_mp.yaml
 479 |         required: true
 480 |       responses:
 481 |         "200":
-482 |          content:
-483 |            application/json:
-484 |              schema:
-485 |                $ref: "#/components/schemas/Mediaplan"
-486 |          description: Mediaplan updated successfully.
+482 |           content:
+483 |             application/json:
+484 |               schema:
+485 |                 $ref: "#/components/schemas/Mediaplan"
+486 |           description: Mediaplan updated successfully.
 487 |         "204":
-488 |          description: Mediaplan updated successfully.
+488 |           description: Mediaplan updated successfully.
 489 |         "400":
-490 |          content:
-491 |            application/json:
-492 |              schema:
-493 |                $ref: "#/components/schemas/Error"
-494 |          description: Bad Request
+490 |           content:
+491 |             application/json:
+492 |               schema:
+493 |                 $ref: "#/components/schemas/Error"
+494 |           description: Bad Request
 495 |         "404":
-496 |          content:
-497 |            application/json:
-498 |              schema:
-499 |                $ref: "#/components/schemas/Error"
-500 |          description: Mediaplan not found.
+496 |           content:
+497 |             application/json:
+498 |               schema:
+499 |                 $ref: "#/components/schemas/Error"
+500 |           description: Mediaplan not found.
 501 |         "422":
-502 |          content:
-503 |            application/json:
-504 |              schema:
-505 |                $ref: "#/components/schemas/Error"
-506 |          description: Unprocessable Entity
+502 |           content:
+503 |             application/json:
+504 |               schema:
+505 |                 $ref: "#/components/schemas/Error"
+506 |           description: Unprocessable Entity
 507 |         "500":
-508 |          content:
-509 |            application/json:
-510 |              schema:
-511 |                $ref: "#/components/schemas/Error"
-512 |          description: Internal Server Error
+508 |           content:
+509 |             application/json:
+510 |               schema:
+511 |                 $ref: "#/components/schemas/Error"
+512 |           description: Internal Server Error
 513 | 
 514 |     delete:
 515 |       summary: Delete a Mediaplan
 516 |       # ... (rest of definition - unchanged) ...
 517 |       tags:
-518 |        - Mediaplans
+518 |         - Mediaplans
 519 |       parameters:
-520 |        - description: The unique identifier of the Mediaplan.
-521 |          in: path
-522 |          name: id
-523 |          required: true
-524 |          schema:
-525 |            format: uuid
-526 |            type: string
+520 |         - description: The unique identifier of the Mediaplan.
+521 |           in: path
+522 |           name: id
+523 |           required: true
+524 |           schema:
+525 |             format: uuid
+526 |             type: string
 527 |       responses:
 528 |         "204":
-529 |          description: Mediaplan deleted successfully.
+529 |           description: Mediaplan deleted successfully.
 530 |         "400":
-531 |          content:
-532 |            application/json:
-533 |              schema:
-534 |                $ref: "#/components/schemas/Error"
-535 |          description: Bad Request
+531 |           content:
+532 |             application/json:
+533 |               schema:
+534 |                 $ref: "#/components/schemas/Error"
+535 |           description: Bad Request
 536 |         "404":
-537 |          content:
-538 |            application/json:
-539 |              schema:
-540 |                $ref: "#/components/schemas/Error"
-541 |          description: Mediaplan not found.
+537 |           content:
+538 |             application/json:
+539 |               schema:
+540 |                 $ref: "#/components/schemas/Error"
+541 |           description: Mediaplan not found.
 542 |         "500":
-543 |          content:
-544 |            application/json:
-545 |              schema:
-546 |                $ref: "#/components/schemas/Error"
-547 |          description: Internal Server Error
+543 |           content:
+544 |             application/json:
+545 |               schema:
+546 |                 $ref: "#/components/schemas/Error"
+547 |           description: Internal Server Error
 548 | 
 549 |   /mediaplans/{mediaplanId}/projects:
 550 |     get:
 551 |       summary: Get all projects for a given Mediaplan
 552 |       # ... (rest of definition including previous example - unchanged) ...
 553 |       tags:
-554 |        - Projects
+554 |         - Projects
 555 |       parameters:
-556 |        - description: The ID of the Mediaplan.
-557 |          in: path
-558 |          name: mediaplanId
-559 |          required: true
-560 |          schema:
-561 |            format: uuid
-562 |            type: string
+556 |         - description: The ID of the Mediaplan.
+557 |           in: path
+558 |           name: mediaplanId
+559 |           required: true
+560 |           schema:
+561 |             format: uuid
+562 |             type: string
 563 |       responses:
 564 |         "200":
-565 |          content:
-566 |            application/json:
-567 |              example:
-568 |                current_page: 0
-569 |                items:
-570 |                  - _id: f47ac10b-58cc-4372-a567-0e02b2c3d479
-571 |                    abbreviation: "NC-ALWAYS-ON-2024_Individ #1"
-572 |                    created_at: "2024-10-02T09:15:00Z"
-573 |                    default_vars:
-574 |                      adtype: Banner
-575 |                      campaigndetail: null
-576 |                      campaigntype: Always On
-577 |                      dimension: 300x250
-578 |                      language: DEU
-579 |                      subsegment: New Car
-580 |                      targeturls: null
-581 |                    descriptive_vars:
-582 |                      adobecampaignname: Always On 2024
-583 |                      bmwponumber: PO12345
-584 |                      brand: MINI
-585 |                      campaigntype: Always On
-586 |                      country: SE
-587 |                      projectname: NC-ALWAYS-ON-2024_Individ
-588 |                      subsegment: New Car
-589 |                      year: 2024
-590 |                    detail: To be defined might be very long
-591 |                    duration:
-592 |                      end_date: "2024-04-15T00:00:00Z"
-593 |                      formatted: 15.01-15.04.2024
-594 |                      start_date: "2024-01-15T00:00:00Z"
-595 |                    is_locked: false
-596 |                    labels: []
-597 |                    lock_state: 0
-598 |                    owner: user123
-599 |                    updated_at: "2024-10-02T09:15:00Z"
-600 |                    uploaded_at: "2024-10-02T09:15:00Z"
-601 |                  - _id: a3b8d4e1-6c2f-4a1e-8b7d-9c1f0a3e2b1d
-602 |                    abbreviation: "NC-SPECIAL-2024_Individ #2"
-603 |                    created_at: "2024-10-03T11:30:00Z"
-604 |                    default_vars:
-605 |                      adtype: Banner
-606 |                      campaigndetail: null
-607 |                      campaigntype: Always On
-608 |                      dimension: 300x250
-609 |                      language: SWE
-610 |                      subsegment: New Car
-611 |                      targeturls: null
-612 |                    descriptive_vars:
-613 |                      adobecampaignname: Always On 2024
-614 |                      bmwponumber: PO67890
-615 |                      brand: MINI
-616 |                      campaigntype: Always On
-617 |                      country: NL
-618 |                      projectname: NC-ALWAYS-ON-2024_Individ
-619 |                      subsegment: New Car
-620 |                      year: 2024
-621 |                    detail: This project focuses on the Dutch market.
-622 |                    duration:
-623 |                      end_date: "2024-04-15T00:00:00Z"
-624 |                      formatted: 01.01-30.04.2024
-625 |                      start_date: "2024-01-15T00:00:00Z"
-626 |                    is_locked: false
-627 |                    labels: []
-628 |                    lock_state: 0
-629 |                    owner: user123
-630 |                    updated_at: "2024-10-03T11:30:00Z"
-631 |                    uploaded_at: "2024-10-03T11:30:00Z"
-632 |                  - _id: e1c7b6a0-8d3e-4f5a-9b8c-1d0e2f3a4b5c
-633 |                    abbreviation: "NC-ALWAYS-ON-2024_Individ #3"
-634 |                    created_at: "2024-10-04T15:20:00Z"
-635 |                    default_vars:
-636 |                      adtype: Banner
-637 |                      campaigndetail: null
-638 |                      campaigntype: Always On
-639 |                      dimension: 300x250
-640 |                      language: NLD
-641 |                      subsegment: New Car
-642 |                      targeturls: null
-643 |                    descriptive_vars:
-644 |                      adobecampaignname: Always On 2024
-645 |                      bmwponumber: PO12345
-646 |                      brand: MINI
-647 |                      campaigntype: Always On
-648 |                      country: FR
-649 |                      projectname: NC-ALWAYS-ON-2024_Individ
-650 |                      subsegment: New Car
-651 |                      year: 2024
-652 |                    detail: To be defined might be very long
-653 |                    duration:
-654 |                      end_date: "2024-04-15T00:00:00Z"
-655 |                      formatted: 01.03-30.04.2024
-656 |                      start_date: "2024-01-15T00:00:00Z"
-657 |                    is_locked: false
-658 |                    labels: []
-659 |                    lock_state: 0
-660 |                    owner: user123
-661 |                    updated_at: "2024-10-04T15:20:00Z"
-662 |                    uploaded_at: "2024-10-04T15:20:00Z"
-663 |                  - _id: b9d8c7e1-7a4f-4b6e-9c8d-0e1f2a3b4c5d
-664 |                    abbreviation: "NC-SPECIAL-2024_Individ #4"
-665 |                    created_at: "2024-10-05T10:45:00Z"
-666 |                    default_vars:
-667 |                      adtype: Banner
-668 |                      campaigndetail: null
-669 |                      campaigntype: Always On
-670 |                      dimension: 300x250
-671 |                      language: DEU
-672 |                      subsegment: New Car
-673 |                      targeturls: null
-674 |                    descriptive_vars:
-675 |                      adobecampaignname: Always On 2024
-676 |                      bmwponumber: PO67890
-677 |                      brand: MINI
-678 |                      campaigntype: Always On
-679 |                      country: SE
-680 |                      projectname: NC-ALWAYS-ON-2024_Individ
-681 |                      subsegment: New Car
-682 |                      year: 2024
-683 |                    detail: This is a special project for the Swedish market.
-684 |                    duration:
-685 |                      end_date: "2024-04-15T00:00:00Z"
-686 |                      formatted: 15.01-15.04.2024
-687 |                      start_date: "2024-01-15T00:00:00Z"
-688 |                    is_locked: false
-689 |                    labels: []
-690 |                    lock_state: 0
-691 |                    owner: user123
-692 |                    updated_at: "2024-10-05T10:45:00Z"
-693 |                    uploaded_at: "2024-10-05T10:45:00Z"
-694 |                  - _id: d3e4f5a0-8b7c-4a1e-8c7d-9f0a1b2c3d4e
-695 |                    abbreviation: "NC-ALWAYS-ON-2024_Individ #5"
-696 |                    created_at: "2024-10-06T13:15:00Z"
-697 |                    default_vars:
-698 |                      adtype: Banner
-699 |                      campaigndetail: null
-700 |                      campaigntype: Always On
-701 |                      dimension: 300x250
-702 |                      language: SWE
-703 |                      subsegment: New Car
-704 |                      targeturls: null
-705 |                    descriptive_vars:
-706 |                      adobecampaignname: Always On 2024
-707 |                      bmwponumber: PO12345
-708 |                      brand: MINI
-709 |                      campaigntype: Always On
-710 |                      country: NL
-711 |                      projectname: NC-ALWAYS-ON-2024_Individ
-712 |                      subsegment: New Car
-713 |                      year: 2024
-714 |                    detail: To be defined might be very long
-715 |                    duration:
-716 |                      end_date: "2024-04-15T00:00:00Z"
-717 |                      formatted: 01.01-15.04.2024
-718 |                      start_date: "2024-01-15T00:00:00Z"
-719 |                    is_locked: false
-720 |                    labels: []
-721 |                    lock_state: 0
-722 |                    owner: user123
-723 |                    updated_at: "2024-10-06T13:15:00Z"
-724 |                    uploaded_at: "2024-10-06T13:15:00Z"
-725 |                  - _id: c7b8a9e1-6d3f-4c2a-9a8b-1e0f2d3c4b5a
-726 |                    abbreviation: "NC-ALWAYS-ON-2024_Individ #6"
-727 |                    created_at: "2024-10-07T09:15:00Z"
-728 |                    default_vars:
-729 |                      adtype: Banner
-730 |                      campaigndetail: null
-731 |                      campaigntype: Always On
-732 |                      dimension: 300x250
-733 |                      language: DEU
-734 |                      subsegment: New Car
-735 |                      targeturls: null
-736 |                    descriptive_vars:
-737 |                      adobecampaignname: Always On 2024
-738 |                      bmwponumber: PO67890
-739 |                      brand: MINI
-740 |                      campaigntype: Always On
-741 |                      country: FR
-742 |                      projectname: NC-ALWAYS-ON-2024_Individ
-743 |                      subsegment: New Car
-744 |                      year: 2024
-745 |                    detail: To be defined might be very long
-746 |                    duration:
-747 |                      end_date: "2024-04-15T00:00:00Z"
-748 |                      formatted: 15.01-30.06.2024
-749 |                      start_date: "2024-01-15T00:00:00Z"
-750 |                    is_locked: false
-751 |                    labels: []
-752 |                    lock_state: 0
-753 |                    owner: user123
-754 |                    updated_at: "2024-10-07T09:15:00Z"
-755 |                    uploaded_at: "2024-10-07T09:15:00Z"
-756 |                  - _id: a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d
-757 |                    abbreviation: "NC-SPECIAL-2024_Individ #7"
-758 |                    created_at: "2024-10-08T11:30:00Z"
-759 |                    default_vars:
-760 |                      adtype: Banner
-761 |                      campaigndetail: null
-762 |                      campaigntype: Always On
-763 |                      dimension: 300x250
-764 |                      language: NLD
-765 |                      subsegment: New Car
-766 |                      targeturls: null
-767 |                    descriptive_vars:
-768 |                      adobecampaignname: Always On 2024
-769 |                      bmwponumber: PO12345
-770 |                      brand: MINI
-771 |                      campaigntype: Always On
-772 |                      country: SE
-773 |                      projectname: NC-ALWAYS-ON-2024_Individ
-774 |                      subsegment: New Car
-775 |                      year: 2024
-776 |                    detail: To be defined might be very long
-777 |                    duration:
-778 |                      end_date: "2024-04-15T00:00:00Z"
-779 |                      formatted: 01.04-30.06.2024
-780 |                      start_date: "2024-01-15T00:00:00Z"
-781 |                    is_locked: false
-782 |                    labels: []
-783 |                    lock_state: 0
-784 |                    owner: user123
-785 |                    updated_at: "2024-10-08T11:30:00Z"
-786 |                    uploaded_at: "2024-10-08T11:30:00Z"
-787 |                  - _id: f0e1d2c3-4b5a-4c6d-8e9f-0a1b2c3d4e5f
-788 |                    abbreviation: "NC-ALWAYS-ON-2024_Individ #8"
-789 |                    created_at: "2024-10-09T15:20:00Z"
-790 |                    default_vars:
-791 |                      adtype: Banner
-792 |                      campaigndetail: null
-793 |                      campaigntype: Always On
-794 |                      dimension: 300x250
-795 |                      language: DEU
-796 |                      subsegment: New Car
-797 |                      targeturls: null
-798 |                    descriptive_vars:
-799 |                      adobecampaignname: Always On 2024
-800 |                      bmwponumber: PO67890
-801 |                      brand: MINI
-802 |                      campaigntype: Always On
-803 |                      country: NL
-804 |                      projectname: NC-ALWAYS-ON-2024_Individ
-805 |                      subsegment: New Car
-806 |                      year: 2024
-807 |                    detail: To be defined might be very long
-808 |                    duration:
-809 |                      end_date: "2024-04-15T00:00:00Z"
-810 |                      formatted: 01.01-15.05.2024
-811 |                      start_date: "2024-01-15T00:00:00Z"
-812 |                    is_locked: false
-813 |                    labels: []
-814 |                    lock_state: 0
-815 |                    owner: user123
-816 |                    updated_at: "2024-10-09T15:20:00Z"
-817 |                    uploaded_at: "2024-10-09T15:20:00Z"
-818 |                  - _id: b4c5d6e7-8f9a-4b1c-9d0e-1f2a3b4c5d6e
-819 |                    abbreviation: "NC-SPECIAL-2024_Individ #9"
-820 |                    created_at: "2024-10-10T10:45:00Z"
-821 |                    default_vars:
-822 |                      adtype: Banner
-823 |                      campaigndetail: null
-824 |                      campaigntype: Always On
-825 |                      dimension: 300x250
-826 |                      language: SWE
-827 |                      subsegment: New Car
-828 |                      targeturls: null
-829 |                    descriptive_vars:
-830 |                      adobecampaignname: Always On 2024
-831 |                      bmwponumber: PO12345
-832 |                      brand: MINI
-833 |                      campaigntype: Always On
-834 |                      country: FR
-835 |                      projectname: NC-ALWAYS-ON-2024_Individ
-836 |                      subsegment: New Car
-837 |                      year: 2024
-838 |                    detail: To be defined might be very long
-839 |                    duration:
-840 |                      end_date: "2024-04-15T00:00:00Z"
-841 |                      formatted: 15.01-30.06.2024
-842 |                      start_date: "2024-01-15T00:00:00Z"
-843 |                    is_locked: false
-844 |                    labels: []
-845 |                    lock_state: 0
-846 |                    owner: user123
-847 |                    updated_at: "2024-10-10T10:45:00Z"
-848 |                    uploaded_at: "2024-10-10T10:45:00Z"
-849 |                  - _id: d8e9f0a1-b2c3-4d4e-8f5a-0b1c2d3e4f5a
-850 |                    abbreviation: "NC-ALWAYS-ON-2024_Individ #10"
-851 |                    created_at: "2024-10-11T13:15:00Z"
-852 |                    default_vars:
-853 |                      adtype: Banner
-854 |                      campaigndetail: null
-855 |                      campaigntype: Always On
-856 |                      dimension: 300x250
-857 |                      language: NLD
-858 |                      subsegment: New Car
-859 |                      targeturls: null
-860 |                    descriptive_vars:
-861 |                      adobecampaignname: Always On 2024
-862 |                      bmwponumber: PO67890
-863 |                      brand: MINI
-864 |                      campaigntype: Always On
-865 |                      country: SE
-866 |                      projectname: NC-ALWAYS-ON-2024_Individ
-867 |                      subsegment: New Car
-868 |                      year: 2024
-869 |                    detail: To be defined might be very long
-870 |                    duration:
-871 |                      end_date: "2024-04-15T00:00:00Z"
-872 |                      formatted: 01.05-30.06.2024
-873 |                      start_date: "2024-01-15T00:00:00Z"
-874 |                    is_locked: false
-875 |                    labels: []
-876 |                    lock_state: 0
-877 |                    owner: user123
-878 |                    updated_at: "2024-10-11T13:15:00Z"
-879 |                    uploaded_at: "2024-10-11T13:15:00Z"
-880 |                  - _id: 1f2a3b4c-5d6e-4f7a-8b9c-0d1e2f3a4b5c
-881 |                    abbreviation: USED-CAR-Q3-2024_Campaign_11
-882 |                    created_at: "2024-11-01T10:00:00Z"
-883 |                    default_vars:
-884 |                      adtype: Video
-885 |                      campaigndetail: null
-886 |                      campaigntype: Sales
-887 |                      dimension: 1920x1080
-888 |                      language: ENG
-889 |                      subsegment: Used Car
-890 |                      targeturls: https://example.com/used
-891 |                    descriptive_vars:
-892 |                      adobecampaignname: Used Car Q3
-893 |                      bmwponumber: PO99887
-894 |                      brand: BMW
-895 |                      campaigntype: Sales
-896 |                      country: GB
-897 |                      projectname: USED-CAR-Q3-2024_Campaign
-898 |                      subsegment: Used Car
-899 |                      year: 2024
-900 |                    detail: Focus on certified pre-owned vehicles.
-901 |                    duration:
-902 |                      end_date: "2024-09-30T00:00:00Z"
-903 |                      formatted: 01.07-30.09.2024
-904 |                      start_date: "2024-07-01T00:00:00Z"
-905 |                    is_locked: true
-906 |                    labels:
-907 |                      - priority
-908 |                      - video
-909 |                    lock_state: 1
-910 |                    owner: user456
-911 |                    updated_at: "2024-11-05T14:00:00Z"
-912 |                    uploaded_at: "2024-11-01T10:00:00Z"
-913 |                  - _id: 2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d
-914 |                    abbreviation: SERVICE-WINTER-CHECK_Promo_12
-915 |                    created_at: "2024-11-02T11:20:00Z"
-916 |                    default_vars:
-917 |                      adtype: Social
-918 |                      campaigndetail: Tyre Change
-919 |                      campaigntype: Seasonal
-920 |                      dimension: 1080x1080
-921 |                      language: FRA
-922 |                      subsegment: Aftersales
-923 |                      targeturls: null
-924 |                    descriptive_vars:
-925 |                      adobecampaignname: Winter Check 24
-926 |                      bmwponumber: PO77665
-927 |                      brand: BMW
-928 |                      campaigntype: Seasonal
-929 |                      country: FR
-930 |                      projectname: SERVICE-WINTER-CHECK_Promo
-931 |                      subsegment: Aftersales
-932 |                      year: 2024
-933 |                    detail: Promotional offer for winter service checks.
-934 |                    duration:
-935 |                      end_date: "2024-12-15T00:00:00Z"
-936 |                      formatted: 15.10-15.12.2024
-937 |                      start_date: "2024-10-15T00:00:00Z"
-938 |                    is_locked: false
-939 |                    labels:
-940 |                      - aftersales
-941 |                    lock_state: 0
-942 |                    owner: user789
-943 |                    updated_at: "2024-11-03T11:20:00Z"
-944 |                    uploaded_at: "2024-11-02T11:20:00Z"
-945 |                  - _id: 3b4c5d6e-7f8a-4b9c-0d1e-2f3a4b5c6d7e
-946 |                    abbreviation: NC-LAUNCH-X5-2025_Awareness_13
-947 |                    created_at: "2024-11-10T09:00:00Z"
-948 |                    default_vars:
-949 |                      adtype: Display
-950 |                      campaigndetail: X5 Facelift
-951 |                      campaigntype: Launch
-952 |                      dimension: 728x90
-953 |                      language: DEU
-954 |                      subsegment: New Car
-955 |                      targeturls: null
-956 |                    descriptive_vars:
-957 |                      adobecampaignname: X5 Launch 2025
-958 |                      bmwponumber: PO11223
-959 |                      brand: BMW
-960 |                      campaigntype: Launch
-961 |                      country: DE
-962 |                      projectname: NC-LAUNCH-X5-2025_Awareness
-963 |                      subsegment: New Car
-964 |                      year: 2025
-965 |                    detail: Initial awareness phase for the new X5 model.
-966 |                    duration:
-967 |                      end_date: "2025-03-31T00:00:00Z"
-968 |                      formatted: 01.02-31.03.2025
-969 |                      start_date: "2025-02-01T00:00:00Z"
-970 |                    is_locked: false
-971 |                    labels:
-972 |                      - launch
-973 |                      - awareness
-974 |                    lock_state: 0
-975 |                    owner: user123
-976 |                    updated_at: "2024-11-12T16:30:00Z"
-977 |                    uploaded_at: "2024-11-10T09:00:00Z"
-978 |                  - _id: 4c5d6e7f-8a9b-4c0d-1e2f-3a4b5c6d7e8f
-979 |                    abbreviation: MINI-EV-TESTDRIVE_LeadGen_14
-980 |                    created_at: "2024-11-15T13:45:00Z"
-981 |                    default_vars:
-982 |                      adtype: Search
-983 |                      campaigndetail: Electric Cooper
-984 |                      campaigntype: Lead Generation
-985 |                      dimension: null
-986 |                      language: NLD
-987 |                      subsegment: New Car
-988 |                      targeturls: https://mini.example.com/testdrive
-989 |                    descriptive_vars:
-990 |                      adobecampaignname: MINI EV Leads
-991 |                      bmwponumber: PO44556
-992 |                      brand: MINI
-993 |                      campaigntype: Lead Generation
-994 |                      country: NL
-995 |                      projectname: MINI-EV-TESTDRIVE_LeadGen
-996 |                      subsegment: New Car
-997 |                      year: 2024
-998 |                    detail: Campaign to generate test drive requests for MINI Electric.
-999 |                    duration:
-1000 |                      end_date: "2024-12-20T00:00:00Z"
-1001 |                      formatted: 20.11-20.12.2024
-1002 |                      start_date: "2024-11-20T00:00:00Z"
-1003 |                    is_locked: false
-1004 |                    labels:
-1005 |                      - electric
-1006 |                      - leads
-1007 |                    lock_state: 0
-1008 |                    owner: user456
-1009 |                    updated_at: "2024-11-15T13:45:00Z"
-1010 |                    uploaded_at: "2024-11-15T13:45:00Z"
-1011 |                  - _id: 5d6e7f8a-9b0c-4d1e-2f3a-4b5c6d7e8f9a
-1012 |                    abbreviation: BMW-M-PERFORMANCE_Consideration_15
-1013 |                    created_at: "2024-11-20T10:10:00Z"
-1014 |                    default_vars:
-1015 |                      adtype: Video
-1016 |                      campaigndetail: M Models
-1017 |                      campaigntype: Consideration
-1018 |                      dimension: 1920x1080
-1019 |                      language: ITA
-1020 |                      subsegment: New Car
-1021 |                      targeturls: null
-1022 |                    descriptive_vars:
-1023 |                      adobecampaignname: M Power Consideration
-1024 |                      bmwponumber: PO66778
-1025 |                      brand: BMW
-1026 |                      campaigntype: Consideration
-1027 |                      country: IT
-1028 |                      projectname: BMW-M-PERFORMANCE_Consideration
-1029 |                      subsegment: New Car
-1030 |                      year: 2024
-1031 |                    detail: Highlighting M performance parts and models.
-1032 |                    duration:
-1033 |                      end_date: "2024-11-30T00:00:00Z"
-1034 |                      formatted: 01.09-30.11.2024
-1035 |                      start_date: "2024-09-01T00:00:00Z"
-1036 |                    is_locked: false
-1037 |                    labels:
-1038 |                      - performance
-1039 |                      - M
-1040 |                    lock_state: 0
-1041 |                    owner: user789
-1042 |                    updated_at: "2024-11-21T12:00:00Z"
-1043 |                    uploaded_at: "2024-11-20T10:10:00Z"
-1044 |                  - _id: 6e7f8a9b-0c1d-4e2f-3a4b-5c6d7e8f9a0b
-1045 |                    abbreviation: FINANCIAL-SERVICES-Q1-25_Offer_16
-1046 |                    created_at: "2024-11-25T15:00:00Z"
-1047 |                    default_vars:
-1048 |                      adtype: Display
-1049 |                      campaigndetail: Leasing 0%
-1050 |                      campaigntype: Offer
-1051 |                      dimension: 300x600
-1052 |                      language: ESP
-1053 |                      subsegment: Financial Services
-1054 |                      targeturls: https://bmw-fs.example.com/offers
-1055 |                    descriptive_vars:
-1056 |                      adobecampaignname: FS Q1 Offers
-1057 |                      bmwponumber: PO22334
-1058 |                      brand: BMW
-1059 |                      campaigntype: Offer
-1060 |                      country: ES
-1061 |                      projectname: FINANCIAL-SERVICES-Q1-25_Offer
-1062 |                      subsegment: Financial Services
-1063 |                      year: 2025
-1064 |                    detail: Special financing offers for Q1 2025.
-1065 |                    duration:
-1066 |                      end_date: "2025-03-31T00:00:00Z"
-1067 |                      formatted: 10.01-31.03.2025
-1068 |                      start_date: "2025-01-10T00:00:00Z"
-1069 |                    is_locked: false
-1070 |                    labels:
-1071 |                      - financing
-1072 |                      - FS
-1073 |                    lock_state: 0
-1074 |                    owner: user123
-1075 |                    updated_at: "2024-11-28T10:00:00Z"
-1076 |                    uploaded_at: "2024-11-25T15:00:00Z"
-1077 |                  - _id: 7f8a9b0c-1d2e-4f3a-4b5c-6d7e8f9a0b1c
-1078 |                    abbreviation: MINI-USED-NEXT_Q4_Sales_17
-1079 |                    created_at: "2024-12-01T12:12:12Z"
-1080 |                    default_vars:
-1081 |                      adtype: Search
-1082 |                      campaigndetail: MINI Next
-1083 |                      campaigntype: Sales
-1084 |                      dimension: null
-1085 |                      language: DEU
-1086 |                      subsegment: Used Car
-1087 |                      targeturls: null
-1088 |                    descriptive_vars:
-1089 |                      adobecampaignname: MINI Used Q4 AT
-1090 |                      bmwponumber: PO55667
-1091 |                      brand: MINI
-1092 |                      campaigntype: Sales
-1093 |                      country: AT
-1094 |                      projectname: MINI-USED-NEXT_Q4_Sales
-1095 |                      subsegment: Used Car
-1096 |                      year: 2024
-1097 |                    detail: Promoting MINI Next certified used cars in Austria.
-1098 |                    duration:
-1099 |                      end_date: "2024-12-31T00:00:00Z"
-1100 |                      formatted: 01.10-31.12.2024
-1101 |                      start_date: "2024-10-01T00:00:00Z"
-1102 |                    is_locked: false
-1103 |                    labels:
-1104 |                      - used
-1105 |                      - mini next
-1106 |                    lock_state: 0
-1107 |                    owner: user456
-1108 |                    updated_at: "2024-12-01T12:12:12Z"
-1109 |                    uploaded_at: "2024-12-01T12:12:12Z"
-1110 |                  - _id: 8a9b0c1d-2e3f-4a4b-5c6d-7e8f9a0b1c2d
-1111 |                    abbreviation: BMW-I4-SUSTAINABILITY_Brand_18
-1112 |                    created_at: "2024-12-05T08:30:00Z"
-1113 |                    default_vars:
-1114 |                      adtype: Social
-1115 |                      campaigndetail: i4 Electric
-1116 |                      campaigntype: Brand
-1117 |                      dimension: 1080x1920
-1118 |                      language: ENG
-1119 |                      subsegment: Corporate
-1120 |                      targeturls: https://bmw.example.com/sustainability
-1121 |                    descriptive_vars:
-1122 |                      adobecampaignname: BMW Sustainability i4
-1123 |                      bmwponumber: PO88990
-1124 |                      brand: BMW
-1125 |                      campaigntype: Brand
-1126 |                      country: US
-1127 |                      projectname: BMW-I4-SUSTAINABILITY_Brand
-1128 |                      subsegment: Corporate
-1129 |                      year: 2024
-1130 |                    detail: Brand campaign focusing on the sustainability aspects of the BMW i4.
-1131 |                    duration:
-1132 |                      end_date: "2025-01-31T00:00:00Z"
-1133 |                      formatted: 01.11-31.01.2025
-1134 |                      start_date: "2024-11-01T00:00:00Z"
-1135 |                    is_locked: true
-1136 |                    labels:
-1137 |                      - brand
-1138 |                      - sustainability
-1139 |                      - electric
-1140 |                      - i4
-1141 |                    lock_state: 1
-1142 |                    owner: user789
-1143 |                    updated_at: "2024-12-10T11:00:00Z"
-1144 |                    uploaded_at: "2024-12-05T08:30:00Z"
-1145 |                total_items: 18
-1146 |                total_pages: 1
-1147 |              schema:
-1148 |                items:
-1149 |                  $ref: "#/components/schemas/Project"
-1150 |                type: array
-1151 |          description: Successful response - returns a list of projects.
-1152 |         "400":
-1153 |          content:
-1154 |            application/json:
-1155 |              schema:
-1156 |                $ref: "#/components/schemas/Error"
-1157 |          description: Bad Request (e.g., invalid Mediaplan ID format)
-1158 |         "404":
-1159 |          content:
-1160 |            application/json:
-1161 |              schema:
-1162 |                $ref: "#/components/schemas/Error"
-1163 |          description: Mediaplan not found.
-1164 |         "500":
-1165 |          content:
-1166 |            application/json:
-1167 |              schema:
-1168 |                $ref: "#/components/schemas/Error"
-1169 |          description: Internal Server Error
-1170 | 
-1171 |     post:
-1172 |       summary: Create a new Project for a Mediaplan
-1173 |       # ... (rest of definition - unchanged) ...
-1174 |       tags:
-1175 |        - Projects
-1176 |       parameters:
-1177 |        - description: The ID of the Mediaplan to which the project belongs.
-1178 |          in: path
-1179 |          name: mediaplanId
-1180 |          required: true
-1181 |          schema:
-1182 |            format: uuid
-1183 |            type: string
-1184 |       requestBody:
-1185 |         content:
-1186 |           application/json:
-1187 |             example:
-1188 |               abbreviation: MyNewProject
-1189 |               default_vars:
-1190 |                 adtype: Banner
-1191 |                 campaigndetail: null
-1192 |                 campaigntype: Awareness
-1193 |                 dimension: 300x250
-1194 |                 language: en
-1195 |                 subsegment: OT
-1196 |                 targeturls: null
-1197 |               descriptive_vars:
-1198 |                 adobecampaignname: SummerSale
-1199 |                 bmwponumber: PO12345
-1200 |                 brand: BMW
-1201 |                 campaigntype: Awareness
-1202 |                 country: US
-1203 |                 projectname: SummerSale_OT
-1204 |                 subsegment: OT
-1205 |                 year: 2025
-1206 |               is_locked: false
-1207 |               labels: []
-1208 |               lock_state: 0
-1209 |               message: OK
-1210 |               owner: user123
-1211 |               version: v1
-1212 |             schema:
-1213 |               $ref: "#/components/schemas/ProjectCreate"
-1214 |         required: true
-1215 |       responses:
-1216 |         "201":
-1217 |          content:
-1218 |            application/json:
-1219 |              schema:
-1220 |                $ref: "#/components/schemas/Project"
-1221 |          description: Project created successfully.
-1222 |          headers:
-1223 |            Location:
-1224 |              description: URL of the newly created Project.
-1225 |              schema:
-1226 |                format: url
-1227 |                type: string
-1228 |         "400":
-1229 |          content:
-1230 |            application/json:
-1231 |              schema:
-1232 |                $ref: "#/components/schemas/Error"
-1233 |          description: Bad Request (e.g., invalid request body or Mediaplan ID)
-1234 |         "404":
-1235 |          content:
-1236 |            application/json:
-1237 |              schema:
-1238 |                $ref: "#/components/schemas/Error"
-1239 |          description: Mediaplan not found.
-1240 |         "422":
-1241 |          content:
-1242 |            application/json:
-1243 |              schema:
-1244 |                $ref: "#/components/schemas/Error"
-1245 |          description: Unprocessable Entity (validation errors)
-1246 |         "500":
-1247 |          content:
-1248 |            application/json:
-1249 |              schema:
-1250 |                $ref: "#/components/schemas/Error"
-1251 |          description: Internal Server Error
-1252 | 
-1253 |   /mediaplans/{mediaplanId}/projects/{projectId}:
-1254 |     get:
-1255 |       summary: Get a Project
-1256 |       tags:
-1257 |         - Projects
-1258 |       parameters:
-1259 |         - in: path
-1260 |           name: mediaplanId
-1261 |           schema:
-1262 |             type: string
-1263 |             format: uuid
-1264 |           required: true
-1265 |           description: The ID of the Mediaplan.
-1266 |         - in: path
-1267 |           name: projectId
-1268 |           schema:
-1269 |             type: string
-1270 |             format: uuid
-1271 |           required: true
-1272 |           description: The ID of the Project to get.
-1273 |       responses:
-1274 |         '200':
-1275 |           description: Project fetched successfully.
-1276 |           content:
-1277 |             application/json:
-1278 |               schema:
-1279 |                 $ref: '#/components/schemas/Project'
-1280 |               # --- START EXAMPLE ---
-1281 |               example:
-1282 |                 _id: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Use a valid UUID
-1283 |                 abbreviation: "NC-ALWAYS-ON-2024_Individ #1"
-1284 |                 created_at: "2024-10-02T09:15:00Z"
-1285 |                 default_vars:
-1286 |                   targeturls: null
-1287 |                   subsegment: "New Car"
-1288 |                   campaigntype: "Always On"
-1289 |                   language: "DEU"
-1290 |                   campaigndetail: null
-1291 |                   adtype: "Banner"
-1292 |                   dimension: "300x250"
-1293 |                 descriptive_vars:
-1294 |                   brand: "MINI"
-1295 |                   country: "SE"
-1296 |                   bmwponumber: "PO12345"
-1297 |                   adobecampaignname: "Always On 2024"
-1298 |                   subsegment: "New Car"
-1299 |                   campaigntype: "Always On"
-1300 |                   projectname: "NC-ALWAYS-ON-2024_Individ"
-1301 |                   year: 2024
-1302 |                 is_locked: false
-1303 |                 labels: []
-1304 |                 lock_state: 0
-1305 |                 owner: "user123"
-1306 |                 updated_at: "2024-10-02T09:15:00Z"
-1307 |                 uploaded_at: "2024-10-02T09:15:00Z"
-1308 |                 duration:
-1309 |                   start_date: "2024-01-15T00:00:00Z"
-1310 |                   end_date: "2024-04-15T00:00:00Z"
-1311 |                   formatted: "15.01-15.04.2024"
-1312 |                 detail: "This is the first project, focusing on Sweden."
-1313 |               # --- END EXAMPLE ---
-1314 |         '400':
-1315 |           description: Bad Request
-1316 |           # ... (rest unchanged)
-1317 |         '404':
-1318 |           description: Mediaplan or Project not found.
-1319 |           # ... (rest unchanged)
-1320 |         '500':
-1321 |           description: Internal Server Error
-1322 |           # ... (rest unchanged)
-1323 | 
-1324 |     put:
-1325 |       summary: Update a Project (replace entire resource)
-1326 |       # ... (rest of definition - unchanged) ...
-1327 |       tags:
-1328 |        - Projects
-1329 |       parameters:
-1330 |        - description: The ID of the Mediaplan.
-1331 |          in: path
-1332 |          name: mediaplanId
-1333 |          required: true
-1334 |          schema:
-1335 |            format: uuid
-1336 |            type: string
-1337 |        - description: The ID of the Project to update.
-1338 |          in: path
-1339 |          name: projectId
-1340 |          required: true
-1341 |          schema:
-1342 |            format: uuid
-1343 |            type: string
-1344 |       requestBody:
-1345 |         content:
-1346 |           application/json:
-1347 |             schema:
-1348 |               $ref: "#/components/schemas/Project"
-1349 |         required: true
-1350 |       responses:
-1351 |         "200":
-1352 |          content:
-1353 |            application/json:
-1354 |              schema:
-1355 |                $ref: "#/components/schemas/Project"
-1356 |          description: Project updated successfully.
-1357 |         "204":
-1358 |          description: Project updated successfully.
-1359 |         "400":
-1360 |          content:
-1361 |            application/json:
-1362 |              schema:
-1363 |                $ref: "#/components/schemas/Error"
-1364 |          description: Bad Request
-1365 |         "404":
-1366 |          content:
-1367 |            application/json:
-1368 |              schema:
-1369 |                $ref: "#/components/schemas/Error"
-1370 |          description: Mediaplan or Project not found.
-1371 |         "422":
-1372 |          content:
-1373 |            application/json:
-1374 |              schema:
-1375 |                $ref: "#/components/schemas/Error"
-1376 |          description: Unprocessable Entity
-1377 |         "500":
-1378 |          content:
-1379 |            application/json:
-1380 |              schema:
-1381 |                $ref: "#/components/schemas/Error"
-1382 |          description: Internal Server Error
-1383 | 
-1384 |     delete:
-1385 |       summary: Delete a Project
-1386 |       # ... (rest of definition - unchanged) ...
-1387 |       tags:
-1388 |        - Projects
-1389 |       parameters:
-1390 |        - description: The ID of the Mediaplan.
-1391 |          in: path
-1392 |          name: mediaplanId
-1393 |          required: true
-1394 |          schema:
-1395 |            format: uuid
-1396 |            type: string
-1397 |        - description: The ID of the Project to delete.
-1398 |          in: path
-1399 |          name: projectId
-1400 |          required: true
-1401 |          schema:
-1402 |            format: uuid
-1403 |            type: string
-1404 |       responses:
-1405 |         "204":
-1406 |          description: Project deleted successfully.
-1407 |         "400":
-1408 |          content:
-1409 |            application/json:
-1410 |              schema:
-1411 |                $ref: "#/components/schemas/Error"
-1412 |          description: Bad Request
-1413 |         "404":
-1414 |          content:
-1415 |            application/json:
-1416 |              schema:
-1417 |                $ref: "#/components/schemas/Error"
-1418 |          description: Mediaplan or Project not found.
-1419 |         "500":
-1420 |          content:
-1421 |            application/json:
-1422 |              schema:
-1423 |                $ref: "#/components/schemas/Error"
-1424 |          description: Internal Server Error
-1425 | 
-1426 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns:
-1427 |     get:
-1428 |       summary: Get all campaigns for a given Project within a Mediaplan
-1429 |       tags:
-1430 |         - Campaigns
-1431 |       parameters:
-1432 |         - in: path
-1433 |           name: mediaplanId
-1434 |           schema:
-1435 |             type: string
-1436 |             format: uuid
-1437 |           required: true
-1438 |           description: The ID of the Mediaplan.
-1439 |         - in: path
-1440 |           name: projectId
-1441 |           schema:
-1442 |             type: string
-1443 |             format: uuid
-1444 |           required: true
-1445 |           description: The ID of the Project.
-1446 |         # --- ADD Pagination parameters ---
-1447 |         - in: query
-1448 |           name: page
-1449 |           schema:
-1450 |             type: integer
-1451 |             minimum: 0
-1452 |             default: 0
-1453 |           description: The page number to retrieve (0-based).
-1454 |         - in: query
-1455 |           name: per_page
-1456 |           schema:
-1457 |             type: integer
-1458 |             minimum: 1
-1459 |             maximum: 100
-1460 |             default: 15 # Match store default
-1461 |           description: The number of items per page.
-1462 |         # Optional: Add sort/order parameters if API supports them
-1463 |         # - in: query
-1464 |         #   name: sort
-1465 |         #   schema: { type: string }
-1466 |         # - in: query
-1467 |         #   name: order
-1468 |         #   schema: { type: string, enum: [asc, desc] }
-1469 |       responses:
-1470 |         '200':
-1471 |           description: Successful response - returns a list of campaigns.
-1472 |           content:
-1473 |             application/json:
-1474 |               # --- ASSUME PAGINATED RESPONSE SCHEMA ---
-1475 |               schema:
-1476 |                 type: object
-1477 |                 properties:
-1478 |                   total_items:
-1479 |                     type: integer
-1480 |                   total_pages:
-1481 |                     type: integer
-1482 |                   current_page:
-1483 |                     type: integer
-1484 |                   items:
-1485 |                     type: array
-1486 |                     items:
-1487 |                       $ref: '#/components/schemas/Campaign'
-1488 |               # --- START EXAMPLE for Campaigns (Paginated) ---
-1489 |               example:
-1490 |                 total_items: 5 # Example total
-1491 |                 total_pages: 1 # Example pages
-1492 |                 current_page: 0 # Example current page
-1493 |                 items:
-1494 |                   - _id: "c1f0a3e2-b1d9-4a1e-8b7d-a3b8d4e16c2f" # UUID
-1495 |                     campaignname: "SE_MINI_NC-AO-24_Summer_Display_DEU_Generic"
-1496 |                     pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID from example above
-1497 |                     campaigndetail: "Generic Summer Banner Ads"
-1498 |                     campaigntype: "Always On"
-1499 |                     created_at: "2024-10-15T10:00:00Z"
-1500 |                     language: "DEU"
-1501 |                     product: "Generic" # Example Product
-1502 |                     subsegment: "New Car"
-1503 |                     type: "display"
-1504 |                     updated_at: "2024-10-16T11:00:00Z"
-1505 |                   - _id: "d4e16c2f-9b8c-4f5a-8d3e-e1c7b6a08d3e" # UUID
-1506 |                     campaignname: "SE_MINI_NC-AO-24_Summer_Video_DEU_Brand"
-1507 |                     pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
-1508 |                     campaigndetail: "Brand Awareness Video"
-1509 |                     campaigntype: "Always On"
-1510 |                     created_at: "2024-10-15T11:00:00Z"
-1511 |                     language: "DEU"
-1512 |                     product: "Brand" # Example Product
-1513 |                     subsegment: "New Car"
-1514 |                     type: "video"
-1515 |                     updated_at: "2024-10-17T09:30:00Z"
-1516 |                   - _id: "1d0e2f3a-4b5c-4a1e-8c7d-b9d8c7e17a4f" # UUID
-1517 |                     campaignname: "SE_MINI_NC-AO-24_Q3_Search_DEU_Electric"
-1518 |                     pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
-1519 |                     campaigndetail: "Search Ads for Electric Models"
-1520 |                     campaigntype: "Always On"
-1521 |                     created_at: "2024-10-18T14:00:00Z"
-1522 |                     language: "DEU"
-1523 |                     product: "Electric" # Example Product
-1524 |                     subsegment: "New Car"
-1525 |                     type: "search"
-1526 |                     updated_at: null # Example with null updated_at
-1527 |                   - _id: "9f0a1b2c-3d4e-4a1e-8b7c-d3e4f5a08b7c" # UUID
-1528 |                     campaignname: "SE_MINI_NC-AO-24_Q3_Social_DEU_Cooper"
-1529 |                     pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
-1530 |                     campaigndetail: "Social Media Ads Cooper"
-1531 |                     campaigntype: "Always On"
-1532 |                     created_at: "2024-10-20T09:15:00Z"
-1533 |                     language: "DEU"
-1534 |                     product: "Cooper" # Example Product
-1535 |                     subsegment: "New Car"
-1536 |                     type: "social"
-1537 |                     updated_at: "2024-10-20T09:15:00Z"
-1538 |                   - _id: "1e0f2d3c-4b5a-4c2a-9a8b-c7b8a9e16d3f" # UUID
-1539 |                     campaignname: "SE_MINI_NC-AO-24_Q4_Display_DEU_Countryman"
-1540 |                     pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
-1541 |                     campaigndetail: "Q4 Display Countryman"
-1542 |                     campaigntype: "Always On"
-1543 |                     created_at: "2024-10-25T16:30:00Z"
-1544 |                     language: "DEU"
-1545 |                     product: "Countryman" # Example Product
-1546 |                     subsegment: "New Car"
-1547 |                     type: "display"
-1548 |                     updated_at: "2024-10-26T10:00:00Z"
-1549 |               # --- END EXAMPLE ---
-1550 |         '400':
-1551 |           description: Bad Request
-1552 |           # ... (rest unchanged)
-1553 |         '404':
-1554 |           description: Mediaplan or Project not found.
-1555 |           # ... (rest unchanged)
-1556 |         '500':
-1557 |           description: Internal Server Error
-1558 |           # ... (rest unchanged)
-1559 |     post:
-1560 |       summary: Create new Campaing
-1561 |       # ... (rest of definition - unchanged) ...
-1562 |       tags:
-1563 |        - Campaigns
-1564 |       parameters:
-1565 |        - description: The ID of the Mediaplan.
-1566 |          in: path
-1567 |          name: mediaplanId
-1568 |          required: true
-1569 |          schema:
-1570 |            format: uuid
-1571 |            type: string
-1572 |        - description: The ID of the Project.
-1573 |          in: path
-1574 |          name: projectId
-1575 |          required: true
-1576 |          schema:
-1577 |            format: uuid
-1578 |            type: string
-1579 |       requestBody:
-1580 |         content:
-1581 |           application/json:
-1582 |             example:
-1583 |               campaignname: PL_BMW_NC_NC-AO-2025-weq_AMSF_2025_AO_POL_eqfwefw
-1584 |               campaigndetail: eqfwefw
-1585 |               campaigntype: AO
-1586 |               language: POL
-1587 |               pid: 6780ed13ea3ea0016ff8975e
-1588 |               product: AMSF
-1589 |               subsegment: NC
-1590 |               type: display
-1591 |             schema:
-1592 |               $ref: "#/components/schemas/CampaignCreate"
-1593 |         required: true
-1594 |       responses:
-1595 |         "201":
-1596 |          content:
-1597 |            application/json:
-1598 |              schema:
-1599 |                $ref: "#/components/schemas/Campaign"
-1600 |          description: Campaign created successfully.
-1601 |         "400":
-1602 |          content:
-1603 |            application/json:
-1604 |              schema:
-1605 |                $ref: "#/components/schemas/Error"
-1606 |          description: Bad Request
-1607 |         "404":
-1608 |          content:
-1609 |            application/json:
-1610 |              schema:
-1611 |                $ref: "#/components/schemas/Error"
-1612 |          description: Mediaplan or Project not found.
-1613 |         "422":
-1614 |          content:
-1615 |            application/json:
-1616 |              schema:
-1617 |                $ref: "#/components/schemas/Error"
-1618 |          description: Unprocessable Entity
-1619 |         "500":
-1620 |          content:
-1621 |            application/json:
-1622 |              schema:
-1623 |                $ref: "#/components/schemas/Error"
-1624 |          description: Internal Server Error
-1625 | 
-1626 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}:
-1627 |     get:
-1628 |       summary: Get a single Campaign by ID
-1629 |       # ... (rest of definition - unchanged) ...
-1630 |       tags:
-1631 |        - Campaigns
-1632 |       parameters:
-1633 |        - description: The ID of the Mediaplan.
-1634 |          in: path
-1635 |          name: mediaplanId
-1636 |          required: true
-1637 |          schema:
-1638 |            format: uuid
-1639 |            type: string
-1640 |        - description: The ID of the Project.
-1641 |          in: path
-1642 |          name: projectId
-1643 |          required: true
-1644 |          schema:
-1645 |            format: uuid
-1646 |            type: string
-1647 |        - description: The ID of the Campaign.
-1648 |          in: path
-1649 |          name: campaignId
-1650 |          required: true
-1651 |          schema:
-1652 |            format: uuid
-1653 |            type: string
-1654 |       responses:
-1655 |         "200":
-1656 |          content:
-1657 |            application/json:
-1658 |              schema:
-1659 |                $ref: "#/components/schemas/Campaign"
-1660 |          description: Successful response - returns the Campaign.
-1661 |         "400":
-1662 |          content:
-1663 |            application/json:
-1664 |              schema:
-1665 |                $ref: "#/components/schemas/Error"
-1666 |          description: Bad Request (e.g., invalid ID format)
-1667 |         "404":
-1668 |          content:
-1669 |            application/json:
-1670 |              schema:
-1671 |                $ref: "#/components/schemas/Error"
-1672 |          description: Mediaplan, Project, or Campaign not found.
-1673 |         "500":
-1674 |          content:
-1675 |            application/json:
-1676 |              schema:
-1677 |                $ref: "#/components/schemas/Error"
-1678 |          description: Internal Server Error
-1679 | 
-1680 |     put:
-1681 |       summary: Update a Campaign (replace entire resource)
-1682 |       # ... (rest of definition - unchanged) ...
-1683 |       tags:
-1684 |        - Campaigns
-1685 |       parameters:
-1686 |        - description: The ID of the Mediaplan.
-1687 |          in: path
-1688 |          name: mediaplanId
-1689 |          required: true
-1690 |          schema:
-1691 |            format: uuid
-1692 |            type: string
-1693 |        - description: The ID of the Project.
-1694 |          in: path
-1695 |          name: projectId
-1696 |          required: true
-1697 |          schema:
-1698 |            format: uuid
-1699 |            type: string
-1700 |        - description: The ID of the Campaign to update.
-1701 |          in: path
-1702 |          name: campaignId
-1703 |          required: true
-1704 |          schema:
-1705 |            format: uuid
-1706 |            type: string
-1707 |       requestBody:
-1708 |         content:
-1709 |           application/json:
-1710 |             schema:
-1711 |               $ref: "#/components/schemas/Campaign"
-1712 |         required: true
-1713 |       responses:
-1714 |         "200":
-1715 |          content:
-1716 |            application/json:
-1717 |              schema:
-1718 |                $ref: "#/components/schemas/Campaign"
-1719 |          description: Campaign updated successfully.
-1720 |         "204":
-1721 |          description: Campaign updated successfully.
-1722 |         "400":
-1723 |          content:
-1724 |            application/json:
-1725 |              schema:
-1726 |                $ref: "#/components/schemas/Error"
-1727 |          description: Bad Request
-1728 |         "404":
-1729 |          content:
-1730 |            application/json:
-1731 |              schema:
-1732 |                $ref: "#/components/schemas/Error"
-1733 |          description: Mediaplan, Project, or Campaign not found
-1734 |         "422":
-1735 |          content:
-1736 |            application/json:
-1737 |              schema:
-1738 |                $ref: "#/components/schemas/Error"
-1739 |          description: Unprocessable Entity
-1740 |         "500":
-1741 |          content:
-1742 |            application/json:
-1743 |              schema:
-1744 |                $ref: "#/components/schemas/Error"
-1745 |          description: Internal Server Error
-1746 | 
-1747 |     delete:
-1748 |       summary: Delete a Campaign
-1749 |       # ... (rest of definition - unchanged) ...
-1750 |       tags:
-1751 |        - Campaigns
-1752 |       parameters:
-1753 |        - description: The ID of the Mediaplan.
-1754 |          in: path
-1755 |          name: mediaplanId
-1756 |          required: true
-1757 |          schema:
-1758 |            format: uuid
-1759 |            type: string
-1760 |        - description: The ID of the Project.
-1761 |          in: path
-1762 |          name: projectId
-1763 |          required: true
-1764 |          schema:
-1765 |            format: uuid
-1766 |            type: string
-1767 |        - description: The ID of the Campaign to delete.
-1768 |          in: path
-1769 |          name: campaignId
-1770 |          required: true
-1771 |          schema:
-1772 |            format: uuid
-1773 |            type: string
-1774 |       responses:
-1775 |         "204":
-1776 |          description: Campaign deleted successfully.
-1777 |         "400":
-1778 |          content:
-1779 |            application/json:
-1780 |              schema:
-1781 |                $ref: "#/components/schemas/Error"
-1782 |          description: Bad Request
-1783 |         "404":
-1784 |          content:
-1785 |            application/json:
-1786 |              schema:
-1787 |                $ref: "#/components/schemas/Error"
-1788 |          description: Mediaplan, Project, or Campaign not found
-1789 |         "500":
-1790 |          content:
-1791 |            application/json:
-1792 |              schema:
-1793 |                $ref: "#/components/schemas/Error"
-1794 |          description: Internal Server Error
-1795 | 
-1796 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}/lineitems:
-1797 |     get:
-1798 |       summary: Get all line items for a given Campaign
-1799 |       # ... (rest of definition - unchanged) ...
-1800 |       tags:
-1801 |        - LineItems
-1802 |       parameters:
-1803 |        - description: The ID of the Mediaplan.
-1804 |          in: path
-1805 |          name: mediaplanId
-1806 |          required: true
-1807 |          schema:
-1808 |            format: uuid
-1809 |            type: string
-1810 |        - description: The ID of the Project.
-1811 |          in: path
-1812 |          name: projectId
-1813 |          required: true
-1814 |          schema:
-1815 |            format: uuid
-1816 |            type: string
-1817 |        - description: The ID of the Campaign.
-1818 |          in: path
-1819 |          name: campaignId
-1820 |          required: true
-1821 |          schema:
-1822 |            format: uuid
-1823 |            type: string
-1824 |       responses:
-1825 |         "200":
-1826 |          content:
-1827 |            application/json:
-1828 |              schema:
-1829 |                items:
-1830 |                  $ref: "#/components/schemas/LineItem"
-1831 |                type: array
-1832 |          description: Successful response - returns a list of line items.
-1833 |         "400":
-1834 |          content:
-1835 |            application/json:
-1836 |              schema:
-1837 |                $ref: "#/components/schemas/Error"
-1838 |          description: Bad Request
-1839 |         "404":
-1840 |          content:
-1841 |            application/json:
-1842 |              schema:
-1843 |                $ref: "#/components/schemas/Error"
-1844 |          description: Mediaplan, Project, or Campaign not found.
-1845 |         "500":
-1846 |          content:
-1847 |            application/json:
-1848 |              schema:
-1849 |                $ref: "#/components/schemas/Error"
-1850 |          description: Internal Server Error
-1851 | 
-1852 | components:
-1853 |   schemas:
-1854 |     # ... (Error, ChangelogEntry, EntityReference, MediaplanFilter, MediaplanCreate, PONumber, Mediaplan - unchanged) ...
-1855 |     Error:
-1856 |       properties:
-1857 |         _id:
-1858 |           description: Unique identifier for this error instance.
-1859 |           example: 1@mediaplan-app-2025-6d57887bb4-8t9z7
-1860 |           type: string
-1861 |         code:
-1862 |           description: HTTP status code.
-1863 |           example: 400
-1864 |           type: integer
-1865 |         error:
-1866 |           description: Specific error details.
-1867 |           example: Somethin went wrong.
-1868 |           type: string
-1869 |         message:
-1870 |           description: A general message describing the error category.
-1871 |           example: Bad Request
-1872 |           type: string
-1873 |         timestamp:
-1874 |           description: Timestamp of when the error occurred.
-1875 |           example: "2025-03-11T13:31:06.443086Z"
-1876 |           format: date-time
-1877 |           type: string
-1878 |         version:
-1879 |           description: Application version where the error occurred.
-1880 |           example: mediaplan/0.1.45
-1881 |           type: string
-1882 |       type: object
-1883 |     ChangelogEntry:
-1884 |       properties:
-1885 |         date:
-1886 |           description: Date and time of the changelog entry.
-1887 |           example: "2024-10-27T14:30:00Z"
-1888 |           format: date-time
-1889 |           type: string
-1890 |         text:
-1891 |           description: Description of the change.
-1892 |           example: Added new feature for campaign optimization.
-1893 |           type: string
-1894 |         tool:
-1895 |           description: The tool associated with this changelog entry.
-1896 |           enum:
-1897 |             - CampaignBuilder
-1898 |             - Linkshortener
-1899 |             - Mediaplan
-1900 |           example: CampaignBuilder
-1901 |           type: string
-1902 |       required:
-1903 |         - date
-1904 |         - tool
-1905 |         - text
-1906 |       type: object
-1907 |     EntityReference:
-1908 |       properties:
-1909 |         _id:
-1910 |           description: Unique identifier.
-1911 |           example: user-002
-1912 |           format: uuid
-1913 |           type: string
-1914 |         name:
-1915 |           description: Name of the entity.
-1916 |           example: Alice Smith
-1917 |           type: string
-1918 |       required:
-1919 |         - _id
-1920 |         - name
-1921 |       type: object
-1922 |     MediaplanFilter:
-1923 |       properties:
-1924 |         brand_id:
-1925 |           description: Filter by Brand ID.
-1926 |           format: uuid
-1927 |           type: string
-1928 |         search:
-1929 |           description: Search term for filtering by name or other relevant fields.
-1930 |           type: string
-1931 |         start_date_after:
-1932 |           description: Filter for mediaplans starting after this date.
-1933 |           format: date-time
-1934 |           type: string
-1935 |         start_date_before:
-1936 |           description: Filter for mediaplans starting before this date.
-1937 |           format: date-time
+565 |           content:
+566 |             application/json:
+567 |               example:
+568 |                 current_page: 0
+569 |                 items:
+570 |                   - _id: f47ac10b-58cc-4372-a567-0e02b2c3d479
+571 |                     abbreviation: "NC-ALWAYS-ON-2024_Individ #1"
+572 |                     created_at: "2024-10-02T09:15:00Z"
+573 |                     default_vars:
+574 |                       adtype: Banner
+575 |                       campaigndetail: null
+576 |                       campaigntype: Always On
+577 |                       dimension: 300x250
+578 |                       language: DEU
+579 |                       subsegment: New Car
+580 |                       targeturls: null
+581 |                     descriptive_vars:
+582 |                       adobecampaignname: Always On 2024
+583 |                       bmwponumber: PO12345
+584 |                       brand: MINI
+585 |                       campaigntype: Always On
+586 |                       country: SE
+587 |                       projectname: NC-ALWAYS-ON-2024_Individ
+588 |                       subsegment: New Car
+589 |                       year: 2024
+590 |                     detail: To be defined might be very long
+591 |                     duration:
+592 |                       end_date: "2024-04-15T00:00:00Z"
+593 |                       formatted: 15.01-15.04.2024
+594 |                       start_date: "2024-01-15T00:00:00Z"
+595 |                     is_locked: false
+596 |                     labels: [ ]
+597 |                     lock_state: 0
+598 |                     owner: user123
+599 |                     updated_at: "2024-10-02T09:15:00Z"
+600 |                     uploaded_at: "2024-10-02T09:15:00Z"
+601 |                     budget:
+602 |                       used: 12500.50
+603 |                       total: 50000.00
+604 |                       available: 37499.50
+605 |                   - _id: a3b8d4e1-6c2f-4a1e-8b7d-9c1f0a3e2b1d
+606 |                     abbreviation: "NC-SPECIAL-2024_Individ #2"
+607 |                     created_at: "2024-10-03T11:30:00Z"
+608 |                     default_vars:
+609 |                       adtype: Banner
+610 |                       campaigndetail: null
+611 |                       campaigntype: Always On
+612 |                       dimension: 300x250
+613 |                       language: SWE
+614 |                       subsegment: New Car
+615 |                       targeturls: null
+616 |                     descriptive_vars:
+617 |                       adobecampaignname: Always On 2024
+618 |                       bmwponumber: PO67890
+619 |                       brand: MINI
+620 |                       campaigntype: Always On
+621 |                       country: NL
+622 |                       projectname: NC-ALWAYS-ON-2024_Individ
+623 |                       subsegment: New Car
+624 |                       year: 2024
+625 |                     detail: This project focuses on the Dutch market.
+626 |                     duration:
+627 |                       end_date: "2024-04-15T00:00:00Z"
+628 |                       formatted: 01.01-30.04.2024
+629 |                       start_date: "2024-01-15T00:00:00Z"
+630 |                     is_locked: false
+631 |                     labels: [ ]
+632 |                     lock_state: 0
+633 |                     owner: user123
+634 |                     updated_at: "2024-10-03T11:30:00Z"
+635 |                     uploaded_at: "2024-10-03T11:30:00Z"
+636 |                     budget:
+637 |                       used: 12500.50
+638 |                       total: 50000.00
+639 |                       available: 37499.50
+640 |                   - _id: e1c7b6a0-8d3e-4f5a-9b8c-1d0e2f3a4b5c
+641 |                     abbreviation: "NC-ALWAYS-ON-2024_Individ #3"
+642 |                     created_at: "2024-10-04T15:20:00Z"
+643 |                     default_vars:
+644 |                       adtype: Banner
+645 |                       campaigndetail: null
+646 |                       campaigntype: Always On
+647 |                       dimension: 300x250
+648 |                       language: NLD
+649 |                       subsegment: New Car
+650 |                       targeturls: null
+651 |                     descriptive_vars:
+652 |                       adobecampaignname: Always On 2024
+653 |                       bmwponumber: PO12345
+654 |                       brand: MINI
+655 |                       campaigntype: Always On
+656 |                       country: FR
+657 |                       projectname: NC-ALWAYS-ON-2024_Individ
+658 |                       subsegment: New Car
+659 |                       year: 2024
+660 |                     detail: To be defined might be very long
+661 |                     duration:
+662 |                       end_date: "2024-04-15T00:00:00Z"
+663 |                       formatted: 01.03-30.04.2024
+664 |                       start_date: "2024-01-15T00:00:00Z"
+665 |                     is_locked: false
+666 |                     labels: [ ]
+667 |                     lock_state: 0
+668 |                     owner: user123
+669 |                     updated_at: "2024-10-04T15:20:00Z"
+670 |                     uploaded_at: "2024-10-04T15:20:00Z"
+671 |                     budget:
+672 |                       used: 32000.00
+673 |                       total: 75000.00
+674 |                       available: 43000.00
+675 |                   - _id: b9d8c7e1-7a4f-4b6e-9c8d-0e1f2a3b4c5d
+676 |                     abbreviation: "NC-SPECIAL-2024_Individ #4"
+677 |                     created_at: "2024-10-05T10:45:00Z"
+678 |                     default_vars:
+679 |                       adtype: Banner
+680 |                       campaigndetail: null
+681 |                       campaigntype: Always On
+682 |                       dimension: 300x250
+683 |                       language: DEU
+684 |                       subsegment: New Car
+685 |                       targeturls: null
+686 |                     descriptive_vars:
+687 |                       adobecampaignname: Always On 2024
+688 |                       bmwponumber: PO67890
+689 |                       brand: MINI
+690 |                       campaigntype: Always On
+691 |                       country: SE
+692 |                       projectname: NC-ALWAYS-ON-2024_Individ
+693 |                       subsegment: New Car
+694 |                       year: 2024
+695 |                     detail: This is a special project for the Swedish market.
+696 |                     duration:
+697 |                       end_date: "2024-04-15T00:00:00Z"
+698 |                       formatted: 15.01-15.04.2024
+699 |                       start_date: "2024-01-15T00:00:00Z"
+700 |                     is_locked: false
+701 |                     labels: [ ]
+702 |                     lock_state: 0
+703 |                     owner: user123
+704 |                     updated_at: "2024-10-05T10:45:00Z"
+705 |                     uploaded_at: "2024-10-05T10:45:00Z"
+706 |                     budget:
+707 |                       used: 15000.00
+708 |                       total: 60000.00
+709 |                       available: 45000.00
+710 |                   - _id: d3e4f5a0-8b7c-4a1e-8c7d-9f0a1b2c3d4e
+711 |                     abbreviation: "NC-ALWAYS-ON-2024_Individ #5"
+712 |                     created_at: "2024-10-06T13:15:00Z"
+713 |                     default_vars:
+714 |                       adtype: Banner
+715 |                       campaigndetail: null
+716 |                       campaigntype: Always On
+717 |                       dimension: 300x250
+718 |                       language: SWE
+719 |                       subsegment: New Car
+720 |                       targeturls: null
+721 |                     descriptive_vars:
+722 |                       adobecampaignname: Always On 2024
+723 |                       bmwponumber: PO12345
+724 |                       brand: MINI
+725 |                       campaigntype: Always On
+726 |                       country: NL
+727 |                       projectname: NC-ALWAYS-ON-2024_Individ
+728 |                       subsegment: New Car
+729 |                       year: 2024
+730 |                     detail: To be defined might be very long
+731 |                     duration:
+732 |                       end_date: "2024-04-15T00:00:00Z"
+733 |                       formatted: 01.01-15.04.2024
+734 |                       start_date: "2024-01-15T00:00:00Z"
+735 |                     is_locked: false
+736 |                     labels: [ ]
+737 |                     lock_state: 0
+738 |                     owner: user123
+739 |                     updated_at: "2024-10-06T13:15:00Z"
+740 |                     uploaded_at: "2024-10-06T13:15:00Z"
+741 | 
+742 |                     budget:
+743 |                       used: 15000.00
+744 |                       total: 60000.00
+745 |                       available: 45000.00
+746 |                   - _id: c7b8a9e1-6d3f-4c2a-9a8b-1e0f2d3c4b5a
+747 |                     abbreviation: "NC-ALWAYS-ON-2024_Individ #6"
+748 |                     created_at: "2024-10-07T09:15:00Z"
+749 |                     default_vars:
+750 |                       adtype: Banner
+751 |                       campaigndetail: null
+752 |                       campaigntype: Always On
+753 |                       dimension: 300x250
+754 |                       language: DEU
+755 |                       subsegment: New Car
+756 |                       targeturls: null
+757 |                     descriptive_vars:
+758 |                       adobecampaignname: Always On 2024
+759 |                       bmwponumber: PO67890
+760 |                       brand: MINI
+761 |                       campaigntype: Always On
+762 |                       country: FR
+763 |                       projectname: NC-ALWAYS-ON-2024_Individ
+764 |                       subsegment: New Car
+765 |                       year: 2024
+766 |                     detail: To be defined might be very long
+767 |                     duration:
+768 |                       end_date: "2024-04-15T00:00:00Z"
+769 |                       formatted: 15.01-30.06.2024
+770 |                       start_date: "2024-01-15T00:00:00Z"
+771 |                     is_locked: false
+772 |                     labels: [ ]
+773 |                     lock_state: 0
+774 |                     owner: user123
+775 |                     updated_at: "2024-10-07T09:15:00Z"
+776 |                     uploaded_at: "2024-10-07T09:15:00Z"
+777 | 
+778 |                     budget:
+779 |                       used: 15000.00
+780 |                       total: 60000.00
+781 |                       available: 45000.00
+782 |                   - _id: a1b2c3d4-5e6f-4a7b-8c9d-0e1f2a3b4c5d
+783 |                     abbreviation: "NC-SPECIAL-2024_Individ #7"
+784 |                     created_at: "2024-10-08T11:30:00Z"
+785 |                     default_vars:
+786 |                       adtype: Banner
+787 |                       campaigndetail: null
+788 |                       campaigntype: Always On
+789 |                       dimension: 300x250
+790 |                       language: NLD
+791 |                       subsegment: New Car
+792 |                       targeturls: null
+793 |                     descriptive_vars:
+794 |                       adobecampaignname: Always On 2024
+795 |                       bmwponumber: PO12345
+796 |                       brand: MINI
+797 |                       campaigntype: Always On
+798 |                       country: SE
+799 |                       projectname: NC-ALWAYS-ON-2024_Individ
+800 |                       subsegment: New Car
+801 |                       year: 2024
+802 |                     detail: To be defined might be very long
+803 |                     duration:
+804 |                       end_date: "2024-04-15T00:00:00Z"
+805 |                       formatted: 01.04-30.06.2024
+806 |                       start_date: "2024-01-15T00:00:00Z"
+807 |                     is_locked: false
+808 |                     labels: [ ]
+809 |                     lock_state: 0
+810 |                     owner: user123
+811 |                     updated_at: "2024-10-08T11:30:00Z"
+812 |                     uploaded_at: "2024-10-08T11:30:00Z"
+813 | 
+814 |                     budget:
+815 |                       used: 15000.00
+816 |                       total: 60000.00
+817 |                       available: 45000.00
+818 |                   - _id: f0e1d2c3-4b5a-4c6d-8e9f-0a1b2c3d4e5f
+819 |                     abbreviation: "NC-ALWAYS-ON-2024_Individ #8"
+820 |                     created_at: "2024-10-09T15:20:00Z"
+821 |                     default_vars:
+822 |                       adtype: Banner
+823 |                       campaigndetail: null
+824 |                       campaigntype: Always On
+825 |                       dimension: 300x250
+826 |                       language: DEU
+827 |                       subsegment: New Car
+828 |                       targeturls: null
+829 |                     descriptive_vars:
+830 |                       adobecampaignname: Always On 2024
+831 |                       bmwponumber: PO67890
+832 |                       brand: MINI
+833 |                       campaigntype: Always On
+834 |                       country: NL
+835 |                       projectname: NC-ALWAYS-ON-2024_Individ
+836 |                       subsegment: New Car
+837 |                       year: 2024
+838 |                     detail: To be defined might be very long
+839 |                     duration:
+840 |                       end_date: "2024-04-15T00:00:00Z"
+841 |                       formatted: 01.01-15.05.2024
+842 |                       start_date: "2024-01-15T00:00:00Z"
+843 |                     is_locked: false
+844 |                     labels: [ ]
+845 |                     lock_state: 0
+846 |                     owner: user123
+847 |                     updated_at: "2024-10-09T15:20:00Z"
+848 |                     uploaded_at: "2024-10-09T15:20:00Z"
+849 | 
+850 |                     budget:
+851 |                       used: 15000.00
+852 |                       total: 60000.00
+853 |                       available: 45000.00
+854 |                   - _id: b4c5d6e7-8f9a-4b1c-9d0e-1f2a3b4c5d6e
+855 |                     abbreviation: "NC-SPECIAL-2024_Individ #9"
+856 |                     created_at: "2024-10-10T10:45:00Z"
+857 |                     default_vars:
+858 |                       adtype: Banner
+859 |                       campaigndetail: null
+860 |                       campaigntype: Always On
+861 |                       dimension: 300x250
+862 |                       language: SWE
+863 |                       subsegment: New Car
+864 |                       targeturls: null
+865 |                     descriptive_vars:
+866 |                       adobecampaignname: Always On 2024
+867 |                       bmwponumber: PO12345
+868 |                       brand: MINI
+869 |                       campaigntype: Always On
+870 |                       country: FR
+871 |                       projectname: NC-ALWAYS-ON-2024_Individ
+872 |                       subsegment: New Car
+873 |                       year: 2024
+874 |                     detail: To be defined might be very long
+875 |                     duration:
+876 |                       end_date: "2024-04-15T00:00:00Z"
+877 |                       formatted: 15.01-30.06.2024
+878 |                       start_date: "2024-01-15T00:00:00Z"
+879 |                     is_locked: false
+880 |                     labels: [ ]
+881 |                     lock_state: 0
+882 |                     owner: user123
+883 |                     updated_at: "2024-10-10T10:45:00Z"
+884 |                     uploaded_at: "2024-10-10T10:45:00Z"
+885 | 
+886 |                     budget:
+887 |                       used: 15000.00
+888 |                       total: 60000.00
+889 |                       available: 45000.00
+890 |                   - _id: d8e9f0a1-b2c3-4d4e-8f5a-0b1c2d3e4f5a
+891 |                     abbreviation: "NC-ALWAYS-ON-2024_Individ #10"
+892 |                     created_at: "2024-10-11T13:15:00Z"
+893 |                     default_vars:
+894 |                       adtype: Banner
+895 |                       campaigndetail: null
+896 |                       campaigntype: Always On
+897 |                       dimension: 300x250
+898 |                       language: NLD
+899 |                       subsegment: New Car
+900 |                       targeturls: null
+901 |                     descriptive_vars:
+902 |                       adobecampaignname: Always On 2024
+903 |                       bmwponumber: PO67890
+904 |                       brand: MINI
+905 |                       campaigntype: Always On
+906 |                       country: SE
+907 |                       projectname: NC-ALWAYS-ON-2024_Individ
+908 |                       subsegment: New Car
+909 |                       year: 2024
+910 |                     detail: To be defined might be very long
+911 |                     duration:
+912 |                       end_date: "2024-04-15T00:00:00Z"
+913 |                       formatted: 01.05-30.06.2024
+914 |                       start_date: "2024-01-15T00:00:00Z"
+915 |                     is_locked: false
+916 |                     labels: [ ]
+917 |                     lock_state: 0
+918 |                     owner: user123
+919 |                     updated_at: "2024-10-11T13:15:00Z"
+920 |                     uploaded_at: "2024-10-11T13:15:00Z"
+921 | 
+922 |                     budget:
+923 |                       used: 15000.00
+924 |                       total: 60000.00
+925 |                       available: 45000.00
+926 |                   - _id: 1f2a3b4c-5d6e-4f7a-8b9c-0d1e2f3a4b5c
+927 |                     abbreviation: USED-CAR-Q3-2024_Campaign_11
+928 |                     created_at: "2024-11-01T10:00:00Z"
+929 |                     default_vars:
+930 |                       adtype: Video
+931 |                       campaigndetail: null
+932 |                       campaigntype: Sales
+933 |                       dimension: 1920x1080
+934 |                       language: ENG
+935 |                       subsegment: Used Car
+936 |                       targeturls: https://example.com/used
+937 |                     descriptive_vars:
+938 |                       adobecampaignname: Used Car Q3
+939 |                       bmwponumber: PO99887
+940 |                       brand: BMW
+941 |                       campaigntype: Sales
+942 |                       country: GB
+943 |                       projectname: USED-CAR-Q3-2024_Campaign
+944 |                       subsegment: Used Car
+945 |                       year: 2024
+946 |                     detail: Focus on certified pre-owned vehicles.
+947 |                     duration:
+948 |                       end_date: "2024-09-30T00:00:00Z"
+949 |                       formatted: 01.07-30.09.2024
+950 |                       start_date: "2024-07-01T00:00:00Z"
+951 |                     is_locked: true
+952 |                     labels:
+953 |                       - priority
+954 |                       - video
+955 |                     lock_state: 1
+956 |                     owner: user456
+957 |                     updated_at: "2024-11-05T14:00:00Z"
+958 |                     uploaded_at: "2024-11-01T10:00:00Z"
+959 |                     budget:
+960 |                       used: 15000.00
+961 |                       total: 60000.00
+962 |                       available: 45000.00
+963 |                   - _id: 2a3b4c5d-6e7f-4a8b-9c0d-1e2f3a4b5c6d
+964 |                     abbreviation: SERVICE-WINTER-CHECK_Promo_12
+965 |                     created_at: "2024-11-02T11:20:00Z"
+966 |                     default_vars:
+967 |                       adtype: Social
+968 |                       campaigndetail: Tyre Change
+969 |                       campaigntype: Seasonal
+970 |                       dimension: 1080x1080
+971 |                       language: FRA
+972 |                       subsegment: Aftersales
+973 |                       targeturls: null
+974 |                     descriptive_vars:
+975 |                       adobecampaignname: Winter Check 24
+976 |                       bmwponumber: PO77665
+977 |                       brand: BMW
+978 |                       campaigntype: Seasonal
+979 |                       country: FR
+980 |                       projectname: SERVICE-WINTER-CHECK_Promo
+981 |                       subsegment: Aftersales
+982 |                       year: 2024
+983 |                     detail: Promotional offer for winter service checks.
+984 |                     duration:
+985 |                       end_date: "2024-12-15T00:00:00Z"
+986 |                       formatted: 15.10-15.12.2024
+987 |                       start_date: "2024-10-15T00:00:00Z"
+988 |                     is_locked: false
+989 |                     labels:
+990 |                       - aftersales
+991 |                     lock_state: 0
+992 |                     owner: user789
+993 |                     updated_at: "2024-11-03T11:20:00Z"
+994 |                     uploaded_at: "2024-11-02T11:20:00Z"
+995 |                     budget:
+996 |                       used: 15000.00
+997 |                       total: 60000.00
+998 |                       available: 45000.00
+999 |                   - _id: 3b4c5d6e-7f8a-4b9c-0d1e-2f3a4b5c6d7e
+1000 |                     abbreviation: NC-LAUNCH-X5-2025_Awareness_13
+1001 |                     created_at: "2024-11-10T09:00:00Z"
+1002 |                     default_vars:
+1003 |                       adtype: Display
+1004 |                       campaigndetail: X5 Facelift
+1005 |                       campaigntype: Launch
+1006 |                       dimension: 728x90
+1007 |                       language: DEU
+1008 |                       subsegment: New Car
+1009 |                       targeturls: null
+1010 |                     descriptive_vars:
+1011 |                       adobecampaignname: X5 Launch 2025
+1012 |                       bmwponumber: PO11223
+1013 |                       brand: BMW
+1014 |                       campaigntype: Launch
+1015 |                       country: DE
+1016 |                       projectname: NC-LAUNCH-X5-2025_Awareness
+1017 |                       subsegment: New Car
+1018 |                       year: 2025
+1019 |                     detail: Initial awareness phase for the new X5 model.
+1020 |                     duration:
+1021 |                       end_date: "2025-03-31T00:00:00Z"
+1022 |                       formatted: 01.02-31.03.2025
+1023 |                       start_date: "2025-02-01T00:00:00Z"
+1024 |                     is_locked: false
+1025 |                     labels:
+1026 |                       - launch
+1027 |                       - awareness
+1028 |                     lock_state: 0
+1029 |                     owner: user123
+1030 |                     updated_at: "2024-11-12T16:30:00Z"
+1031 |                     uploaded_at: "2024-11-10T09:00:00Z"
+1032 |                     budget:
+1033 |                       used: 15000.00
+1034 |                       total: 60000.00
+1035 |                       available: 45000.00
+1036 |                   - _id: 4c5d6e7f-8a9b-4c0d-1e2f-3a4b5c6d7e8f
+1037 |                     abbreviation: MINI-EV-TESTDRIVE_LeadGen_14
+1038 |                     created_at: "2024-11-15T13:45:00Z"
+1039 |                     default_vars:
+1040 |                       adtype: Search
+1041 |                       campaigndetail: Electric Cooper
+1042 |                       campaigntype: Lead Generation
+1043 |                       dimension: null
+1044 |                       language: NLD
+1045 |                       subsegment: New Car
+1046 |                       targeturls: https://mini.example.com/testdrive
+1047 |                     descriptive_vars:
+1048 |                       adobecampaignname: MINI EV Leads
+1049 |                       bmwponumber: PO44556
+1050 |                       brand: MINI
+1051 |                       campaigntype: Lead Generation
+1052 |                       country: NL
+1053 |                       projectname: MINI-EV-TESTDRIVE_LeadGen
+1054 |                       subsegment: New Car
+1055 |                       year: 2024
+1056 |                     detail: Campaign to generate test drive requests for MINI Electric.
+1057 |                     duration:
+1058 |                       end_date: "2024-12-20T00:00:00Z"
+1059 |                       formatted: 20.11-20.12.2024
+1060 |                       start_date: "2024-11-20T00:00:00Z"
+1061 |                     is_locked: false
+1062 |                     labels:
+1063 |                       - electric
+1064 |                       - leads
+1065 |                     lock_state: 0
+1066 |                     owner: user456
+1067 |                     updated_at: "2024-11-15T13:45:00Z"
+1068 |                     uploaded_at: "2024-11-15T13:45:00Z"
+1069 |                     budget:
+1070 |                       used: 15000.00
+1071 |                       total: 60000.00
+1072 |                       available: 45000.00
+1073 |                   - _id: 5d6e7f8a-9b0c-4d1e-2f3a-4b5c6d7e8f9a
+1074 |                     abbreviation: BMW-M-PERFORMANCE_Consideration_15
+1075 |                     created_at: "2024-11-20T10:10:00Z"
+1076 |                     default_vars:
+1077 |                       adtype: Video
+1078 |                       campaigndetail: M Models
+1079 |                       campaigntype: Consideration
+1080 |                       dimension: 1920x1080
+1081 |                       language: ITA
+1082 |                       subsegment: New Car
+1083 |                       targeturls: null
+1084 |                     descriptive_vars:
+1085 |                       adobecampaignname: M Power Consideration
+1086 |                       bmwponumber: PO66778
+1087 |                       brand: BMW
+1088 |                       campaigntype: Consideration
+1089 |                       country: IT
+1090 |                       projectname: BMW-M-PERFORMANCE_Consideration
+1091 |                       subsegment: New Car
+1092 |                       year: 2024
+1093 |                     detail: Highlighting M performance parts and models.
+1094 |                     duration:
+1095 |                       end_date: "2024-11-30T00:00:00Z"
+1096 |                       formatted: 01.09-30.11.2024
+1097 |                       start_date: "2024-09-01T00:00:00Z"
+1098 |                     is_locked: false
+1099 |                     labels:
+1100 |                       - performance
+1101 |                       - M
+1102 |                     lock_state: 0
+1103 |                     owner: user789
+1104 |                     updated_at: "2024-11-21T12:00:00Z"
+1105 |                     uploaded_at: "2024-11-20T10:10:00Z"
+1106 |                     budget:
+1107 |                       used: 15000.00
+1108 |                       total: 60000.00
+1109 |                       available: 45000.00
+1110 |                   - _id: 6e7f8a9b-0c1d-4e2f-3a4b-5c6d7e8f9a0b
+1111 |                     abbreviation: FINANCIAL-SERVICES-Q1-25_Offer_16
+1112 |                     created_at: "2024-11-25T15:00:00Z"
+1113 |                     default_vars:
+1114 |                       adtype: Display
+1115 |                       campaigndetail: Leasing 0%
+1116 |                       campaigntype: Offer
+1117 |                       dimension: 300x600
+1118 |                       language: ESP
+1119 |                       subsegment: Financial Services
+1120 |                       targeturls: https://bmw-fs.example.com/offers
+1121 |                     descriptive_vars:
+1122 |                       adobecampaignname: FS Q1 Offers
+1123 |                       bmwponumber: PO22334
+1124 |                       brand: BMW
+1125 |                       campaigntype: Offer
+1126 |                       country: ES
+1127 |                       projectname: FINANCIAL-SERVICES-Q1-25_Offer
+1128 |                       subsegment: Financial Services
+1129 |                       year: 2025
+1130 |                     detail: Special financing offers for Q1 2025.
+1131 |                     duration:
+1132 |                       end_date: "2025-03-31T00:00:00Z"
+1133 |                       formatted: 10.01-31.03.2025
+1134 |                       start_date: "2025-01-10T00:00:00Z"
+1135 |                     is_locked: false
+1136 |                     labels:
+1137 |                       - financing
+1138 |                       - FS
+1139 |                     lock_state: 0
+1140 |                     owner: user123
+1141 |                     updated_at: "2024-11-28T10:00:00Z"
+1142 |                     uploaded_at: "2024-11-25T15:00:00Z"
+1143 |                     budget:
+1144 |                       used: 15000.00
+1145 |                       total: 60000.00
+1146 |                       available: 45000.00
+1147 |                   - _id: 7f8a9b0c-1d2e-4f3a-4b5c-6d7e8f9a0b1c
+1148 |                     abbreviation: MINI-USED-NEXT_Q4_Sales_17
+1149 |                     created_at: "2024-12-01T12:12:12Z"
+1150 |                     default_vars:
+1151 |                       adtype: Search
+1152 |                       campaigndetail: MINI Next
+1153 |                       campaigntype: Sales
+1154 |                       dimension: null
+1155 |                       language: DEU
+1156 |                       subsegment: Used Car
+1157 |                       targeturls: null
+1158 |                     descriptive_vars:
+1159 |                       adobecampaignname: MINI Used Q4 AT
+1160 |                       bmwponumber: PO55667
+1161 |                       brand: MINI
+1162 |                       campaigntype: Sales
+1163 |                       country: AT
+1164 |                       projectname: MINI-USED-NEXT_Q4_Sales
+1165 |                       subsegment: Used Car
+1166 |                       year: 2024
+1167 |                     detail: Promoting MINI Next certified used cars in Austria.
+1168 |                     duration:
+1169 |                       end_date: "2024-12-31T00:00:00Z"
+1170 |                       formatted: 01.10-31.12.2024
+1171 |                       start_date: "2024-10-01T00:00:00Z"
+1172 |                     is_locked: false
+1173 |                     labels:
+1174 |                       - used
+1175 |                       - mini next
+1176 |                     lock_state: 0
+1177 |                     owner: user456
+1178 |                     updated_at: "2024-12-01T12:12:12Z"
+1179 |                     uploaded_at: "2024-12-01T12:12:12Z"
+1180 |                     budget:
+1181 |                       used: 15000.00
+1182 |                       total: 60000.00
+1183 |                       available: 45000.00
+1184 |                   - _id: 8a9b0c1d-2e3f-4a4b-5c6d-7e8f9a0b1c2d
+1185 |                     abbreviation: BMW-I4-SUSTAINABILITY_Brand_18
+1186 |                     created_at: "2024-12-05T08:30:00Z"
+1187 |                     default_vars:
+1188 |                       adtype: Social
+1189 |                       campaigndetail: i4 Electric
+1190 |                       campaigntype: Brand
+1191 |                       dimension: 1080x1920
+1192 |                       language: ENG
+1193 |                       subsegment: Corporate
+1194 |                       targeturls: https://bmw.example.com/sustainability
+1195 |                     descriptive_vars:
+1196 |                       adobecampaignname: BMW Sustainability i4
+1197 |                       bmwponumber: PO88990
+1198 |                       brand: BMW
+1199 |                       campaigntype: Brand
+1200 |                       country: US
+1201 |                       projectname: BMW-I4-SUSTAINABILITY_Brand
+1202 |                       subsegment: Corporate
+1203 |                       year: 2024
+1204 |                     detail: Brand campaign focusing on the sustainability aspects of the BMW i4.
+1205 |                     duration:
+1206 |                       end_date: "2025-01-31T00:00:00Z"
+1207 |                       formatted: 01.11-31.01.2025
+1208 |                       start_date: "2024-11-01T00:00:00Z"
+1209 |                     is_locked: true
+1210 |                     labels:
+1211 |                       - brand
+1212 |                       - sustainability
+1213 |                       - electric
+1214 |                       - i4
+1215 |                     lock_state: 1
+1216 |                     owner: user789
+1217 |                     updated_at: "2024-12-10T11:00:00Z"
+1218 |                     uploaded_at: "2024-12-05T08:30:00Z"
+1219 |                     budget:
+1220 |                       used: 18000.00
+1221 |                       total: 60000.00
+1222 |                       available: 42000.00
+1223 |                 total_items: 18
+1224 |                 total_pages: 1
+1225 |               schema:
+1226 |                 items:
+1227 |                   $ref: "#/components/schemas/Project"
+1228 |                 type: array
+1229 |           description: Successful response - returns a list of projects.
+1230 |         "400":
+1231 |           content:
+1232 |             application/json:
+1233 |               schema:
+1234 |                 $ref: "#/components/schemas/Error"
+1235 |           description: Bad Request (e.g., invalid Mediaplan ID format)
+1236 |         "404":
+1237 |           content:
+1238 |             application/json:
+1239 |               schema:
+1240 |                 $ref: "#/components/schemas/Error"
+1241 |           description: Mediaplan not found.
+1242 |         "500":
+1243 |           content:
+1244 |             application/json:
+1245 |               schema:
+1246 |                 $ref: "#/components/schemas/Error"
+1247 |           description: Internal Server Error
+1248 | 
+1249 |     post:
+1250 |       summary: Create a new Project for a Mediaplan
+1251 |       # ... (rest of definition - unchanged) ...
+1252 |       tags:
+1253 |         - Projects
+1254 |       parameters:
+1255 |         - description: The ID of the Mediaplan to which the project belongs.
+1256 |           in: path
+1257 |           name: mediaplanId
+1258 |           required: true
+1259 |           schema:
+1260 |             format: uuid
+1261 |             type: string
+1262 |       requestBody:
+1263 |         content:
+1264 |           application/json:
+1265 |             example:
+1266 |               abbreviation: MyNewProject
+1267 |               default_vars:
+1268 |                 adtype: Banner
+1269 |                 campaigndetail: null
+1270 |                 campaigntype: Awareness
+1271 |                 dimension: 300x250
+1272 |                 language: en
+1273 |                 subsegment: OT
+1274 |                 targeturls: null
+1275 |               descriptive_vars:
+1276 |                 adobecampaignname: SummerSale
+1277 |                 bmwponumber: PO12345
+1278 |                 brand: BMW
+1279 |                 campaigntype: Awareness
+1280 |                 country: US
+1281 |                 projectname: SummerSale_OT
+1282 |                 subsegment: OT
+1283 |                 year: 2025
+1284 |               is_locked: false
+1285 |               labels: [ ]
+1286 |               lock_state: 0
+1287 |               message: OK
+1288 |               owner: user123
+1289 |               version: v1
+1290 |             schema:
+1291 |               $ref: "#/components/schemas/ProjectCreate"
+1292 |         required: true
+1293 |       responses:
+1294 |         "201":
+1295 |           content:
+1296 |             application/json:
+1297 |               schema:
+1298 |                 $ref: "#/components/schemas/Project"
+1299 |           description: Project created successfully.
+1300 |           headers:
+1301 |             Location:
+1302 |               description: URL of the newly created Project.
+1303 |               schema:
+1304 |                 format: url
+1305 |                 type: string
+1306 |         "400":
+1307 |           content:
+1308 |             application/json:
+1309 |               schema:
+1310 |                 $ref: "#/components/schemas/Error"
+1311 |           description: Bad Request (e.g., invalid request body or Mediaplan ID)
+1312 |         "404":
+1313 |           content:
+1314 |             application/json:
+1315 |               schema:
+1316 |                 $ref: "#/components/schemas/Error"
+1317 |           description: Mediaplan not found.
+1318 |         "422":
+1319 |           content:
+1320 |             application/json:
+1321 |               schema:
+1322 |                 $ref: "#/components/schemas/Error"
+1323 |           description: Unprocessable Entity (validation errors)
+1324 |         "500":
+1325 |           content:
+1326 |             application/json:
+1327 |               schema:
+1328 |                 $ref: "#/components/schemas/Error"
+1329 |           description: Internal Server Error
+1330 | 
+1331 |   /mediaplans/{mediaplanId}/projects/{projectId}:
+1332 |     get:
+1333 |       summary: Get a Project
+1334 |       tags:
+1335 |         - Projects
+1336 |       parameters:
+1337 |         - in: path
+1338 |           name: mediaplanId
+1339 |           schema:
+1340 |             type: string
+1341 |             format: uuid
+1342 |           required: true
+1343 |           description: The ID of the Mediaplan.
+1344 |         - in: path
+1345 |           name: projectId
+1346 |           schema:
+1347 |             type: string
+1348 |             format: uuid
+1349 |           required: true
+1350 |           description: The ID of the Project to get.
+1351 |       responses:
+1352 |         '200':
+1353 |           description: Project fetched successfully.
+1354 |           content:
+1355 |             application/json:
+1356 |               schema:
+1357 |                 $ref: '#/components/schemas/Project'
+1358 |               # --- START EXAMPLE ---
+1359 |               example:
+1360 |                 _id: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Use a valid UUID
+1361 |                 abbreviation: "NC-ALWAYS-ON-2024_Individ #1"
+1362 |                 created_at: "2024-10-02T09:15:00Z"
+1363 |                 default_vars:
+1364 |                   targeturls: null
+1365 |                   subsegment: "New Car"
+1366 |                   campaigntype: "Always On"
+1367 |                   language: "DEU"
+1368 |                   campaigndetail: null
+1369 |                   adtype: "Banner"
+1370 |                   dimension: "300x250"
+1371 |                 descriptive_vars:
+1372 |                   brand: "MINI"
+1373 |                   country: "SE"
+1374 |                   bmwponumber: "PO12345"
+1375 |                   adobecampaignname: "Always On 2024"
+1376 |                   subsegment: "New Car"
+1377 |                   campaigntype: "Always On"
+1378 |                   projectname: "NC-ALWAYS-ON-2024_Individ"
+1379 |                   year: 2024
+1380 |                 is_locked: false
+1381 |                 labels: [ ]
+1382 |                 lock_state: 0
+1383 |                 owner: "user123"
+1384 |                 updated_at: "2024-10-02T09:15:00Z"
+1385 |                 uploaded_at: "2024-10-02T09:15:00Z"
+1386 |                 duration:
+1387 |                   start_date: "2024-01-15T00:00:00Z"
+1388 |                   end_date: "2024-04-15T00:00:00Z"
+1389 |                   formatted: "15.01-15.04.2024"
+1390 |                 detail: "This is the first project, focusing on Sweden."
+1391 |               # --- END EXAMPLE ---
+1392 |         '400':
+1393 |           description: Bad Request
+1394 |           # ... (rest unchanged)
+1395 |         '404':
+1396 |           description: Mediaplan or Project not found.
+1397 |           # ... (rest unchanged)
+1398 |         '500':
+1399 |           description: Internal Server Error
+1400 |           # ... (rest unchanged)
+1401 | 
+1402 |     put:
+1403 |       summary: Update a Project (replace entire resource)
+1404 |       # ... (rest of definition - unchanged) ...
+1405 |       tags:
+1406 |         - Projects
+1407 |       parameters:
+1408 |         - description: The ID of the Mediaplan.
+1409 |           in: path
+1410 |           name: mediaplanId
+1411 |           required: true
+1412 |           schema:
+1413 |             format: uuid
+1414 |             type: string
+1415 |         - description: The ID of the Project to update.
+1416 |           in: path
+1417 |           name: projectId
+1418 |           required: true
+1419 |           schema:
+1420 |             format: uuid
+1421 |             type: string
+1422 |       requestBody:
+1423 |         content:
+1424 |           application/json:
+1425 |             schema:
+1426 |               $ref: "#/components/schemas/Project"
+1427 |         required: true
+1428 |       responses:
+1429 |         "200":
+1430 |           content:
+1431 |             application/json:
+1432 |               schema:
+1433 |                 $ref: "#/components/schemas/Project"
+1434 |           description: Project updated successfully.
+1435 |         "204":
+1436 |           description: Project updated successfully.
+1437 |         "400":
+1438 |           content:
+1439 |             application/json:
+1440 |               schema:
+1441 |                 $ref: "#/components/schemas/Error"
+1442 |           description: Bad Request
+1443 |         "404":
+1444 |           content:
+1445 |             application/json:
+1446 |               schema:
+1447 |                 $ref: "#/components/schemas/Error"
+1448 |           description: Mediaplan or Project not found.
+1449 |         "422":
+1450 |           content:
+1451 |             application/json:
+1452 |               schema:
+1453 |                 $ref: "#/components/schemas/Error"
+1454 |           description: Unprocessable Entity
+1455 |         "500":
+1456 |           content:
+1457 |             application/json:
+1458 |               schema:
+1459 |                 $ref: "#/components/schemas/Error"
+1460 |           description: Internal Server Error
+1461 | 
+1462 |     delete:
+1463 |       summary: Delete a Project
+1464 |       # ... (rest of definition - unchanged) ...
+1465 |       tags:
+1466 |         - Projects
+1467 |       parameters:
+1468 |         - description: The ID of the Mediaplan.
+1469 |           in: path
+1470 |           name: mediaplanId
+1471 |           required: true
+1472 |           schema:
+1473 |             format: uuid
+1474 |             type: string
+1475 |         - description: The ID of the Project to delete.
+1476 |           in: path
+1477 |           name: projectId
+1478 |           required: true
+1479 |           schema:
+1480 |             format: uuid
+1481 |             type: string
+1482 |       responses:
+1483 |         "204":
+1484 |           description: Project deleted successfully.
+1485 |         "400":
+1486 |           content:
+1487 |             application/json:
+1488 |               schema:
+1489 |                 $ref: "#/components/schemas/Error"
+1490 |           description: Bad Request
+1491 |         "404":
+1492 |           content:
+1493 |             application/json:
+1494 |               schema:
+1495 |                 $ref: "#/components/schemas/Error"
+1496 |           description: Mediaplan or Project not found.
+1497 |         "500":
+1498 |           content:
+1499 |             application/json:
+1500 |               schema:
+1501 |                 $ref: "#/components/schemas/Error"
+1502 |           description: Internal Server Error
+1503 | 
+1504 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns:
+1505 |     get:
+1506 |       summary: Get all campaigns for a given Project within a Mediaplan
+1507 |       tags:
+1508 |         - Campaigns
+1509 |       parameters:
+1510 |         - in: path
+1511 |           name: mediaplanId
+1512 |           schema:
+1513 |             type: string
+1514 |             format: uuid
+1515 |           required: true
+1516 |           description: The ID of the Mediaplan.
+1517 |         - in: path
+1518 |           name: projectId
+1519 |           schema:
+1520 |             type: string
+1521 |             format: uuid
+1522 |           required: true
+1523 |           description: The ID of the Project.
+1524 |         # --- ADD Pagination parameters ---
+1525 |         - in: query
+1526 |           name: page
+1527 |           schema:
+1528 |             type: integer
+1529 |             minimum: 0
+1530 |             default: 0
+1531 |           description: The page number to retrieve (0-based).
+1532 |         - in: query
+1533 |           name: per_page
+1534 |           schema:
+1535 |             type: integer
+1536 |             minimum: 1
+1537 |             maximum: 100
+1538 |             default: 15 # Match store default
+1539 |           description: The number of items per page.
+1540 |         # Optional: Add sort/order parameters if API supports them
+1541 |         # - in: query
+1542 |         #   name: sort
+1543 |         #   schema: { type: string }
+1544 |         # - in: query
+1545 |         #   name: order
+1546 |         #   schema: { type: string, enum: [asc, desc] }
+1547 |       responses:
+1548 |         '200':
+1549 |           description: Successful response - returns a list of campaigns.
+1550 |           content:
+1551 |             application/json:
+1552 |               # --- ASSUME PAGINATED RESPONSE SCHEMA ---
+1553 |               schema:
+1554 |                 type: object
+1555 |                 properties:
+1556 |                   total_items:
+1557 |                     type: integer
+1558 |                   total_pages:
+1559 |                     type: integer
+1560 |                   current_page:
+1561 |                     type: integer
+1562 |                   items:
+1563 |                     type: array
+1564 |                     items:
+1565 |                       $ref: '#/components/schemas/Campaign'
+1566 |               # --- START EXAMPLE for Campaigns (Paginated) ---
+1567 |               example:
+1568 |                 total_items: 5 # Example total
+1569 |                 total_pages: 1 # Example pages
+1570 |                 current_page: 0 # Example current page
+1571 |                 items:
+1572 |                   - _id: "c1f0a3e2-b1d9-4a1e-8b7d-a3b8d4e16c2f" # UUID
+1573 |                     campaignname: "SE_MINI_NC-AO-24_Summer_Display_DEU_Generic"
+1574 |                     pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID from example above
+1575 |                     campaigndetail: "Generic Summer Banner Ads"
+1576 |                     campaigntype: "Always On"
+1577 |                     created_at: "2024-10-15T10:00:00Z"
+1578 |                     language: "DEU"
+1579 |                     product: "Generic" # Example Product
+1580 |                     subsegment: "New Car"
+1581 |                     type: "display"
+1582 |                     updated_at: "2024-10-16T11:00:00Z"
+1583 |                   - _id: "d4e16c2f-9b8c-4f5a-8d3e-e1c7b6a08d3e" # UUID
+1584 |                     campaignname: "SE_MINI_NC-AO-24_Summer_Video_DEU_Brand"
+1585 |                     pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
+1586 |                     campaigndetail: "Brand Awareness Video"
+1587 |                     campaigntype: "Always On"
+1588 |                     created_at: "2024-10-15T11:00:00Z"
+1589 |                     language: "DEU"
+1590 |                     product: "Brand" # Example Product
+1591 |                     subsegment: "New Car"
+1592 |                     type: "video"
+1593 |                     updated_at: "2024-10-17T09:30:00Z"
+1594 |                   - _id: "1d0e2f3a-4b5c-4a1e-8c7d-b9d8c7e17a4f" # UUID
+1595 |                     campaignname: "SE_MINI_NC-AO-24_Q3_Search_DEU_Electric"
+1596 |                     pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
+1597 |                     campaigndetail: "Search Ads for Electric Models"
+1598 |                     campaigntype: "Always On"
+1599 |                     created_at: "2024-10-18T14:00:00Z"
+1600 |                     language: "DEU"
+1601 |                     product: "Electric" # Example Product
+1602 |                     subsegment: "New Car"
+1603 |                     type: "search"
+1604 |                     updated_at: null # Example with null updated_at
+1605 |                   - _id: "9f0a1b2c-3d4e-4a1e-8b7c-d3e4f5a08b7c" # UUID
+1606 |                     campaignname: "SE_MINI_NC-AO-24_Q3_Social_DEU_Cooper"
+1607 |                     pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
+1608 |                     campaigndetail: "Social Media Ads Cooper"
+1609 |                     campaigntype: "Always On"
+1610 |                     created_at: "2024-10-20T09:15:00Z"
+1611 |                     language: "DEU"
+1612 |                     product: "Cooper" # Example Product
+1613 |                     subsegment: "New Car"
+1614 |                     type: "social"
+1615 |                     updated_at: "2024-10-20T09:15:00Z"
+1616 |                   - _id: "1e0f2d3c-4b5a-4c2a-9a8b-c7b8a9e16d3f" # UUID
+1617 |                     campaignname: "SE_MINI_NC-AO-24_Q4_Display_DEU_Countryman"
+1618 |                     pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches Project UUID
+1619 |                     campaigndetail: "Q4 Display Countryman"
+1620 |                     campaigntype: "Always On"
+1621 |                     created_at: "2024-10-25T16:30:00Z"
+1622 |                     language: "DEU"
+1623 |                     product: "Countryman" # Example Product
+1624 |                     subsegment: "New Car"
+1625 |                     type: "display"
+1626 |                     updated_at: "2024-10-26T10:00:00Z"
+1627 |               # --- END EXAMPLE ---
+1628 |         '400':
+1629 |           description: Bad Request
+1630 |           # ... (rest unchanged)
+1631 |         '404':
+1632 |           description: Mediaplan or Project not found.
+1633 |           # ... (rest unchanged)
+1634 |         '500':
+1635 |           description: Internal Server Error
+1636 |           # ... (rest unchanged)
+1637 |     post:
+1638 |       summary: Create new Campaing
+1639 |       # ... (rest of definition - unchanged) ...
+1640 |       tags:
+1641 |         - Campaigns
+1642 |       parameters:
+1643 |         - description: The ID of the Mediaplan.
+1644 |           in: path
+1645 |           name: mediaplanId
+1646 |           required: true
+1647 |           schema:
+1648 |             format: uuid
+1649 |             type: string
+1650 |         - description: The ID of the Project.
+1651 |           in: path
+1652 |           name: projectId
+1653 |           required: true
+1654 |           schema:
+1655 |             format: uuid
+1656 |             type: string
+1657 |       requestBody:
+1658 |         content:
+1659 |           application/json:
+1660 |             example:
+1661 |               campaignname: PL_BMW_NC_NC-AO-2025-weq_AMSF_2025_AO_POL_eqfwefw
+1662 |               campaigndetail: eqfwefw
+1663 |               campaigntype: AO
+1664 |               language: POL
+1665 |               pid: 6780ed13ea3ea0016ff8975e
+1666 |               product: AMSF
+1667 |               subsegment: NC
+1668 |               type: display
+1669 |             schema:
+1670 |               $ref: "#/components/schemas/CampaignCreate"
+1671 |         required: true
+1672 |       responses:
+1673 |         "201":
+1674 |           content:
+1675 |             application/json:
+1676 |               schema:
+1677 |                 $ref: "#/components/schemas/Campaign"
+1678 |           description: Campaign created successfully.
+1679 |         "400":
+1680 |           content:
+1681 |             application/json:
+1682 |               schema:
+1683 |                 $ref: "#/components/schemas/Error"
+1684 |           description: Bad Request
+1685 |         "404":
+1686 |           content:
+1687 |             application/json:
+1688 |               schema:
+1689 |                 $ref: "#/components/schemas/Error"
+1690 |           description: Mediaplan or Project not found.
+1691 |         "422":
+1692 |           content:
+1693 |             application/json:
+1694 |               schema:
+1695 |                 $ref: "#/components/schemas/Error"
+1696 |           description: Unprocessable Entity
+1697 |         "500":
+1698 |           content:
+1699 |             application/json:
+1700 |               schema:
+1701 |                 $ref: "#/components/schemas/Error"
+1702 |           description: Internal Server Error
+1703 | 
+1704 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}:
+1705 |     get:
+1706 |       summary: Get a single Campaign by ID
+1707 |       # ... (rest of definition - unchanged) ...
+1708 |       tags:
+1709 |         - Campaigns
+1710 |       parameters:
+1711 |         - description: The ID of the Mediaplan.
+1712 |           in: path
+1713 |           name: mediaplanId
+1714 |           required: true
+1715 |           schema:
+1716 |             format: uuid
+1717 |             type: string
+1718 |         - description: The ID of the Project.
+1719 |           in: path
+1720 |           name: projectId
+1721 |           required: true
+1722 |           schema:
+1723 |             format: uuid
+1724 |             type: string
+1725 |         - description: The ID of the Campaign.
+1726 |           in: path
+1727 |           name: campaignId
+1728 |           required: true
+1729 |           schema:
+1730 |             format: uuid
+1731 |             type: string
+1732 |       responses:
+1733 |         "200":
+1734 |           content:
+1735 |             application/json:
+1736 |               schema:
+1737 |                 $ref: "#/components/schemas/Campaign"
+1738 |           description: Successful response - returns the Campaign.
+1739 |         "400":
+1740 |           content:
+1741 |             application/json:
+1742 |               schema:
+1743 |                 $ref: "#/components/schemas/Error"
+1744 |           description: Bad Request (e.g., invalid ID format)
+1745 |         "404":
+1746 |           content:
+1747 |             application/json:
+1748 |               schema:
+1749 |                 $ref: "#/components/schemas/Error"
+1750 |           description: Mediaplan, Project, or Campaign not found.
+1751 |         "500":
+1752 |           content:
+1753 |             application/json:
+1754 |               schema:
+1755 |                 $ref: "#/components/schemas/Error"
+1756 |           description: Internal Server Error
+1757 | 
+1758 |     put:
+1759 |       summary: Update a Campaign (replace entire resource)
+1760 |       # ... (rest of definition - unchanged) ...
+1761 |       tags:
+1762 |         - Campaigns
+1763 |       parameters:
+1764 |         - description: The ID of the Mediaplan.
+1765 |           in: path
+1766 |           name: mediaplanId
+1767 |           required: true
+1768 |           schema:
+1769 |             format: uuid
+1770 |             type: string
+1771 |         - description: The ID of the Project.
+1772 |           in: path
+1773 |           name: projectId
+1774 |           required: true
+1775 |           schema:
+1776 |             format: uuid
+1777 |             type: string
+1778 |         - description: The ID of the Campaign to update.
+1779 |           in: path
+1780 |           name: campaignId
+1781 |           required: true
+1782 |           schema:
+1783 |             format: uuid
+1784 |             type: string
+1785 |       requestBody:
+1786 |         content:
+1787 |           application/json:
+1788 |             schema:
+1789 |               $ref: "#/components/schemas/Campaign"
+1790 |         required: true
+1791 |       responses:
+1792 |         "200":
+1793 |           content:
+1794 |             application/json:
+1795 |               schema:
+1796 |                 $ref: "#/components/schemas/Campaign"
+1797 |           description: Campaign updated successfully.
+1798 |         "204":
+1799 |           description: Campaign updated successfully.
+1800 |         "400":
+1801 |           content:
+1802 |             application/json:
+1803 |               schema:
+1804 |                 $ref: "#/components/schemas/Error"
+1805 |           description: Bad Request
+1806 |         "404":
+1807 |           content:
+1808 |             application/json:
+1809 |               schema:
+1810 |                 $ref: "#/components/schemas/Error"
+1811 |           description: Mediaplan, Project, or Campaign not found
+1812 |         "422":
+1813 |           content:
+1814 |             application/json:
+1815 |               schema:
+1816 |                 $ref: "#/components/schemas/Error"
+1817 |           description: Unprocessable Entity
+1818 |         "500":
+1819 |           content:
+1820 |             application/json:
+1821 |               schema:
+1822 |                 $ref: "#/components/schemas/Error"
+1823 |           description: Internal Server Error
+1824 | 
+1825 |     delete:
+1826 |       summary: Delete a Campaign
+1827 |       # ... (rest of definition - unchanged) ...
+1828 |       tags:
+1829 |         - Campaigns
+1830 |       parameters:
+1831 |         - description: The ID of the Mediaplan.
+1832 |           in: path
+1833 |           name: mediaplanId
+1834 |           required: true
+1835 |           schema:
+1836 |             format: uuid
+1837 |             type: string
+1838 |         - description: The ID of the Project.
+1839 |           in: path
+1840 |           name: projectId
+1841 |           required: true
+1842 |           schema:
+1843 |             format: uuid
+1844 |             type: string
+1845 |         - description: The ID of the Campaign to delete.
+1846 |           in: path
+1847 |           name: campaignId
+1848 |           required: true
+1849 |           schema:
+1850 |             format: uuid
+1851 |             type: string
+1852 |       responses:
+1853 |         "204":
+1854 |           description: Campaign deleted successfully.
+1855 |         "400":
+1856 |           content:
+1857 |             application/json:
+1858 |               schema:
+1859 |                 $ref: "#/components/schemas/Error"
+1860 |           description: Bad Request
+1861 |         "404":
+1862 |           content:
+1863 |             application/json:
+1864 |               schema:
+1865 |                 $ref: "#/components/schemas/Error"
+1866 |           description: Mediaplan, Project, or Campaign not found
+1867 |         "500":
+1868 |           content:
+1869 |             application/json:
+1870 |               schema:
+1871 |                 $ref: "#/components/schemas/Error"
+1872 |           description: Internal Server Error
+1873 | 
+1874 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}/lineitems:
+1875 |     get:
+1876 |       summary: Get all line items for a given Campaign
+1877 |       # ... (rest of definition - unchanged) ...
+1878 |       tags:
+1879 |         - LineItems
+1880 |       parameters:
+1881 |         - description: The ID of the Mediaplan.
+1882 |           in: path
+1883 |           name: mediaplanId
+1884 |           required: true
+1885 |           schema:
+1886 |             format: uuid
+1887 |             type: string
+1888 |         - description: The ID of the Project.
+1889 |           in: path
+1890 |           name: projectId
+1891 |           required: true
+1892 |           schema:
+1893 |             format: uuid
+1894 |             type: string
+1895 |         - description: The ID of the Campaign.
+1896 |           in: path
+1897 |           name: campaignId
+1898 |           required: true
+1899 |           schema:
+1900 |             format: uuid
+1901 |             type: string
+1902 |       responses:
+1903 |         "200":
+1904 |           content:
+1905 |             application/json:
+1906 |               schema:
+1907 |                 items:
+1908 |                   $ref: "#/components/schemas/LineItem"
+1909 |                 type: array
+1910 |           description: Successful response - returns a list of line items.
+1911 |         "400":
+1912 |           content:
+1913 |             application/json:
+1914 |               schema:
+1915 |                 $ref: "#/components/schemas/Error"
+1916 |           description: Bad Request
+1917 |         "404":
+1918 |           content:
+1919 |             application/json:
+1920 |               schema:
+1921 |                 $ref: "#/components/schemas/Error"
+1922 |           description: Mediaplan, Project, or Campaign not found.
+1923 |         "500":
+1924 |           content:
+1925 |             application/json:
+1926 |               schema:
+1927 |                 $ref: "#/components/schemas/Error"
+1928 |           description: Internal Server Error
+1929 | 
+1930 | components:
+1931 |   schemas:
+1932 |     # ... (Error, ChangelogEntry, EntityReference, MediaplanFilter, MediaplanCreate, PONumber, Mediaplan - unchanged) ...
+1933 |     Error:
+1934 |       properties:
+1935 |         _id:
+1936 |           description: Unique identifier for this error instance.
+1937 |           example: 1@mediaplan-app-2025-6d57887bb4-8t9z7
 1938 |           type: string
-1939 |         status:
-1940 |           description: Filter by status.
-1941 |           enum:
-1942 |             - In Planning
-1943 |             - Draft
-1944 |             - For Approval
-1945 |           type: string
-1946 |       type: object
-1947 |     MediaplanCreate:
-1948 |       properties:
-1949 |         brand:
-1950 |           properties:
-1951 |             _id:
-1952 |               description: ID of the associated brand.
-1953 |               format: uuid
-1954 |               type: string
-1955 |           required:
-1956 |             - _id
-1957 |           type: object
-1958 |         budget:
-1959 |           properties:
-1960 |             total:
-1961 |               description: Total budget allocated.
-1962 |               format: double
-1963 |               type: number
-1964 |           type: object
-1965 |         end_date:
-1966 |           description: End date of the Mediaplan.
-1967 |           example: "2024-08-31T18:00:00Z"
-1968 |           format: date-time
-1969 |           type: string
-1970 |         name:
-1971 |           description: Name of the Mediaplan.
-1972 |           example: Summer Campaign 2024
-1973 |           type: string
-1974 |         po_numbers:
-1975 |           items:
-1976 |             $ref: "#/components/schemas/PONumber"
-1977 |           type: array
-1978 |         start_date:
-1979 |           description: Start date of the Mediaplan.
-1980 |           example: "2024-07-15T10:00:00Z"
-1981 |           format: date-time
-1982 |           type: string
-1983 |         status:
-1984 |           description: Status of the Mediaplan.
-1985 |           enum:
-1986 |             - In Planning
-1987 |             - Draft
-1988 |             - For Approval
-1989 |           example: Draft
-1990 |           type: string
-1991 |       required:
-1992 |         - name
-1993 |         - status
-1994 |         - start_date
-1995 |         - end_date
-1996 |         - brand
-1997 |         - budget
-1998 |       type: object
-1999 |     PONumber:
-2000 |       properties:
-2001 |         _id:
-2002 |           description: Unique identifier of the PO Number.
-2003 |           example: po-001
-2004 |           type: string
-2005 |         name:
-2006 |           description: Name or description of the PO Number.
-2007 |           example: "4700551823"
+1939 |         code:
+1940 |           description: HTTP status code.
+1941 |           example: 400
+1942 |           type: integer
+1943 |         error:
+1944 |           description: Specific error details.
+1945 |           example: Somethin went wrong.
+1946 |           type: string
+1947 |         message:
+1948 |           description: A general message describing the error category.
+1949 |           example: Bad Request
+1950 |           type: string
+1951 |         timestamp:
+1952 |           description: Timestamp of when the error occurred.
+1953 |           example: "2025-03-11T13:31:06.443086Z"
+1954 |           format: date-time
+1955 |           type: string
+1956 |         version:
+1957 |           description: Application version where the error occurred.
+1958 |           example: mediaplan/0.1.45
+1959 |           type: string
+1960 |       type: object
+1961 |     ChangelogEntry:
+1962 |       properties:
+1963 |         date:
+1964 |           description: Date and time of the changelog entry.
+1965 |           example: "2024-10-27T14:30:00Z"
+1966 |           format: date-time
+1967 |           type: string
+1968 |         text:
+1969 |           description: Description of the change.
+1970 |           example: Added new feature for campaign optimization.
+1971 |           type: string
+1972 |         tool:
+1973 |           description: The tool associated with this changelog entry.
+1974 |           enum:
+1975 |             - CampaignBuilder
+1976 |             - Linkshortener
+1977 |             - Mediaplan
+1978 |           example: CampaignBuilder
+1979 |           type: string
+1980 |       required:
+1981 |         - date
+1982 |         - tool
+1983 |         - text
+1984 |       type: object
+1985 |     EntityReference:
+1986 |       properties:
+1987 |         _id:
+1988 |           description: Unique identifier.
+1989 |           example: user-002
+1990 |           format: uuid
+1991 |           type: string
+1992 |         name:
+1993 |           description: Name of the entity.
+1994 |           example: Alice Smith
+1995 |           type: string
+1996 |       required:
+1997 |         - _id
+1998 |         - name
+1999 |       type: object
+2000 |     MediaplanFilter:
+2001 |       properties:
+2002 |         brand_id:
+2003 |           description: Filter by Brand ID.
+2004 |           format: uuid
+2005 |           type: string
+2006 |         search:
+2007 |           description: Search term for filtering by name or other relevant fields.
 2008 |           type: string
-2009 |         value:
-2010 |           description: The numerical value of the PO Number.
-2011 |           example: 450.0
-2012 |           format: float
-2013 |           type: number
-2014 |       required:
-2015 |         - _id
-2016 |         - name
-2017 |         - value
-2018 |       type: object
-2019 |     Mediaplan:
-2020 |       properties:
-2021 |         _id:
-2022 |           description: Unique identifier of the Mediaplan.
-2023 |           example: f47ac10b-58cc-4372-a567-0e02b2c3d399
-2024 |           format: uuid
-2025 |           type: string
-2026 |         brand:
-2027 |           $ref: "#/components/schemas/EntityReference"
-2028 |           description: Reference to the Brand information.
-2029 |         budget:
-2030 |           description: Budget details for the Mediaplan.
-2031 |           properties:
-2032 |             available:
-2033 |               description: Budget remaining.
-2034 |               example: 374.5
-2035 |               format: double
-2036 |               type: number
-2037 |             total:
-2038 |               description: Total budget allocated.
-2039 |               example: 1250.0
+2009 |         start_date_after:
+2010 |           description: Filter for mediaplans starting after this date.
+2011 |           format: date-time
+2012 |           type: string
+2013 |         start_date_before:
+2014 |           description: Filter for mediaplans starting before this date.
+2015 |           format: date-time
+2016 |           type: string
+2017 |         status:
+2018 |           description: Filter by status.
+2019 |           enum:
+2020 |             - In Planning
+2021 |             - Draft
+2022 |             - For Approval
+2023 |           type: string
+2024 |       type: object
+2025 |     MediaplanCreate:
+2026 |       properties:
+2027 |         brand:
+2028 |           properties:
+2029 |             _id:
+2030 |               description: ID of the associated brand.
+2031 |               format: uuid
+2032 |               type: string
+2033 |           required:
+2034 |             - _id
+2035 |           type: object
+2036 |         budget:
+2037 |           properties:
+2038 |             total:
+2039 |               description: Total budget allocated.
 2040 |               format: double
 2041 |               type: number
-2042 |             used:
-2043 |               description: Amount of budget used.
-2044 |               example: 875.5
-2045 |               format: double
-2046 |               type: number
-2047 |           required:
-2048 |             - total
-2049 |             - used
-2050 |             - available
-2051 |           type: object
-2052 |         created_at:
-2053 |           description: Timestamp of creation.
-2054 |           example: "2024-11-28T14:15:00Z"
-2055 |           format: date-time
-2056 |           type: string
-2057 |         created_by:
-2058 |           $ref: "#/components/schemas/EntityReference"
-2059 |           description: Reference to the user who created the Mediaplan.
-2060 |         end_date:
-2061 |           description: End date of the Mediaplan.
-2062 |           example: "2025-03-25T00:00:00Z"
-2063 |           format: date-time
-2064 |           type: string
-2065 |         name:
-2066 |           description: Name of the Mediaplan.
-2067 |           example: Campaign Launch Q1
+2042 |           type: object
+2043 |         end_date:
+2044 |           description: End date of the Mediaplan.
+2045 |           example: "2024-08-31T18:00:00Z"
+2046 |           format: date-time
+2047 |           type: string
+2048 |         name:
+2049 |           description: Name of the Mediaplan.
+2050 |           example: Summer Campaign 2024
+2051 |           type: string
+2052 |         po_numbers:
+2053 |           items:
+2054 |             $ref: "#/components/schemas/PONumber"
+2055 |           type: array
+2056 |         start_date:
+2057 |           description: Start date of the Mediaplan.
+2058 |           example: "2024-07-15T10:00:00Z"
+2059 |           format: date-time
+2060 |           type: string
+2061 |         status:
+2062 |           description: Status of the Mediaplan.
+2063 |           enum:
+2064 |             - In Planning
+2065 |             - Draft
+2066 |             - For Approval
+2067 |           example: Draft
 2068 |           type: string
-2069 |         po_numbers:
-2070 |           description: List of associated Purchase Order numbers.
-2071 |           example:
-2072 |             - _id: po-001
-2073 |               name: "4700551823"
-2074 |               value: 450.0
-2075 |             - _id: po-002
-2076 |               name: "4700551911"
-2077 |               value: 425.5
-2078 |           items:
-2079 |             $ref: "#/components/schemas/PONumber"
-2080 |           type: array
-2081 |         start_date:
-2082 |           description: Start date of the Mediaplan.
-2083 |           example: "2025-02-10T00:00:00Z"
-2084 |           format: date-time
-2085 |           type: string
-2086 |         status:
-2087 |           description: Status of the Mediaplan.
-2088 |           enum:
-2089 |             - In Planning
-2090 |             - Draft
-2091 |             - For Approval
-2092 |           example: In Planning
-2093 |           type: string
-2094 |         updated_at:
-2095 |           description: Timestamp of last update.
-2096 |           example: "2024-12-05T09:30:00Z"
-2097 |           format: date-time
-2098 |           type: string
-2099 |       required:
-2100 |         - _id
-2101 |         - name
-2102 |         - status
-2103 |         - start_date
-2104 |         - end_date
-2105 |         - brand
-2106 |         - budget
-2107 |         - created_by
-2108 |         - created_at
-2109 |         - updated_at
-2110 |       type: object
-2111 | 
-2112 |     Project:
-2113 |       type: object
-2114 |       properties:
-2115 |         _id:
-2116 |           type: string
-2117 |           format: uuid
-2118 |           description: Unique identifier of the Project.
-2119 |         abbreviation:
-2120 |           type: string
-2121 |           description: Abbreviation for the project.
-2122 |         created_at:
-2123 |           type: string
-2124 |           format: date-time
-2125 |           description: Project creation timestamp.
-2126 |         default_vars:
-2127 |           type: object
-2128 |           description: Default variables for the project.
-2129 |           properties:
-2130 |             targeturls:
-2131 |               type: string
-2132 |               nullable: true
-2133 |               description: Target URLs (can be null).
-2134 |             subsegment:
-2135 |               type: string
-2136 |               nullable: true
-2137 |               description: Subsegment (can be null).
-2138 |             campaigntype:
-2139 |               type: string
-2140 |               nullable: true
-2141 |               description: Campaign type (can be null).
-2142 |             language:
-2143 |               type: string
-2144 |               nullable: true
-2145 |               description: Language (can be null).
-2146 |             campaigndetail:
-2147 |               type: string
-2148 |               nullable: true
-2149 |               description: Campaign detail (can be null).
-2150 |             adtype:
-2151 |               type: string
-2152 |               nullable: true
-2153 |               description: Ad type (can be null).
-2154 |             dimension:
-2155 |               type: string
-2156 |               nullable: true
-2157 |               description: Dimension (can be null).
-2158 |         descriptive_vars:
-2159 |           type: object
-2160 |           description: Descriptive variables for the project.
-2161 |           properties:
-2162 |             brand:
-2163 |               type: string
-2164 |               description: Brand name.
-2165 |             country:
-2166 |               type: string
-2167 |               description: Country code.
-2168 |             bmwponumber:
-2169 |               type: string
-2170 |               description: BMW purchase order number.
-2171 |             adobecampaignname:
-2172 |               type: string
-2173 |               description: Adobe campaign name.
-2174 |             subsegment:
-2175 |               type: string
-2176 |               description: Subsegment.
-2177 |             campaigntype:
-2178 |               type: string
-2179 |               description: Campaign type.
-2180 |             projectname:
-2181 |               type: string
-2182 |               description: Project name.
-2183 |             year:
-2184 |               type: integer
-2185 |               description: Year.
-2186 |         is_locked:
-2187 |           type: boolean
-2188 |           description: Indicates if the project is locked.
-2189 |         labels:
-2190 |           type: array
-2191 |           items:
-2192 |             type: string
-2193 |           description: Labels associated with project
-2194 |         lock_state:
-2195 |           type: integer
-2196 |           description: Lock state of the project.
-2197 |         owner:
+2069 |       required:
+2070 |         - name
+2071 |         - status
+2072 |         - start_date
+2073 |         - end_date
+2074 |         - brand
+2075 |         - budget
+2076 |       type: object
+2077 |     PONumber:
+2078 |       properties:
+2079 |         _id:
+2080 |           description: Unique identifier of the PO Number.
+2081 |           example: po-001
+2082 |           type: string
+2083 |         name:
+2084 |           description: Name or description of the PO Number.
+2085 |           example: "4700551823"
+2086 |           type: string
+2087 |         value:
+2088 |           description: The numerical value of the PO Number.
+2089 |           example: 450.0
+2090 |           format: float
+2091 |           type: number
+2092 |       required:
+2093 |         - _id
+2094 |         - name
+2095 |         - value
+2096 |       type: object
+2097 |     Mediaplan:
+2098 |       properties:
+2099 |         _id:
+2100 |           description: Unique identifier of the Mediaplan.
+2101 |           example: f47ac10b-58cc-4372-a567-0e02b2c3d399
+2102 |           format: uuid
+2103 |           type: string
+2104 |         brand:
+2105 |           $ref: "#/components/schemas/EntityReference"
+2106 |           description: Reference to the Brand information.
+2107 |         budget:
+2108 |           description: Budget details for the Mediaplan.
+2109 |           properties:
+2110 |             available:
+2111 |               description: Budget remaining.
+2112 |               example: 374.5
+2113 |               format: double
+2114 |               type: number
+2115 |             total:
+2116 |               description: Total budget allocated.
+2117 |               example: 1250.0
+2118 |               format: double
+2119 |               type: number
+2120 |             used:
+2121 |               description: Amount of budget used.
+2122 |               example: 875.5
+2123 |               format: double
+2124 |               type: number
+2125 |           required:
+2126 |             - total
+2127 |             - used
+2128 |             - available
+2129 |           type: object
+2130 |         created_at:
+2131 |           description: Timestamp of creation.
+2132 |           example: "2024-11-28T14:15:00Z"
+2133 |           format: date-time
+2134 |           type: string
+2135 |         created_by:
+2136 |           $ref: "#/components/schemas/EntityReference"
+2137 |           description: Reference to the user who created the Mediaplan.
+2138 |         end_date:
+2139 |           description: End date of the Mediaplan.
+2140 |           example: "2025-03-25T00:00:00Z"
+2141 |           format: date-time
+2142 |           type: string
+2143 |         name:
+2144 |           description: Name of the Mediaplan.
+2145 |           example: Campaign Launch Q1
+2146 |           type: string
+2147 |         po_numbers:
+2148 |           description: List of associated Purchase Order numbers.
+2149 |           example:
+2150 |             - _id: po-001
+2151 |               name: "4700551823"
+2152 |               value: 450.0
+2153 |             - _id: po-002
+2154 |               name: "4700551911"
+2155 |               value: 425.5
+2156 |           items:
+2157 |             $ref: "#/components/schemas/PONumber"
+2158 |           type: array
+2159 |         start_date:
+2160 |           description: Start date of the Mediaplan.
+2161 |           example: "2025-02-10T00:00:00Z"
+2162 |           format: date-time
+2163 |           type: string
+2164 |         status:
+2165 |           description: Status of the Mediaplan.
+2166 |           enum:
+2167 |             - In Planning
+2168 |             - Draft
+2169 |             - For Approval
+2170 |           example: In Planning
+2171 |           type: string
+2172 |         updated_at:
+2173 |           description: Timestamp of last update.
+2174 |           example: "2024-12-05T09:30:00Z"
+2175 |           format: date-time
+2176 |           type: string
+2177 |       required:
+2178 |         - _id
+2179 |         - name
+2180 |         - status
+2181 |         - start_date
+2182 |         - end_date
+2183 |         - brand
+2184 |         - budget
+2185 |         - created_by
+2186 |         - created_at
+2187 |         - updated_at
+2188 |       type: object
+2189 | 
+2190 |     Project:
+2191 |       type: object
+2192 |       properties:
+2193 |         _id:
+2194 |           type: string
+2195 |           format: uuid
+2196 |           description: Unique identifier of the Project.
+2197 |         abbreviation:
 2198 |           type: string
-2199 |           description: Owner of the project.
-2200 |         updated_at:
+2199 |           description: Abbreviation for the project.
+2200 |         created_at:
 2201 |           type: string
 2202 |           format: date-time
-2203 |           nullable: true
-2204 |           description: Project last update timestamp.
-2205 |         uploaded_at:
-2206 |           type: string
-2207 |           format: date-time
-2208 |           description: Project upload timestamp.
-2209 |         # Optional fields based on mock data (add here if part of schema)
-2210 |         duration:
-2211 |            type: object
-2212 |            properties:
-2213 |              start_date:
-2214 |                type: string
-2215 |                format: date-time
-2216 |              end_date:
-2217 |                type: string
-2218 |                format: date-time
-2219 |              formatted:
-2220 |                type: string
-2221 |         detail:
-2222 |            type: string
-2223 |            nullable: true
-2224 |       required:
-2225 |         - _id
-2226 |         - abbreviation
-2227 |         - created_at
-2228 |         - default_vars
-2229 |         - descriptive_vars
-2230 |         - is_locked
-2231 |         - lock_state
-2232 |         # Removed message, version, timestamp from required
-2233 |         - owner
-2234 |         - uploaded_at
-2235 |         # updated_at is nullable
-2236 | 
-2237 |     ProjectCreate:
-2238 |       # ... (unchanged) ...
-2239 |       properties:
-2240 |         default_vars:
-2241 |           description: Default variables for the project.
-2242 |           properties:
-2243 |             adtype:
-2244 |               description: Ad type (can be null).
+2203 |           description: Project creation timestamp.
+2204 |         budget:
+2205 |           type: object
+2206 |           description: Budget information for the project.
+2207 |           properties:
+2208 |             used:
+2209 |               type: number
+2210 |               format: float
+2211 |               example: 12500.50
+2212 |               description: The amount of budget that has been used.
+2213 |             total:
+2214 |               type: number
+2215 |               format: float
+2216 |               example: 50000.00
+2217 |               description: The total budget amount.
+2218 |             available:
+2219 |               type: number
+2220 |               format: float
+2221 |               example: 37499.50
+2222 |               description: The remaining available budget.
+2223 |         example:
+2224 |           used: 12500.50
+2225 |           total: 50000.00
+2226 |           available: 37499.50
+2227 |         default_vars:
+2228 |           type: object
+2229 |           description: Default variables for the project.
+2230 |           properties:
+2231 |             targeturls:
+2232 |               type: string
+2233 |               nullable: true
+2234 |               description: Target URLs (can be null).
+2235 |             subsegment:
+2236 |               type: string
+2237 |               nullable: true
+2238 |               description: Subsegment (can be null).
+2239 |             campaigntype:
+2240 |               type: string
+2241 |               nullable: true
+2242 |               description: Campaign type (can be null).
+2243 |             language:
+2244 |               type: string
 2245 |               nullable: true
-2246 |               type: string
+2246 |               description: Language (can be null).
 2247 |             campaigndetail:
-2248 |               description: Campaign detail (can be null).
+2248 |               type: string
 2249 |               nullable: true
-2250 |               type: string
-2251 |             campaigntype:
-2252 |               description: Campaign type (can be null).
+2250 |               description: Campaign detail (can be null).
+2251 |             adtype:
+2252 |               type: string
 2253 |               nullable: true
-2254 |               type: string
+2254 |               description: Ad type (can be null).
 2255 |             dimension:
-2256 |               description: Dimension (can be null).
+2256 |               type: string
 2257 |               nullable: true
-2258 |               type: string
-2259 |             language:
-2260 |               description: Language (can be null).
-2261 |               nullable: true
-2262 |               type: string
-2263 |             subsegment:
-2264 |               description: Subsegment (can be null).
-2265 |               nullable: true
-2266 |               type: string
-2267 |             targeturls:
-2268 |               description: Target URLs (can be null).
-2269 |               nullable: true
+2258 |               description: Dimension (can be null).
+2259 |         descriptive_vars:
+2260 |           type: object
+2261 |           description: Descriptive variables for the project.
+2262 |           properties:
+2263 |             brand:
+2264 |               type: string
+2265 |               description: Brand name.
+2266 |             country:
+2267 |               type: string
+2268 |               description: Country code.
+2269 |             bmwponumber:
 2270 |               type: string
-2271 |           type: object
-2272 |         descriptive_vars:
-2273 |           description: Descriptive variables for the project.
-2274 |           properties:
-2275 |             adobecampaignname:
-2276 |               description: Adobe campaign name.
-2277 |               type: string
-2278 |             bmwponumber:
-2279 |               description: BMW purchase order number.
-2280 |               type: string
-2281 |             brand:
-2282 |               description: Brand name.
-2283 |               type: string
-2284 |             campaigntype:
-2285 |               description: Campaign type.
-2286 |               type: string
-2287 |             country:
-2288 |               description: Country code.
-2289 |               type: string
-2290 |             subsegment:
-2291 |               description: Subsegment.
-2292 |               type: string
-2293 |           type: object
-2294 |         labels:
-2295 |           description: Labels associated with project
-2296 |           items:
-2297 |             type: string
-2298 |           type: array
-2299 |       type: object
-2300 | 
-2301 |     CampaignCreate:
-2302 |       # ... (unchanged) ...
-2303 |       properties:
-2304 |         campaignname:
-2305 |           description: Name of the campaign.
-2306 |           type: string
-2307 |         campaigndetail:
-2308 |           description: Details about the campaign.
-2309 |           nullable: true
-2310 |           type: string
-2311 |         campaigntype:
-2312 |           description: Type of the campaign.
-2313 |           type: string
-2314 |         language:
-2315 |           description: Language of the campaign.
-2316 |           type: string
-2317 |         pid:
-2318 |           description: ID of the parent Project.  IMPORTANT!
-2319 |           format: uuid
-2320 |           type: string
-2321 |         product:
-2322 |           description: Product associated with the campaign.
+2271 |               description: BMW purchase order number.
+2272 |             adobecampaignname:
+2273 |               type: string
+2274 |               description: Adobe campaign name.
+2275 |             subsegment:
+2276 |               type: string
+2277 |               description: Subsegment.
+2278 |             campaigntype:
+2279 |               type: string
+2280 |               description: Campaign type.
+2281 |             projectname:
+2282 |               type: string
+2283 |               description: Project name.
+2284 |             year:
+2285 |               type: integer
+2286 |               description: Year.
+2287 |         is_locked:
+2288 |           type: boolean
+2289 |           description: Indicates if the project is locked.
+2290 |         labels:
+2291 |           type: array
+2292 |           items:
+2293 |             type: string
+2294 |           description: Labels associated with project
+2295 |         lock_state:
+2296 |           type: integer
+2297 |           description: Lock state of the project.
+2298 |         owner:
+2299 |           type: string
+2300 |           description: Owner of the project.
+2301 |         updated_at:
+2302 |           type: string
+2303 |           format: date-time
+2304 |           nullable: true
+2305 |           description: Project last update timestamp.
+2306 |         uploaded_at:
+2307 |           type: string
+2308 |           format: date-time
+2309 |           description: Project upload timestamp.
+2310 |         # Optional fields based on mock data (add here if part of schema)
+2311 |         duration:
+2312 |           type: object
+2313 |           properties:
+2314 |             start_date:
+2315 |               type: string
+2316 |               format: date-time
+2317 |             end_date:
+2318 |               type: string
+2319 |               format: date-time
+2320 |             formatted:
+2321 |               type: string
+2322 |         detail:
 2323 |           type: string
-2324 |         subsegment:
-2325 |           description: Subsegment of the campaign.
-2326 |           type: string
-2327 |         type:
-2328 |           description: Campaign type (e.g., display, video).
-2329 |           type: string
-2330 |       required:
-2331 |         - campaignname
-2332 |         - pid
-2333 |         - campaigntype
-2334 |       type: object
-2335 | 
-2336 |     Campaign:
-2337 |       type: object
-2338 |       properties:
-2339 |         _id:
-2340 |           type: string
-2341 |           format: uuid
-2342 |           description: Unique identifier of the Campaign.
-2343 |         campaignname:
-2344 |           type: string
-2345 |           description: Name of the campaign.
-2346 |         pid:
-2347 |           type: string
-2348 |           format: uuid
-2349 |           description: ID of the parent Project.
-2350 |         campaigndetail:
-2351 |           type: string
-2352 |           nullable: true
-2353 |           description: Details about the campaign.
-2354 |         campaigntype:
-2355 |           type: string
-2356 |           description: Type of the campaign.
-2357 |         created_at:
-2358 |           type: string
-2359 |           format: date-time
-2360 |           description: Campaign creation timestamp.
-2361 |         language:
-2362 |           type: string
-2363 |           description: Language of the campaign.
-2364 |         product:
-2365 |           type: string
-2366 |           description: Product associated with the campaign.
-2367 |         subsegment:
-2368 |           type: string
-2369 |           description: Subsegment of the campaign.
-2370 |         type:
-2371 |           type: string
-2372 |           description: Campaign type (e.g., display, video).
-2373 |         updated_at:
-2374 |           type: string
-2375 |           format: date-time
-2376 |           nullable: true
-2377 |           description: Campaign last update timestamp.
-2378 |       required:
-2379 |         - _id
-2380 |         - campaignname
-2381 |         - pid
-2382 |         - campaigntype
-2383 |         - created_at
-2384 |         - language
-2385 |         - product
-2386 |         - subsegment
-2387 |         - type
-2388 | 
-2389 |     LineItem:
-2390 |       # ... (unchanged) ...
-2391 |       properties:
-2392 |         _id:
-2393 |           description: Unique identifier of the Line Item.
-2394 |           format: uuid
-2395 |           type: string
-2396 |         created_at:
-2397 |           description: Line item creation timestamp.
-2398 |           format: date-time
-2399 |           type: string
-2400 |         creatives:
-2401 |           description: Array of creative IDs.
-2402 |           items:
-2403 |             type: string
-2404 |           type: array
-2405 |         goals:
-2406 |           description: Goal of the line item.
+2324 |           nullable: true
+2325 |       required:
+2326 |         - _id
+2327 |         - abbreviation
+2328 |         - created_at
+2329 |         - default_vars
+2330 |         - descriptive_vars
+2331 |         - is_locked
+2332 |         - lock_state
+2333 |         # Removed message, version, timestamp from required
+2334 |         - owner
+2335 |         - uploaded_at
+2336 |         # updated_at is nullable
+2337 | 
+2338 |     ProjectCreate:
+2339 |       # ... (unchanged) ...
+2340 |       properties:
+2341 |         default_vars:
+2342 |           description: Default variables for the project.
+2343 |           properties:
+2344 |             adtype:
+2345 |               description: Ad type (can be null).
+2346 |               nullable: true
+2347 |               type: string
+2348 |             campaigndetail:
+2349 |               description: Campaign detail (can be null).
+2350 |               nullable: true
+2351 |               type: string
+2352 |             campaigntype:
+2353 |               description: Campaign type (can be null).
+2354 |               nullable: true
+2355 |               type: string
+2356 |             dimension:
+2357 |               description: Dimension (can be null).
+2358 |               nullable: true
+2359 |               type: string
+2360 |             language:
+2361 |               description: Language (can be null).
+2362 |               nullable: true
+2363 |               type: string
+2364 |             subsegment:
+2365 |               description: Subsegment (can be null).
+2366 |               nullable: true
+2367 |               type: string
+2368 |             targeturls:
+2369 |               description: Target URLs (can be null).
+2370 |               nullable: true
+2371 |               type: string
+2372 |           type: object
+2373 |         descriptive_vars:
+2374 |           description: Descriptive variables for the project.
+2375 |           properties:
+2376 |             adobecampaignname:
+2377 |               description: Adobe campaign name.
+2378 |               type: string
+2379 |             bmwponumber:
+2380 |               description: BMW purchase order number.
+2381 |               type: string
+2382 |             brand:
+2383 |               description: Brand name.
+2384 |               type: string
+2385 |             campaigntype:
+2386 |               description: Campaign type.
+2387 |               type: string
+2388 |             country:
+2389 |               description: Country code.
+2390 |               type: string
+2391 |             subsegment:
+2392 |               description: Subsegment.
+2393 |               type: string
+2394 |           type: object
+2395 |         labels:
+2396 |           description: Labels associated with project
+2397 |           items:
+2398 |             type: string
+2399 |           type: array
+2400 |       type: object
+2401 | 
+2402 |     CampaignCreate:
+2403 |       # ... (unchanged) ...
+2404 |       properties:
+2405 |         campaignname:
+2406 |           description: Name of the campaign.
 2407 |           type: string
-2408 |         lineitem:
-2409 |           description: (Clarify purpose)
-2410 |           type: string
-2411 |         lineitemname:
-2412 |           description: Name of the line item.
-2413 |           type: string
-2414 |         mid:
-2415 |           description: (Clarify purpose)
-2416 |           type: string
-2417 |         phase:
-2418 |           description: Phase of the line item.
-2419 |           type: string
-2420 |         pid:
-2421 |           description: ID of the parent Project.
-2422 |           format: uuid
-2423 |           type: string
-2424 |         product:
-2425 |           description: Product associated with the line item.
-2426 |           type: string
-2427 |         targetingtactic:
-2428 |           description: Targeting tactic.
-2429 |           type: string
-2430 |         updated_at:
-2431 |           description: Line item last update timestamp.
-2432 |           format: date-time
-2433 |           type: string
-2434 |       required:
-2435 |         - _id
-2436 |         - pid
-2437 |         - lineitemname
-2438 |         - created_at
-2439 |         - goals
-2440 |         - phase
-2441 |         - product
-2442 |         - targetingtactic
-2443 |       type: object
+2408 |         campaigndetail:
+2409 |           description: Details about the campaign.
+2410 |           nullable: true
+2411 |           type: string
+2412 |         campaigntype:
+2413 |           description: Type of the campaign.
+2414 |           type: string
+2415 |         language:
+2416 |           description: Language of the campaign.
+2417 |           type: string
+2418 |         pid:
+2419 |           description: ID of the parent Project.  IMPORTANT!
+2420 |           format: uuid
+2421 |           type: string
+2422 |         product:
+2423 |           description: Product associated with the campaign.
+2424 |           type: string
+2425 |         subsegment:
+2426 |           description: Subsegment of the campaign.
+2427 |           type: string
+2428 |         type:
+2429 |           description: Campaign type (e.g., display, video).
+2430 |           type: string
+2431 |       required:
+2432 |         - campaignname
+2433 |         - pid
+2434 |         - campaigntype
+2435 |       type: object
+2436 | 
+2437 |     Campaign:
+2438 |       type: object
+2439 |       properties:
+2440 |         _id:
+2441 |           type: string
+2442 |           format: uuid
+2443 |           description: Unique identifier of the Campaign.
+2444 |         campaignname:
+2445 |           type: string
+2446 |           description: Name of the campaign.
+2447 |         pid:
+2448 |           type: string
+2449 |           format: uuid
+2450 |           description: ID of the parent Project.
+2451 |         campaigndetail:
+2452 |           type: string
+2453 |           nullable: true
+2454 |           description: Details about the campaign.
+2455 |         campaigntype:
+2456 |           type: string
+2457 |           description: Type of the campaign.
+2458 |         created_at:
+2459 |           type: string
+2460 |           format: date-time
+2461 |           description: Campaign creation timestamp.
+2462 |         language:
+2463 |           type: string
+2464 |           description: Language of the campaign.
+2465 |         product:
+2466 |           type: string
+2467 |           description: Product associated with the campaign.
+2468 |         subsegment:
+2469 |           type: string
+2470 |           description: Subsegment of the campaign.
+2471 |         type:
+2472 |           type: string
+2473 |           description: Campaign type (e.g., display, video).
+2474 |         updated_at:
+2475 |           type: string
+2476 |           format: date-time
+2477 |           nullable: true
+2478 |           description: Campaign last update timestamp.
+2479 |       required:
+2480 |         - _id
+2481 |         - campaignname
+2482 |         - pid
+2483 |         - campaigntype
+2484 |         - created_at
+2485 |         - language
+2486 |         - product
+2487 |         - subsegment
+2488 |         - type
+2489 | 
+2490 |     LineItem:
+2491 |       # ... (unchanged) ...
+2492 |       properties:
+2493 |         _id:
+2494 |           description: Unique identifier of the Line Item.
+2495 |           format: uuid
+2496 |           type: string
+2497 |         created_at:
+2498 |           description: Line item creation timestamp.
+2499 |           format: date-time
+2500 |           type: string
+2501 |         creatives:
+2502 |           description: Array of creative IDs.
+2503 |           items:
+2504 |             type: string
+2505 |           type: array
+2506 |         goals:
+2507 |           description: Goal of the line item.
+2508 |           type: string
+2509 |         lineitem:
+2510 |           description: (Clarify purpose)
+2511 |           type: string
+2512 |         lineitemname:
+2513 |           description: Name of the line item.
+2514 |           type: string
+2515 |         mid:
+2516 |           description: (Clarify purpose)
+2517 |           type: string
+2518 |         phase:
+2519 |           description: Phase of the line item.
+2520 |           type: string
+2521 |         pid:
+2522 |           description: ID of the parent Project.
+2523 |           format: uuid
+2524 |           type: string
+2525 |         product:
+2526 |           description: Product associated with the line item.
+2527 |           type: string
+2528 |         targetingtactic:
+2529 |           description: Targeting tactic.
+2530 |           type: string
+2531 |         updated_at:
+2532 |           description: Line item last update timestamp.
+2533 |           format: date-time
+2534 |           type: string
+2535 |       required:
+2536 |         - _id
+2537 |         - pid
+2538 |         - lineitemname
+2539 |         - created_at
+2540 |         - goals
+2541 |         - phase
+2542 |         - product
+2543 |         - targetingtactic
+2544 |       type: object
 ```
 
 src/plugins/vuetify.ts
@@ -4357,144 +4575,166 @@ src/stores/mediaplanStore.ts
 30 |     const mediaplans  = ref<Mediaplan[]>([]);
 31 |     const isLoading   = ref(false);
 32 |     const error       = ref<string | null>(null);
-33 | 
-34 |     // Pagination
-35 |     const totalItems  = ref(0);
-36 |     const totalPages  = ref(0);
-37 |     const currentPage = ref(0);
-38 |     const perPage     = ref(10);
-39 | 
-40 |     // Filters & Sorting
-41 |     const filters   = ref<MediaplanFilter>({ search: '', status: '' });
-42 |     const sortBy    = ref('updated_at');
-43 |     const sortOrder = ref<'asc' | 'desc'>('desc');
-44 | 
-45 |     const hasFilters = computed(() =>
-46 |         !!(
-47 |             filters.value.search ||
-48 |             filters.value.status ||
-49 |             filters.value.brand_id ||
-50 |             filters.value.country
-51 |         )
-52 |     );
-53 | 
-54 |     // --- Actions ---
-55 |     /** Load real source‐lists (when API is available) */
-56 |     async function fetchSources() {
-57 |         isLoading.value = true;
-58 |         try {
-59 |             const res = await customFetch('/mediaplans/sources?type=overview') as SourcesResponse;
-60 |             sources.value = {
-61 |                 brands:       res.data.brand       ?? [],
-62 |                 countries:    res.data.country     ?? [],
-63 |                 subsegments:  res.data.subsegment  ?? [],
-64 |                 products:     res.data.product     ?? [],
-65 |                 campaigntypes:res.data.campaigntype ?? [],
-66 |                 languages:    res.data.language    ?? []
-67 |             };
-68 |         } catch {
-69 |             // keep the mock data
-70 |         } finally {
-71 |             isLoading.value = false;
-72 |         }
-73 |     }
-74 | 
-75 |     /** Fetch paginated & filtered list */
-76 |     async function fetchMediaplans() {
-77 |         isLoading.value = true;
-78 |         error.value = null;
-79 |         try {
-80 |             const params = new URLSearchParams({
-81 |                 page:        currentPage.value.toString(),
-82 |                 per_page:    perPage.value.toString(),
-83 |                 sort:        sortBy.value,
-84 |                 order:       sortOrder.value,
-85 |             });
-86 | 
-87 |             // apply filters
-88 |             const active: Record<string, any> = {};
-89 |             Object.entries(filters.value).forEach(([k, v]) => {
-90 |                 if (v !== '' && v != null) {
-91 |                     active[k] = v;
-92 |                 }
-93 |             });
-94 |             if (Object.keys(active).length) {
-95 |                 params.append('filter', JSON.stringify(active));
-96 |             }
-97 | 
-98 |             const url = `/mediaplans?${params.toString()}`;
-99 |             const resp = await customFetch(url) as MediaplanListResponse;
-100 | 
-101 |             mediaplans.value  = resp.items;
-102 |             totalItems.value  = resp.total_items;
-103 |             totalPages.value  = resp.total_pages;
-104 |             currentPage.value = resp.current_page;
-105 |         } catch (err) {
-106 |             error.value = err instanceof Error ? err.message : 'Error fetching mediaplans';
-107 |             mediaplans.value = [];
-108 |             totalItems.value = totalPages.value = 0;
-109 |         } finally {
-110 |             isLoading.value = false;
-111 |         }
-112 |     }
-113 | 
-114 |     /** Update a single filter and reload */
-115 |     function setFilter(key: keyof MediaplanFilter, value: unknown) {
-116 |         filters.value = { ...filters.value, [key]: value };
-117 |         currentPage.value = 0;
-118 |         fetchMediaplans();
-119 |     }
+33 |     const selectedMediaplan = ref<Mediaplan | null>(null)
+34 | 
+35 | 
+36 |     // Pagination
+37 |     const totalItems  = ref(0);
+38 |     const totalPages  = ref(0);
+39 |     const currentPage = ref(0);
+40 |     const perPage     = ref(10);
+41 | 
+42 |     // Filters & Sorting
+43 |     const filters   = ref<MediaplanFilter>({ search: '', status: '' });
+44 |     const sortBy    = ref('updated_at');
+45 |     const sortOrder = ref<'asc' | 'desc'>('desc');
+46 | 
+47 |     const hasFilters = computed(() =>
+48 |         !!(
+49 |             filters.value.search ||
+50 |             filters.value.status ||
+51 |             filters.value.brand_id ||
+52 |             filters.value.country
+53 |         )
+54 |     );
+55 | 
+56 |     // --- Actions ---
+57 |     /** Load real source‐lists (when API is available) */
+58 |     async function fetchSources() {
+59 |         isLoading.value = true;
+60 |         try {
+61 |             const res = await customFetch('/mediaplans/sources?type=overview') as SourcesResponse;
+62 |             sources.value = {
+63 |                 brands:       res.data.brand       ?? [],
+64 |                 countries:    res.data.country     ?? [],
+65 |                 subsegments:  res.data.subsegment  ?? [],
+66 |                 products:     res.data.product     ?? [],
+67 |                 campaigntypes:res.data.campaigntype ?? [],
+68 |                 languages:    res.data.language    ?? []
+69 |             };
+70 |         } catch {
+71 |             // keep the mock data
+72 |         } finally {
+73 |             isLoading.value = false;
+74 |         }
+75 |     }
+76 | // Inside defineStore in mediaplanStore.ts
+77 | 
+78 | 
+79 |     /**
+80 |      * Fetch a single Mediaplan by ID
+81 |      */
+82 |     async function fetchMediaplan(id: string) {
+83 |         isLoading.value = true
+84 |         error.value = null
+85 |         try {
+86 |             const res = await customFetch(`/mediaplans/${id}`) as Mediaplan
+87 |             selectedMediaplan.value = res
+88 |         } catch (err) {
+89 |             selectedMediaplan.value = null
+90 |             error.value = err instanceof Error ? err.message : 'Error fetching mediaplan'
+91 |         } finally {
+92 |             isLoading.value = false
+93 |         }
+94 |     }
+95 |     /** Fetch paginated & filtered list */
+96 |     async function fetchMediaplans() {
+97 |         isLoading.value = true;
+98 |         error.value = null;
+99 |         try {
+100 |             const params = new URLSearchParams({
+101 |                 page:        currentPage.value.toString(),
+102 |                 per_page:    perPage.value.toString(),
+103 |                 sort:        sortBy.value,
+104 |                 order:       sortOrder.value,
+105 |             });
+106 | 
+107 |             // apply filters
+108 |             const active: Record<string, any> = {};
+109 |             Object.entries(filters.value).forEach(([k, v]) => {
+110 |                 if (v !== '' && v != null) {
+111 |                     active[k] = v;
+112 |                 }
+113 |             });
+114 |             if (Object.keys(active).length) {
+115 |                 params.append('filter', JSON.stringify(active));
+116 |             }
+117 | 
+118 |             const url = `/mediaplans?${params.toString()}`;
+119 |             const resp = await customFetch(url) as MediaplanListResponse;
 120 | 
-121 |     /** Clear all filters back to defaults */
-122 |     function clearFilters() {
-123 |         filters.value = { search: '', status: '' };
-124 |         currentPage.value = 0;
-125 |         fetchMediaplans();
-126 |     }
-127 | 
-128 |     /** Change sorting and reload */
-129 |     function setSorting(field: string, order: 'asc' | 'desc') {
-130 |         sortBy.value    = field;
-131 |         sortOrder.value = order;
-132 |         fetchMediaplans();
-133 |     }
-134 | 
-135 |     /** Change page and reload */
-136 |     function setPage(page: number) {
-137 |         currentPage.value = page;
+121 |             mediaplans.value  = resp.items;
+122 |             totalItems.value  = resp.total_items;
+123 |             totalPages.value  = resp.total_pages;
+124 |             currentPage.value = resp.current_page;
+125 |         } catch (err) {
+126 |             error.value = err instanceof Error ? err.message : 'Error fetching mediaplans';
+127 |             mediaplans.value = [];
+128 |             totalItems.value = totalPages.value = 0;
+129 |         } finally {
+130 |             isLoading.value = false;
+131 |         }
+132 |     }
+133 | 
+134 |     /** Update a single filter and reload */
+135 |     function setFilter(key: keyof MediaplanFilter, value: unknown) {
+136 |         filters.value = { ...filters.value, [key]: value };
+137 |         currentPage.value = 0;
 138 |         fetchMediaplans();
 139 |     }
 140 | 
-141 |     /** Initialize both sources and list */
-142 |     function init() {
-143 |         fetchSources();
-144 |         fetchMediaplans();
-145 |     }
-146 | 
-147 |     return {
-148 |         // state
-149 |         sources,
-150 |         mediaplans,
-151 |         isLoading,
-152 |         error,
-153 |         totalItems,
-154 |         totalPages,
-155 |         currentPage,
-156 |         perPage,
-157 |         filters,
-158 |         sortBy,
-159 |         sortOrder,
-160 |         hasFilters,
-161 |         // actions
-162 |         fetchSources,
-163 |         fetchMediaplans,
-164 |         setFilter,
-165 |         clearFilters,
-166 |         setSorting,
-167 |         setPage,
-168 |         init
-169 |     };
-170 | });
+141 |     /** Clear all filters back to defaults */
+142 |     function clearFilters() {
+143 |         filters.value = { search: '', status: '' };
+144 |         currentPage.value = 0;
+145 |         fetchMediaplans();
+146 |     }
+147 | 
+148 |     /** Change sorting and reload */
+149 |     function setSorting(field: string, order: 'asc' | 'desc') {
+150 |         sortBy.value    = field;
+151 |         sortOrder.value = order;
+152 |         fetchMediaplans();
+153 |     }
+154 | 
+155 |     /** Change page and reload */
+156 |     function setPage(page: number) {
+157 |         currentPage.value = page;
+158 |         fetchMediaplans();
+159 |     }
+160 | 
+161 |     /** Initialize both sources and list */
+162 |     function init() {
+163 |         fetchSources();
+164 |         fetchMediaplans();
+165 |     }
+166 | 
+167 |     return {
+168 |         // state
+169 |         sources,
+170 |         mediaplans,
+171 |         selectedMediaplan,
+172 |         isLoading,
+173 |         error,
+174 |         totalItems,
+175 |         totalPages,
+176 |         currentPage,
+177 |         perPage,
+178 |         filters,
+179 |         sortBy,
+180 |         sortOrder,
+181 |         hasFilters,
+182 |         // actions
+183 |         fetchSources,
+184 |         fetchMediaplans,
+185 |         fetchMediaplan,
+186 |         setFilter,
+187 |         clearFilters,
+188 |         setSorting,
+189 |         setPage,
+190 |         init
+191 |     }
+192 | });
 ```
 
 src/stores/projectStore.ts
@@ -4917,77 +5157,80 @@ src/types/project.ts
 1 | // src/types/project.ts
 2 | 
 3 | // Country reference
-4 | export interface Country {
-5 |   code: string;
-6 |   name: string;
-7 | }
-8 | 
-9 | // Basic structure for default variables
-10 | export interface ProjectDefaultVars {
-11 |   targeturls: string | null;
-12 |   subsegment: string | null;
-13 |   campaigntype: string | null;
-14 |   language: string | null;
-15 |   campaigndetail: string | null;
-16 |   adtype: string | null;
-17 |   dimension: string | null;
-18 | }
-19 | 
-20 | // Basic structure for descriptive variables
-21 | export interface ProjectDescriptiveVars {
-22 |   brand: string;
-23 |   country: string;
-24 |   bmwponumber: string;
-25 |   adobecampaignname: string;
-26 |   subsegment: string;
-27 |   campaigntype: string;
-28 |   projectname: string;
-29 |   year: number;
-30 | }
-31 | 
-32 | // Duration information
-33 | export interface ProjectDuration {
-34 |   start_date: string;
-35 |   end_date: string;
-36 |   formatted: string;
-37 | }
-38 | 
-39 | // Project object
-40 | export interface Project {
-41 |   _id: string;
-42 |   abbreviation: string;
-43 |   created_at: string;
-44 |   default_vars: ProjectDefaultVars;
-45 |   descriptive_vars: ProjectDescriptiveVars;
-46 |   is_locked: boolean;
-47 |   labels: string[];
-48 |   lock_state: number;
-49 |   owner: string;
-50 |   updated_at: string;
-51 |   uploaded_at: string;
-52 |   message: string;
-53 |   timestamp: string;
-54 |   version: string;
-55 |   duration?: ProjectDuration;
-56 |   detail?: string;
-57 |   mediaplanId?: string;
-58 | }
-59 | 
-60 | // Project create request
-61 | export interface ProjectCreate {
-62 |   abbreviation?: string;
-63 |   default_vars: ProjectDefaultVars;
-64 |   descriptive_vars: ProjectDescriptiveVars;
-65 |   labels?: string[];
-66 | }
-67 | 
-68 | // API response for project list
-69 | export interface ProjectListResponse {
-70 |   total_items: number;
-71 |   total_pages: number;
-72 |   current_page: number;
-73 |   items: Project[];
-74 | }
+4 | import type {Budget} from "./mediaplan.ts";
+5 | 
+6 | export interface Country {
+7 |   code: string;
+8 |   name: string;
+9 | }
+10 | 
+11 | // Basic structure for default variables
+12 | export interface ProjectDefaultVars {
+13 |   targeturls: string | null;
+14 |   subsegment: string | null;
+15 |   campaigntype: string | null;
+16 |   language: string | null;
+17 |   campaigndetail: string | null;
+18 |   adtype: string | null;
+19 |   dimension: string | null;
+20 | }
+21 | 
+22 | // Basic structure for descriptive variables
+23 | export interface ProjectDescriptiveVars {
+24 |   brand: string;
+25 |   country: string;
+26 |   bmwponumber: string;
+27 |   adobecampaignname: string;
+28 |   subsegment: string;
+29 |   campaigntype: string;
+30 |   projectname: string;
+31 |   year: number;
+32 | }
+33 | 
+34 | // Duration information
+35 | export interface ProjectDuration {
+36 |   start_date: string;
+37 |   end_date: string;
+38 |   formatted: string;
+39 | }
+40 | 
+41 | // Project object
+42 | export interface Project {
+43 |   _id: string;
+44 |   abbreviation: string;
+45 |   created_at: string;
+46 |   default_vars: ProjectDefaultVars;
+47 |   descriptive_vars: ProjectDescriptiveVars;
+48 |   is_locked: boolean;
+49 |   labels: string[];
+50 |   lock_state: number;
+51 |   owner: string;
+52 |   updated_at: string;
+53 |   uploaded_at: string;
+54 |   message: string;
+55 |   timestamp: string;
+56 |   version: string;
+57 |   duration?: ProjectDuration;
+58 |   detail?: string;
+59 |   budget?: Budget;
+60 |   mediaplanId?: string;
+61 | }
+62 | 
+63 | // Project create request
+64 | export interface ProjectCreate {
+65 |   abbreviation?: string;
+66 |   default_vars: ProjectDefaultVars;
+67 |   descriptive_vars: ProjectDescriptiveVars;
+68 |   labels?: string[];
+69 | }
+70 | 
+71 | // API response for project list
+72 | export interface ProjectListResponse {
+73 |   total_items: number;
+74 |   total_pages: number;
+75 |   current_page: number;
+76 |   items: Project[];
+77 | }
 ```
 
 src/validations/validations.ts
@@ -5480,247 +5723,212 @@ src/views/ProjectDetail.vue
 3 | import { useRouter, useRoute } from 'vue-router';
 4 | import MainLayout from '@/layouts/MainLayout.vue';
 5 | import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue';
-6 | // Entferne den Import von ProjectToolbar
-7 | // import ProjectToolbar from '@/components/project/ProjectToolbar.vue';
-8 | // Füge den Import von MediaplanHeader hinzu
-9 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue';
-10 | // Füge den Import von MediaplanViewToggle hinzu (falls noch nicht vorhanden)
-11 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue';
-12 | import CampaignListView from '@/components/project/CampaignListView.vue';
-13 | import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue';
-14 | import { useMediaplanStore } from '@/stores/mediaplanStore';
-15 | import { useProjectStore } from '@/stores/projectStore';
-16 | import { useCampaignStore } from '@/stores/campaignStore';
-17 | import type { Project } from '@/types/project';
-18 | import { formatDateRange } from '@/helpers/dateUtils';
-19 | // Importiere den Helper für die Prozentrechnung
-20 | import { calculatePercentage } from '@/helpers/currencyUtils';
-21 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue"; // Pfad prüfen
-22 | 
-23 | // --- Props & Route ---
-24 | const props = defineProps<{ mediaplanId?: string; projectId?: string; }>();
-25 | const route = useRoute();
-26 | const router = useRouter();
-27 | const currentMediaplanId = ref(props.mediaplanId || route.params.mediaplanId as string);
-28 | const currentProjectId = ref(props.projectId || route.params.projectId as string);
-29 | 
-30 | // --- Stores ---
-31 | const mediaplanStore = useMediaplanStore();
-32 | const projectStore = useProjectStore();
-33 | const campaignStore = useCampaignStore();
-34 | 
-35 | // --- Computed Properties ---
-36 | const parentMediaplan = computed(() => mediaplanStore.selectedMediaplan);
-37 | const project = computed(() => projectStore.selectedProject);
-38 | const isLoadingProject = computed(() => projectStore.isLoading);
-39 | const errorProject = computed(() => projectStore.error);
-40 | const campaigns = computed(() => campaignStore.campaigns);
-41 | const totalCampaigns = computed(() => campaignStore.totalItems);
-42 | const isLoadingCampaigns = computed(() => campaignStore.isLoading);
-43 | const errorCampaigns = computed(() => campaignStore.error);
-44 | const campaignCurrentPage = computed(() => campaignStore.currentPage);
-45 | const campaignItemsPerPage = computed(() => campaignStore.perPage);
-46 | 
-47 | // --- UI State ---
-48 | // currentView wird jetzt für den MediaplanViewToggle benötigt
-49 | const currentView = ref<string>('planning'); // 'planning' or 'budget'
-50 | const search = ref<string>('');
+6 | // import ProjectToolbar from '@/components/project/ProjectToolbar.vue';
+7 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue';
+8 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue';
+9 | import CampaignListView from '@/components/project/CampaignListView.vue';
+10 | import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue';
+11 | import { useMediaplanStore } from '@/stores/mediaplanStore';
+12 | import { useProjectStore } from '@/stores/projectStore';
+13 | import { useCampaignStore } from '@/stores/campaignStore';
+14 | import type { Project } from '@/types/project';
+15 | import { formatDateRange } from '@/helpers/dateUtils';
+16 | import { calculatePercentage } from '@/helpers/currencyUtils';
+17 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
+18 | import ProjectDetailTable from "@/components/project/ProjectDetailTable.vue"; // Pfad prüfen
+19 | 
+20 | // --- Props & Route ---
+21 | const props = defineProps<{ mediaplanId?: string; projectId?: string; }>();
+22 | const route = useRoute();
+23 | const router = useRouter();
+24 | const currentMediaplanId = ref(props.mediaplanId || route.params.mediaplanId as string);
+25 | const currentProjectId = ref(props.projectId || route.params.projectId as string);
+26 | 
+27 | // --- Stores ---
+28 | const mediaplanStore = useMediaplanStore();
+29 | const projectStore = useProjectStore();
+30 | const campaignStore = useCampaignStore();
+31 | 
+32 | // --- Computed Properties ---
+33 | const parentMediaplan = computed(() => mediaplanStore.selectedMediaplan);
+34 | const project = computed(() => projectStore.selectedProject);
+35 | const isLoadingProject = computed(() => projectStore.isLoading);
+36 | const errorProject = computed(() => projectStore.error);
+37 | const campaigns = computed(() => campaignStore.campaigns);
+38 | const totalCampaigns = computed(() => campaignStore.totalItems);
+39 | const isLoadingCampaigns = computed(() => campaignStore.isLoading);
+40 | const errorCampaigns = computed(() => campaignStore.error);
+41 | const campaignCurrentPage = computed(() => campaignStore.currentPage);
+42 | const campaignItemsPerPage = computed(() => campaignStore.perPage);
+43 | 
+44 | // --- UI State ---
+45 | // currentView wird jetzt für den MediaplanViewToggle benötigt
+46 | const currentView = ref<string>('planning'); // 'planning' or 'budget'
+47 | const search = ref<string>('');
+48 | 
+49 | // --- Snackbar ---
+50 | const snackbar = reactive({ show: false, text: '', color: 'success' });
 51 | 
-52 | // --- Snackbar ---
-53 | const snackbar = reactive({ show: false, text: '', color: 'success' });
-54 | 
-55 | // --- Methods ---
-56 | const handleCampaignOptionsUpdate = (options: { /* ... */ page: number; itemsPerPage: number; }) => {
-57 |   const newZeroBasedPage = options.page - 1;
-58 |   let needsReload = false;
-59 |   if (newZeroBasedPage !== campaignCurrentPage.value) {
-60 |     campaignStore.currentPage = newZeroBasedPage;
-61 |     needsReload = true;
-62 |   }
-63 |   if (options.itemsPerPage !== campaignItemsPerPage.value) {
-64 |     campaignStore.perPage = options.itemsPerPage;
-65 |     if (campaignStore.currentPage !== 0) campaignStore.currentPage = 0;
-66 |     needsReload = true;
+52 | // --- Methods ---
+53 | const handleCampaignOptionsUpdate = (options: { /* ... */ page: number; itemsPerPage: number; }) => {
+54 |   const newZeroBasedPage = options.page - 1;
+55 |   let needsReload = false;
+56 |   if (newZeroBasedPage !== campaignCurrentPage.value) {
+57 |     campaignStore.currentPage = newZeroBasedPage;
+58 |     needsReload = true;
+59 |   }
+60 |   if (options.itemsPerPage !== campaignItemsPerPage.value) {
+61 |     campaignStore.perPage = options.itemsPerPage;
+62 |     if (campaignStore.currentPage !== 0) campaignStore.currentPage = 0;
+63 |     needsReload = true;
+64 |   }
+65 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
+66 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
 67 |   }
-68 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
-69 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
-70 |   }
-71 | };
-72 | 
-73 | const openCreateCampaignDialog = () => { /* ... */
-74 |   console.log('Trigger create campaign');
-75 | };
-76 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => { /* ... */
-77 |   snackbar.text = text;
-78 |   snackbar.color = color;
-79 |   snackbar.show = true;
-80 | };
-81 | 
-82 | // Handler für das @update:search Event von MediaplanHeader
-83 | const updateSearchHandler = (value: string | null) => {
-84 |   search.value = value || '';
-85 |   // Hier Logik zum Filtern der Kampagnen basierend auf 'search.value' hinzufügen, falls gewünscht
-86 |   // z.B. campaignStore.setFilter('search', search.value); campaignStore.fetchCampaigns(...)
-87 | };
-88 | 
-89 | 
-90 | // --- Lifecycle Hooks ---
-91 | onMounted(() => {
-92 |   if (!currentMediaplanId.value || !currentProjectId.value) {
-93 |     console.error('Missing ID(s) for Project Detail view');
-94 |     errorProject.value = 'Missing Mediaplan or Project ID.'; // Set error directly or via store
-95 |     return;
-96 |   }
-97 |   projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
-98 |   campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
-99 |   // Lade den Parent-Mediaplan nur, wenn er noch nicht geladen ist oder ein anderer ist
-100 |   if (!parentMediaplan.value || parentMediaplan.value._id !== currentMediaplanId.value) {
-101 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
-102 |   }
-103 | });
-104 | 
-105 | // --- Watchers ---
-106 | // Beobachte Routenänderungen, um Daten neu zu laden
-107 | watch(() => [route.params.mediaplanId, route.params.projectId], ([newMpId, newPId]) => {
-108 |   let needsReload = false;
-109 |   if (newMpId && typeof newMpId === 'string' && newMpId !== currentMediaplanId.value) {
-110 |     currentMediaplanId.value = newMpId;
-111 |     needsReload = true;
-112 |   }
-113 |   if (newPId && typeof newPId === 'string' && newPId !== currentProjectId.value) {
-114 |     currentProjectId.value = newPId;
-115 |     needsReload = true;
-116 |   }
-117 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
-118 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
-119 |     projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
-120 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
-121 |   }
-122 | }, { deep: true }); // deep watch might be needed if params object changes identity
-123 | 
-124 | watch(errorProject, (newError) => {
-125 |   if (newError) showSnackbar(`Error loading project: ${newError}`, 'error');
+68 | };
+69 | 
+70 | const openCreateCampaignDialog = () => { /* ... */
+71 |   console.log('Trigger create campaign');
+72 | };
+73 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => { /* ... */
+74 |   snackbar.text = text;
+75 |   snackbar.color = color;
+76 |   snackbar.show = true;
+77 | };
+78 | 
+79 | // Handler für das @update:search Event von MediaplanHeader
+80 | const updateSearchHandler = (value: string | null) => {
+81 |   search.value = value || '';
+82 |   // Hier Logik zum Filtern der Kampagnen basierend auf 'search.value' hinzufügen, falls gewünscht
+83 |   // z.B. campaignStore.setFilter('search', search.value); campaignStore.fetchCampaigns(...)
+84 | };
+85 | 
+86 | 
+87 | // --- Lifecycle Hooks ---
+88 | onMounted(() => {
+89 |   if (!currentMediaplanId.value || !currentProjectId.value) {
+90 |     console.error('Missing ID(s) for Project Detail view');
+91 |     errorProject.value = 'Missing Mediaplan or Project ID.'; // Set error directly or via store
+92 |     return;
+93 |   }
+94 |   projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
+95 |   campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
+96 |   // Lade den Parent-Mediaplan nur, wenn er noch nicht geladen ist oder ein anderer ist
+97 |   if (!parentMediaplan.value || parentMediaplan.value._id !== currentMediaplanId.value) {
+98 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
+99 |   }
+100 | });
+101 | 
+102 | // --- Watchers ---
+103 | // Beobachte Routenänderungen, um Daten neu zu laden
+104 | watch(() => [route.params.mediaplanId, route.params.projectId], ([newMpId, newPId]) => {
+105 |   let needsReload = false;
+106 |   if (newMpId && typeof newMpId === 'string' && newMpId !== currentMediaplanId.value) {
+107 |     currentMediaplanId.value = newMpId;
+108 |     needsReload = true;
+109 |   }
+110 |   if (newPId && typeof newPId === 'string' && newPId !== currentProjectId.value) {
+111 |     currentProjectId.value = newPId;
+112 |     needsReload = true;
+113 |   }
+114 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
+115 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
+116 |     projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
+117 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
+118 |   }
+119 | }, { deep: true });
+120 | 
+121 | watch(errorProject, (newError) => {
+122 |   if (newError) showSnackbar(`Error loading project: ${newError}`, 'error');
+123 | });
+124 | watch(errorCampaigns, (newError) => {
+125 |   if (newError) showSnackbar(`Error loading campaigns: ${newError}`, 'error');
 126 | });
-127 | watch(errorCampaigns, (newError) => {
-128 |   if (newError) showSnackbar(`Error loading campaigns: ${newError}`, 'error');
-129 | });
-130 | 
-131 | // Optional: Watch search changes for immediate filtering
-132 | // watch(search, (newValue) => { ... });
-133 | </script>
-134 | 
-135 | <template>
-136 |   <MainLayout>
-137 |     <div class="project-detail">
-138 |       <v-alert v-if="errorProject && !isLoadingProject" type="error" density="compact" class="mb-4" closable>
-139 |         Error loading project details: {{ errorProject }}
-140 |       </v-alert>
-141 |       <div v-if="isLoadingProject && !project" class="text-center my-10">
-142 |         <v-progress-circular indeterminate color="primary" size="40"></v-progress-circular>
-143 |         <p class="mt-2 text-disabled">Loading Project...</p>
-144 |       </div>
-145 | 
-146 |       <template v-if="!isLoadingProject && project">
-147 |         <MediaplanTopSection
-148 |             :mediaplan="parentMediaplan"
-149 |             :project="project"
-150 |             :search="search"
-151 |             :is-loading="isLoadingProject || mediaplanStore.isLoading"
-152 |             :current-view="currentView"
-153 |             @update:search="updateSearchHandler"
-154 |             @update:current-view="val => currentView = val"
-155 |         >
-156 |           <template #campaign-type-select>
-157 |             <!-- TODO v-select - select campaigntyppe -->
-158 |           </template>
-159 |         </MediaplanTopSection>
-160 |         <v-row v-if="project" class="mb-4">
-161 |           <v-col>
-162 |             <v-card variant="outlined">
-163 |               <v-card-title class="d-flex align-center text-h6">
-164 |                 <span>Project: {{ project.abbreviation }}</span>
-165 |                 <v-spacer></v-spacer>
-166 |                 <v-chip size="small" class="ml-2" :color="project.is_locked ? 'orange' : 'grey-lighten-1'" label>
-167 |                   <v-icon start :icon="project.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant'"></v-icon>
-168 |                   {{ project.is_locked ? 'Locked' : 'Unlocked' }}
-169 |                 </v-chip>
-170 |               </v-card-title>
-171 |               <v-card-subtitle class="pb-2">
-172 |                 {{ project.descriptive_vars?.projectname }}
-173 |               </v-card-subtitle>
-174 |               <v-card-text class="pt-2">
-175 |                 <v-chip size="small" class="mr-2 mb-1" label prepend-icon="mdi-flag">
-176 |                   {{ project.descriptive_vars?.country || 'N/A' }}
-177 |                 </v-chip>
-178 |                 <v-chip size="small" class="mr-2 mb-1" label prepend-icon="mdi-tag-outline">
-179 |                   {{ project.default_vars?.campaigntype || 'N/A' }}
-180 |                 </v-chip>
-181 |                 <v-chip size="small" class="mr-2 mb-1" label prepend-icon="mdi-account-outline">
-182 |                   {{ project.owner || 'N/A' }}
-183 |                 </v-chip>
-184 |                 <v-chip v-if="project.duration" size="small" class="mr-2 mb-1" label prepend-icon="mdi-calendar-range">
-185 |                   {{
-186 |                     project.duration.formatted || formatDateRange(project.duration.start_date, project.duration.end_date)
-187 |                   }}
-188 |                 </v-chip>
-189 |                 <p v-if="project.detail" class="text-body-2 mt-3">{{ project.detail }}</p>
-190 |               </v-card-text>
-191 |             </v-card>
-192 |           </v-col>
-193 |         </v-row>
-194 | 
-195 |         <template v-if="project">
-196 |           <div class="main-content">
-197 |             <CampaignListView
-198 |                 v-if="currentView === 'planning'"
-199 |                 :campaigns="campaigns"
-200 |                 :total-campaigns="totalCampaigns"
-201 |                 :is-loading="isLoadingCampaigns"
-202 |                 :current-page="campaignCurrentPage"
-203 |                 :items-per-page="campaignItemsPerPage"
-204 |                 @update:options="handleCampaignOptionsUpdate"
-205 |                 @add-campaign="openCreateCampaignDialog"
-206 |             />
-207 |             <MediaplanBudgetView
-208 |                 v-else-if="currentView === 'budget' && parentMediaplan"
-209 |                 :mediaplan="parentMediaplan"
-210 |             />
-211 |             <div v-else-if="currentView === 'budget' && !parentMediaplan">
-212 |               Loading budget data... </div>
-213 | 
-214 |             <v-alert v-if="errorCampaigns && currentView === 'planning'" type="error" density="compact" class="mt-4"
-215 |                      closable>
-216 |               Failed to load campaigns: {{ errorCampaigns }}
-217 |             </v-alert>
-218 |           </div>
-219 |         </template>
-220 |         <template v-else-if="!isLoadingProject && errorProject">
-221 |           <div class="text-center my-10 text-disabled">
-222 |             <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
-223 |             <p>Could not load Project data.</p>
-224 |           </div>
-225 |         </template>
-226 |       </template>
-227 | 
-228 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-229 |         {{ snackbar.text }}
-230 |         <template v-slot:actions>
-231 |           <v-btn icon="mdi-close" @click="snackbar.show = false"></v-btn>
-232 |         </template>
-233 |       </v-snackbar>
-234 |     </div>
-235 |   </MainLayout>
-236 | </template>
-237 | 
-238 | <style scoped>
-239 | .project-detail {
-240 |   padding-bottom: 20px;
-241 | }
-242 | 
-243 | .main-content {
-244 |   min-height: 60vh;
-245 | }
-246 | </style>
+127 | 
+128 | // Optional: Watch search changes for immediate filtering
+129 | // watch(search, (newValue) => { ... });
+130 | </script>
+131 | 
+132 | <template>
+133 |   <MainLayout>
+134 |     <div class="project-detail">
+135 |       <v-alert v-if="errorProject && !isLoadingProject" type="error" density="compact" class="mb-4" closable>
+136 |         Error loading project details: {{ errorProject }}
+137 |       </v-alert>
+138 |       <div v-if="isLoadingProject && !project" class="text-center my-10">
+139 |         <v-progress-circular indeterminate color="primary" size="40"></v-progress-circular>
+140 |         <p class="mt-2 text-disabled">Loading Project...</p>
+141 |       </div>
+142 | 
+143 |       <template v-if="!isLoadingProject && project">
+144 |         <MediaplanTopSection
+145 |             :mediaplan="parentMediaplan"
+146 |             :project="project"
+147 |             :search="search"
+148 |             :is-loading="isLoadingProject || mediaplanStore.isLoading"
+149 |             :current-view="currentView"
+150 |             @update:search="updateSearchHandler"
+151 |             @update:current-view="val => currentView = val"
+152 |         >
+153 |           <template #campaign-type-select>
+154 |             <!-- TODO v-select - select campaigntyppe -->
+155 |           </template>
+156 |         </MediaplanTopSection>
+157 | 
+158 |         <ProjectDetailTable :project="project" class="pb-3"/>
+159 | 
+160 |         <template v-if="project">
+161 |           <div class="main-content">
+162 |             <CampaignListView
+163 |                 v-if="currentView === 'planning'"
+164 |                 :campaigns="campaigns"
+165 |                 :total-campaigns="totalCampaigns"
+166 |                 :is-loading="isLoadingCampaigns"
+167 |                 :current-page="campaignCurrentPage"
+168 |                 :items-per-page="campaignItemsPerPage"
+169 |                 @update:options="handleCampaignOptionsUpdate"
+170 |                 @add-campaign="openCreateCampaignDialog"
+171 |             />
+172 |             <MediaplanBudgetView
+173 |                 v-else-if="currentView === 'budget' && parentMediaplan"
+174 |                 :mediaplan="parentMediaplan"
+175 |             />
+176 |             <div v-else-if="currentView === 'budget' && !parentMediaplan">
+177 |               Loading budget data... </div>
+178 | 
+179 |             <v-alert v-if="errorCampaigns && currentView === 'planning'" type="error" density="compact" class="mt-4"
+180 |                      closable>
+181 |               Failed to load campaigns: {{ errorCampaigns }}
+182 |             </v-alert>
+183 |           </div>
+184 |         </template>
+185 |         <template v-else-if="!isLoadingProject && errorProject">
+186 |           <div class="text-center my-10 text-disabled">
+187 |             <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
+188 |             <p>Could not load Project data.</p>
+189 |           </div>
+190 |         </template>
+191 |       </template>
+192 | 
+193 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+194 |         {{ snackbar.text }}
+195 |         <template v-slot:actions>
+196 |           <v-btn icon="mdi-close" @click="snackbar.show = false"></v-btn>
+197 |         </template>
+198 |       </v-snackbar>
+199 |     </div>
+200 |   </MainLayout>
+201 | </template>
+202 | 
+203 | <style scoped>
+204 | .project-detail {
+205 |   padding-bottom: 20px;
+206 | }
+207 | 
+208 | .main-content {
+209 |   min-height: 60vh;
+210 | }
+211 | </style>
 ```
 
 src/components/common/CountryFlag.vue
@@ -6342,7 +6550,7 @@ src/components/mediaplan/MediaplanInfo.vue
 16 |       <v-btn 
 17 |         color="primary" 
 18 |         variant="flat" 
-19 |         prepend-icon="mdi-pencil"
+19 |         prepend-icon="mdi-pencil-outline"
 20 |         :to="`/mediaplans/${mediaplanId}/edit`"
 21 |       >
 22 |         Edit
@@ -6456,220 +6664,228 @@ src/components/mediaplan/MediaplanInfo.vue
 src/components/mediaplan/MediaplanPlanningView.vue
 ```
 1 | <script setup lang="ts">
-2 | import { ref, watch, computed } from 'vue';
-3 | import { useRouter } from 'vue-router'; // Router importieren für Links
+2 | import {ref, watch, computed} from 'vue';
+3 | import {useRouter} from 'vue-router'; // Router importieren für Links
 4 | import CountryFlag from '@/components/common/CountryFlag.vue'; // Pfad prüfen
-5 | import { getBrandLogo } from "@/helpers/brandUtils"; // Pfad prüfen
-6 | import type { Project } from '@/types/project'; // Pfad prüfen
-7 | 
-8 | // --- Props ---
-9 | interface Props {
-10 |   projects: Project[];
-11 |   totalProjects: number;
-12 |   isLoading: boolean;
-13 |   currentPage: number;
-14 |   itemsPerPage: number;
-15 |   mediaplanId: string; // *** Diese Prop ist entscheidend für den Link ***
-16 | }
-17 | 
-18 | const props = withDefaults(defineProps<Props>(), {
-19 |   projects: () => [],
-20 |   totalProjects: 0,
-21 |   isLoading: false,
-22 |   currentPage: 0,
-23 |   itemsPerPage: 10,
-24 |   mediaplanId: '' // Wichtig: Muss vom Parent (MediaplanDetail) übergeben werden!
-25 | });
-26 | 
-27 | // --- Emits ---
-28 | const emit = defineEmits<{
-29 |   (e: 'addProject'): void;
-30 |   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
-31 | }>();
-32 | 
-33 | // Router Instanz
-34 | const router = useRouter();
-35 | 
-36 | // --- Computed Properties für Tabelle ---
-37 | const pageModel = computed({
-38 |   get: () => props.currentPage + 1,
-39 |   set: (value) => {}
-40 | });
-41 | 
-42 | const itemsPerPageModel = computed({
-43 |   get: () => props.itemsPerPage,
-44 |   set: (value) => {}
-45 | });
-46 | 
-47 | // --- Tabellen-Header ---
-48 | const headers = [
-49 |   { title: '', key: 'edit', sortable: false, width: '50px' },
-50 |   { title: 'Name', key: 'abbreviation', sortable: true, align: 'start' },
-51 |   { title: 'Country', key: 'descriptive_vars.country', sortable: true },
-52 |   { title: 'Duration', key: 'duration.formatted', sortable: false },
-53 |   { title: 'Detail', key: 'detail', sortable: true },
-54 |   { title: 'Campaign Type', key: 'default_vars.campaigntype', sortable: true },
-55 |   { title: 'Subsegment', key: 'default_vars.subsegment', sortable: true },
-56 |   { title: 'Locked', key: 'is_locked', sortable: true, align: 'center' },
-57 |   { title: 'Actions', key: 'actions', sortable: false, align: 'center', width: '50px' }
-58 | ];
-59 | 
-60 | // --- Methoden ---
-61 | const onOptionsUpdate = (options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }) => {
-62 |   emit('update:options', options);
-63 | };
-64 | 
-65 | const addProject = () => {
-66 |   emit('addProject');
-67 | };
+5 | import {getBrandLogo} from "@/helpers/brandUtils"; // Pfad prüfen
+6 | import type {Project} from '@/types/project';
+7 | import {projectHeaders} from "@/constants/project.ts";
+8 | import {formatPercentage, percentage} from "../../helpers/format.ts"; // Pfad prüfen
+9 | 
+10 | // --- Props ---
+11 | interface Props {
+12 |   projects: Project[];
+13 |   totalProjects: number;
+14 |   isLoading: boolean;
+15 |   currentPage: number;
+16 |   itemsPerPage: number;
+17 |   mediaplanId: string; // *** Diese Prop ist entscheidend für den Link ***
+18 | }
+19 | 
+20 | const props = withDefaults(defineProps<Props>(), {
+21 |   projects: () => [],
+22 |   totalProjects: 0,
+23 |   isLoading: false,
+24 |   currentPage: 0,
+25 |   itemsPerPage: 10,
+26 |   mediaplanId: '' // Wichtig: Muss vom Parent (MediaplanDetail) übergeben werden!
+27 | });
+28 | 
+29 | // --- Emits ---
+30 | const emit = defineEmits<{
+31 |   (e: 'addProject'): void;
+32 |   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
+33 | }>();
+34 | 
+35 | // Router Instanz
+36 | const router = useRouter();
+37 | 
+38 | // --- Computed Properties für Tabelle ---
+39 | const pageModel = computed({
+40 |   get: () => props.currentPage + 1,
+41 |   set: (value) => {
+42 |   }
+43 | });
+44 | 
+45 | const itemsPerPageModel = computed({
+46 |   get: () => props.itemsPerPage,
+47 |   set: (value) => {
+48 |   }
+49 | });
+50 | 
+51 | 
+52 | // --- Methoden ---
+53 | const onOptionsUpdate = (options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }) => {
+54 |   emit('update:options', options);
+55 | };
+56 | 
+57 | const addProject = () => {
+58 |   emit('addProject');
+59 | };
+60 | 
+61 | const editProject = (project: Project) => {
+62 |   console.log('Edit project:', project._id);
+63 |   // Navigation zur Edit-Seite oder Dialog öffnen
+64 |   // router.push({ name: 'ProjectEdit', params: { mediaplanId: props.mediaplanId, projectId: project._id } });
+65 | };
+66 | 
+67 | </script>
 68 | 
-69 | const editProject = (project: Project) => {
-70 |   console.log('Edit project:', project._id);
-71 |   // Navigation zur Edit-Seite oder Dialog öffnen
-72 |   // router.push({ name: 'ProjectEdit', params: { mediaplanId: props.mediaplanId, projectId: project._id } });
-73 | };
-74 | 
-75 | </script>
-76 | 
-77 | <template>
-78 |   <div class="planning-view-container mt-4">
-79 |     <v-card class="projects-table elevation-0" variant="flat">
-80 |       <v-theme-provider theme="dark">
-81 |         <v-data-table-server
-82 |             v-model:items-per-page="itemsPerPageModel"
-83 |             v-model:page="pageModel"
-84 |             :headers="headers"
-85 |             :items="projects"
-86 |             :items-length="totalProjects"
-87 |             :loading="isLoading"
-88 |             item-value="_id"
-89 |             hover
-90 |             class="projects-data-table"
-91 |             @update:options="onOptionsUpdate"
+69 | <template>
+70 |   <div class="planning-view-container mt-4">
+71 |     <v-card class="projects-table elevation-0" variant="flat">
+72 |       <v-theme-provider theme="dark">
+73 |         <v-data-table-server
+74 |             v-model:items-per-page="itemsPerPageModel"
+75 |             v-model:page="pageModel"
+76 |             :headers="projectHeaders"
+77 |             :items="projects"
+78 |             :items-length="totalProjects"
+79 |             :loading="isLoading"
+80 |             item-value="_id"
+81 |             hover
+82 |             class="projects-data-table"
+83 |             @update:options="onOptionsUpdate"
+84 | 
+85 |         >
+86 |           <template v-slot:item.edit="{ item }">
+87 |             <v-btn icon density="compact" variant="text" @click.stop="editProject(item)">
+88 |               <v-icon>mdi-pencil-outline</v-icon>
+89 |               <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+90 |             </v-btn>
+91 |           </template>
 92 | 
-93 |         >
-94 |           <template v-slot:item.edit="{ item }">
-95 |             <v-btn icon density="comfortable" variant="text" color="grey" @click.stop="editProject(item)">
-96 |               <v-icon>mdi-pencil</v-icon>
-97 |               <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
-98 |             </v-btn>
-99 |           </template>
-100 | 
-101 |           <template v-slot:item.abbreviation="{ item }">
-102 |             <router-link
-103 |                 :to="{ name: 'ProjectDetail', params: { mediaplanId: props.mediaplanId, projectId: item._id } }"
-104 |                 class="project-link d-flex align-center"
-105 |                 v-if="item.abbreviation && props.mediaplanId"
-106 |                 @click.stop
-107 |             >
-108 |               <v-avatar size="32" class="mr-2 grey lighten-4"
-109 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
-110 |               <span>{{ item.abbreviation }}</span>
-111 |             </router-link>
-112 |             <div class="d-flex align-center" v-else-if="item.abbreviation">
-113 |               <v-avatar size="32" class="mr-2 grey lighten-4"
-114 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
-115 |               <span>{{ item.abbreviation }}</span>
-116 |               <v-tooltip activator="parent" location="top">Cannot link project (missing Mediaplan ID)</v-tooltip>
-117 |             </div>
-118 |             <div v-else>N/A</div>
-119 |           </template>
-120 | 
-121 |           <template v-slot:item.descriptive_vars.country="{ item }">
-122 |             <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
-123 |               <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2"/>
-124 |               <span>{{ item.descriptive_vars.country }}</span>
-125 |             </div>
-126 |             <div v-else>N/A</div>
-127 |           </template>
-128 | 
-129 |           <template v-slot:item.duration.formatted="{ item }">
-130 |             <div class="d-flex align-center" v-if="item.duration?.formatted">
-131 |               <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
-132 |               <span>{{ item.duration.formatted }}</span>
-133 |             </div>
-134 |             <div v-else>N/A</div>
+93 |           <template v-slot:item.abbreviation="{ item }">
+94 |             <router-link
+95 |                 :to="{ name: 'ProjectDetail', params: { mediaplanId: props.mediaplanId, projectId: item._id } }"
+96 |                 class="project-link d-flex align-center"
+97 |                 v-if="item.abbreviation && props.mediaplanId"
+98 |                 @click.stop
+99 |             >
+100 |               <v-avatar size="32" class="mr-2 grey lighten-4"
+101 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
+102 |               <span>{{ item.abbreviation }}</span>
+103 |               <v-tooltip activator="parent" location="top">Open project</v-tooltip>
+104 |             </router-link>
+105 |             <div class="d-flex align-center" v-else-if="item.abbreviation">
+106 |               <v-avatar size="32" class="mr-2 grey lighten-4"
+107 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
+108 |               <span>{{ item.abbreviation }}</span>
+109 |               <v-tooltip activator="parent" location="top">Cannot link project (missing Mediaplan ID)</v-tooltip>
+110 |             </div>
+111 |             <div v-else>N/A</div>
+112 |           </template>
+113 | 
+114 |           <template v-slot:item.descriptive_vars.country="{ item }">
+115 |             <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
+116 |               <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2"/>
+117 |               <span>{{ item.descriptive_vars.country }}</span>
+118 |             </div>
+119 |             <div v-else>N/A</div>
+120 |           </template>
+121 | 
+122 |           <template v-slot:item.duration.formatted="{ item }">
+123 |             <div class="d-flex align-center" v-if="item.duration?.formatted">
+124 |               <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
+125 |               <span>{{ item.duration.formatted }}</span>
+126 |             </div>
+127 |             <div v-else>N/A</div>
+128 |           </template>
+129 | 
+130 |           <template v-slot:item.detail="{ item }">
+131 |             <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
+132 |             <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top"
+133 |                        max-width="300px">{{ item.detail }}
+134 |             </v-tooltip>
 135 |           </template>
 136 | 
-137 |           <template v-slot:item.detail="{ item }">
-138 |             <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
-139 |             <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top" max-width="300px">{{ item.detail }}</v-tooltip>
-140 |           </template>
-141 | 
-142 |           <template v-slot:item.default_vars.campaigntype="{ item }">
-143 |             {{ item.default_vars?.campaigntype || 'N/A' }}
-144 |           </template>
-145 | 
-146 |           <template v-slot:item.default_vars.subsegment="{ item }">
-147 |             {{ item.default_vars?.subsegment || 'N/A' }}
-148 |           </template>
-149 | 
-150 |           <template v-slot:item.is_locked="{ item }">
-151 |             <v-icon v-if="item.is_locked != null" :color="item.is_locked ? 'orange' : 'grey-lighten-1'">
-152 |               {{ item.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant' }}
-153 |             </v-icon>
-154 |             <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
+137 |           <template v-slot:item.default_vars.campaigntype="{ item }">
+138 |             {{ item.default_vars?.campaigntype || 'N/A' }}
+139 |           </template>
+140 | 
+141 |           <template v-slot:item.default_vars.subsegment="{ item }">
+142 |             {{ item.default_vars?.subsegment || 'N/A' }}
+143 |           </template>
+144 |           <template v-slot:item.budget="{ item }">
+145 |             <v-row no-gutters>
+146 |                 <v-progress-linear
+147 |                   :model-value="percentage(item?.budget?.used , item?.budget?.total )"
+148 |                   color="success"
+149 |                   height="8"
+150 |                   class="ml-2 mr-4"
+151 |                   style="width: 120px"
+152 |               ></v-progress-linear>
+153 |               {{ formatPercentage(item?.budget?.used, item?.budget?.total) }}
+154 |             </v-row>
 155 |           </template>
 156 | 
-157 |           <template v-slot:item.actions="{ item }">
-158 |             <v-menu>
-159 |               <template v-slot:activator="{ props: menuProps }">
-160 |                 <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
-161 |               </template>
-162 |               <v-list density="compact">
-163 |                 <v-list-item @click.stop="editProject(item)">
-164 |                   <v-list-item-title>Edit</v-list-item-title>
-165 |                 </v-list-item>
-166 |                 <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
-167 |                   <v-list-item-title>Delete</v-list-item-title>
-168 |                 </v-list-item>
-169 |               </v-list>
-170 |             </v-menu>
-171 |           </template>
-172 | 
-173 |           <template v-slot:loading>
-174 |             <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
-175 |           </template>
-176 |           <template v-slot:no-data>
-177 |             <div class="text-center pa-4 text-disabled">
-178 |               <v-icon size="large" class="mb-2">mdi-database-off-outline</v-icon>
-179 |               <p>No projects found for this mediaplan.</p>
-180 |             </div>
-181 |           </template>
-182 | 
-183 |           <template v-slot:bottom>
-184 |             <div class="d-flex align-center pa-4 bg-grey-lighten-2">
-185 |               <v-btn
-186 |                   prepend-icon="mdi-plus"
-187 |                   class="black-text-button"
-188 |                   variant="text"
-189 |                   color="black"
-190 |                   @click="addProject"
-191 |                   :disabled="isLoading"
-192 |               >
-193 |                 Add Project
-194 |               </v-btn>
-195 |             </div>
-196 |           </template>
-197 |         </v-data-table-server>
-198 |       </v-theme-provider>
-199 |     </v-card>
-200 |   </div>
-201 | 
-202 | </template>
-203 | 
-204 | <style scoped>
-205 | /* ... (Styles bleiben) ... */
-206 | .project-link {
-207 |   color: white; /* Oder eine andere passende Farbe im Dark Theme */
-208 |   text-decoration: none;
-209 |   font-weight: 500;
-210 | }
-211 | .project-link:hover {
-212 |   text-decoration: underline;
-213 |   color: #E0E0E0; /* Leichte Aufhellung beim Hover */
-214 | }
-215 | </style>
+157 |           <template v-slot:item.is_locked="{ item }">
+158 |             <v-icon v-if="item.is_locked != null" :color="item.is_locked ? 'orange' : 'grey-lighten-1'">
+159 |               {{ item.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant' }}
+160 |             </v-icon>
+161 |             <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
+162 |           </template>
+163 | 
+164 |           <template v-slot:item.actions="{ item }">
+165 |             <v-menu>
+166 |               <template v-slot:activator="{ props: menuProps }">
+167 |                 <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
+168 |               </template>
+169 |               <v-list density="compact">
+170 |                 <v-list-item @click.stop="editProject(item)">
+171 |                   <v-list-item-title>Edit</v-list-item-title>
+172 |                 </v-list-item>
+173 |                 <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
+174 |                   <v-list-item-title>Delete</v-list-item-title>
+175 |                 </v-list-item>
+176 |               </v-list>
+177 |             </v-menu>
+178 |           </template>
+179 | 
+180 |           <template v-slot:loading>
+181 |             <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
+182 |           </template>
+183 |           <template v-slot:no-data>
+184 |             <div class="text-center pa-4 text-disabled">
+185 |               <v-icon size="large" class="mb-2">mdi-database-off-outline</v-icon>
+186 |               <p>No projects found for this mediaplan.</p>
+187 |             </div>
+188 |           </template>
+189 | 
+190 |           <template v-slot:bottom>
+191 |             <div class="d-flex align-center pa-4 bg-grey-lighten-2">
+192 |               <v-btn
+193 |                   prepend-icon="mdi-plus"
+194 |                   class="black-text-button"
+195 |                   variant="text"
+196 |                   color="black"
+197 |                   @click="addProject"
+198 |                   :disabled="isLoading"
+199 |               >
+200 |                 Add Project
+201 |               </v-btn>
+202 |             </div>
+203 |           </template>
+204 |         </v-data-table-server>
+205 |       </v-theme-provider>
+206 |     </v-card>
+207 |   </div>
+208 | 
+209 | </template>
+210 | 
+211 | <style scoped>
+212 | /* ... (Styles bleiben) ... */
+213 | .project-link {
+214 |   color: white; /* Oder eine andere passende Farbe im Dark Theme */
+215 |   text-decoration: none;
+216 |   font-weight: 500;
+217 | }
+218 | 
+219 | .project-link:hover {
+220 |   text-decoration: underline;
+221 |   color: #E0E0E0; /* Leichte Aufhellung beim Hover */
+222 | }
+223 | </style>
 ```
 
 src/components/mediaplan/MediaplanProjects.vue
@@ -6762,7 +6978,7 @@ src/components/mediaplan/MediaplanProjects.vue
 86 |               v-bind="props"
 87 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
 88 |             >
-89 |               <v-icon>mdi-pencil</v-icon>
+89 |               <v-icon>mdi-pencil-outline</v-icon>
 90 |             </v-btn>
 91 |           </template>
 92 |         </v-tooltip>
@@ -7002,7 +7218,7 @@ src/components/mediaplan/ProjectsList.vue
 76 |           density="comfortable"
 77 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
 78 |         >
-79 |           <v-icon>mdi-pencil</v-icon>
+79 |           <v-icon>mdi-pencil-outline</v-icon>
 80 |         </v-btn>
 81 |         <v-btn
 82 |           icon
@@ -7225,7 +7441,7 @@ src/components/overview/CreateFirstProjectDialog.vue
 165 | 
 166 | <script setup lang="ts">
 167 | // Script content remains the same as the previous correct version
-168 | import {ref, computed, onMounted, watch, nextTick } from 'vue';
+168 | import {ref, computed, onMounted, watch, nextTick} from 'vue';
 169 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
 170 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
 171 | import {useProjectStore} from '@/stores/projectStore';
@@ -7252,162 +7468,186 @@ src/components/overview/CreateFirstProjectDialog.vue
 192 |   endDate?: string | Date | null
 193 |   brand?: { _id: string; name: string }
 194 | }
-195 | const props = defineProps<CreateFirstProjectDialogProps>()
-196 | 
-197 | const emit = defineEmits<{
-198 |   (e: 'update:modelValue', value: boolean): void;
-199 |   (e: 'created', projectId: string): void;
-200 | }>();
-201 | 
-202 | const form = ref<any>(null);
-203 | const projectStore = useProjectStore();
-204 | const isFormValid = ref(false);
-205 | const isSubmitting = ref(false);
-206 | 
-207 | const selectedCountry = ref<ProjectCountry | null>(null);
-208 | const selectedLanguage = ref<string | null>(null);
-209 | const selectedBuilder = ref<string | null>(null);
-210 | const selectedCampaignType = ref<string | null>(null);
-211 | const selectedPhase = ref<string | null>(null);
-212 | const selectedGoal = ref<string | null>(null);
-213 | 
-214 | const brandName = computed(() => props.brand?.name || 'Brand');
-215 | const poNumbersDisplay = computed(() => {
-216 |   if (!props.poNumbers || props.poNumbers.length === 0) return '-';
-217 |   return props.poNumbers.map(po => po.name).join(', ');
-218 | });
-219 | const startDateValue = computed(() => props.startDate || null);
-220 | const endDateValue = computed(() => props.endDate || null);
-221 | 
-222 | const countries = computed(() => projectStore.countries || []);
-223 | const languageOptions = computed(() => projectStore.languages || []);
-224 | const builders = computed(() => projectStore.builders?.map(b => ({code: b.id, name: b.name})) || []);
-225 | const campaignTypes = computed(() => projectStore.campaignTypes?.map(t => ({code: t.id, name: t.name})) || []);
-226 | const phases = computed(() => projectStore.phases?.map(p => ({code: p.id, name: p.name})) || []);
-227 | const goals = computed(() => projectStore.goals?.map(g => ({code: g.id, name: g.name})) || []);
-228 | 
-229 | const formIsReady = computed(() => {
-230 |   return isFormValid.value &&
-231 |       !!selectedCountry.value &&
-232 |       !!selectedLanguage.value &&
-233 |       !!selectedBuilder.value &&
-234 |       !!selectedCampaignType.value &&
-235 |       !!selectedPhase.value &&
-236 |       !!selectedGoal.value;
-237 | });
-238 | 
-239 | const availableLanguages = computed(() => {
-240 |   if (!selectedCountry.value) return [];
-241 |   return languageOptions.value.filter((lang: any) =>
-242 |       lang.country_codes?.includes(selectedCountry.value!.code)
-243 |   );
-244 | });
-245 | 
-246 | const validateForm = async (): Promise<boolean> => {
-247 |   if (!form.value) return false;
-248 |   const {valid} = await form.value.validate();
-249 |   return valid && formIsReady.value;
-250 | };
-251 | 
-252 | const resetFormFields = () => {
-253 |   selectedCountry.value = null;
-254 |   selectedLanguage.value = null;
-255 |   selectedBuilder.value = null;
-256 |   selectedCampaignType.value = null;
-257 |   selectedPhase.value = null;
-258 |   selectedGoal.value = null;
-259 |   nextTick(() => {
-260 |     form.value?.resetValidation();
-261 |   });
-262 | };
-263 | 
-264 | const submitForm = async () => {
-265 |   const isValid = await validateForm();
-266 |   if (!isValid) {
-267 |     showWarning('Please fill in all required fields correctly.');
-268 |     return;
-269 |   }
-270 | 
-271 |   isSubmitting.value = true;
-272 |   try {
-273 |     const payload = {
-274 |       country_code: selectedCountry.value?.code,
-275 |       language_code: selectedLanguage.value,
-276 |       builder_code: selectedBuilder.value,
-277 |       campaign_type_code: selectedCampaignType.value,
-278 |       phase_code: selectedPhase.value,
-279 |       goal_code: selectedGoal.value,
-280 |     };
-281 |     console.log("Submitting First Project Payload:", payload);
-282 | 
-283 |     console.log(`Calling create for mediaplan ID: ${props.mediaplanId}`);
-284 |     const newProject = await projectStore.createProject(props.mediaplanId, payload);
-285 |     showSuccess(`Project created successfully`);
-286 |     emit('created', newProject._id);
-287 | 
-288 |     emit('update:modelValue', false);
-289 | 
-290 |   } catch (error: any) {
-291 |     console.error(`Error creating first project:`, error);
-292 |     const message = error?.response?.data?.message || error?.message || `Failed to create project.`;
-293 |     showError(message);
-294 |   } finally {
-295 |     isSubmitting.value = false;
-296 |   }
-297 | };
-298 | 
-299 | const handleClose = (value: boolean) => {
-300 |   if (!value) {
-301 |     cancelDialog();
-302 |   }
-303 | }
-304 | 
-305 | const cancelDialog = () => {
-306 |   if (isSubmitting.value) {
-307 |     showWarning('Please wait, submission is in progress.');
-308 |     return;
-309 |   }
-310 |   resetFormFields();
-311 |   emit('update:modelValue', false);
-312 | };
+195 | 
+196 | const props = defineProps<CreateFirstProjectDialogProps>()
+197 | 
+198 | const emit = defineEmits<{
+199 |   (e: 'update:modelValue', value: boolean): void;
+200 |   (e: 'created', projectId: string): void;
+201 | }>();
+202 | 
+203 | const form = ref<any>(null);
+204 | const projectStore = useProjectStore();
+205 | const isFormValid = ref(false);
+206 | const isSubmitting = ref(false);
+207 | 
+208 | const selectedCountry = ref<ProjectCountry | null>(null);
+209 | const selectedLanguage = ref<string | null>(null);
+210 | const selectedBuilder = ref<string | null>(null);
+211 | const selectedCampaignType = ref<string | null>(null);
+212 | const selectedPhase = ref<string | null>(null);
+213 | const selectedGoal = ref<string | null>(null);
+214 | 
+215 | const brandName = computed(() => props.brand?.name || 'Brand');
+216 | const poNumbersDisplay = computed(() => {
+217 |   if (!props.poNumbers || props.poNumbers.length === 0) return '-';
+218 |   return props.poNumbers.map(po => po.name).join(', ');
+219 | });
+220 | const startDateValue = computed(() => props.startDate || null);
+221 | const endDateValue = computed(() => props.endDate || null);
+222 | 
+223 | const countries = computed(() => projectStore.countries || []);
+224 | const languageOptions = computed(() => projectStore.languages || []);
+225 | const builders = computed(() => projectStore.builders?.map(b => ({code: b.id, name: b.name})) || []);
+226 | const campaignTypes = computed(() => projectStore.campaignTypes?.map(t => ({code: t.id, name: t.name})) || []);
+227 | const phases = computed(() => projectStore.phases?.map(p => ({code: p.id, name: p.name})) || []);
+228 | const goals = computed(() => projectStore.goals?.map(g => ({code: g.id, name: g.name})) || []);
+229 | 
+230 | const formIsReady = computed(() => {
+231 |   return isFormValid.value &&
+232 |       !!selectedCountry.value &&
+233 |       !!selectedLanguage.value &&
+234 |       !!selectedBuilder.value &&
+235 |       !!selectedCampaignType.value &&
+236 |       !!selectedPhase.value &&
+237 |       !!selectedGoal.value;
+238 | });
+239 | 
+240 | const availableLanguages = computed(() => {
+241 |   if (!selectedCountry.value) return [];
+242 |   return languageOptions.value.filter((lang: any) =>
+243 |       lang.country_codes?.includes(selectedCountry.value!.code)
+244 |   );
+245 | });
+246 | 
+247 | const validateForm = async (): Promise<boolean> => {
+248 |   if (!form.value) return false;
+249 |   const {valid} = await form.value.validate();
+250 |   return valid && formIsReady.value;
+251 | };
+252 | 
+253 | const resetFormFields = () => {
+254 |   selectedCountry.value = null;
+255 |   selectedLanguage.value = null;
+256 |   selectedBuilder.value = null;
+257 |   selectedCampaignType.value = null;
+258 |   selectedPhase.value = null;
+259 |   selectedGoal.value = null;
+260 |   nextTick(() => {
+261 |     form.value?.resetValidation();
+262 |   });
+263 | };
+264 | 
+265 | const submitForm = async () => {
+266 |   const isValid = await validateForm();
+267 |   if (!isValid) {
+268 |     showWarning('Please fill in all required fields correctly.');
+269 |     return;
+270 |   }
+271 | 
+272 |   // Double-check that required refs have values before proceeding
+273 |   // formIsReady should cover this, but an extra check can be helpful.
+274 |   if (!selectedCountry.value || !selectedLanguage.value || !selectedPhase.value || !selectedCampaignType.value /* Add checks for other required fields if needed */) {
+275 |     showError("Critical project information is missing. Please check selections.");
+276 |     isSubmitting.value = false; // Ensure submission stops
+277 |     return;
+278 |   }
+279 | 
+280 |   isSubmitting.value = true;
+281 |   try {
+282 |     // --- Construct the single ProjectCreate object ---
+283 |     // NOTE: Determine how the project 'name' should be generated.
+284 |     // Using a combination of country/language as placeholder.
+285 |     // You might need a dedicated input or different logic.
+286 |     const projectCreateData: ProjectCreate = {
+287 |       mediaplanId: props.mediaplanId,
+288 |       name: `Project ${selectedCountry.value.code}-${selectedLanguage.value}`, // Placeholder name
+289 |       country: selectedCountry.value, // Pass the whole country object
+290 |       language: selectedLanguage.value, // Pass language code
+291 |       phase: selectedPhase.value, // Pass phase code
+292 |       campaignType: selectedCampaignType.value, // Pass campaign type code
+293 |       // Add goal, builder etc. IF the ProjectCreate type defines them
+294 |       // and if the store action uses them. Based on the store code provided,
+295 |       // builder/goal don't seem directly mapped in the payload construction.
+296 |       // goal: selectedGoal.value,
+297 |       // builder: selectedBuilder.value,
+298 |     };
+299 | 
+300 |     console.log("DEBUG: Submitting ProjectCreate object:", projectCreateData);
+301 | 
+302 |     // --- Call store action with the single object ---
+303 |     // The store action 'createProject' now receives the correctly structured object
+304 |     const newProjectResponse = await projectStore.createProject(projectCreateData);
+305 | 
+306 |     showSuccess(`Project created successfully`);
+307 |     // Assuming createProject returns the ID or relevant data
+308 |     // If it returns a mock ID like `project-${Date.now()}` as in the store code:
+309 |     const newProjectId = typeof newProjectResponse === 'string' ? newProjectResponse : newProjectResponse?._id || `unknown-${Date.now()}`;
+310 |     emit('created', newProjectId);
+311 | 
+312 |     emit('update:modelValue', false);
 313 | 
-314 | watch(() => props.modelValue, (isVisible) => {
-315 |   if (isVisible) {
-316 |     resetFormFields();
-317 |   }
-318 | });
-319 | 
-320 | watch(selectedCountry, (newCountry, oldCountry) => {
-321 |   if (newCountry !== oldCountry && oldCountry !== undefined) {
-322 |     selectedLanguage.value = null;
-323 |     nextTick(() => {
-324 |       if (availableLanguages.value.length === 1) {
-325 |         selectedLanguage.value = availableLanguages.value[0].code;
-326 |       }
-327 |     });
-328 |   }
-329 | });
-330 | 
-331 | onMounted(async () => {
-332 |   try {
-333 |     await projectStore.fetchProjectOptions();
-334 |     console.log("First Project Dialog options loaded on mount.");
-335 |   } catch (error) {
-336 |     console.error('Error fetching form options on mount:', error);
-337 |     showError('Failed to load required form options.');
-338 |   }
-339 | });
-340 | 
-341 | </script>
-342 | 
-343 | <style scoped>
-344 | .country-flag {
-345 |   width: 20px;
-346 |   height: auto;
-347 |   display: inline-block;
-348 |   vertical-align: middle;
-349 | }
-350 | </style>
+314 |   } catch (error: any) {
+315 |     console.error(`Error creating first project:`, error);
+316 |     // Log the specific error from the store if possible
+317 |     const message = error?.response?.data?.message || error?.message || `Failed to create project.`;
+318 |     showError(message);
+319 |   } finally {
+320 |     isSubmitting.value = false;
+321 |   }
+322 | };
+323 | const handleClose = (value: boolean) => {
+324 |   if (!value) {
+325 |     cancelDialog();
+326 |   }
+327 | }
+328 | 
+329 | const cancelDialog = () => {
+330 |   if (isSubmitting.value) {
+331 |     showWarning('Please wait, submission is in progress.');
+332 |     return;
+333 |   }
+334 |   resetFormFields();
+335 |   emit('update:modelValue', false);
+336 | };
+337 | 
+338 | watch(() => props.modelValue, (isVisible) => {
+339 |   if (isVisible) {
+340 |     resetFormFields();
+341 |   }
+342 | });
+343 | 
+344 | watch(selectedCountry, (newCountry, oldCountry) => {
+345 |   if (newCountry !== oldCountry && oldCountry !== undefined) {
+346 |     selectedLanguage.value = null;
+347 |     nextTick(() => {
+348 |       if (availableLanguages.value.length === 1) {
+349 |         selectedLanguage.value = availableLanguages.value[0].code;
+350 |       }
+351 |     });
+352 |   }
+353 | });
+354 | 
+355 | onMounted(async () => {
+356 |   try {
+357 |     await projectStore.fetchProjectOptions();
+358 |     console.log("First Project Dialog options loaded on mount.");
+359 |   } catch (error) {
+360 |     console.error('Error fetching form options on mount:', error);
+361 |     showError('Failed to load required form options.');
+362 |   }
+363 | });
+364 | 
+365 | </script>
+366 | 
+367 | <style scoped>
+368 | .country-flag {
+369 |   width: 20px;
+370 |   height: auto;
+371 |   display: inline-block;
+372 |   vertical-align: middle;
+373 | }
+374 | </style>
 ```
 
 src/components/overview/CreateMediaplanButton.vue
@@ -7603,7 +7843,7 @@ src/components/overview/CreateMediaplanDialog.vue
 131 |   />
 132 | 
 133 |   <!-- Project Creation Dialog (shown after mediaplan creation) -->
-134 |   <CreateProjectDialog
+134 |   <CreateFirstProjectDialog
 135 |       mode="create-mediaplan"
 136 |       v-if="showProjectDialog"
 137 |       v-model="showProjectDialog"
@@ -7625,7 +7865,7 @@ src/components/overview/CreateMediaplanDialog.vue
 153 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
 154 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
 155 | import DateRangePicker from './DateRangePicker.vue';
-156 | import CreateProjectDialog from '@/components/overview/CreateFirstProjectDialog.vue';
+156 | import CreateFirstProjectDialog from '@/components/overview/CreateFirstProjectDialog.vue';
 157 | import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
 158 | import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
 159 | import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
@@ -8463,7 +8703,7 @@ src/components/overview/MediaplanCard.vue
 22 |           </template>
 23 |           <span>{{ mediaplan.name }}</span>
 24 |         </v-tooltip>
-25 |         <v-icon size="x-small" color="primary" icon="mdi-pencil" class="mr-3"/>
+25 |         <v-icon size="x-small" color="primary" icon="mdi-pencil-outline" class="mr-3"/>
 26 | 
 27 |         <!-- Brand logo -->
 28 |         <v-img
@@ -9111,138 +9351,242 @@ src/components/project/CampaignListView.vue
 2 | import {ref, computed} from 'vue';
 3 | import type {Campaign} from '@/types/campaign';
 4 | import {useRouter} from 'vue-router';
-5 | 
-6 | // --- Props ---
-7 | interface Props {
-8 |   campaigns: Campaign[];
-9 |   totalCampaigns: number;
-10 |   isLoading: boolean;
-11 |   currentPage: number;
-12 |   itemsPerPage: number;
-13 | }
-14 | 
-15 | const props = withDefaults(defineProps<Props>(), { /* ... defaults ... */});
-16 | 
-17 | // --- Emits ---
-18 | const emit = defineEmits<{
-19 |   (e: 'addCampaign'): void;
-20 |   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
-21 | }>();
-22 | 
-23 | // --- Router ---
-24 | const router = useRouter();
-25 | 
-26 | // --- Tabelle Models & Header ---
-27 | const pageModel = computed({
-28 |   get: () => props.currentPage + 1, set: () => {
-29 |   }
-30 | });
-31 | const itemsPerPageModel = computed({
-32 |   get: () => props.itemsPerPage, set: () => {
-33 |   }
-34 | });
-35 | const headers = ref([
-36 |   {title: 'Campaign Name', key: 'campaignname', sortable: true},
-37 |   {title: 'Type', key: 'type', sortable: true},
-38 |   {title: 'Subsegment', key: 'subsegment', sortable: true},
-39 |   {title: 'Product', key: 'product', sortable: true},
-40 |   {title: 'Language', key: 'language', sortable: true},
-41 |   {title: 'Campaign Type', key: 'campaigntype', sortable: true},
-42 |   {title: 'Detail', key: 'campaigndetail', sortable: false, width: '200px'},
-43 |   {title: 'Created', key: 'created_at', sortable: true},
-44 |   {title: 'Actions', key: 'actions', sortable: false, align: 'center', width: '60px'}
-45 | ]);
-46 | 
-47 | // --- Methoden ---
-48 | const onOptionsUpdate = (options: any) => {
-49 |   emit('update:options', options);
-50 | };
-51 | const triggerAddCampaign = () => {
-52 |   emit('addCampaign');
-53 | };
-54 | const editCampaign = (item: Campaign) => {
-55 |   console.log('Edit Campaign:', item._id);
-56 | };
-57 | const deleteCampaign = (item: Campaign) => {
-58 |   console.log('Delete Campaign:', item._id);
-59 | };
-60 | 
-61 | </script>
-62 | 
-63 | <template>
-64 |   <div class="campaign-list-container">
-65 |     <v-card class="campaigns-table elevation-1" variant="outlined">
-66 |       <v-data-table-server
-67 |           v-model:items-per-page="itemsPerPageModel"
-68 |           v-model:page="pageModel"
-69 |           :headers="headers"
-70 |           :items="campaigns"
-71 |           :items-length="totalCampaigns"
-72 |           :loading="isLoading"
-73 |           :items-per-page-options="[15, 30, 50, 100]"
-74 |           item-value="_id"
-75 |           hover
-76 |           class="campaigns-data-table"
-77 |           @update:options="onOptionsUpdate"
-78 |       >
-79 |         <template v-slot:item.campaignname="{ item }"> {{ item.campaignname }}</template>
-80 |         <template v-slot:item.created_at="{ item }">
-81 |           {{ item.created_at ? new Date(item.created_at).toLocaleDateString('de-DE') : '-' }}
-82 |         </template>
-83 |         <template v-slot:item.campaigndetail="{ item }">
-84 |           <span class="d-inline-block text-truncate" style="max-width: 200px;"> {{ item.campaigndetail || '-' }} </span>
-85 |           <v-tooltip v-if="item.campaigndetail && item.campaigndetail.length > 30" activator="parent" location="top"
-86 |                      max-width="300px"> {{ item.campaigndetail }}
-87 |           </v-tooltip>
-88 |         </template>
-89 |         <template v-slot:item.actions="{ item }">
-90 |           <v-menu>
-91 |             <template v-slot:activator="{ props: menuProps }">
-92 |               <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
-93 |             </template>
-94 |             <v-list density="compact">
-95 |               <v-list-item @click.stop="editCampaign(item)">
-96 |                 <template v-slot:prepend>
-97 |                   <v-icon size="small">mdi-pencil</v-icon>
-98 |                 </template>
-99 |                 <v-list-item-title>Edit</v-list-item-title>
-100 |               </v-list-item>
-101 |               <v-list-item @click.stop="deleteCampaign(item)" class="text-error">
-102 |                 <template v-slot:prepend>
-103 |                   <v-icon size="small">mdi-delete-outline</v-icon>
-104 |                 </template>
-105 |                 <v-list-item-title>Delete</v-list-item-title>
-106 |               </v-list-item>
-107 |             </v-list>
-108 |           </v-menu>
-109 |         </template>
-110 |         <template v-slot:loading>
-111 |           <v-skeleton-loader type="table-row@10"></v-skeleton-loader>
-112 |         </template>
-113 |         <template v-slot:no-data>
-114 |           <div class="text-center pa-4 text-grey">
-115 |             <v-icon size="large" class="mb-2">mdi-bullhorn-off-outline</v-icon>
-116 |             <p>No campaigns found for this project.</p></div>
-117 |         </template>
-118 | 
-119 |         <template v-slot:bottom>
-120 |           <v-divider></v-divider>
-121 |           <div class="d-flex align-center pa-3">
-122 |             <v-btn prepend-icon="mdi-plus" variant="text" @click="triggerAddCampaign" :disabled="isLoading">
-123 |               Add Campaign
-124 |             </v-btn>
-125 |             <v-spacer></v-spacer>
-126 |             <span class="text-caption mr-4 text-disabled" v-if="totalCampaigns > 0 && !isLoading">
-127 |                   Total: {{ totalCampaigns }} Campaigns
-128 |                </span>
-129 |           </div>
-130 |         </template>
-131 |       </v-data-table-server>
-132 |     </v-card>
-133 |   </div>
-134 | </template>
-135 | 
-136 | <style scoped> /* ... */ </style>
+5 | import {campaignHeaders} from "@/constants/campaign.ts";
+6 | 
+7 | // --- Props ---
+8 | interface Props {
+9 |   campaigns: Campaign[];
+10 |   totalCampaigns: number;
+11 |   isLoading: boolean;
+12 |   currentPage: number;
+13 |   itemsPerPage: number;
+14 | }
+15 | 
+16 | const props = withDefaults(defineProps<Props>(), { /* ... defaults ... */});
+17 | 
+18 | // --- Emits ---
+19 | const emit = defineEmits<{
+20 |   (e: 'addCampaign'): void;
+21 |   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
+22 | }>();
+23 | 
+24 | // --- Router ---
+25 | const router = useRouter();
+26 | 
+27 | // --- Tabelle Models & Header ---
+28 | const pageModel = computed({
+29 |   get: () => props.currentPage + 1, set: () => {
+30 |   }
+31 | });
+32 | const itemsPerPageModel = computed({
+33 |   get: () => props.itemsPerPage, set: () => {
+34 |   }
+35 | });
+36 | 
+37 | // --- Methoden ---
+38 | const onOptionsUpdate = (options: any) => {
+39 |   emit('update:options', options);
+40 | };
+41 | const triggerAddCampaign = () => {
+42 |   emit('addCampaign');
+43 | };
+44 | const editCampaign = (item: Campaign) => {
+45 |   console.log('Edit Campaign:', item._id);
+46 | };
+47 | const deleteCampaign = (item: Campaign) => {
+48 |   console.log('Delete Campaign:', item._id);
+49 | };
+50 | 
+51 | </script>
+52 | 
+53 | <template>
+54 |   <div class="campaign-list-container">
+55 |     <v-card class="campaigns-table elevation-1">
+56 |       <v-data-table-server
+57 |           v-model:items-per-page="itemsPerPageModel"
+58 |           v-model:page="pageModel"
+59 |           :headers="campaignHeaders"
+60 |           :items="campaigns"
+61 |           :items-length="totalCampaigns"
+62 |           :loading="isLoading"
+63 |           :items-per-page-options="[15, 30, 50, 100]"
+64 |           item-value="_id"
+65 |           hover
+66 |           class="campaigns-data-table"
+67 |           @update:options="onOptionsUpdate"
+68 |       >
+69 |         <template v-slot:item.edit="{ item }">
+70 |           <v-btn icon density="compact" variant="text" @click.stop="editCampaign(item)">
+71 |             <v-icon>mdi-pencil-outline</v-icon>
+72 |             <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+73 |           </v-btn>
+74 |         </template>
+75 |         <template v-slot:item.campaignname="{ item }"> {{ item.campaignname }}</template>
+76 |         <template v-slot:item.created_at="{ item }">
+77 |           {{ item.created_at ? new Date(item.created_at).toLocaleDateString('de-DE') : '-' }}
+78 |         </template>
+79 |         <template v-slot:item.campaigndetail="{ item }">
+80 |           <span class="d-inline-block text-truncate" style="max-width: 200px;"> {{ item.campaigndetail || '-' }} </span>
+81 |           <v-tooltip v-if="item.campaigndetail && item.campaigndetail.length > 30" activator="parent" location="top"
+82 |                      max-width="300px"> {{ item.campaigndetail }}
+83 |           </v-tooltip>
+84 |         </template>
+85 |         <template v-slot:item.actions="{ item }">
+86 |           <v-menu>
+87 |             <template v-slot:activator="{ props: menuProps }">
+88 |               <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
+89 |             </template>
+90 |             <v-list density="compact">
+91 |               <v-list-item @click.stop="editCampaign(item)">
+92 |                 <template v-slot:prepend>
+93 |                   <v-icon size="small">mdi-pencil-outline</v-icon>
+94 |                 </template>
+95 |                 <v-list-item-title>Edit</v-list-item-title>
+96 |               </v-list-item>
+97 |               <v-list-item @click.stop="deleteCampaign(item)" class="text-error">
+98 |                 <template v-slot:prepend>
+99 |                   <v-icon size="small">mdi-delete-outline</v-icon>
+100 |                 </template>
+101 |                 <v-list-item-title>Delete</v-list-item-title>
+102 |               </v-list-item>
+103 |             </v-list>
+104 |           </v-menu>
+105 |         </template>
+106 |         <template v-slot:loading>
+107 |           <v-skeleton-loader type="table-row@10"></v-skeleton-loader>
+108 |         </template>
+109 |         <template v-slot:no-data>
+110 |           <div class="text-center pa-4 text-grey">
+111 |             <v-icon size="large" class="mb-2">mdi-bullhorn-off-outline</v-icon>
+112 |             <p>No campaigns found for this project.</p></div>
+113 |         </template>
+114 | 
+115 |         <template v-slot:bottom>
+116 |           <v-divider></v-divider>
+117 |           <div class="d-flex align-center pa-3">
+118 |             <v-btn prepend-icon="mdi-plus" variant="text" @click="triggerAddCampaign" :disabled="isLoading">
+119 |               Add Campaign
+120 |             </v-btn>
+121 |             <v-spacer></v-spacer>
+122 |             <span class="text-caption mr-4 text-disabled" v-if="totalCampaigns > 0 && !isLoading">
+123 |                   Total: {{ totalCampaigns }} Campaigns
+124 |                </span>
+125 |           </div>
+126 |         </template>
+127 |       </v-data-table-server>
+128 |     </v-card>
+129 |   </div>
+130 | </template>
+131 | 
+132 | <style scoped> /* ... */ </style>
+```
+
+src/components/project/ProjectDetailTable.vue
+```
+1 | <script setup lang="ts">
+2 | import { computed } from 'vue'
+3 | import CountryFlag from '@/components/common/CountryFlag.vue'
+4 | import { getBrandLogo } from '@/helpers/brandUtils'
+5 | import type { Project } from '@/types/project'
+6 | import { projectHeaders } from '@/constants/project.ts'
+7 | 
+8 | const props = defineProps<{ project: Project }>()
+9 | const items = computed(() => props.project ? [props.project] : [])
+10 | 
+11 | const editProject = (project: Project) => {
+12 |   console.log('Edit project:', project._id);
+13 |   // Navigation zur Edit-Seite oder Dialog öffnen
+14 |   // router.push({ name: 'ProjectEdit', params: { mediaplanId: props.mediaplanId, projectId: project._id } });
+15 | };
+16 | </script>
+17 | 
+18 | <template>
+19 |   <v-card class="projects-table elevation-0" variant="flat">
+20 |     <v-theme-provider theme="dark">
+21 |       <v-data-table
+22 |           :headers="projectHeaders"
+23 |           :items="items"
+24 |           class="projects-data-table project-detail-table"
+25 |           hide-default-footer
+26 |           hide-default-header
+27 |           item-value="_id"
+28 |           density="compact"
+29 |       >
+30 |         <template v-slot:item.edit="{ item }">
+31 |           <v-btn icon density="compact" variant="text"  @click.stop="editProject(item)">
+32 |             <v-icon>mdi-pencil-outline</v-icon>
+33 |             <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+34 |           </v-btn>
+35 |         </template>
+36 |         <template #item.abbreviation="{ item }">
+37 |           <div class="d-flex align-center">
+38 |             <v-avatar size="32" class="mr-2 grey lighten-4" :image="getBrandLogo(item.descriptive_vars?.brand)" />
+39 |             <span>{{ item.abbreviation }}</span>
+40 |           </div>
+41 |         </template>
+42 | 
+43 |         <template #item.descriptive_vars.country="{ item }">
+44 |           <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
+45 |             <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2" />
+46 |             <span>{{ item.descriptive_vars.country }}</span>
+47 |           </div>
+48 |         </template>
+49 | 
+50 |         <template #item.duration.formatted="{ item }">
+51 |           <div class="d-flex align-center" v-if="item.duration?.formatted">
+52 |             <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
+53 |             <span>{{ item.duration.formatted }}</span>
+54 |           </div>
+55 |         </template>
+56 | 
+57 |         <template #item.detail="{ item }">
+58 |           <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
+59 |           <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top">
+60 |             {{ item.detail }}
+61 |           </v-tooltip>
+62 |         </template>
+63 | 
+64 |         <template #item.default_vars.campaigntype="{ item }">
+65 |           {{ item.default_vars?.campaigntype || 'N/A' }}
+66 |         </template>
+67 | 
+68 |         <template #item.default_vars.subsegment="{ item }">
+69 |           {{ item.default_vars?.subsegment || 'N/A' }}
+70 |         </template>
+71 | 
+72 |         <template #item.is_locked="{ item }">
+73 |           <v-icon :color="item.is_locked ? 'orange' : 'grey-lighten-1'">
+74 |             {{ item.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant' }}
+75 |           </v-icon>
+76 |           <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
+77 |         </template>
+78 |         <template v-slot:item.actions="{ item }">
+79 |           <v-menu>
+80 |             <template v-slot:activator="{ props: menuProps }">
+81 |               <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
+82 |             </template>
+83 |             <v-list density="compact">
+84 |               <v-list-item @click.stop="editProject(item)">
+85 |                 <v-list-item-title>Edit</v-list-item-title>
+86 |               </v-list-item>
+87 |               <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
+88 |                 <v-list-item-title>Delete</v-list-item-title>
+89 |               </v-list-item>
+90 |             </v-list>
+91 |           </v-menu>
+92 |         </template>
+93 |       </v-data-table>
+94 |     </v-theme-provider>
+95 |   </v-card>
+96 | </template>
+97 | 
+98 | <style scoped>
+99 | /* Increase vertical spacing in the row */
+100 | ::v-deep(.project-detail-table .v-data-table__td) {
+101 |   padding-top: 6px !important;
+102 |   padding-bottom: 6px !important;
+103 | }
+104 | </style>
 ```
 
 src/components/common/dialog/DialogFooter.vue
