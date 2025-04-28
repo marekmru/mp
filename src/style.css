@@ -13,6 +13,7 @@
     background-color: #4D4D4D;
 }
 
+
 .v-theme--dark.v-table.projects-data-table .v-table__wrapper > table > tbody > tr > td {
     background-color: #666666;
 }
@@ -33,4 +34,18 @@
 
 .v-table.lineitem-data-table .v-table__wrapper > table > tbody > tr > td {
     background-color: #ffffff !important;
+}
+/* last dol left shadow */
+/*.v-table .v-table__wrapper > table > thead > tr > th:last-child,*/
+.v-table .v-table__wrapper > table > tbody > tr > td:last-child {
+    position: relative;
+    box-shadow: -6px 0px 8px -4px rgba(0, 0, 0, 0.33);
+    overflow: visible;
+    z-index: 1;
+}
+.v-table .v-table__wrapper > table > thead > tr > th:last-child,
+.v-table .v-table__wrapper > table > tbody > tr > td:last-child {
+    padding-left: 5px;
+    padding-right: 6px;
+
 }

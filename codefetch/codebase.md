@@ -1,5 +1,7 @@
 Project Structure:
 ├── README.md
+├── codefetch
+│   └── codebase.md
 ├── index.html
 ├── package-lock.json
 ├── package.json
@@ -673,49 +675,48 @@ src/helpers/dateUtils.ts
 3 | /**
 4 |  * Formats a date string to a readable format
 5 |  */
-6 | export const formatDate = (dateString?: string): string => {
-7 |   if (!dateString) return '';
-8 |   
-9 |   const date = new Date(dateString);
-10 |   return new Intl.DateTimeFormat('en-DE', {
-11 |     year: 'numeric',
-12 |     month: '2-digit',
-13 |     day: '2-digit'
-14 |   }).format(date);
-15 | };
-16 | 
-17 | /**
-18 |  * Formats a date range to a readable format
-19 |  */
-20 | export const formatDateRange = (startDate?: string, endDate?: string): string => {
-21 |   if (!startDate || !endDate) return '';
-22 |   
-23 |   const start = new Date(startDate);
-24 |   const end = new Date(endDate);
-25 |   
-26 |   const startFormatted = formatDate(startDate);
-27 |   const endFormatted = formatDate(endDate);
-28 |   
-29 |   return `${startFormatted} - ${endFormatted}`;
-30 | };
-31 | 
-32 | /**
-33 |  * Formats a date to DD.MM-DD.MM.YYYY format (used for campaign durations)
-34 |  */
-35 | export const formatCampaignDuration = (startDate?: string, endDate?: string): string => {
-36 |   if (!startDate || !endDate) return '';
-37 |   
-38 |   const start = new Date(startDate);
-39 |   const end = new Date(endDate);
-40 |   
-41 |   const startDay = String(start.getDate()).padStart(2, '0');
-42 |   const startMonth = String(start.getMonth() + 1).padStart(2, '0');
-43 |   const endDay = String(end.getDate()).padStart(2, '0');
-44 |   const endMonth = String(end.getMonth() + 1).padStart(2, '0');
-45 |   const year = end.getFullYear();
-46 |   
-47 |   return `${startDay}.${startMonth}-${endDay}.${endMonth}.${year}`;
-48 | };
+6 | export const formatDate = (dateString?: string, format: string = 'DD.MM.YYYY'): string => {
+7 |     if (!dateString) return '';
+8 | 
+9 |     const date = new Date(dateString);
+10 |     return format === 'DD.MM.YYYY' ?
+11 |         `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}` :
+12 |         new Intl.DateTimeFormat('en-DE', {
+13 |             year: 'numeric',
+14 |             month: '2-digit',
+15 |             day: '2-digit'
+16 |         }).format(date);
+17 | };
+18 | 
+19 | /**
+20 |  * Formats a date range to a readable format
+21 |  */
+22 | export const formatDateRange = (startDate?: string, endDate?: string, format: string = 'DD.MM.YYYY'): string => {
+23 |     if (!startDate || !endDate) return '';
+24 | 
+25 |     const startFormatted = formatDate(startDate, format);
+26 |     const endFormatted = formatDate(endDate, format);
+27 | 
+28 |     return `${startFormatted} - ${endFormatted}`;
+29 | };
+30 | 
+31 | /**
+32 |  * Formats a date to DD.MM-DD.MM.YYYY format (used for campaign durations)
+33 |  */
+34 | export const formatCampaignDuration = (startDate?: string, endDate?: string): string => {
+35 |     if (!startDate || !endDate) return '';
+36 | 
+37 |     const start = new Date(startDate);
+38 |     const end = new Date(endDate);
+39 | 
+40 |     const startDay = String(start.getDate()).padStart(2, '0');
+41 |     const startMonth = String(start.getMonth() + 1).padStart(2, '0');
+42 |     const endDay = String(end.getDate()).padStart(2, '0');
+43 |     const endMonth = String(end.getMonth() + 1).padStart(2, '0');
+44 |     const year = end.getFullYear();
+45 | 
+46 |     return `${startDay}.${startMonth}-${endDay}.${endMonth}.${year}`;
+47 | };
 ```
 
 src/helpers/emitter.ts
@@ -5931,1347 +5932,6 @@ src/views/ProjectDetail.vue
 211 | </style>
 ```
 
-src/components/common/CountryFlag.vue
-```
-1 | <template>
-2 |   <span :class="`fi fi-${country.toLowerCase()}`" :style="flagStyle"></span>
-3 | </template>
-4 | 
-5 | <script setup lang="ts">
-6 | import {computed} from 'vue';
-7 | import 'flag-icons/css/flag-icons.min.css';
-8 | 
-9 | const props = defineProps<{
-10 |   country: string;
-11 |   size?: string;
-12 | }>();
-13 | 
-14 | const flagStyle = computed(() => {
-15 |   return {
-16 |     fontSize: props.size || '1.5em',
-17 |     lineHeight: 1,
-18 |     verticalAlign: 'middle',
-19 |     display: 'inline-block'
-20 |   };
-21 | });
-22 | </script>
-23 | 
-24 | <style scoped>
-25 | 
-26 | 
-27 | span[class^="fi"] {
-28 | }
-29 | 
-30 | </style>
-```
-
-src/components/common/MediaplanTopSection.vue
-```
-1 | <template>
-2 |   <!-- Wrapper with native tooltip showing the current level on hover -->
-3 |   <div :title="levelDisplay">
-4 |     <v-row class="mb-0">
-5 |       <v-col cols="12" md="5" class="d-flex align-center pt-0 pb-0">
-6 |         <MediaplanBreadcrumb :mediaplan="mediaplan" :project="project" />
-7 |       </v-col>
-8 |       <v-col cols="12" md="7">
-9 |         <MediaplanHeader
-10 |             :plan-budget="mediaplan?.budget?.total || 0"
-11 |             :used-percentage="calculatePercentage(mediaplan?.budget?.used, mediaplan?.budget?.total)"
-12 |             :search="search"
-13 |             @update:search="val => emit('update:search', val)"
-14 |             :is-loading="isLoading"
-15 |         />
-16 |       </v-col>
-17 |     </v-row>
-18 | 
-19 |     <v-row class="mb-4">
-20 |       <v-col cols="12" sm="auto">
-21 |         <MediaplanViewToggle v-model="internalView" />
-22 |       </v-col>
-23 |       <v-col>
-24 |         <slot name="campaign-type-select" />
-25 |       </v-col>
-26 |     </v-row>
-27 | 
-28 |   </div>
-29 | </template>
-30 | 
-31 | <script setup lang="ts">
-32 | import { toRefs, computed } from 'vue'
-33 | import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue'
-34 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue'
-35 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue'
-36 | import type { Mediaplan } from '@/types/mediaplan'
-37 | import type { Project } from '@/types/project'
-38 | import type { Campaign } from '@/types/campaign'
-39 | 
-40 | const props = defineProps<{
-41 |   mediaplan: Mediaplan | null
-42 |   project: Project | null
-43 |   campaign?: Campaign | null
-44 |   search: string
-45 |   isLoading: boolean
-46 |   currentView: 'planning' | 'budget'
-47 | }>()
-48 | 
-49 | const emit = defineEmits<{
-50 |   (e: 'update:search', value: string): void
-51 |   (e: 'update:current-view', value: 'planning' | 'budget'): void
-52 | }>()
-53 | 
-54 | const { mediaplan, project, campaign, search, isLoading, currentView } = toRefs(props)
-55 | 
-56 | // Internal binding for the view toggle
-57 | const internalView = computed<'planning' | 'budget'>({
-58 |   get: () => currentView.value,
-59 |   set: val => emit('update:current-view', val),
-60 | })
-61 | 
-62 | // Determine which level we’re in
-63 | const levelDisplay = computed(() => {
-64 |   if (campaign?.value) return 'Campaign'
-65 |   if (project.value)    return 'Project'
-66 |   return 'Mediaplan'
-67 | })
-68 | 
-69 | function calculatePercentage(used: number | undefined, total: number | undefined): number {
-70 |   if (!used || !total) return 0
-71 |   return (used / total) * 100
-72 | }
-73 | </script>
-74 | 
-75 | <style scoped>
-76 | /* Optional: eigene Styles hier hinzufügen */
-77 | </style>
-```
-
-src/components/common/NotificationSnackbar.vue
-```
-1 | <template>
-2 |   <v-snackbar
-3 |     v-model="notification.show"
-4 |     :color="notification.type"
-5 |     :timeout="notification.timeout"
-6 |     class="notification-snackbar"
-7 |   >
-8 |     <div class="d-flex align-center">
-9 |       <v-icon :icon="getIconForType(notification.type)" class="mr-3" />
-10 |       <span>{{ notification.text }}</span>
-11 |     </div>
-12 |     <template v-slot:actions v-if="notification.closable">
-13 |       <v-btn
-14 |         icon
-15 |         variant="text"
-16 |         @click="closeNotification"
-17 |         size="small"
-18 |       >
-19 |         <v-icon>mdi-close</v-icon>
-20 |       </v-btn>
-21 |     </template>
-22 |   </v-snackbar>
-23 | </template>
-24 | 
-25 | <script setup lang="ts">
-26 | import { notification, closeNotification, NotificationType } from '@/helpers/notificationUtils';
-27 | 
-28 | /**
-29 |  * Gets the appropriate icon for the notification type
-30 |  * @param type Notification type
-31 |  * @returns Material Design Icon name
-32 |  */
-33 | const getIconForType = (type: NotificationType): string => {
-34 |   switch (type) {
-35 |     case NotificationType.SUCCESS:
-36 |       return 'mdi-check-circle';
-37 |     case NotificationType.ERROR:
-38 |       return 'mdi-alert-circle';
-39 |     case NotificationType.WARNING:
-40 |       return 'mdi-alert';
-41 |     case NotificationType.INFO:
-42 |     default:
-43 |       return 'mdi-information';
-44 |   }
-45 | };
-46 | </script>
-47 | 
-48 | <style scoped>
-49 | .notification-snackbar {
-50 |   z-index: 9999;
-51 | }
-52 | </style>
-```
-
-src/components/common/PaginationControls.vue
-```
-1 | <template>
-2 |   <div class="d-flex justify-center align-center my-4">
-3 |     <v-pagination
-4 |         v-model="modelValue"
-5 |         :length="length"
-6 |         :disabled="disabled"
-7 |         :total-visible="totalVisible"
-8 |         rounded="circle"
-9 |         @update:model-value="updatePage"
-10 |     />
-11 | 
-12 |     <div v-if="showItemsPerPage" class="ml-4 d-flex align-center">
-13 |       <span class="text-caption mr-2">Items per page:</span>
-14 |       <v-select
-15 |           v-model="itemsPerPage"
-16 |           :items="itemsPerPageOptions"
-17 |           density="compact"
-18 |           variant="outlined"
-19 |           hide-details
-20 |           class="items-per-page-select"
-21 |           @update:model-value="updateItemsPerPage"
-22 |       />
-23 |     </div>
-24 |   </div>
-25 | </template>
-26 | 
-27 | <script setup lang="ts">
-28 | import { computed, ref, watch } from 'vue';
-29 | 
-30 | interface Props {
-31 |   modelValue: number;
-32 |   length: number;
-33 |   disabled?: boolean;
-34 |   totalVisible?: number;
-35 |   showItemsPerPage?: boolean;
-36 |   itemsPerPageValue?: number;
-37 |   itemsPerPageOptions?: number[];
-38 | }
-39 | 
-40 | const props = withDefaults(defineProps<Props>(), {
-41 |   disabled: false,
-42 |   totalVisible: 7,
-43 |   showItemsPerPage: true,
-44 |   itemsPerPageValue: 10,
-45 |   itemsPerPageOptions: () => [10, 25, 50, 100]
-46 | });
-47 | 
-48 | const emit = defineEmits<{
-49 |   (e: 'update:model-value', value: number): void;
-50 |   (e: 'update:items-per-page', value: number): void;
-51 | }>();
-52 | 
-53 | // Internal model value for v-pagination (needs to be 1-based)
-54 | const modelValue = computed({
-55 |   get: () => props.modelValue + 1, // Convert from 0-based to 1-based
-56 |   set: (value: number) => {
-57 |     emit('update:model-value', value - 1); // Convert from 1-based to 0-based
-58 |   }
-59 | });
-60 | 
-61 | // Items per page handling
-62 | const itemsPerPage = ref(props.itemsPerPageValue);
-63 | 
-64 | // When props change, update the local state
-65 | watch(() => props.itemsPerPageValue, (newValue) => {
-66 |   itemsPerPage.value = newValue;
-67 | });
-68 | 
-69 | const updatePage = (page: number) => {
-70 |   emit('update:model-value', page - 1); // Convert from 1-based to 0-based
-71 | };
-72 | 
-73 | const updateItemsPerPage = (value: number) => {
-74 |   itemsPerPage.value = value;
-75 |   emit('update:items-per-page', value);
-76 | };
-77 | </script>
-78 | 
-79 | <style scoped>
-80 | .items-per-page-select {
-81 |   width: 80px;
-82 | }
-83 | </style>
-```
-
-src/components/mediaplan/DeleteProjectDialog.vue
-```
-1 | <template>
-2 |   <v-dialog v-model="internalValue" max-width="500" persistent>
-3 |     <v-card>
-4 |       <v-toolbar color="error" density="comfortable" dark>
-5 |         <v-toolbar-title>Confirm Delete</v-toolbar-title>
-6 |       </v-toolbar>
-7 |       
-8 |       <v-card-text class="pa-6">
-9 |         <v-alert
-10 |           v-if="error"
-11 |           type="error"
-12 |           variant="tonal"
-13 |           class="mb-4"
-14 |           closable
-15 |         >
-16 |           {{ error }}
-17 |         </v-alert>
-18 |         
-19 |         <p class="text-body-1">
-20 |           Are you sure you want to delete the project <strong>{{ project?.name }}</strong>?
-21 |         </p>
-22 |         <p class="text-body-2 mt-2 text-red">
-23 |           This action cannot be undone.
-24 |         </p>
-25 |       </v-card-text>
-26 |       
-27 |       <v-card-actions class="pa-6 pt-0">
-28 |         <v-spacer></v-spacer>
-29 |         <v-btn 
-30 |           variant="text" 
-31 |           @click="closeDialog"
-32 |           :disabled="isLoading"
-33 |         >
-34 |           Cancel
-35 |         </v-btn>
-36 |         <v-btn 
-37 |           color="error" 
-38 |           variant="flat"
-39 |           :loading="isLoading"
-40 |           @click="confirmDeletion"
-41 |         >
-42 |           Delete Project
-43 |         </v-btn>
-44 |       </v-card-actions>
-45 |     </v-card>
-46 |   </v-dialog>
-47 | </template>
-48 | 
-49 | <script setup lang="ts">
-50 | import { computed } from 'vue';
-51 | import type { Project } from '@/types/project';
-52 | 
-53 | // Define props
-54 | interface Props {
-55 |   modelValue: boolean;
-56 |   project: Project | null;
-57 |   isLoading: boolean;
-58 |   error: string | null;
-59 | }
-60 | 
-61 | // Define emits
-62 | const emit = defineEmits<{
-63 |   (e: 'update:modelValue', value: boolean): void;
-64 |   (e: 'confirm'): void;
-65 |   (e: 'cancel'): void;
-66 | }>();
-67 | 
-68 | // Computed property for v-model binding
-69 | const internalValue = computed({
-70 |   get: () => props.modelValue,
-71 |   set: (value: boolean) => emit('update:modelValue', value)
-72 | });
-73 | 
-74 | const closeDialog = () => {
-75 |   emit('cancel');
-76 | };
-77 | 
-78 | const confirmDeletion = () => {
-79 |   emit('confirm');
-80 | };
-81 | 
-82 | // Receive props with defaults
-83 | const props = withDefaults(defineProps<Props>(), {
-84 |   project: null,
-85 |   error: null
-86 | });
-87 | </script>
-```
-
-src/components/mediaplan/MediaplanBreadcrumb.vue
-```
-1 | // src/components/mediaplan/MediaplanBreadcrumb.vue (Angepasst)
-2 | 
-3 | <script setup lang="ts">
-4 | import {computed} from 'vue';
-5 | import {useRouter} from 'vue-router';
-6 | import type {Mediaplan} from '@/types/mediaplan'; // Pfad prüfen
-7 | import type {Project} from '@/types/project';
-8 | import {getBrandLogo} from "@/helpers/brandUtils.ts";   // Pfad prüfen
-9 | const router = useRouter();
-10 | 
-11 | // --- Props ---
-12 | // Akzeptiert jetzt optional ein ganzes Project-Objekt
-13 | interface Props {
-14 |   mediaplan?: Mediaplan | null;
-15 |   project?: Project | null;     // NEU: Akzeptiert Project-Objekt statt nur Name
-16 |   campaignName?: string;        // Bleibt vorerst als String
-17 | }
-18 | 
-19 | // Define events
-20 | const emit = defineEmits(['back']);
-21 | 
-22 | // Props mit Defaults
-23 | const props = withDefaults(defineProps<Props>(), {
-24 |   mediaplan: null,
-25 |   project: null,
-26 |   campaignName: '',
-27 | });
-28 | 
-29 | // --- Computed Properties für die Anzeige ---
-30 | const breadcrumbItems = computed(() => {
-31 |   const items = [];
-32 |   // Immer Home/Übersicht als Basis? Oder dynamisch? Hier als Beispiel statisch.
-33 |   items.push({title: 'Mediaplans', to: '/', disabled: !props.mediaplan});
-34 | 
-35 |   if (props.mediaplan) {
-36 |     items.push({
-37 |       title: props.mediaplan.name || 'Mediaplan',
-38 |       // Link nur aktiv, wenn wir tiefer sind (also wenn ein Projekt übergeben wurde)
-39 |       to: props.project ? {name: 'MediaplanDetail', params: {id: props.mediaplan._id}} : undefined,
-40 |       disabled: !props.project
-41 |     });
-42 | 
-43 |     if (props.project) {
-44 |       items.push({
-45 |         title: props.project.abbreviation || props.project.descriptive_vars?.projectname || 'Project',
-46 |         // Link nur aktiv, wenn wir tiefer sind (also wenn campaignName übergeben wurde)
-47 |         to: props.campaignName ? {
-48 |           name: 'ProjectDetail',
-49 |           params: {mediaplanId: props.mediaplan._id, projectId: props.project._id}
-50 |         } : undefined,
-51 |         disabled: !props.campaignName
-52 |       });
-53 | 
-54 |       if (props.campaignName) {
-55 |         items.push({
-56 |           title: props.campaignName,
-57 |           // Kein Link für das letzte Element
-58 |           disabled: true
-59 |         });
-60 |       }
-61 |     }
-62 |   }
-63 |   return items;
-64 | });
-65 | 
-66 | 
-67 | // --- Methods ---
-68 | const handleBack = () => {
-69 |   emit('back'); // Event auslösen
-70 |   // Gehe zur Mediaplan-Übersicht (oder eine Ebene höher, falls möglich/gewünscht)
-71 |   router.push({name: 'Overview'}); // Gehe zur allgemeinen Übersicht
-72 | };
-73 | 
-74 | </script>
-75 | 
-76 | <template>
-77 |   <div class="d-flex align-center">
-78 |     <v-btn
-79 |         icon
-80 |         variant="text"
-81 |         size="small"
-82 |         class="mr-1"
-83 |         @click="handleBack"
-84 |         aria-label="Go back to overview"
-85 |     >
-86 |       <v-icon> mdi-arrow-u-left-top
-87 |       </v-icon>
-88 |       <v-tooltip activator="parent" location="bottom">Back to Overview</v-tooltip>
-89 |     </v-btn>
-90 | 
-91 |     <div class="breadcrumb-content d-flex align-center flex-wrap">
-92 |       <div class="brand-logo mr-2 flex-shrink-0" v-if="mediaplan?.brand">
-93 |         <v-img
-94 |             :src="getBrandLogo(mediaplan.brand)"
-95 |             :alt="mediaplan.brand.name || ''"
-96 |             width="50"
-97 |             height="25"
-98 |             contain
-99 |         ></v-img>
-100 |       </div>
-101 | 
-102 |       <v-breadcrumbs :items="breadcrumbItems" class="pa-0">
-103 |         <template v-slot:title="{ item }">
-104 |               <span :class="{ 'text-disabled': item.disabled }">
-105 |                   {{ item.title }}
-106 |               </span>
-107 |         </template>
-108 |       </v-breadcrumbs>
-109 | 
-110 |     </div>
-111 |   </div>
-112 | </template>
-113 | 
-114 | <style scoped>
-115 | .breadcrumb-content {
-116 |   min-height: 40px; /* Höhe beibehalten */
-117 |   overflow: hidden; /* Verhindert Umbruchprobleme bei sehr langen Namen */
-118 | }
-119 | 
-120 | .brand-logo {
-121 |   display: flex;
-122 |   align-items: center;
-123 |   justify-content: center;
-124 | }
-125 | 
-126 | /* Optional: Stelle sicher, dass Breadcrumbs nicht zu viel Platz einnehmen */
-127 | .v-breadcrumbs {
-128 |   flex-grow: 1;
-129 |   /* white-space: nowrap; */ /* Verhindert Umbruch, ggf. mit text-overflow */
-130 | }
-131 | 
-132 | .v-breadcrumbs :deep(.v-breadcrumbs-item) {
-133 |   font-size: 0.86rem; /* Etwas kleinere Schrift */
-134 | }
-135 | 
-136 | .text-disabled {
-137 |   color: #757575 !important; /* Vuetify Standard für disabled */
-138 | }
-139 | </style>
-```
-
-src/components/mediaplan/MediaplanBudgetView.vue
-```
-1 | <template>
-2 |   <div class="budget-view-container">
-3 |     <v-card class="pa-6">
-4 |       <v-card-title class="text-h5 mb-4">Budget View</v-card-title>
-5 |       <v-card-text>
-6 |         <p class="text-body-1">
-7 |           This is a placeholder for the Budget View. This section will be implemented later.
-8 |         </p>
-9 |         <v-divider class="my-4"></v-divider>
-10 |         <p class="text-body-2 text-grey">
-11 |           The Budget View will allow users to manage financial aspects of campaigns, track spending, and allocate resources.
-12 |         </p>
-13 |       </v-card-text>
-14 |     </v-card>
-15 |   </div>
-16 | </template>
-17 | 
-18 | <script setup lang="ts">
-19 | // No props or state needed for this placeholder component
-20 | </script>
-21 | 
-22 | <style scoped>
-23 | .budget-view-container {
-24 |   margin-top: 16px;
-25 | }
-26 | </style>
-```
-
-src/components/mediaplan/MediaplanHeader.vue
-```
-1 | <template>
-2 |   <v-row align="center" style="height: 57px;">
-3 |     <div class="d-flex align-center border-b border-grey-lighten-2 mr-2 h-100">
-4 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Plan Budget:</div>
-5 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">{{ formatCurrency(planBudget) }}</div>
-6 | 
-7 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Used:</div>
-8 |       <v-progress-linear
-9 |           :model-value="usedPercentage"
-10 |           color="success"
-11 |           height="8"
-12 |           class="ml-2 mr-4"
-13 |           style="width: 120px"
-14 |       ></v-progress-linear>
-15 |       <span class="text-subtitle-1 text-grey-darken-1">{{ usedPercentage }}%</span>
-16 |     </div>
-17 | 
-18 |     <v-text-field
-19 |         v-model="search"
-20 |         placeholder="Search..."
-21 |         hide-details
-22 |         class="mr-2"
-23 |         append-inner-icon="mdi-magnify"
-24 |         @update:modelValue="$emit('update:search', $event)"
-25 |         bg-color="white"
-26 |     ></v-text-field>
-27 |     <v-btn icon="mdi-dots-horizontal" variant="plain">
-28 |     </v-btn>
-29 | 
-30 |   </v-row>
-31 | </template>
-32 | 
-33 | <script setup lang="ts">
-34 | import {ref, watch} from 'vue';
-35 | 
-36 | // Define props
-37 | interface Props {
-38 |   planBudget: number;
-39 |   usedPercentage: number;
-40 |   search: string;
-41 | }
-42 | 
-43 | // Define events
-44 | defineEmits([
-45 |   'update:search'
-46 | ]);
-47 | 
-48 | // Receive props with defaults
-49 | const props = withDefaults(defineProps<Props>(), {
-50 |   planBudget: 0,
-51 |   usedPercentage: 0,
-52 |   search: ''
-53 | });
-54 | 
-55 | // Local state
-56 | const search = ref(props.search);
-57 | 
-58 | // Watch for prop changes
-59 | watch(() => props.search, (newValue) => {
-60 |   search.value = newValue;
-61 | });
-62 | 
-63 | // Format currency
-64 | const formatCurrency = (value: number): string => {
-65 |   return new Intl.NumberFormat('en-US', {
-66 |     style: 'currency',
-67 |     currency: 'EUR',
-68 |     minimumFractionDigits: 0,
-69 |     maximumFractionDigits: 0
-70 |   }).format(value);
-71 | };
-72 | </script>
-73 | 
-```
-
-src/components/mediaplan/MediaplanInfo.vue
-```
-1 | <template>
-2 |   <v-card class="mb-4">
-3 |     <v-card-title class="d-flex align-center justify-space-between py-4 px-6">
-4 |       <div class="d-flex align-center">
-5 |         <div class="text-h5">{{ mediaplan?.name || 'Mediaplan Details' }}</div>
-6 |         <v-chip
-7 |           :color="getMediaplanStatusColor(mediaplan?.status)"
-8 |           class="ml-4"
-9 |           size="small"
-10 |           variant="elevated"
-11 |         >
-12 |           {{ getMediaplanStatusLabel(mediaplan?.status) }}
-13 |         </v-chip>
-14 |       </div>
-15 |       
-16 |       <v-btn 
-17 |         color="primary" 
-18 |         variant="flat" 
-19 |         prepend-icon="mdi-pencil-outline"
-20 |         :to="`/mediaplans/${mediaplanId}/edit`"
-21 |       >
-22 |         Edit
-23 |       </v-btn>
-24 |     </v-card-title>
-25 |     
-26 |     <v-divider></v-divider>
-27 |     
-28 |     <v-card-text v-if="mediaplan" class="pa-6">
-29 |       <v-row>
-30 |         <v-col cols="12" md="4">
-31 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Brand</div>
-32 |           <div class="d-flex align-center">
-33 |             <v-avatar size="32" color="grey-lighten-3" class="mr-2">
-34 |               <v-img v-if="hasBrandLogo(mediaplan.brand)" :src="getBrandLogo(mediaplan.brand)"></v-img>
-35 |               <span v-else>{{ getBrandInitials(mediaplan.brand) }}</span>
-36 |             </v-avatar>
-37 |             <span class="font-weight-medium">{{ mediaplan.brand.name }}</span>
-38 |           </div>
-39 |         </v-col>
-40 |         
-41 |         <v-col cols="12" md="4">
-42 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Campaign Period</div>
-43 |           <div class="font-weight-medium">{{ formatDateRange(mediaplan.start_date, mediaplan.end_date) }}</div>
-44 |         </v-col>
-45 |         
-46 |         <v-col cols="12" md="4">
-47 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Budget</div>
-48 |           <div class="d-flex align-center justify-space-between mb-1">
-49 |             <span class="font-weight-medium">{{ formatCurrency(mediaplan.budget.used) }} / {{ formatCurrency(mediaplan.budget.total) }}</span>
-50 |             <span class="text-body-2">{{ calculatePercentage(mediaplan.budget.used, mediaplan.budget.total) }}%</span>
-51 |           </div>
-52 |           <v-progress-linear 
-53 |             :model-value="calculatePercentage(mediaplan.budget.used, mediaplan.budget.total)" 
-54 |             height="8" 
-55 |             :color="getBudgetStatusColor(mediaplan.budget)" 
-56 |             rounded
-57 |             bg-color="grey-lighten-3"
-58 |           ></v-progress-linear>
-59 |         </v-col>
-60 |       </v-row>
-61 |       
-62 |       <v-row class="mt-6">
-63 |         <v-col cols="12" md="4">
-64 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">PO Numbers</div>
-65 |           <div v-if="mediaplan.po_numbers && mediaplan.po_numbers.length > 0">
-66 |             <v-chip
-67 |               v-for="po in mediaplan.po_numbers"
-68 |               :key="po._id"
-69 |               class="mr-2 mb-2"
-70 |               variant="outlined"
-71 |               size="small"
-72 |             >
-73 |               {{ po.name }}: {{ formatCurrency(po.value) }}
-74 |             </v-chip>
-75 |           </div>
-76 |           <div v-else class="text-body-2 text-grey">No PO numbers added</div>
-77 |         </v-col>
-78 |         
-79 |         <v-col cols="12" md="4">
-80 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Created By</div>
-81 |           <div class="font-weight-medium">{{ mediaplan.created_by?.name || 'Unknown' }}</div>
-82 |         </v-col>
-83 |         
-84 |         <v-col cols="12" md="4">
-85 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Last Updated</div>
-86 |           <div class="font-weight-medium">{{ formatDate(mediaplan.updated_at) }}</div>
-87 |         </v-col>
-88 |       </v-row>
-89 |     </v-card-text>
-90 |     
-91 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
-92 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
-93 |     </div>
-94 |     
-95 |     <div v-if="error" class="error-container mx-6 my-4 pa-4">
-96 |       <v-alert type="error" title="Error Loading Mediaplan">
-97 |         {{ error }}
-98 |       </v-alert>
-99 |     </div>
-100 |   </v-card>
-101 | </template>
-102 | 
-103 | <script setup lang="ts">
-104 | import { formatDate, formatDateRange } from '@/helpers/dateUtils';
-105 | import { formatCurrency, calculatePercentage, getBudgetStatusColor } from '@/helpers/currencyUtils';
-106 | import { getBrandLogo, getBrandInitials, hasBrandLogo } from '@/helpers/brandUtils';
-107 | import { getMediaplanStatusColor, getMediaplanStatusLabel } from '@/constants/mediaplanStatuses';
-108 | import type { Mediaplan } from '@/types/mediaplan';
-109 | 
-110 | // Define props
-111 | interface Props {
-112 |   mediaplan: Mediaplan | null;
-113 |   mediaplanId: string;
-114 |   isLoading: boolean;
-115 |   error: string | null;
-116 | }
-117 | 
-118 | // Receive props
-119 | const props = defineProps<Props>();
-120 | </script>
-121 | 
-122 | <style scoped>
-123 | .error-container {
-124 |   border-radius: 4px;
-125 |   background-color: rgba(var(--v-theme-error), 0.1);
-126 | }
-127 | </style>
-```
-
-src/components/mediaplan/MediaplanPlanningView.vue
-```
-1 | <script setup lang="ts">
-2 | import {ref, watch, computed} from 'vue';
-3 | import {useRouter} from 'vue-router'; // Router importieren für Links
-4 | import CountryFlag from '@/components/common/CountryFlag.vue'; // Pfad prüfen
-5 | import {getBrandLogo} from "@/helpers/brandUtils"; // Pfad prüfen
-6 | import type {Project} from '@/types/project';
-7 | import {projectHeaders} from "@/constants/project.ts";
-8 | import {formatPercentage, percentage} from "../../helpers/format.ts"; // Pfad prüfen
-9 | 
-10 | // --- Props ---
-11 | interface Props {
-12 |   projects: Project[];
-13 |   totalProjects: number;
-14 |   isLoading: boolean;
-15 |   currentPage: number;
-16 |   itemsPerPage: number;
-17 |   mediaplanId: string; // *** Diese Prop ist entscheidend für den Link ***
-18 | }
-19 | 
-20 | const props = withDefaults(defineProps<Props>(), {
-21 |   projects: () => [],
-22 |   totalProjects: 0,
-23 |   isLoading: false,
-24 |   currentPage: 0,
-25 |   itemsPerPage: 10,
-26 |   mediaplanId: '' // Wichtig: Muss vom Parent (MediaplanDetail) übergeben werden!
-27 | });
-28 | 
-29 | // --- Emits ---
-30 | const emit = defineEmits<{
-31 |   (e: 'addProject'): void;
-32 |   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
-33 | }>();
-34 | 
-35 | // Router Instanz
-36 | const router = useRouter();
-37 | 
-38 | // --- Computed Properties für Tabelle ---
-39 | const pageModel = computed({
-40 |   get: () => props.currentPage + 1,
-41 |   set: (value) => {
-42 |   }
-43 | });
-44 | 
-45 | const itemsPerPageModel = computed({
-46 |   get: () => props.itemsPerPage,
-47 |   set: (value) => {
-48 |   }
-49 | });
-50 | 
-51 | 
-52 | // --- Methoden ---
-53 | const onOptionsUpdate = (options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }) => {
-54 |   emit('update:options', options);
-55 | };
-56 | 
-57 | const addProject = () => {
-58 |   emit('addProject');
-59 | };
-60 | 
-61 | const editProject = (project: Project) => {
-62 |   console.log('Edit project:', project._id);
-63 |   // Navigation zur Edit-Seite oder Dialog öffnen
-64 |   // router.push({ name: 'ProjectEdit', params: { mediaplanId: props.mediaplanId, projectId: project._id } });
-65 | };
-66 | 
-67 | </script>
-68 | 
-69 | <template>
-70 |   <div class="planning-view-container mt-4">
-71 |     <v-card class="projects-table elevation-0" variant="flat">
-72 |       <v-theme-provider theme="dark">
-73 |         <v-data-table-server
-74 |             v-model:items-per-page="itemsPerPageModel"
-75 |             v-model:page="pageModel"
-76 |             :headers="projectHeaders"
-77 |             :items="projects"
-78 |             :items-length="totalProjects"
-79 |             :loading="isLoading"
-80 |             item-value="_id"
-81 |             hover
-82 |             class="projects-data-table"
-83 |             @update:options="onOptionsUpdate"
-84 | 
-85 |         >
-86 |           <template v-slot:item.edit="{ item }">
-87 |             <v-btn icon density="compact" variant="text" @click.stop="editProject(item)">
-88 |               <v-icon>mdi-pencil-outline</v-icon>
-89 |               <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
-90 |             </v-btn>
-91 |           </template>
-92 | 
-93 |           <template v-slot:item.abbreviation="{ item }">
-94 |             <router-link
-95 |                 :to="{ name: 'ProjectDetail', params: { mediaplanId: props.mediaplanId, projectId: item._id } }"
-96 |                 class="project-link d-flex align-center"
-97 |                 v-if="item.abbreviation && props.mediaplanId"
-98 |                 @click.stop
-99 |             >
-100 |               <v-avatar size="32" class="mr-2 grey lighten-4"
-101 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
-102 |               <span>{{ item.abbreviation }}</span>
-103 |               <v-tooltip activator="parent" location="top">Open project</v-tooltip>
-104 |             </router-link>
-105 |             <div class="d-flex align-center" v-else-if="item.abbreviation">
-106 |               <v-avatar size="32" class="mr-2 grey lighten-4"
-107 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
-108 |               <span>{{ item.abbreviation }}</span>
-109 |               <v-tooltip activator="parent" location="top">Cannot link project (missing Mediaplan ID)</v-tooltip>
-110 |             </div>
-111 |             <div v-else>N/A</div>
-112 |           </template>
-113 | 
-114 |           <template v-slot:item.descriptive_vars.country="{ item }">
-115 |             <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
-116 |               <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2"/>
-117 |               <span>{{ item.descriptive_vars.country }}</span>
-118 |             </div>
-119 |             <div v-else>N/A</div>
-120 |           </template>
-121 | 
-122 |           <template v-slot:item.duration.formatted="{ item }">
-123 |             <div class="d-flex align-center" v-if="item.duration?.formatted">
-124 |               <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
-125 |               <span>{{ item.duration.formatted }}</span>
-126 |             </div>
-127 |             <div v-else>N/A</div>
-128 |           </template>
-129 | 
-130 |           <template v-slot:item.detail="{ item }">
-131 |             <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
-132 |             <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top"
-133 |                        max-width="300px">{{ item.detail }}
-134 |             </v-tooltip>
-135 |           </template>
-136 | 
-137 |           <template v-slot:item.default_vars.campaigntype="{ item }">
-138 |             {{ item.default_vars?.campaigntype || 'N/A' }}
-139 |           </template>
-140 | 
-141 |           <template v-slot:item.default_vars.subsegment="{ item }">
-142 |             {{ item.default_vars?.subsegment || 'N/A' }}
-143 |           </template>
-144 |           <template v-slot:item.budget="{ item }">
-145 |             <v-row no-gutters>
-146 |                 <v-progress-linear
-147 |                   :model-value="percentage(item?.budget?.used , item?.budget?.total )"
-148 |                   color="success"
-149 |                   height="8"
-150 |                   class="ml-2 mr-4"
-151 |                   style="width: 120px"
-152 |               ></v-progress-linear>
-153 |               {{ formatPercentage(item?.budget?.used, item?.budget?.total) }}
-154 |             </v-row>
-155 |           </template>
-156 | 
-157 |           <template v-slot:item.is_locked="{ item }">
-158 |             <v-icon v-if="item.is_locked != null" :color="item.is_locked ? 'orange' : 'grey-lighten-1'">
-159 |               {{ item.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant' }}
-160 |             </v-icon>
-161 |             <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
-162 |           </template>
-163 | 
-164 |           <template v-slot:item.actions="{ item }">
-165 |             <v-menu>
-166 |               <template v-slot:activator="{ props: menuProps }">
-167 |                 <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
-168 |               </template>
-169 |               <v-list density="compact">
-170 |                 <v-list-item @click.stop="editProject(item)">
-171 |                   <v-list-item-title>Edit</v-list-item-title>
-172 |                 </v-list-item>
-173 |                 <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
-174 |                   <v-list-item-title>Delete</v-list-item-title>
-175 |                 </v-list-item>
-176 |               </v-list>
-177 |             </v-menu>
-178 |           </template>
-179 | 
-180 |           <template v-slot:loading>
-181 |             <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
-182 |           </template>
-183 |           <template v-slot:no-data>
-184 |             <div class="text-center pa-4 text-disabled">
-185 |               <v-icon size="large" class="mb-2">mdi-database-off-outline</v-icon>
-186 |               <p>No projects found for this mediaplan.</p>
-187 |             </div>
-188 |           </template>
-189 | 
-190 |           <template v-slot:bottom>
-191 |             <div class="d-flex align-center pa-4 bg-grey-lighten-2">
-192 |               <v-btn
-193 |                   prepend-icon="mdi-plus"
-194 |                   class="black-text-button"
-195 |                   variant="text"
-196 |                   color="black"
-197 |                   @click="addProject"
-198 |                   :disabled="isLoading"
-199 |               >
-200 |                 Add Project
-201 |               </v-btn>
-202 |             </div>
-203 |           </template>
-204 |         </v-data-table-server>
-205 |       </v-theme-provider>
-206 |     </v-card>
-207 |   </div>
-208 | 
-209 | </template>
-210 | 
-211 | <style scoped>
-212 | /* ... (Styles bleiben) ... */
-213 | .project-link {
-214 |   color: white; /* Oder eine andere passende Farbe im Dark Theme */
-215 |   text-decoration: none;
-216 |   font-weight: 500;
-217 | }
-218 | 
-219 | .project-link:hover {
-220 |   text-decoration: underline;
-221 |   color: #E0E0E0; /* Leichte Aufhellung beim Hover */
-222 | }
-223 | </style>
-```
-
-src/components/mediaplan/MediaplanProjects.vue
-```
-1 | <template>
-2 |   <v-card>
-3 |     <v-toolbar flat color="primary" density="comfortable">
-4 |       <v-toolbar-title>Projects</v-toolbar-title>
-5 |       <v-spacer></v-spacer>
-6 |       <v-btn 
-7 |         variant="outlined" 
-8 |         prepend-icon="mdi-plus" 
-9 |         @click="$emit('createProject')"
-10 |         :disabled="isLoading"
-11 |         color="white"
-12 |       >
-13 |         Add Project
-14 |       </v-btn>
-15 |     </v-toolbar>
-16 |     
-17 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
-18 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
-19 |     </div>
-20 |     
-21 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
-22 |       <v-alert type="error" title="Error Loading Projects">
-23 |         {{ error }}
-24 |       </v-alert>
-25 |     </div>
-26 |     
-27 |     <v-data-table-server
-28 |       v-else
-29 |       v-model:items-per-page="itemsPerPage"
-30 |       v-model:page="page"
-31 |       :headers="projectHeaders"
-32 |       :items="projects"
-33 |       :items-length="totalProjects"
-34 |       :loading="isLoading"
-35 |       class="elevation-0"
-36 |       @update:options="onOptionsUpdate"
-37 |     >
-38 |       <!-- Country column with flag -->
-39 |       <template v-slot:item.country="{ item }">
-40 |         <div class="d-flex align-center">
-41 |           <v-avatar size="24" class="mr-2">
-42 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
-43 |           </v-avatar>
-44 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
-45 |         </div>
-46 |       </template>
-47 |       
-48 |       <!-- Campaign Type column -->
-49 |       <template v-slot:item.campaignType="{ item }">
-50 |         <v-chip
-51 |           size="small"
-52 |           :color="getCampaignTypeColor(item.raw.campaignType)"
-53 |           class="text-capitalize"
-54 |         >
-55 |           {{ item.raw.campaignType }}
-56 |         </v-chip>
-57 |       </template>
-58 |       
-59 |       <!-- Created date column -->
-60 |       <template v-slot:item.createdAt="{ item }">
-61 |         {{ formatDate(item.raw.createdAt) }}
-62 |       </template>
-63 |       
-64 |       <!-- Actions column -->
-65 |       <template v-slot:item.actions="{ item }">
-66 |         <v-tooltip text="View Details">
-67 |           <template v-slot:activator="{ props }">
-68 |             <v-btn
-69 |               icon
-70 |               variant="text"
-71 |               density="comfortable"
-72 |               v-bind="props"
-73 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
-74 |             >
-75 |               <v-icon>mdi-eye</v-icon>
-76 |             </v-btn>
-77 |           </template>
-78 |         </v-tooltip>
-79 |         
-80 |         <v-tooltip text="Edit Project">
-81 |           <template v-slot:activator="{ props }">
-82 |             <v-btn
-83 |               icon
-84 |               variant="text"
-85 |               density="comfortable"
-86 |               v-bind="props"
-87 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
-88 |             >
-89 |               <v-icon>mdi-pencil-outline</v-icon>
-90 |             </v-btn>
-91 |           </template>
-92 |         </v-tooltip>
-93 |         
-94 |         <v-tooltip text="Delete Project">
-95 |           <template v-slot:activator="{ props }">
-96 |             <v-btn
-97 |               icon
-98 |               variant="text"
-99 |               density="comfortable"
-100 |               color="error"
-101 |               v-bind="props"
-102 |               @click="$emit('deleteProject', item.raw)"
-103 |             >
-104 |               <v-icon>mdi-delete</v-icon>
-105 |             </v-btn>
-106 |           </template>
-107 |         </v-tooltip>
-108 |       </template>
-109 |       
-110 |       <!-- Empty state -->
-111 |       <template v-slot:no-data>
-112 |         <v-sheet class="d-flex flex-column align-center justify-center pa-6" height="300">
-113 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
-114 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
-115 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
-116 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="$emit('createProject')">
-117 |             Add First Project
-118 |           </v-btn>
-119 |         </v-sheet>
-120 |       </template>
-121 |     </v-data-table-server>
-122 |   </v-card>
-123 | </template>
-124 | 
-125 | <script setup lang="ts">
-126 | import { ref, watch } from 'vue';
-127 | import { formatDate } from '@/helpers/dateUtils';
-128 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
-129 | import type { Project } from '@/types/project';
-130 | 
-131 | // Define props
-132 | interface Props {
-133 |   projects: Project[];
-134 |   mediaplanId: string;
-135 |   totalProjects: number;
-136 |   isLoading: boolean;
-137 |   error: string | null;
-138 | }
-139 | 
-140 | // Define emits
-141 | const emit = defineEmits<{
-142 |   (e: 'createProject'): void;
-143 |   (e: 'deleteProject', project: Project): void;
-144 |   (e: 'update:page', page: number): void;
-145 |   (e: 'update:itemsPerPage', itemsPerPage: number): void;
-146 | }>();
-147 | 
-148 | // Component state
-149 | const page = ref<number>(1);
-150 | const itemsPerPage = ref<number>(10);
-151 | 
-152 | // Watch for pagination changes
-153 | watch([page, itemsPerPage], () => {
-154 |   emit('update:page', page.value);
-155 |   emit('update:itemsPerPage', itemsPerPage.value);
-156 | });
-157 | 
-158 | // Project Table Headers
-159 | const projectHeaders = [
-160 |   { title: 'Name', key: 'name', sortable: true },
-161 |   { title: 'Country', key: 'country', sortable: true },
-162 |   { title: 'Language', key: 'language', sortable: true },
-163 |   { title: 'Campaign Type', key: 'campaignType', sortable: true },
-164 |   { title: 'Phase', key: 'phase', sortable: true },
-165 |   { title: 'Goal', key: 'goal', sortable: true },
-166 |   { title: 'Created At', key: 'createdAt', sortable: true },
-167 |   { title: 'Actions', key: 'actions', sortable: false, align: 'end' },
-168 | ];
-169 | 
-170 | // Method to handle datatable option updates (sorting, etc)
-171 | const onOptionsUpdate = (options: any) => {
-172 |   // You can add additional logic here for sorting if needed
-173 |   // For now, we just update pagination
-174 |   page.value = options.page;
-175 |   itemsPerPage.value = options.itemsPerPage;
-176 | };
-177 | 
-178 | // Receive props with defaults
-179 | const props = withDefaults(defineProps<Props>(), {
-180 |   projects: () => [],
-181 |   totalProjects: 0,
-182 |   error: null
-183 | });
-184 | </script>
-185 | 
-186 | <style scoped>
-187 | .error-container {
-188 |   border-radius: 4px;
-189 |   background-color: rgba(var(--v-theme-error), 0.1);
-190 | }
-191 | </style>
-```
-
-src/components/mediaplan/MediaplanViewToggle.vue
-```
-1 | <template>
-2 |   <div class="view-toggle-container">
-3 |     <v-btn-toggle
-4 |         v-model="selectedView"
-5 |         class="view-toggle"
-6 |         density="comfortable"
-7 |         @update:modelValue="$emit('update:modelValue', $event)"
-8 |     >
-9 |       <v-btn value="planning">Planning view</v-btn>
-10 |       <v-btn value="budget">Budget view</v-btn>
-11 |     </v-btn-toggle>
-12 |   </div>
-13 | </template>
-14 | 
-15 | <script setup lang="ts">
-16 | import { ref, watch } from 'vue'
-17 | 
-18 | // Define props
-19 | interface Props {
-20 |   modelValue: string
-21 | }
-22 | 
-23 | defineEmits(['update:modelValue'])
-24 | const props = defineProps<Props>()
-25 | 
-26 | const selectedView = ref(props.modelValue)
-27 | 
-28 | watch(
-29 |     () => props.modelValue,
-30 |     (newValue) => {
-31 |       selectedView.value = newValue
-32 |     },
-33 |     { immediate: true }
-34 | )
-35 | </script>
-36 | 
-37 | <style scoped>
-38 | .view-toggle .v-btn {
-39 |   background-color: white;
-40 |   color: black;
-41 |   border: 1px solid #ccc;
-42 |   border-radius: 0;
-43 |   font-weight: 500;
-44 | }
-45 | 
-46 | .view-toggle .v-btn.v-btn--active {
-47 |   background-color: black;
-48 |   color: white;
-49 |   border-color: black;
-50 | }
-51 | </style>
-```
-
-src/components/mediaplan/ProjectsList.vue
-```
-1 | <template>
-2 |   <v-card>
-3 |     <v-card-title class="d-flex justify-space-between align-center py-4 px-6">
-4 |       <div class="text-h6">Projects</div>
-5 |       <v-btn 
-6 |         color="primary" 
-7 |         prepend-icon="mdi-plus" 
-8 |         @click="emit('createProject')"
-9 |       >
-10 |         Add Project
-11 |       </v-btn>
-12 |     </v-card-title>
-13 |     
-14 |     <v-divider></v-divider>
-15 |     
-16 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
-17 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
-18 |     </div>
-19 |     
-20 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
-21 |       <v-alert type="error" title="Error Loading Projects">
-22 |         {{ error }}
-23 |       </v-alert>
-24 |     </div>
-25 |     
-26 |     <v-data-table-server
-27 |       v-else
-28 |       v-model:items-per-page="itemsPerPage"
-29 |       v-model:page="page"
-30 |       :headers="projectHeaders"
-31 |       :items="projects"
-32 |       :items-length="totalItems"
-33 |       :loading="isLoading"
-34 |       class="elevation-0"
-35 |       @update:options="onOptionsUpdate"
-36 |     >
-37 |       <!-- Country column with flag -->
-38 |       <template v-slot:item.country="{ item }">
-39 |         <div class="d-flex align-center">
-40 |           <v-avatar size="24" class="mr-2">
-41 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
-42 |           </v-avatar>
-43 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
-44 |         </div>
-45 |       </template>
-46 |       
-47 |       <!-- Campaign Type column -->
-48 |       <template v-slot:item.campaignType="{ item }">
-49 |         <v-chip
-50 |           size="small"
-51 |           :color="getCampaignTypeColor(item.raw.campaignType)"
-52 |           class="text-capitalize"
-53 |         >
-54 |           {{ item.raw.campaignType }}
-55 |         </v-chip>
-56 |       </template>
-57 |       
-58 |       <!-- Created date column -->
-59 |       <template v-slot:item.createdAt="{ item }">
-60 |         {{ formatDate(item.raw.createdAt) }}
-61 |       </template>
-62 |       
-63 |       <!-- Actions column -->
-64 |       <template v-slot:item.actions="{ item }">
-65 |         <v-btn
-66 |           icon
-67 |           variant="text"
-68 |           density="comfortable"
-69 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
-70 |         >
-71 |           <v-icon>mdi-eye</v-icon>
-72 |         </v-btn>
-73 |         <v-btn
-74 |           icon
-75 |           variant="text"
-76 |           density="comfortable"
-77 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
-78 |         >
-79 |           <v-icon>mdi-pencil-outline</v-icon>
-80 |         </v-btn>
-81 |         <v-btn
-82 |           icon
-83 |           variant="text"
-84 |           density="comfortable"
-85 |           color="error"
-86 |           @click="emit('deleteProject', item.raw)"
-87 |         >
-88 |           <v-icon>mdi-delete</v-icon>
-89 |         </v-btn>
-90 |       </template>
-91 |       
-92 |       <!-- Empty state -->
-93 |       <template v-slot:no-data>
-94 |         <div class="d-flex flex-column align-center justify-center pa-6">
-95 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
-96 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
-97 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
-98 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="emit('createProject')">
-99 |             Add First Project
-100 |           </v-btn>
-101 |         </div>
-102 |       </template>
-103 |     </v-data-table-server>
-104 |   </v-card>
-105 | </template>
-106 | 
-107 | <script setup lang="ts">
-108 | import { ref, watch } from 'vue';
-109 | import { formatDate } from '@/helpers/dateUtils';
-110 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
-111 | import type { Project } from '@/types/project';
-112 | 
-113 | // Define props
-114 | interface Props {
-115 |   projects: Project[];
-116 |   mediaplanId: string;
-117 |   totalItems: number;
-118 |   isLoading: boolean;
-119 |   error: string | null;
-120 | }
-121 | 
-122 | // Define emits
-123 | const emit = defineEmits<{
-124 |   (e: 'createProject'): void;
-125 |   (e: 'deleteProject', project: Project): void;
-126 |   (e: 'updatePage', page: number): void;
-127 |   (e: 'updateItemsPerPage', itemsPerPage: number): void;
-128 | }>();
-129 | 
-130 | //
-```
-
 src/components/overview/CreateFirstProjectDialog.vue
 ```
 1 | <template>
@@ -7337,14 +5997,14 @@ src/components/overview/CreateFirstProjectDialog.vue
 61 |                 >
 62 |                   <template v-slot:selection="{ item }">
 63 |                     <div class="d-flex align-center">
-64 |                       <country-flag :country="item.raw.code" class="mr-2"/>
-65 |                       {{ item.raw.code }} - {{ item.raw.name }}
+64 |                       <country-flag :country="item.code" class="mr-2"/>
+65 |                       {{ item.code }} - {{ item.name }}
 66 |                     </div>
 67 |                   </template>
 68 |                   <template v-slot:item="{ item, props }">
-69 |                     <v-list-item v-bind="props" :title="`${item.raw.code} - ${item.raw.name}`">
+69 |                     <v-list-item v-bind="props" :title="`${item.code} - ${item.name}`">
 70 |                       <template v-slot:prepend>
-71 |                         <country-flag :country="item.raw.code" class="mr-2"/>
+71 |                         <country-flag :country="item.code" class="mr-2"/>
 72 |                       </template>
 73 |                     </v-list-item>
 74 |                   </template>
@@ -9481,6 +8141,238 @@ src/components/project/CampaignListView.vue
 132 | <style scoped> /* ... */ </style>
 ```
 
+src/components/project/EditOrCreateProjectDialog.vue
+```
+1 | <template>
+2 |   <v-dialog :model-value="modelValue" max-width="550px" persistent @update:model-value="close">
+3 |     <v-card class="pa-6">
+4 |       <DialogHeader
+5 |           :title="isEdit ? 'Edit Project Data' : 'Create New Project'"
+6 |           :show-close-button="true"
+7 |           @close="close"
+8 |           :show-back-button="false"
+9 |       />
+10 | 
+11 |       <v-form ref="form" @submit.prevent="onSubmit" v-model="isFormValid" validate-on="input">
+12 |         <WithFormDefaults>
+13 | 
+14 |           <!-- Country & Language -->
+15 |           <CountryLanguageSelector v-model="countryLanguage"/>
+16 | 
+17 |           <!-- Date Range -->
+18 |           <FormElementVrowVcol label="Start date - End date" required>
+19 |             <DateRangePicker
+20 |                 id="date-range"
+21 |                 v-model="dateRange"
+22 |                 placeholder="Select start and end dates"
+23 |                 :rules="[required]"
+24 |                 dialog-title="Choose a date range"
+25 |                 @update:model-value="handleDateRangeChange"
+26 |             />
+27 |           </FormElementVrowVcol>
+28 | 
+29 |           <FormElementVrowVcol label="PO Number">
+30 |             <v-text-field v-model="project.poNumber" placeholder="Optional PO Number"/>
+31 |           </FormElementVrowVcol>
+32 | 
+33 |           <FormElementVrowVcol label="Builder" required>
+34 |             <v-select
+35 |                 v-model="project.builder"
+36 |                 :items="builders"
+37 |                 item-title="name"
+38 |                 item-value="code"
+39 |                 placeholder="Select Builder"
+40 |                 :rules="[required]"
+41 |             />
+42 |           </FormElementVrowVcol>
+43 | 
+44 |           <FormElementVrowVcol label="Campaign Type" required>
+45 |             <v-select
+46 |                 v-model="project.campaignType"
+47 |                 :items="campaignTypes"
+48 |                 item-title="name"
+49 |                 item-value="code"
+50 |                 placeholder="Select Campaign Type"
+51 |                 :rules="[required]"
+52 |             />
+53 |           </FormElementVrowVcol>
+54 | 
+55 |           <FormElementVrowVcol label="Phase" required>
+56 |             <v-select
+57 |                 v-model="project.phase"
+58 |                 :items="phases"
+59 |                 item-title="name"
+60 |                 item-value="code"
+61 |                 placeholder="Select Phase"
+62 |                 :rules="[required]"
+63 |             />
+64 |           </FormElementVrowVcol>
+65 | 
+66 |           <FormElementVrowVcol label="Goal" required>
+67 |             <v-select
+68 |                 v-model="project.goal"
+69 |                 :items="goals"
+70 |                 item-title="name"
+71 |                 item-value="code"
+72 |                 placeholder="Select Goal"
+73 |                 :rules="[required]"
+74 |             />
+75 |           </FormElementVrowVcol>
+76 | 
+77 |           <FormElementVrowVcol label="Budget">
+78 |             <v-text-field v-model="project.budget" type="number" placeholder="Enter Budget (€)"/>
+79 |           </FormElementVrowVcol>
+80 | 
+81 |           <DialogFooter
+82 |               class="mt-5"
+83 |               cancel-text="Cancel"
+84 |               :confirm-text="isEdit ? 'Save' : 'Create'"
+85 |               :disabled="!isFormValid"
+86 |               @cancel="close"
+87 |               @confirm="onSubmit"
+88 |           />
+89 |         </WithFormDefaults>
+90 | 
+91 |       </v-form>
+92 |     </v-card>
+93 |   </v-dialog>
+94 | </template>
+95 | 
+96 | <script setup lang="ts">
+97 | import {ref, onMounted, computed} from 'vue';
+98 | import type {Project} from '@/types/project';
+99 | import type {ProjectCountry} from '@/types/project'; // already imported in your other dialog
+100 | 
+101 | import {useProjectStore} from '@/stores/projectStore';
+102 | import {showSuccess, showError} from '@/helpers/notificationUtils';
+103 | import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
+104 | import DateRangePicker from "@/components/overview/DateRangePicker.vue";
+105 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
+106 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
+107 | import CountryLanguageSelector from "@/components/common/dialog/CountryLanguageSelector.vue";
+108 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
+109 | 
+110 | const props = defineProps<{
+111 |   modelValue: boolean;
+112 |   isEdit?: boolean;
+113 |   initialData?: Project;
+114 | }>();
+115 | 
+116 | const emit = defineEmits<{
+117 |   (e: 'update:modelValue', value: boolean): void;
+118 |   (e: 'saved', project: Project): void;
+119 | }>();
+120 | 
+121 | const form = ref<any>(null);
+122 | const isFormValid = ref(false);
+123 | const projectStore = useProjectStore();
+124 | 
+125 | const required = (v: any) => !!v || 'Required';
+126 | 
+127 | // Separate "shallow" editable model
+128 | const project = ref<Partial<Project>>({
+129 |   startDate: '',
+130 |   endDate: '',
+131 |   poNumber: '',
+132 |   builder: null,
+133 |   campaignType: null,
+134 |   phase: null,
+135 |   goal: null,
+136 |   budget: undefined
+137 | });
+138 | 
+139 | const countryLanguage = ref<{
+140 |   country: ProjectCountry | null;
+141 |   language: string | null;
+142 | }>({
+143 |   country: null,
+144 |   language: null
+145 | });
+146 | 
+147 | const dateRange = ref<[string, string] | null>(null);
+148 | 
+149 | const handleDateRangeChange = ([start, end]: [string, string]) => {
+150 |   project.value.startDate = start;
+151 |   project.value.endDate = end;
+152 | };
+153 | 
+154 | const close = () => emit('update:modelValue', false);
+155 | 
+156 | onMounted(async () => {
+157 |   await projectStore.fetchProjectOptions();
+158 |   if (props.isEdit && props.initialData) {
+159 |     project.value = {
+160 |       ...props.initialData,
+161 |       poNumber: props.initialData.descriptive_vars?.bmwponumber || '',
+162 |       budget: props.initialData.budget,
+163 |       startDate: props.initialData.duration?.start_date || '',
+164 |       endDate: props.initialData.duration?.end_date || ''
+165 |     };
+166 | 
+167 |     countryLanguage.value = {
+168 |       country: {
+169 |         name: props.initialData.descriptive_vars.country,
+170 |         code: props.initialData.descriptive_vars.country // fallback
+171 |       },
+172 |       language: props.initialData.default_vars.language
+173 |     };
+174 | 
+175 |     dateRange.value = [project.value.startDate, project.value.endDate];
+176 |   }
+177 | });
+178 | 
+179 | const builders = computed(() => projectStore.builders);
+180 | const campaignTypes = computed(() => projectStore.campaignTypes);
+181 | const phases = computed(() => projectStore.phases);
+182 | const goals = computed(() => projectStore.goals);
+183 | 
+184 | const onSubmit = async () => {
+185 |   const isValid = await form.value.validate();
+186 |   if (!isValid) return;
+187 | 
+188 |   try {
+189 |     const payload: Partial<Project> = {
+190 |       ...project.value,
+191 |       duration: {
+192 |         start_date: project.value.startDate!,
+193 |         end_date: project.value.endDate!,
+194 |         formatted: '' // add formatted logic here if needed
+195 |       },
+196 |       descriptive_vars: {
+197 |         country: countryLanguage.value.country?.code || '',
+198 |         bmwponumber: project.value.poNumber || '',
+199 |         brand: '',
+200 |         adobecampaignname: '',
+201 |         campaigntype: '',
+202 |         projectname: '',
+203 |         subsegment: '',
+204 |         year: new Date().getFullYear()
+205 |       },
+206 |       default_vars: {
+207 |         language: countryLanguage.value.language || '',
+208 |         campaigntype: project.value.campaignType || '',
+209 |         subsegment: '',
+210 |         adtype: '',
+211 |         dimension: '',
+212 |         targeturls: null,
+213 |         campaigndetail: null
+214 |       }
+215 |     };
+216 | 
+217 |     const result = props.isEdit
+218 |         ? await projectStore.updateProject(payload)
+219 |         : await projectStore.createProject(payload);
+220 | 
+221 |     showSuccess(`Project ${props.isEdit ? 'updated' : 'created'} successfully`);
+222 |     emit('saved', result);
+223 |     close();
+224 |   } catch (err: any) {
+225 |     showError(err?.message || 'Operation failed');
+226 |   }
+227 | };
+228 | </script>
+```
+
 src/components/project/ProjectDetailTable.vue
 ```
 1 | <script setup lang="ts">
@@ -9587,6 +8479,1478 @@ src/components/project/ProjectDetailTable.vue
 102 |   padding-bottom: 6px !important;
 103 | }
 104 | </style>
+```
+
+src/components/mediaplan/DeleteProjectDialog.vue
+```
+1 | <template>
+2 |   <v-dialog v-model="internalValue" max-width="500" persistent>
+3 |     <v-card>
+4 |       <v-toolbar color="error" density="comfortable" dark>
+5 |         <v-toolbar-title>Confirm Delete</v-toolbar-title>
+6 |       </v-toolbar>
+7 |       
+8 |       <v-card-text class="pa-6">
+9 |         <v-alert
+10 |           v-if="error"
+11 |           type="error"
+12 |           variant="tonal"
+13 |           class="mb-4"
+14 |           closable
+15 |         >
+16 |           {{ error }}
+17 |         </v-alert>
+18 |         
+19 |         <p class="text-body-1">
+20 |           Are you sure you want to delete the project <strong>{{ project?.name }}</strong>?
+21 |         </p>
+22 |         <p class="text-body-2 mt-2 text-red">
+23 |           This action cannot be undone.
+24 |         </p>
+25 |       </v-card-text>
+26 |       
+27 |       <v-card-actions class="pa-6 pt-0">
+28 |         <v-spacer></v-spacer>
+29 |         <v-btn 
+30 |           variant="text" 
+31 |           @click="closeDialog"
+32 |           :disabled="isLoading"
+33 |         >
+34 |           Cancel
+35 |         </v-btn>
+36 |         <v-btn 
+37 |           color="error" 
+38 |           variant="flat"
+39 |           :loading="isLoading"
+40 |           @click="confirmDeletion"
+41 |         >
+42 |           Delete Project
+43 |         </v-btn>
+44 |       </v-card-actions>
+45 |     </v-card>
+46 |   </v-dialog>
+47 | </template>
+48 | 
+49 | <script setup lang="ts">
+50 | import { computed } from 'vue';
+51 | import type { Project } from '@/types/project';
+52 | 
+53 | // Define props
+54 | interface Props {
+55 |   modelValue: boolean;
+56 |   project: Project | null;
+57 |   isLoading: boolean;
+58 |   error: string | null;
+59 | }
+60 | 
+61 | // Define emits
+62 | const emit = defineEmits<{
+63 |   (e: 'update:modelValue', value: boolean): void;
+64 |   (e: 'confirm'): void;
+65 |   (e: 'cancel'): void;
+66 | }>();
+67 | 
+68 | // Computed property for v-model binding
+69 | const internalValue = computed({
+70 |   get: () => props.modelValue,
+71 |   set: (value: boolean) => emit('update:modelValue', value)
+72 | });
+73 | 
+74 | const closeDialog = () => {
+75 |   emit('cancel');
+76 | };
+77 | 
+78 | const confirmDeletion = () => {
+79 |   emit('confirm');
+80 | };
+81 | 
+82 | // Receive props with defaults
+83 | const props = withDefaults(defineProps<Props>(), {
+84 |   project: null,
+85 |   error: null
+86 | });
+87 | </script>
+```
+
+src/components/mediaplan/MediaplanBreadcrumb.vue
+```
+1 | // src/components/mediaplan/MediaplanBreadcrumb.vue (Angepasst)
+2 | 
+3 | <script setup lang="ts">
+4 | import {computed} from 'vue';
+5 | import {useRouter} from 'vue-router';
+6 | import type {Mediaplan} from '@/types/mediaplan'; // Pfad prüfen
+7 | import type {Project} from '@/types/project';
+8 | import {getBrandLogo} from "@/helpers/brandUtils.ts";   // Pfad prüfen
+9 | const router = useRouter();
+10 | 
+11 | // --- Props ---
+12 | // Akzeptiert jetzt optional ein ganzes Project-Objekt
+13 | interface Props {
+14 |   mediaplan?: Mediaplan | null;
+15 |   project?: Project | null;     // NEU: Akzeptiert Project-Objekt statt nur Name
+16 |   campaignName?: string;        // Bleibt vorerst als String
+17 | }
+18 | 
+19 | // Define events
+20 | const emit = defineEmits(['back']);
+21 | 
+22 | // Props mit Defaults
+23 | const props = withDefaults(defineProps<Props>(), {
+24 |   mediaplan: null,
+25 |   project: null,
+26 |   campaignName: '',
+27 | });
+28 | 
+29 | // --- Computed Properties für die Anzeige ---
+30 | const breadcrumbItems = computed(() => {
+31 |   const items = [];
+32 |   // Immer Home/Übersicht als Basis? Oder dynamisch? Hier als Beispiel statisch.
+33 |   items.push({title: 'Mediaplans', to: '/', disabled: !props.mediaplan});
+34 | 
+35 |   if (props.mediaplan) {
+36 |     items.push({
+37 |       title: props.mediaplan.name || 'Mediaplan',
+38 |       // Link nur aktiv, wenn wir tiefer sind (also wenn ein Projekt übergeben wurde)
+39 |       to: props.project ? {name: 'MediaplanDetail', params: {id: props.mediaplan._id}} : undefined,
+40 |       disabled: !props.project
+41 |     });
+42 | 
+43 |     if (props.project) {
+44 |       items.push({
+45 |         title: props.project.abbreviation || props.project.descriptive_vars?.projectname || 'Project',
+46 |         // Link nur aktiv, wenn wir tiefer sind (also wenn campaignName übergeben wurde)
+47 |         to: props.campaignName ? {
+48 |           name: 'ProjectDetail',
+49 |           params: {mediaplanId: props.mediaplan._id, projectId: props.project._id}
+50 |         } : undefined,
+51 |         disabled: !props.campaignName
+52 |       });
+53 | 
+54 |       if (props.campaignName) {
+55 |         items.push({
+56 |           title: props.campaignName,
+57 |           // Kein Link für das letzte Element
+58 |           disabled: true
+59 |         });
+60 |       }
+61 |     }
+62 |   }
+63 |   return items;
+64 | });
+65 | 
+66 | 
+67 | // --- Methods ---
+68 | const handleBack = () => {
+69 |   emit('back'); // Event auslösen
+70 |   // Gehe zur Mediaplan-Übersicht (oder eine Ebene höher, falls möglich/gewünscht)
+71 |   router.push({name: 'Overview'}); // Gehe zur allgemeinen Übersicht
+72 | };
+73 | 
+74 | </script>
+75 | 
+76 | <template>
+77 |   <div class="d-flex align-center">
+78 |     <v-btn
+79 |         icon
+80 |         variant="text"
+81 |         size="small"
+82 |         class="mr-1"
+83 |         @click="handleBack"
+84 |         aria-label="Go back to overview"
+85 |     >
+86 |       <v-icon> mdi-arrow-u-left-top
+87 |       </v-icon>
+88 |       <v-tooltip activator="parent" location="bottom">Back to Overview</v-tooltip>
+89 |     </v-btn>
+90 | 
+91 |     <div class="breadcrumb-content d-flex align-center flex-wrap">
+92 |       <div class="brand-logo mr-2 flex-shrink-0" v-if="mediaplan?.brand">
+93 |         <v-img
+94 |             :src="getBrandLogo(mediaplan.brand)"
+95 |             :alt="mediaplan.brand.name || ''"
+96 |             width="50"
+97 |             height="25"
+98 |             contain
+99 |         ></v-img>
+100 |       </div>
+101 | 
+102 |       <v-breadcrumbs :items="breadcrumbItems" class="pa-0">
+103 |         <template v-slot:title="{ item }">
+104 |               <span :class="{ 'text-disabled': item.disabled }">
+105 |                   {{ item.title }}
+106 |               </span>
+107 |         </template>
+108 |       </v-breadcrumbs>
+109 | 
+110 |     </div>
+111 |   </div>
+112 | </template>
+113 | 
+114 | <style scoped>
+115 | .breadcrumb-content {
+116 |   min-height: 40px; /* Höhe beibehalten */
+117 |   overflow: hidden; /* Verhindert Umbruchprobleme bei sehr langen Namen */
+118 | }
+119 | 
+120 | .brand-logo {
+121 |   display: flex;
+122 |   align-items: center;
+123 |   justify-content: center;
+124 | }
+125 | 
+126 | /* Optional: Stelle sicher, dass Breadcrumbs nicht zu viel Platz einnehmen */
+127 | .v-breadcrumbs {
+128 |   flex-grow: 1;
+129 |   /* white-space: nowrap; */ /* Verhindert Umbruch, ggf. mit text-overflow */
+130 | }
+131 | 
+132 | .v-breadcrumbs :deep(.v-breadcrumbs-item) {
+133 |   font-size: 0.86rem; /* Etwas kleinere Schrift */
+134 | }
+135 | 
+136 | .text-disabled {
+137 |   color: #757575 !important; /* Vuetify Standard für disabled */
+138 | }
+139 | </style>
+```
+
+src/components/mediaplan/MediaplanBudgetView.vue
+```
+1 | <template>
+2 |   <div class="budget-view-container">
+3 |     <v-card class="pa-6">
+4 |       <v-card-title class="text-h5 mb-4">Budget View</v-card-title>
+5 |       <v-card-text>
+6 |         <p class="text-body-1">
+7 |           This is a placeholder for the Budget View. This section will be implemented later.
+8 |         </p>
+9 |         <v-divider class="my-4"></v-divider>
+10 |         <p class="text-body-2 text-grey">
+11 |           The Budget View will allow users to manage financial aspects of campaigns, track spending, and allocate resources.
+12 |         </p>
+13 |       </v-card-text>
+14 |     </v-card>
+15 |   </div>
+16 | </template>
+17 | 
+18 | <script setup lang="ts">
+19 | // No props or state needed for this placeholder component
+20 | </script>
+21 | 
+22 | <style scoped>
+23 | .budget-view-container {
+24 |   margin-top: 16px;
+25 | }
+26 | </style>
+```
+
+src/components/mediaplan/MediaplanHeader.vue
+```
+1 | <template>
+2 |   <v-row align="center" style="height: 57px;">
+3 |     <div class="d-flex align-center border-b border-grey-lighten-2 mr-2 h-100">
+4 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Plan Budget:</div>
+5 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">{{ formatCurrency(planBudget) }}</div>
+6 | 
+7 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Used:</div>
+8 |       <v-progress-linear
+9 |           :model-value="usedPercentage"
+10 |           color="success"
+11 |           height="8"
+12 |           class="ml-2 mr-4"
+13 |           style="width: 120px"
+14 |       ></v-progress-linear>
+15 |       <span class="text-subtitle-1 text-grey-darken-1">{{ usedPercentage }}%</span>
+16 |     </div>
+17 | 
+18 |     <v-text-field
+19 |         v-model="search"
+20 |         placeholder="Search..."
+21 |         hide-details
+22 |         class="mr-2"
+23 |         append-inner-icon="mdi-magnify"
+24 |         @update:modelValue="$emit('update:search', $event)"
+25 |         bg-color="white"
+26 |     ></v-text-field>
+27 |     <v-btn icon="mdi-dots-horizontal" variant="plain">
+28 |     </v-btn>
+29 | 
+30 |   </v-row>
+31 | </template>
+32 | 
+33 | <script setup lang="ts">
+34 | import {ref, watch} from 'vue';
+35 | 
+36 | // Define props
+37 | interface Props {
+38 |   planBudget: number;
+39 |   usedPercentage: number;
+40 |   search: string;
+41 | }
+42 | 
+43 | // Define events
+44 | defineEmits([
+45 |   'update:search'
+46 | ]);
+47 | 
+48 | // Receive props with defaults
+49 | const props = withDefaults(defineProps<Props>(), {
+50 |   planBudget: 0,
+51 |   usedPercentage: 0,
+52 |   search: ''
+53 | });
+54 | 
+55 | // Local state
+56 | const search = ref(props.search);
+57 | 
+58 | // Watch for prop changes
+59 | watch(() => props.search, (newValue) => {
+60 |   search.value = newValue;
+61 | });
+62 | 
+63 | // Format currency
+64 | const formatCurrency = (value: number): string => {
+65 |   return new Intl.NumberFormat('en-US', {
+66 |     style: 'currency',
+67 |     currency: 'EUR',
+68 |     minimumFractionDigits: 0,
+69 |     maximumFractionDigits: 0
+70 |   }).format(value);
+71 | };
+72 | </script>
+73 | 
+```
+
+src/components/mediaplan/MediaplanInfo.vue
+```
+1 | <template>
+2 |   <v-card class="mb-4">
+3 |     <v-card-title class="d-flex align-center justify-space-between py-4 px-6">
+4 |       <div class="d-flex align-center">
+5 |         <div class="text-h5">{{ mediaplan?.name || 'Mediaplan Details' }}</div>
+6 |         <v-chip
+7 |           :color="getMediaplanStatusColor(mediaplan?.status)"
+8 |           class="ml-4"
+9 |           size="small"
+10 |           variant="elevated"
+11 |         >
+12 |           {{ getMediaplanStatusLabel(mediaplan?.status) }}
+13 |         </v-chip>
+14 |       </div>
+15 |       
+16 |       <v-btn 
+17 |         color="primary" 
+18 |         variant="flat" 
+19 |         prepend-icon="mdi-pencil-outline"
+20 |         :to="`/mediaplans/${mediaplanId}/edit`"
+21 |       >
+22 |         Edit
+23 |       </v-btn>
+24 |     </v-card-title>
+25 |     
+26 |     <v-divider></v-divider>
+27 |     
+28 |     <v-card-text v-if="mediaplan" class="pa-6">
+29 |       <v-row>
+30 |         <v-col cols="12" md="4">
+31 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Brand</div>
+32 |           <div class="d-flex align-center">
+33 |             <v-avatar size="32" color="grey-lighten-3" class="mr-2">
+34 |               <v-img v-if="hasBrandLogo(mediaplan.brand)" :src="getBrandLogo(mediaplan.brand)"></v-img>
+35 |               <span v-else>{{ getBrandInitials(mediaplan.brand) }}</span>
+36 |             </v-avatar>
+37 |             <span class="font-weight-medium">{{ mediaplan.brand.name }}</span>
+38 |           </div>
+39 |         </v-col>
+40 |         
+41 |         <v-col cols="12" md="4">
+42 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Campaign Period</div>
+43 |           <div class="font-weight-medium">{{ formatDateRange(mediaplan.start_date, mediaplan.end_date) }}</div>
+44 |         </v-col>
+45 |         
+46 |         <v-col cols="12" md="4">
+47 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Budget</div>
+48 |           <div class="d-flex align-center justify-space-between mb-1">
+49 |             <span class="font-weight-medium">{{ formatCurrency(mediaplan.budget.used) }} / {{ formatCurrency(mediaplan.budget.total) }}</span>
+50 |             <span class="text-body-2">{{ calculatePercentage(mediaplan.budget.used, mediaplan.budget.total) }}%</span>
+51 |           </div>
+52 |           <v-progress-linear 
+53 |             :model-value="calculatePercentage(mediaplan.budget.used, mediaplan.budget.total)" 
+54 |             height="8" 
+55 |             :color="getBudgetStatusColor(mediaplan.budget)" 
+56 |             rounded
+57 |             bg-color="grey-lighten-3"
+58 |           ></v-progress-linear>
+59 |         </v-col>
+60 |       </v-row>
+61 |       
+62 |       <v-row class="mt-6">
+63 |         <v-col cols="12" md="4">
+64 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">PO Numbers</div>
+65 |           <div v-if="mediaplan.po_numbers && mediaplan.po_numbers.length > 0">
+66 |             <v-chip
+67 |               v-for="po in mediaplan.po_numbers"
+68 |               :key="po._id"
+69 |               class="mr-2 mb-2"
+70 |               variant="outlined"
+71 |               size="small"
+72 |             >
+73 |               {{ po.name }}: {{ formatCurrency(po.value) }}
+74 |             </v-chip>
+75 |           </div>
+76 |           <div v-else class="text-body-2 text-grey">No PO numbers added</div>
+77 |         </v-col>
+78 |         
+79 |         <v-col cols="12" md="4">
+80 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Created By</div>
+81 |           <div class="font-weight-medium">{{ mediaplan.created_by?.name || 'Unknown' }}</div>
+82 |         </v-col>
+83 |         
+84 |         <v-col cols="12" md="4">
+85 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Last Updated</div>
+86 |           <div class="font-weight-medium">{{ formatDate(mediaplan.updated_at) }}</div>
+87 |         </v-col>
+88 |       </v-row>
+89 |     </v-card-text>
+90 |     
+91 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
+92 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
+93 |     </div>
+94 |     
+95 |     <div v-if="error" class="error-container mx-6 my-4 pa-4">
+96 |       <v-alert type="error" title="Error Loading Mediaplan">
+97 |         {{ error }}
+98 |       </v-alert>
+99 |     </div>
+100 |   </v-card>
+101 | </template>
+102 | 
+103 | <script setup lang="ts">
+104 | import { formatDate, formatDateRange } from '@/helpers/dateUtils';
+105 | import { formatCurrency, calculatePercentage, getBudgetStatusColor } from '@/helpers/currencyUtils';
+106 | import { getBrandLogo, getBrandInitials, hasBrandLogo } from '@/helpers/brandUtils';
+107 | import { getMediaplanStatusColor, getMediaplanStatusLabel } from '@/constants/mediaplanStatuses';
+108 | import type { Mediaplan } from '@/types/mediaplan';
+109 | 
+110 | // Define props
+111 | interface Props {
+112 |   mediaplan: Mediaplan | null;
+113 |   mediaplanId: string;
+114 |   isLoading: boolean;
+115 |   error: string | null;
+116 | }
+117 | 
+118 | // Receive props
+119 | const props = defineProps<Props>();
+120 | </script>
+121 | 
+122 | <style scoped>
+123 | .error-container {
+124 |   border-radius: 4px;
+125 |   background-color: rgba(var(--v-theme-error), 0.1);
+126 | }
+127 | </style>
+```
+
+src/components/mediaplan/MediaplanPlanningView.vue
+```
+1 | <script setup lang="ts">
+2 | import {ref, watch, computed} from 'vue';
+3 | import {useRouter} from 'vue-router'; // Router importieren für Links
+4 | import CountryFlag from '@/components/common/CountryFlag.vue'; // Pfad prüfen
+5 | import {getBrandLogo} from "@/helpers/brandUtils"; // Pfad prüfen
+6 | import type {Project} from '@/types/project';
+7 | import {projectHeaders} from "@/constants/project.ts";
+8 | import {formatPercentage, percentage} from "../../helpers/format.ts"; // Pfad prüfen
+9 | import EditOrCreateProjectDialog from "@/components/project/EditOrCreateProjectDialog.vue";
+10 | 
+11 | 
+12 | // --- Props ---
+13 | interface Props {
+14 |   projects: Project[];
+15 |   totalProjects: number;
+16 |   isLoading: boolean;
+17 |   currentPage: number;
+18 |   itemsPerPage: number;
+19 |   mediaplanId: string; // *** Diese Prop ist entscheidend für den Link ***
+20 | }
+21 | 
+22 | const props = withDefaults(defineProps<Props>(), {
+23 |   projects: () => [],
+24 |   totalProjects: 0,
+25 |   isLoading: false,
+26 |   currentPage: 0,
+27 |   itemsPerPage: 10,
+28 |   mediaplanId: '' // Wichtig: Muss vom Parent (MediaplanDetail) übergeben werden!
+29 | });
+30 | 
+31 | // --- Emits ---
+32 | const emit = defineEmits<{
+33 |   (e: 'addProject'): void;
+34 |   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
+35 | }>();
+36 | 
+37 | // Router Instanz
+38 | const router = useRouter();
+39 | 
+40 | // --- Computed Properties für Tabelle ---
+41 | const pageModel = computed({
+42 |   get: () => props.currentPage + 1,
+43 |   set: (value) => {
+44 |   }
+45 | });
+46 | 
+47 | const itemsPerPageModel = computed({
+48 |   get: () => props.itemsPerPage,
+49 |   set: (value) => {
+50 |   }
+51 | });
+52 | 
+53 | 
+54 | // --- Methoden ---
+55 | const onOptionsUpdate = (options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }) => {
+56 |   emit('update:options', options);
+57 | };
+58 | 
+59 | const addProject = () => {
+60 |   emit('addProject');
+61 | };
+62 | 
+63 | const isProjectDialogOpen = ref(false);
+64 | const selectedProject = ref<Project | null>(null);
+65 | 
+66 | const openCreateProject = () => {
+67 |   selectedProject.value = null;
+68 |   isProjectDialogOpen.value = true;
+69 | };
+70 | 
+71 | const openEditProject = (project: Project) => {
+72 |   selectedProject.value = project;
+73 |   isProjectDialogOpen.value = true;
+74 | };
+75 | 
+76 | const onProjectSaved = (project: Project) => {
+77 |   isProjectDialogOpen.value = false;
+78 |   console.log(project)
+79 |   // Example: refetch list here if needed
+80 |   // await fetchProjects()
+81 | };
+82 | </script>
+83 | 
+84 | <template>
+85 |   <div class="planning-view-container mt-4">
+86 |     <EditOrCreateProjectDialog
+87 |         v-model="isProjectDialogOpen"
+88 |         :is-edit="!!selectedProject"
+89 |         :initial-data="selectedProject || undefined"
+90 |         @saved="onProjectSaved"
+91 |     />
+92 |     <v-card class="projects-table elevation-0" variant="flat">
+93 |       <v-theme-provider theme="dark">
+94 |         <v-data-table-server
+95 |             v-model:items-per-page="itemsPerPageModel"
+96 |             v-model:page="pageModel"
+97 |             :headers="projectHeaders"
+98 |             :items="projects"
+99 |             :items-length="totalProjects"
+100 |             :loading="isLoading"
+101 |             item-value="_id"
+102 |             hover
+103 |             class="projects-data-table"
+104 |             @update:options="onOptionsUpdate"
+105 | 
+106 |         >
+107 |           <template v-slot:item.edit="{ item }">
+108 |             <v-btn icon density="compact" variant="text" @click.stop="openEditProject(item)">
+109 |               <v-icon>mdi-pencil-outline</v-icon>
+110 |               <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+111 |             </v-btn>
+112 |           </template>
+113 | 
+114 |           <template v-slot:item.abbreviation="{ item }">
+115 |             <router-link
+116 |                 :to="{ name: 'ProjectDetail', params: { mediaplanId: props.mediaplanId, projectId: item._id } }"
+117 |                 class="project-link d-flex align-center"
+118 |                 v-if="item.abbreviation && props.mediaplanId"
+119 |                 @click.stop
+120 |             >
+121 |               <v-avatar size="32" class="mr-2 grey lighten-4"
+122 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
+123 |               <span>{{ item.abbreviation }}</span>
+124 |               <v-tooltip activator="parent" location="top">Open project</v-tooltip>
+125 |             </router-link>
+126 |             <div class="d-flex align-center" v-else-if="item.abbreviation">
+127 |               <v-avatar size="32" class="mr-2 grey lighten-4"
+128 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
+129 |               <span>{{ item.abbreviation }}</span>
+130 |               <v-tooltip activator="parent" location="top">Cannot link project (missing Mediaplan ID)</v-tooltip>
+131 |             </div>
+132 |             <div v-else>N/A</div>
+133 |           </template>
+134 | 
+135 |           <template v-slot:item.descriptive_vars.country="{ item }">
+136 |             <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
+137 |               <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2"/>
+138 |               <span>{{ item.descriptive_vars.country }}</span>
+139 |             </div>
+140 |             <div v-else>N/A</div>
+141 |           </template>
+142 | 
+143 |           <template v-slot:item.duration.formatted="{ item }">
+144 |             <div class="d-flex align-center" v-if="item.duration?.formatted">
+145 |               <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
+146 |               <span>{{ item.duration.formatted }}</span>
+147 |             </div>
+148 |             <div v-else>N/A</div>
+149 |           </template>
+150 | 
+151 |           <template v-slot:item.detail="{ item }">
+152 |             <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
+153 |             <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top"
+154 |                        max-width="300px">{{ item.detail }}
+155 |             </v-tooltip>
+156 |           </template>
+157 | 
+158 |           <template v-slot:item.default_vars.campaigntype="{ item }">
+159 |             {{ item.default_vars?.campaigntype || 'N/A' }}
+160 |           </template>
+161 | 
+162 |           <template v-slot:item.default_vars.subsegment="{ item }">
+163 |             {{ item.default_vars?.subsegment || 'N/A' }}
+164 |           </template>
+165 |           <template v-slot:item.budget="{ item }">
+166 |             <v-row no-gutters>
+167 |                 <v-progress-linear
+168 |                   :model-value="percentage(item?.budget?.used , item?.budget?.total )"
+169 |                   color="success"
+170 |                   height="8"
+171 |                   class="ml-2 mr-4"
+172 |                   style="width: 120px"
+173 |               ></v-progress-linear>
+174 |               {{ formatPercentage(item?.budget?.used, item?.budget?.total) }}
+175 |             </v-row>
+176 |           </template>
+177 | 
+178 |           <template v-slot:item.is_locked="{ item }">
+179 |             <v-icon v-if="item.is_locked != null" :color="item.is_locked ? 'orange' : 'grey-lighten-1'">
+180 |               {{ item.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant' }}
+181 |             </v-icon>
+182 |             <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
+183 |           </template>
+184 | 
+185 |           <template v-slot:item.actions="{ item }">
+186 |             <v-menu>
+187 |               <template v-slot:activator="{ props: menuProps }">
+188 |                 <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
+189 |               </template>
+190 |               <v-list density="compact">
+191 |                 <v-list-item @click.stop="editProject(item)">
+192 |                   <v-list-item-title>Edit</v-list-item-title>
+193 |                 </v-list-item>
+194 |                 <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
+195 |                   <v-list-item-title>Delete</v-list-item-title>
+196 |                 </v-list-item>
+197 |               </v-list>
+198 |             </v-menu>
+199 |           </template>
+200 | 
+201 |           <template v-slot:loading>
+202 |             <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
+203 |           </template>
+204 |           <template v-slot:no-data>
+205 |             <div class="text-center pa-4 text-disabled">
+206 |               <v-icon size="large" class="mb-2">mdi-database-off-outline</v-icon>
+207 |               <p>No projects found for this mediaplan.</p>
+208 |             </div>
+209 |           </template>
+210 | 
+211 |           <template v-slot:bottom>
+212 |             <div class="d-flex align-center pa-4 bg-grey-lighten-2">
+213 |               <v-btn
+214 |                   prepend-icon="mdi-plus"
+215 |                   class="black-text-button"
+216 |                   variant="text"
+217 |                   color="black"
+218 |                   @click="addProject"
+219 |                   :disabled="isLoading"
+220 |               >
+221 |                 Add Project
+222 |               </v-btn>
+223 |             </div>
+224 |           </template>
+225 |         </v-data-table-server>
+226 |       </v-theme-provider>
+227 |     </v-card>
+228 |   </div>
+229 | 
+230 | </template>
+231 | 
+232 | <style scoped>
+233 | /* ... (Styles bleiben) ... */
+234 | .project-link {
+235 |   color: white; /* Oder eine andere passende Farbe im Dark Theme */
+236 |   text-decoration: none;
+237 |   font-weight: 500;
+238 | }
+239 | 
+240 | .project-link:hover {
+241 |   text-decoration: underline;
+242 |   color: #E0E0E0; /* Leichte Aufhellung beim Hover */
+243 | }
+244 | </style>
+```
+
+src/components/mediaplan/MediaplanProjects.vue
+```
+1 | <template>
+2 |   <v-card>
+3 |     <v-toolbar flat color="primary" density="comfortable">
+4 |       <v-toolbar-title>Projects</v-toolbar-title>
+5 |       <v-spacer></v-spacer>
+6 |       <v-btn 
+7 |         variant="outlined" 
+8 |         prepend-icon="mdi-plus" 
+9 |         @click="$emit('createProject')"
+10 |         :disabled="isLoading"
+11 |         color="white"
+12 |       >
+13 |         Add Project
+14 |       </v-btn>
+15 |     </v-toolbar>
+16 |     
+17 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
+18 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
+19 |     </div>
+20 |     
+21 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
+22 |       <v-alert type="error" title="Error Loading Projects">
+23 |         {{ error }}
+24 |       </v-alert>
+25 |     </div>
+26 |     
+27 |     <v-data-table-server
+28 |       v-else
+29 |       v-model:items-per-page="itemsPerPage"
+30 |       v-model:page="page"
+31 |       :headers="projectHeaders"
+32 |       :items="projects"
+33 |       :items-length="totalProjects"
+34 |       :loading="isLoading"
+35 |       class="elevation-0"
+36 |       @update:options="onOptionsUpdate"
+37 |     >
+38 |       <!-- Country column with flag -->
+39 |       <template v-slot:item.country="{ item }">
+40 |         <div class="d-flex align-center">
+41 |           <v-avatar size="24" class="mr-2">
+42 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
+43 |           </v-avatar>
+44 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
+45 |         </div>
+46 |       </template>
+47 |       
+48 |       <!-- Campaign Type column -->
+49 |       <template v-slot:item.campaignType="{ item }">
+50 |         <v-chip
+51 |           size="small"
+52 |           :color="getCampaignTypeColor(item.raw.campaignType)"
+53 |           class="text-capitalize"
+54 |         >
+55 |           {{ item.raw.campaignType }}
+56 |         </v-chip>
+57 |       </template>
+58 |       
+59 |       <!-- Created date column -->
+60 |       <template v-slot:item.createdAt="{ item }">
+61 |         {{ formatDate(item.raw.createdAt) }}
+62 |       </template>
+63 |       
+64 |       <!-- Actions column -->
+65 |       <template v-slot:item.actions="{ item }">
+66 |         <v-tooltip text="View Details">
+67 |           <template v-slot:activator="{ props }">
+68 |             <v-btn
+69 |               icon
+70 |               variant="text"
+71 |               density="comfortable"
+72 |               v-bind="props"
+73 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
+74 |             >
+75 |               <v-icon>mdi-eye</v-icon>
+76 |             </v-btn>
+77 |           </template>
+78 |         </v-tooltip>
+79 |         
+80 |         <v-tooltip text="Edit Project">
+81 |           <template v-slot:activator="{ props }">
+82 |             <v-btn
+83 |               icon
+84 |               variant="text"
+85 |               density="comfortable"
+86 |               v-bind="props"
+87 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
+88 |             >
+89 |               <v-icon>mdi-pencil-outline</v-icon>
+90 |             </v-btn>
+91 |           </template>
+92 |         </v-tooltip>
+93 |         
+94 |         <v-tooltip text="Delete Project">
+95 |           <template v-slot:activator="{ props }">
+96 |             <v-btn
+97 |               icon
+98 |               variant="text"
+99 |               density="comfortable"
+100 |               color="error"
+101 |               v-bind="props"
+102 |               @click="$emit('deleteProject', item.raw)"
+103 |             >
+104 |               <v-icon>mdi-delete</v-icon>
+105 |             </v-btn>
+106 |           </template>
+107 |         </v-tooltip>
+108 |       </template>
+109 |       
+110 |       <!-- Empty state -->
+111 |       <template v-slot:no-data>
+112 |         <v-sheet class="d-flex flex-column align-center justify-center pa-6" height="300">
+113 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
+114 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
+115 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
+116 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="$emit('createProject')">
+117 |             Add First Project
+118 |           </v-btn>
+119 |         </v-sheet>
+120 |       </template>
+121 |     </v-data-table-server>
+122 |   </v-card>
+123 | </template>
+124 | 
+125 | <script setup lang="ts">
+126 | import { ref, watch } from 'vue';
+127 | import { formatDate } from '@/helpers/dateUtils';
+128 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
+129 | import type { Project } from '@/types/project';
+130 | 
+131 | // Define props
+132 | interface Props {
+133 |   projects: Project[];
+134 |   mediaplanId: string;
+135 |   totalProjects: number;
+136 |   isLoading: boolean;
+137 |   error: string | null;
+138 | }
+139 | 
+140 | // Define emits
+141 | const emit = defineEmits<{
+142 |   (e: 'createProject'): void;
+143 |   (e: 'deleteProject', project: Project): void;
+144 |   (e: 'update:page', page: number): void;
+145 |   (e: 'update:itemsPerPage', itemsPerPage: number): void;
+146 | }>();
+147 | 
+148 | // Component state
+149 | const page = ref<number>(1);
+150 | const itemsPerPage = ref<number>(10);
+151 | 
+152 | // Watch for pagination changes
+153 | watch([page, itemsPerPage], () => {
+154 |   emit('update:page', page.value);
+155 |   emit('update:itemsPerPage', itemsPerPage.value);
+156 | });
+157 | 
+158 | // Project Table Headers
+159 | const projectHeaders = [
+160 |   { title: 'Name', key: 'name', sortable: true },
+161 |   { title: 'Country', key: 'country', sortable: true },
+162 |   { title: 'Language', key: 'language', sortable: true },
+163 |   { title: 'Campaign Type', key: 'campaignType', sortable: true },
+164 |   { title: 'Phase', key: 'phase', sortable: true },
+165 |   { title: 'Goal', key: 'goal', sortable: true },
+166 |   { title: 'Created At', key: 'createdAt', sortable: true },
+167 |   { title: 'Actions', key: 'actions', sortable: false, align: 'end' },
+168 | ];
+169 | 
+170 | // Method to handle datatable option updates (sorting, etc)
+171 | const onOptionsUpdate = (options: any) => {
+172 |   // You can add additional logic here for sorting if needed
+173 |   // For now, we just update pagination
+174 |   page.value = options.page;
+175 |   itemsPerPage.value = options.itemsPerPage;
+176 | };
+177 | 
+178 | // Receive props with defaults
+179 | const props = withDefaults(defineProps<Props>(), {
+180 |   projects: () => [],
+181 |   totalProjects: 0,
+182 |   error: null
+183 | });
+184 | </script>
+185 | 
+186 | <style scoped>
+187 | .error-container {
+188 |   border-radius: 4px;
+189 |   background-color: rgba(var(--v-theme-error), 0.1);
+190 | }
+191 | </style>
+```
+
+src/components/mediaplan/MediaplanViewToggle.vue
+```
+1 | <template>
+2 |   <div class="view-toggle-container">
+3 |     <v-btn-toggle
+4 |         v-model="selectedView"
+5 |         class="view-toggle"
+6 |         density="comfortable"
+7 |         @update:modelValue="$emit('update:modelValue', $event)"
+8 |     >
+9 |       <v-btn value="planning">Planning view</v-btn>
+10 |       <v-btn value="budget">Budget view</v-btn>
+11 |     </v-btn-toggle>
+12 |   </div>
+13 | </template>
+14 | 
+15 | <script setup lang="ts">
+16 | import { ref, watch } from 'vue'
+17 | 
+18 | // Define props
+19 | interface Props {
+20 |   modelValue: string
+21 | }
+22 | 
+23 | defineEmits(['update:modelValue'])
+24 | const props = defineProps<Props>()
+25 | 
+26 | const selectedView = ref(props.modelValue)
+27 | 
+28 | watch(
+29 |     () => props.modelValue,
+30 |     (newValue) => {
+31 |       selectedView.value = newValue
+32 |     },
+33 |     { immediate: true }
+34 | )
+35 | </script>
+36 | 
+37 | <style scoped>
+38 | .view-toggle .v-btn {
+39 |   background-color: white;
+40 |   color: black;
+41 |   border: 1px solid #ccc;
+42 |   border-radius: 0;
+43 |   font-weight: 500;
+44 | }
+45 | 
+46 | .view-toggle .v-btn.v-btn--active {
+47 |   background-color: black;
+48 |   color: white;
+49 |   border-color: black;
+50 | }
+51 | </style>
+```
+
+src/components/mediaplan/ProjectsList.vue
+```
+1 | <template>
+2 |   <v-card>
+3 |     <v-card-title class="d-flex justify-space-between align-center py-4 px-6">
+4 |       <div class="text-h6">Projects</div>
+5 |       <v-btn 
+6 |         color="primary" 
+7 |         prepend-icon="mdi-plus" 
+8 |         @click="emit('createProject')"
+9 |       >
+10 |         Add Project
+11 |       </v-btn>
+12 |     </v-card-title>
+13 |     
+14 |     <v-divider></v-divider>
+15 |     
+16 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
+17 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
+18 |     </div>
+19 |     
+20 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
+21 |       <v-alert type="error" title="Error Loading Projects">
+22 |         {{ error }}
+23 |       </v-alert>
+24 |     </div>
+25 |     
+26 |     <v-data-table-server
+27 |       v-else
+28 |       v-model:items-per-page="itemsPerPage"
+29 |       v-model:page="page"
+30 |       :headers="projectHeaders"
+31 |       :items="projects"
+32 |       :items-length="totalItems"
+33 |       :loading="isLoading"
+34 |       class="elevation-0"
+35 |       @update:options="onOptionsUpdate"
+36 |     >
+37 |       <!-- Country column with flag -->
+38 |       <template v-slot:item.country="{ item }">
+39 |         <div class="d-flex align-center">
+40 |           <v-avatar size="24" class="mr-2">
+41 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
+42 |           </v-avatar>
+43 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
+44 |         </div>
+45 |       </template>
+46 |       
+47 |       <!-- Campaign Type column -->
+48 |       <template v-slot:item.campaignType="{ item }">
+49 |         <v-chip
+50 |           size="small"
+51 |           :color="getCampaignTypeColor(item.raw.campaignType)"
+52 |           class="text-capitalize"
+53 |         >
+54 |           {{ item.raw.campaignType }}
+55 |         </v-chip>
+56 |       </template>
+57 |       
+58 |       <!-- Created date column -->
+59 |       <template v-slot:item.createdAt="{ item }">
+60 |         {{ formatDate(item.raw.createdAt) }}
+61 |       </template>
+62 |       
+63 |       <!-- Actions column -->
+64 |       <template v-slot:item.actions="{ item }">
+65 |         <v-btn
+66 |           icon
+67 |           variant="text"
+68 |           density="comfortable"
+69 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
+70 |         >
+71 |           <v-icon>mdi-eye</v-icon>
+72 |         </v-btn>
+73 |         <v-btn
+74 |           icon
+75 |           variant="text"
+76 |           density="comfortable"
+77 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
+78 |         >
+79 |           <v-icon>mdi-pencil-outline</v-icon>
+80 |         </v-btn>
+81 |         <v-btn
+82 |           icon
+83 |           variant="text"
+84 |           density="comfortable"
+85 |           color="error"
+86 |           @click="emit('deleteProject', item.raw)"
+87 |         >
+88 |           <v-icon>mdi-delete</v-icon>
+89 |         </v-btn>
+90 |       </template>
+91 |       
+92 |       <!-- Empty state -->
+93 |       <template v-slot:no-data>
+94 |         <div class="d-flex flex-column align-center justify-center pa-6">
+95 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
+96 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
+97 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
+98 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="emit('createProject')">
+99 |             Add First Project
+100 |           </v-btn>
+101 |         </div>
+102 |       </template>
+103 |     </v-data-table-server>
+104 |   </v-card>
+105 | </template>
+106 | 
+107 | <script setup lang="ts">
+108 | import { ref, watch } from 'vue';
+109 | import { formatDate } from '@/helpers/dateUtils';
+110 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
+111 | import type { Project } from '@/types/project';
+112 | 
+113 | // Define props
+114 | interface Props {
+115 |   projects: Project[];
+116 |   mediaplanId: string;
+117 |   totalItems: number;
+118 |   isLoading: boolean;
+119 |   error: string | null;
+120 | }
+121 | 
+122 | // Define emits
+123 | const emit = defineEmits<{
+124 |   (e: 'createProject'): void;
+125 |   (e: 'deleteProject', project: Project): void;
+126 |   (e: 'updatePage', page: number): void;
+127 |   (e: 'updateItemsPerPage', itemsPerPage: number): void;
+128 | }>();
+129 | 
+130 | //
+```
+
+src/components/common/CountryFlag.vue
+```
+1 | <template>
+2 |   <span :class="`fi fi-${country.toLowerCase()}`" :style="flagStyle"></span>
+3 | </template>
+4 | 
+5 | <script setup lang="ts">
+6 | import {computed} from 'vue';
+7 | import 'flag-icons/css/flag-icons.min.css';
+8 | 
+9 | const props = defineProps<{
+10 |   country: string;
+11 |   size?: string;
+12 | }>();
+13 | 
+14 | const flagStyle = computed(() => {
+15 |   return {
+16 |     fontSize: props.size || '1rem',
+17 |     lineHeight: 1,
+18 |     verticalAlign: 'middle',
+19 |     display: 'inline-block'
+20 |   };
+21 | });
+22 | </script>
+23 | 
+24 | <style scoped>
+25 | 
+26 | 
+27 | span[class^="fi"] {
+28 | 
+29 | }
+30 | 
+31 | </style>
+```
+
+src/components/common/MediaplanTopSection.vue
+```
+1 | <template>
+2 |   <!-- Wrapper with native tooltip showing the current level on hover -->
+3 |   <div :title="levelDisplay">
+4 |     <v-row class="mb-0">
+5 |       <v-col cols="12" md="5" class="d-flex align-center pt-0 pb-0">
+6 |         <MediaplanBreadcrumb :mediaplan="mediaplan" :project="project" />
+7 |       </v-col>
+8 |       <v-col cols="12" md="7">
+9 |         <MediaplanHeader
+10 |             :plan-budget="mediaplan?.budget?.total || 0"
+11 |             :used-percentage="calculatePercentage(mediaplan?.budget?.used, mediaplan?.budget?.total)"
+12 |             :search="search"
+13 |             @update:search="val => emit('update:search', val)"
+14 |             :is-loading="isLoading"
+15 |         />
+16 |       </v-col>
+17 |     </v-row>
+18 | 
+19 |     <v-row class="mb-4">
+20 |       <v-col cols="12" sm="auto">
+21 |         <MediaplanViewToggle v-model="internalView" />
+22 |       </v-col>
+23 |       <v-col>
+24 |         <slot name="campaign-type-select" />
+25 |       </v-col>
+26 |     </v-row>
+27 | 
+28 |   </div>
+29 | </template>
+30 | 
+31 | <script setup lang="ts">
+32 | import { toRefs, computed } from 'vue'
+33 | import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue'
+34 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue'
+35 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue'
+36 | import type { Mediaplan } from '@/types/mediaplan'
+37 | import type { Project } from '@/types/project'
+38 | import type { Campaign } from '@/types/campaign'
+39 | 
+40 | const props = defineProps<{
+41 |   mediaplan: Mediaplan | null
+42 |   project: Project | null
+43 |   campaign?: Campaign | null
+44 |   search: string
+45 |   isLoading: boolean
+46 |   currentView: 'planning' | 'budget'
+47 | }>()
+48 | 
+49 | const emit = defineEmits<{
+50 |   (e: 'update:search', value: string): void
+51 |   (e: 'update:current-view', value: 'planning' | 'budget'): void
+52 | }>()
+53 | 
+54 | const { mediaplan, project, campaign, search, isLoading, currentView } = toRefs(props)
+55 | 
+56 | // Internal binding for the view toggle
+57 | const internalView = computed<'planning' | 'budget'>({
+58 |   get: () => currentView.value,
+59 |   set: val => emit('update:current-view', val),
+60 | })
+61 | 
+62 | // Determine which level we’re in
+63 | const levelDisplay = computed(() => {
+64 |   if (campaign?.value) return 'Campaign'
+65 |   if (project.value)    return 'Project'
+66 |   return 'Mediaplan'
+67 | })
+68 | 
+69 | function calculatePercentage(used: number | undefined, total: number | undefined): number {
+70 |   if (!used || !total) return 0
+71 |   return (used / total) * 100
+72 | }
+73 | </script>
+74 | 
+75 | <style scoped>
+76 | /* Optional: eigene Styles hier hinzufügen */
+77 | </style>
+```
+
+src/components/common/NotificationSnackbar.vue
+```
+1 | <template>
+2 |   <v-snackbar
+3 |     v-model="notification.show"
+4 |     :color="notification.type"
+5 |     :timeout="notification.timeout"
+6 |     class="notification-snackbar"
+7 |   >
+8 |     <div class="d-flex align-center">
+9 |       <v-icon :icon="getIconForType(notification.type)" class="mr-3" />
+10 |       <span>{{ notification.text }}</span>
+11 |     </div>
+12 |     <template v-slot:actions v-if="notification.closable">
+13 |       <v-btn
+14 |         icon
+15 |         variant="text"
+16 |         @click="closeNotification"
+17 |         size="small"
+18 |       >
+19 |         <v-icon>mdi-close</v-icon>
+20 |       </v-btn>
+21 |     </template>
+22 |   </v-snackbar>
+23 | </template>
+24 | 
+25 | <script setup lang="ts">
+26 | import { notification, closeNotification, NotificationType } from '@/helpers/notificationUtils';
+27 | 
+28 | /**
+29 |  * Gets the appropriate icon for the notification type
+30 |  * @param type Notification type
+31 |  * @returns Material Design Icon name
+32 |  */
+33 | const getIconForType = (type: NotificationType): string => {
+34 |   switch (type) {
+35 |     case NotificationType.SUCCESS:
+36 |       return 'mdi-check-circle';
+37 |     case NotificationType.ERROR:
+38 |       return 'mdi-alert-circle';
+39 |     case NotificationType.WARNING:
+40 |       return 'mdi-alert';
+41 |     case NotificationType.INFO:
+42 |     default:
+43 |       return 'mdi-information';
+44 |   }
+45 | };
+46 | </script>
+47 | 
+48 | <style scoped>
+49 | .notification-snackbar {
+50 |   z-index: 9999;
+51 | }
+52 | </style>
+```
+
+src/components/common/PaginationControls.vue
+```
+1 | <template>
+2 |   <div class="d-flex justify-center align-center my-4">
+3 |     <v-pagination
+4 |         v-model="modelValue"
+5 |         :length="length"
+6 |         :disabled="disabled"
+7 |         :total-visible="totalVisible"
+8 |         rounded="circle"
+9 |         @update:model-value="updatePage"
+10 |     />
+11 | 
+12 |     <div v-if="showItemsPerPage" class="ml-4 d-flex align-center">
+13 |       <span class="text-caption mr-2">Items per page:</span>
+14 |       <v-select
+15 |           v-model="itemsPerPage"
+16 |           :items="itemsPerPageOptions"
+17 |           density="compact"
+18 |           variant="outlined"
+19 |           hide-details
+20 |           class="items-per-page-select"
+21 |           @update:model-value="updateItemsPerPage"
+22 |       />
+23 |     </div>
+24 |   </div>
+25 | </template>
+26 | 
+27 | <script setup lang="ts">
+28 | import { computed, ref, watch } from 'vue';
+29 | 
+30 | interface Props {
+31 |   modelValue: number;
+32 |   length: number;
+33 |   disabled?: boolean;
+34 |   totalVisible?: number;
+35 |   showItemsPerPage?: boolean;
+36 |   itemsPerPageValue?: number;
+37 |   itemsPerPageOptions?: number[];
+38 | }
+39 | 
+40 | const props = withDefaults(defineProps<Props>(), {
+41 |   disabled: false,
+42 |   totalVisible: 7,
+43 |   showItemsPerPage: true,
+44 |   itemsPerPageValue: 10,
+45 |   itemsPerPageOptions: () => [10, 25, 50, 100]
+46 | });
+47 | 
+48 | const emit = defineEmits<{
+49 |   (e: 'update:model-value', value: number): void;
+50 |   (e: 'update:items-per-page', value: number): void;
+51 | }>();
+52 | 
+53 | // Internal model value for v-pagination (needs to be 1-based)
+54 | const modelValue = computed({
+55 |   get: () => props.modelValue + 1, // Convert from 0-based to 1-based
+56 |   set: (value: number) => {
+57 |     emit('update:model-value', value - 1); // Convert from 1-based to 0-based
+58 |   }
+59 | });
+60 | 
+61 | // Items per page handling
+62 | const itemsPerPage = ref(props.itemsPerPageValue);
+63 | 
+64 | // When props change, update the local state
+65 | watch(() => props.itemsPerPageValue, (newValue) => {
+66 |   itemsPerPage.value = newValue;
+67 | });
+68 | 
+69 | const updatePage = (page: number) => {
+70 |   emit('update:model-value', page - 1); // Convert from 1-based to 0-based
+71 | };
+72 | 
+73 | const updateItemsPerPage = (value: number) => {
+74 |   itemsPerPage.value = value;
+75 |   emit('update:items-per-page', value);
+76 | };
+77 | </script>
+78 | 
+79 | <style scoped>
+80 | .items-per-page-select {
+81 |   width: 80px;
+82 | }
+83 | </style>
+```
+
+src/components/common/dialog/CountryLanguageSelector.vue
+```
+1 | <!-- src/components/common/form/CountryLanguageSelector.vue -->
+2 | <template>
+3 |   <v-row>
+4 |     <v-col>
+5 | 
+6 |       <FormElementVrowVcol label="Country" required>
+7 |         <v-select
+8 |             v-model="selectedCountry"
+9 |             :items="countries"
+10 |             item-title="name"
+11 |             item-value="code"
+12 |             placeholder="Select Country"
+13 |             return-object
+14 |             :rules="[required]"
+15 |             :loading="loading"
+16 |         >
+17 |           <template v-slot:selection="{ item }">
+18 |             <div class="d-flex align-center">
+19 |               <country-flag :country="item.raw.code" class="mr-2" size="1rem"/>
+20 |               {{ item.raw.code }} - {{ item.raw.name }}
+21 |             </div>
+22 |           </template>
+23 |           <template v-slot:item="{ item, props }">
+24 |             <v-list-item v-bind="props" :title="`${item.raw.code} - ${item.raw.name}`">
+25 |               <template v-slot:prepend>
+26 |                 <country-flag :country="item.raw.code" class="mr-2" size="1rem"/>
+27 |               </template>
+28 |             </v-list-item>
+29 |           </template>
+30 |         </v-select>
+31 |       </FormElementVrowVcol>
+32 |     </v-col>
+33 |     <v-col>
+34 |       <FormElementVrowVcol label="Language" required>
+35 |         <v-select
+36 |             v-model="selectedLanguage"
+37 |             :items="filteredLanguages"
+38 |             item-title="name"
+39 |             item-value="code"
+40 |             placeholder="Select Language"
+41 |             persistent-hint
+42 |             hint="*Depends on Country"
+43 |             :rules="[required]"
+44 |             :disabled="!selectedCountry"
+45 |             :loading="loading"
+46 |         />
+47 |       </FormElementVrowVcol>
+48 |     </v-col>
+49 |   </v-row>
+50 | </template>
+51 | 
+52 | <script setup lang="ts">
+53 | import {ref, computed, watch, onMounted} from 'vue';
+54 | import {useProjectStore} from '@/stores/projectStore';
+55 | import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
+56 | import CountryFlag from "@/components/common/CountryFlag.vue";
+57 | 
+58 | const emit = defineEmits<{
+59 |   (e: 'update:modelValue', val: { country: any; language: string | null }): void;
+60 | }>();
+61 | 
+62 | const props = defineProps<{
+63 |   modelValue?: {
+64 |     country: any;
+65 |     language: string | null;
+66 |   };
+67 | }>();
+68 | 
+69 | const projectStore = useProjectStore();
+70 | const loading = ref(false);
+71 | 
+72 | const selectedCountry = ref(props.modelValue?.country || null);
+73 | const selectedLanguage = ref(props.modelValue?.language || null);
+74 | 
+75 | const required = (v: any) => !!v || 'Required';
+76 | 
+77 | const countries = computed(() => projectStore.countries);
+78 | const allLanguages = computed(() => projectStore.languages);
+79 | 
+80 | const filteredLanguages = computed(() => {
+81 |   if (!selectedCountry.value) return [];
+82 |   return allLanguages.value.filter(lang => lang.country_codes?.includes(selectedCountry.value.code));
+83 | });
+84 | 
+85 | watch([selectedCountry, selectedLanguage], () => {
+86 |   emit('update:modelValue', {
+87 |     country: selectedCountry.value,
+88 |     language: selectedLanguage.value,
+89 |   });
+90 | });
+91 | 
+92 | watch(selectedCountry, (newVal, oldVal) => {
+93 |   if (newVal?.code !== oldVal?.code) {
+94 |     selectedLanguage.value = null;
+95 |   }
+96 | });
+97 | 
+98 | onMounted(async () => {
+99 |   if (!projectStore.countries.length || !projectStore.languages.length) {
+100 |     loading.value = true;
+101 |     await projectStore.fetchProjectOptions();
+102 |     loading.value = false;
+103 |   }
+104 | });
+105 | </script>
 ```
 
 src/components/common/dialog/DialogFooter.vue

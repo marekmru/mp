@@ -23,6 +23,9 @@ const defaults = {
     hideDetails: true
   },
   VBtn: {
+  },
+  VDialog: {
+    maxWidth: 450
   }
 };
 </script>

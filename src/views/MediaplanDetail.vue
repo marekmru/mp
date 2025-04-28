@@ -6,7 +6,7 @@
       </v-alert>
 
       <div v-if="isLoadingMediaplan && !mediaplan" class="text-center my-10">
-        <v-progress-circular indeterminate color="primary" size="40" />
+        <v-progress-circular indeterminate color="primary" size="40"/>
         <p class="mt-2 text-disabled">Loading Mediaplan...</p>
       </div>
 
@@ -19,12 +19,7 @@
             :current-view="currentView"
             @update:search="updateSearch"
             @update:current-view="val => currentView = val"
-        >
-          <!-- Slot für späteren Campaign-Type-Select, falls benötigt -->
-          <template #campaign-type-select>
-            <!-- ggf. v-select hier -->
-          </template>
-        </MediaplanTopSection>
+        />
 
         <div class="main-content">
           <MediaplanPlanningView
@@ -39,7 +34,7 @@
               @add-project="openCreateProjectDialog"
           />
 
-          <MediaplanBudgetView v-else :mediaplan="mediaplan" />
+          <MediaplanBudgetView v-else :mediaplan="mediaplan"/>
 
           <v-alert
               v-if="projectError && currentView === 'planning'"
@@ -73,16 +68,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import {ref, computed, onMounted, reactive, watch} from 'vue'
+import {useRoute} from 'vue-router'
 
 import MainLayout from '@/layouts/MainLayout.vue'
-import MediaplanPlanningView from '@/components/mediaplan/MediaplanPlanningView.vue'
+import MediaplanPlanningView from '@/components/mediaplan/MediaplanPlanningViewDatatable.vue'
 import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue'
-import { useMediaplanStore } from '@/stores/mediaplanStore'
-import { useProjectStore } from '@/stores/projectStore'
-import type { Mediaplan } from '@/types/mediaplan'
-import type { Project } from '@/types/project'
+import {useMediaplanStore} from '@/stores/mediaplanStore'
+import {useProjectStore} from '@/stores/projectStore'
+import type {Mediaplan} from '@/types/mediaplan'
+import type {Project} from '@/types/project'
 import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
 
 // --- Props & Route ---
@@ -111,7 +106,7 @@ const currentView = ref<'planning' | 'budget'>('planning')
 const search = ref('')
 
 // --- Snackbar ---
-const snackbar = reactive({ show: false, text: '', color: 'success' })
+const snackbar = reactive({show: false, text: '', color: 'success'})
 
 // --- Methods ---
 const handleProjectOptionsUpdate = (options: {
@@ -175,6 +170,7 @@ watch(projectError, (err) => err && showSnackbar(`Error loading projects: ${err}
 .mediaplan-detail {
   min-height: calc(100vh - 64px);
 }
+
 .main-content {
   min-height: 60vh;
 }

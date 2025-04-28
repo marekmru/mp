@@ -1,5 +1,5 @@
 <template>
-  <v-row align="center" style="height: 57px;">
+  <v-row align="center" justify="end" style="height: 57px;" class="mr-0">
     <div class="d-flex align-center border-b border-grey-lighten-2 mr-2 h-100">
       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Plan Budget:</div>
       <div class="text-subtitle-1 text-grey-darken-1 mr-4">{{ formatCurrency(planBudget) }}</div>
@@ -10,28 +10,31 @@
           color="success"
           height="8"
           class="ml-2 mr-4"
-          style="width: 120px"
+          style="width: 100px"
       ></v-progress-linear>
       <span class="text-subtitle-1 text-grey-darken-1">{{ usedPercentage }}%</span>
     </div>
 
     <v-text-field
+        max-width="120px"
+        min-width="100px"
         v-model="search"
         placeholder="Search..."
         hide-details
-        class="mr-2"
-        append-inner-icon="mdi-magnify"
+        class="mr-2" append-inner-icon="mdi-magnify"
         @update:modelValue="$emit('update:search', $event)"
         bg-color="white"
     ></v-text-field>
+
     <v-btn icon="mdi-dots-horizontal" variant="plain">
     </v-btn>
-
   </v-row>
 </template>
 
 <script setup lang="ts">
 import {ref, watch} from 'vue';
+// Stelle sicher, dass der Pfad korrekt ist oder kommentiere es aus, wenn nicht verwendet
+// import BudgetProgress from "@/components/common/dialog/BudgetProgress.vue";
 
 // Define props
 interface Props {
@@ -62,7 +65,8 @@ watch(() => props.search, (newValue) => {
 
 // Format currency
 const formatCurrency = (value: number): string => {
-  return new Intl.NumberFormat('en-US', {
+  // Empfehlung: 'de-DE' für korrekte Euro-Formatierung in Deutschland
+  return new Intl.NumberFormat('de-DE', {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 0,
@@ -70,4 +74,3 @@ const formatCurrency = (value: number): string => {
   }).format(value);
 };
 </script>
-

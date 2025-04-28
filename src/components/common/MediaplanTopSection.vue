@@ -3,9 +3,17 @@
   <div :title="levelDisplay">
     <v-row class="mb-0">
       <v-col cols="12" md="5" class="d-flex align-center pt-0 pb-0">
-        <MediaplanBreadcrumb :mediaplan="mediaplan" :project="project" />
+        <MediaplanBreadcrumb :mediaplan="mediaplan" :project="project"/>
       </v-col>
-      <v-col cols="12" md="7">
+
+    </v-row>
+
+    <v-row class="mb-4" no-gutters>
+      <v-col>
+        <MediaplanViewToggle v-model="internalView"/>
+      </v-col>
+      <v-col class="d-flex pr-0">
+        <v-spacer></v-spacer>
         <MediaplanHeader
             :plan-budget="mediaplan?.budget?.total || 0"
             :used-percentage="calculatePercentage(mediaplan?.budget?.used, mediaplan?.budget?.total)"
@@ -16,26 +24,17 @@
       </v-col>
     </v-row>
 
-    <v-row class="mb-4">
-      <v-col cols="12" sm="auto">
-        <MediaplanViewToggle v-model="internalView" />
-      </v-col>
-      <v-col>
-        <slot name="campaign-type-select" />
-      </v-col>
-    </v-row>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { toRefs, computed } from 'vue'
+import {toRefs, computed} from 'vue'
 import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue'
 import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue'
 import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue'
-import type { Mediaplan } from '@/types/mediaplan'
-import type { Project } from '@/types/project'
-import type { Campaign } from '@/types/campaign'
+import type {Mediaplan} from '@/types/mediaplan'
+import type {Project} from '@/types/project'
+import type {Campaign} from '@/types/campaign'
 
 const props = defineProps<{
   mediaplan: Mediaplan | null
@@ -51,7 +50,7 @@ const emit = defineEmits<{
   (e: 'update:current-view', value: 'planning' | 'budget'): void
 }>()
 
-const { mediaplan, project, campaign, search, isLoading, currentView } = toRefs(props)
+const {mediaplan, project, campaign, search, isLoading, currentView} = toRefs(props)
 
 // Internal binding for the view toggle
 const internalView = computed<'planning' | 'budget'>({
@@ -62,7 +61,7 @@ const internalView = computed<'planning' | 'budget'>({
 // Determine which level we’re in
 const levelDisplay = computed(() => {
   if (campaign?.value) return 'Campaign'
-  if (project.value)    return 'Project'
+  if (project.value) return 'Project'
   return 'Mediaplan'
 })
 

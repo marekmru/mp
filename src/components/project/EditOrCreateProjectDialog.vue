@@ -75,7 +75,15 @@
           </FormElementVrowVcol>
 
           <FormElementVrowVcol label="Budget">
-            <v-text-field v-model="project.budget" type="number" placeholder="Enter Budget (€)"/>
+            <FormattedCurrencyInput
+                v-model="project.budget"
+                suffix="€"
+                :decimal="'comma'"
+                :allowDecimals="true"
+                outlined
+                density="compact"
+                hide-details="auto"
+            />
           </FormElementVrowVcol>
 
           <DialogFooter
@@ -89,6 +97,7 @@
         </WithFormDefaults>
 
       </v-form>
+      <pre>{{project}}</pre>
     </v-card>
   </v-dialog>
 </template>
@@ -106,6 +115,7 @@ import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
 import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
 import CountryLanguageSelector from "@/components/common/dialog/CountryLanguageSelector.vue";
 import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
+import FormattedCurrencyInput from "@/components/common/FormattedCurrencyInput.vue";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -152,28 +162,59 @@ const handleDateRangeChange = ([start, end]: [string, string]) => {
 };
 
 const close = () => emit('update:modelValue', false);
+import { watch } from 'vue'
 
+watch(
+    () => props.initialData,
+    (newData) => {
+      if (props.isEdit && newData) {
+        const startDate = newData.duration?.start_date ?? '';
+        const endDate = newData.duration?.end_date ?? '';
+
+        project.value = {
+          startDate,
+          endDate,
+          poNumber: newData.descriptive_vars?.bmwponumber ?? '',
+          builder: newData.builder ?? null,
+          campaignType: newData.default_vars?.campaigntype ?? '',
+          phase: newData.phase ?? '',
+          goal: newData.goal ?? '',
+          budget: newData.budget?.total ?? undefined,
+        };
+
+        dateRange.value = [startDate, endDate];
+
+        countryLanguage.value = {
+          country: newData.descriptive_vars?.country
+              ? { name: newData.descriptive_vars.country, code: newData.descriptive_vars.country }
+              : null,
+          language: newData.default_vars?.language ?? ''
+        };
+      }
+    },
+    { immediate: true } // Trigger the watcher also on component mount
+);
 onMounted(async () => {
   await projectStore.fetchProjectOptions();
-  if (props.isEdit && props.initialData) {
-    project.value = {
-      ...props.initialData,
-      poNumber: props.initialData.descriptive_vars?.bmwponumber || '',
-      budget: props.initialData.budget,
-      startDate: props.initialData.duration?.start_date || '',
-      endDate: props.initialData.duration?.end_date || ''
-    };
-
-    countryLanguage.value = {
-      country: {
-        name: props.initialData.descriptive_vars.country,
-        code: props.initialData.descriptive_vars.country // fallback
-      },
-      language: props.initialData.default_vars.language
-    };
-
-    dateRange.value = [project.value.startDate, project.value.endDate];
+/*  console.log(props.initialData, 'props.initialData')
+  if (!(props.isEdit && props.initialData)) {
+    return;
   }
+  project.value = {
+    ...props.initialData,
+    poNumber: props.initialData.descriptive_vars?.bmwponumber || '',
+    budget: props.initialData.budget,
+    startDate: props.initialData.duration?.start_date || '',
+    endDate: props.initialData.duration?.end_date || ''
+  };
+  countryLanguage.value = {
+    country: {
+      name: props.initialData.descriptive_vars.country,
+      code: props.initialData.descriptive_vars.country // fallback
+    },
+    language: props.initialData.default_vars.language
+  };
+  dateRange.value = [project.value.startDate, project.value.endDate];*/
 });
 
 const builders = computed(() => projectStore.builders);

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="handleClose" persistent max-width="550px">
+  <v-dialog :model-value="modelValue" @update:model-value="handleClose" persistent max-width="450px">
     <v-card class="px-6 pa-4">
       <DialogHeader
           title="Create new Mediaplan"

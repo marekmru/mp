@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import {ref, computed, onMounted, reactive, watch} from 'vue';
+import {useRouter, useRoute} from 'vue-router';
 import MainLayout from '@/layouts/MainLayout.vue';
 import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue';
 // import ProjectToolbar from '@/components/project/ProjectToolbar.vue';
@@ -8,14 +8,15 @@ import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue';
 import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue';
 import CampaignListView from '@/components/project/CampaignListView.vue';
 import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue';
-import { useMediaplanStore } from '@/stores/mediaplanStore';
-import { useProjectStore } from '@/stores/projectStore';
-import { useCampaignStore } from '@/stores/campaignStore';
-import type { Project } from '@/types/project';
-import { formatDateRange } from '@/helpers/dateUtils';
-import { calculatePercentage } from '@/helpers/currencyUtils';
+import {useMediaplanStore} from '@/stores/mediaplanStore';
+import {useProjectStore} from '@/stores/projectStore';
+import {useCampaignStore} from '@/stores/campaignStore';
+import type {Project} from '@/types/project';
+import {formatDateRange} from '@/helpers/dateUtils';
+import {calculatePercentage} from '@/helpers/currencyUtils';
 import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
-import ProjectDetailTable from "@/components/project/ProjectDetailTable.vue"; // Pfad prüfen
+import ProjectDetailTable from "@/components/project/ProjectDetailTable.vue";
+import MediaplanPlanningViewDatatable from "@/components/mediaplan/MediaplanPlanningViewDatatable.vue"; // Pfad prüfen
 
 // --- Props & Route ---
 const props = defineProps<{ mediaplanId?: string; projectId?: string; }>();
@@ -31,7 +32,9 @@ const campaignStore = useCampaignStore();
 
 // --- Computed Properties ---
 const parentMediaplan = computed(() => mediaplanStore.selectedMediaplan);
-const project = computed(() => projectStore.selectedProject);
+const project = computed(() => {
+  return projectStore.selectedProject ? [projectStore.selectedProject] : []
+});
 const isLoadingProject = computed(() => projectStore.isLoading);
 const errorProject = computed(() => projectStore.error);
 const campaigns = computed(() => campaignStore.campaigns);
@@ -47,7 +50,7 @@ const currentView = ref<string>('planning'); // 'planning' or 'budget'
 const search = ref<string>('');
 
 // --- Snackbar ---
-const snackbar = reactive({ show: false, text: '', color: 'success' });
+const snackbar = reactive({show: false, text: '', color: 'success'});
 
 // --- Methods ---
 const handleCampaignOptionsUpdate = (options: { /* ... */ page: number; itemsPerPage: number; }) => {
@@ -116,7 +119,7 @@ watch(() => [route.params.mediaplanId, route.params.projectId], ([newMpId, newPI
     projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
   }
-}, { deep: true });
+}, {deep: true});
 
 watch(errorProject, (newError) => {
   if (newError) showSnackbar(`Error loading project: ${newError}`, 'error');
@@ -155,7 +158,20 @@ watch(errorCampaigns, (newError) => {
           </template>
         </MediaplanTopSection>
 
-        <ProjectDetailTable :project="project" class="pb-3"/>
+        <!--        <ProjectDetailTable :project="project"
+                                    class="pb-3"/>-->
+
+
+        <MediaplanPlanningViewDatatable
+            :projects="project"
+            :is-loading="isLoadingProject"
+            :mediaplan-id="route.params.mediaplanId"
+            :current-page="0"
+            :total-projects="1"
+            :items-per-page="1"
+            type="single"
+            class="pb-3"
+        />
 
         <template v-if="project">
           <div class="main-content">
@@ -174,7 +190,8 @@ watch(errorCampaigns, (newError) => {
                 :mediaplan="parentMediaplan"
             />
             <div v-else-if="currentView === 'budget' && !parentMediaplan">
-              Loading budget data... </div>
+              Loading budget data...
+            </div>
 
             <v-alert v-if="errorCampaigns && currentView === 'planning'" type="error" density="compact" class="mt-4"
                      closable>
