@@ -66,12 +66,7 @@ const deleteCampaign = (item: Campaign) => {
           class="campaigns-data-table"
           @update:options="onOptionsUpdate"
       >
-        <template v-slot:item.edit="{ item }">
-          <v-btn icon density="compact" variant="text" @click.stop="editCampaign(item)">
-            <v-icon>mdi-pencil-outline</v-icon>
-            <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
-          </v-btn>
-        </template>
+
         <template v-slot:item.campaignname="{ item }"> {{ item.campaignname }}</template>
         <template v-slot:item.created_at="{ item }">
           {{ item.created_at ? new Date(item.created_at).toLocaleDateString('de-DE') : '-' }}
@@ -83,6 +78,10 @@ const deleteCampaign = (item: Campaign) => {
           </v-tooltip>
         </template>
         <template v-slot:item.actions="{ item }">
+          <v-btn icon density="compact" variant="text" @click.stop="editCampaign(item)">
+            <v-icon>mdi-pencil-outline</v-icon>
+            <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+          </v-btn>
           <v-menu>
             <template v-slot:activator="{ props: menuProps }">
               <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>

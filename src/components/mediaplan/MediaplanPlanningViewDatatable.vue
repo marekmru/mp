@@ -23,12 +23,9 @@
             @update:options="onOptionsUpdate"
 
         >
-          <template v-slot:item.edit="{ item }">
-            <v-btn icon density="compact" variant="text" @click.stop="openEditProject(item)">
-              <v-icon>mdi-pencil-outline</v-icon>
-              <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
-            </v-btn>
-          </template>
+<!--          <template v-slot:item.edit="{ item }">
+
+          </template>-->
 
           <template v-slot:item.abbreviation="{ item }">
             <router-link
@@ -97,6 +94,10 @@
           </template>
 
           <template v-slot:item.actions="{ item }">
+            <v-btn icon density="compact" size="small" variant="text" @click.stop="openEditProject(item)" class="mr-2">
+              <v-icon>mdi-pencil-outline</v-icon>
+              <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+            </v-btn>
             <v-menu>
               <template v-slot:activator="{ props: menuProps }">
                 <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>

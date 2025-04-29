@@ -33,8 +33,6 @@
 
 <script setup lang="ts">
 import {ref, watch} from 'vue';
-// Stelle sicher, dass der Pfad korrekt ist oder kommentiere es aus, wenn nicht verwendet
-// import BudgetProgress from "@/components/common/dialog/BudgetProgress.vue";
 
 // Define props
 interface Props {
