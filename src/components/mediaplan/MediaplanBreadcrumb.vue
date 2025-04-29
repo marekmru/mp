@@ -36,7 +36,7 @@ const breadcrumbItems = computed(() => {
     items.push({
       title: props.mediaplan.name || 'Mediaplan',
       // Link nur aktiv, wenn wir tiefer sind (also wenn ein Projekt übergeben wurde)
-      to: props.project ? {name: 'MediaplanDetail', params: {id: props.mediaplan._id}} : undefined,
+      to: props.project ? {name: 'MediaplanDetail', params: {mediaplanId: props.mediaplan._id}} : undefined,
       disabled: !props.project
     });
 

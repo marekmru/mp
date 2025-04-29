@@ -36,7 +36,7 @@ index.html
 7 |     <title>Mediaplan</title>
 8 | </head>
 9 | <body>
-10 | <div id="app"></div>
+10 | <div mediaplanId="app"></div>
 11 | <script type="module" src="/src/main.ts"></script>
 12 | </body>
 13 | </html>
@@ -1868,7 +1868,7 @@ src/mocks/swagger_mp.yaml
 418 |                 $ref: "#/components/schemas/Error"
 419 |           description: Internal Server Error
 420 | 
-421 |   /mediaplans/{id}:
+421 |   /mediaplans/{mediaplanId}:
 422 |     get:
 423 |       summary: Get a single Mediaplan by ID
 424 |       # ... (rest of definition - unchanged) ...
@@ -1877,7 +1877,7 @@ src/mocks/swagger_mp.yaml
 427 |       parameters:
 428 |         - description: The unique identifier of the Mediaplan.
 429 |           in: path
-430 |           name: id
+430 |           name: mediaplanId
 431 |           required: true
 432 |           schema:
 433 |             format: uuid
@@ -1916,7 +1916,7 @@ src/mocks/swagger_mp.yaml
 466 |       parameters:
 467 |         - description: The unique identifier of the Mediaplan.
 468 |           in: path
-469 |           name: id
+469 |           name: mediaplanId
 470 |           required: true
 471 |           schema:
 472 |             format: uuid
@@ -1969,7 +1969,7 @@ src/mocks/swagger_mp.yaml
 519 |       parameters:
 520 |         - description: The unique identifier of the Mediaplan.
 521 |           in: path
-522 |           name: id
+522 |           name: mediaplanId
 523 |           required: true
 524 |           schema:
 525 |             format: uuid
@@ -1996,7 +1996,7 @@ src/mocks/swagger_mp.yaml
 546 |                 $ref: "#/components/schemas/Error"
 547 |           description: Internal Server Error
 548 | 
-549 |   /mediaplans/{mediaplanId}/projects:
+549 |   /mediaplans/{mediaplanIdRef}/projects:
 550 |     get:
 551 |       summary: Get all projects for a given Mediaplan
 552 |       # ... (rest of definition including previous example - unchanged) ...
@@ -2005,7 +2005,7 @@ src/mocks/swagger_mp.yaml
 555 |       parameters:
 556 |         - description: The ID of the Mediaplan.
 557 |           in: path
-558 |           name: mediaplanId
+558 |           name: mediaplanIdRef
 559 |           required: true
 560 |           schema:
 561 |             format: uuid
@@ -2704,7 +2704,7 @@ src/mocks/swagger_mp.yaml
 1254 |       parameters:
 1255 |         - description: The ID of the Mediaplan to which the project belongs.
 1256 |           in: path
-1257 |           name: mediaplanId
+1257 |           name: mediaplanIdRef
 1258 |           required: true
 1259 |           schema:
 1260 |             format: uuid
@@ -2778,14 +2778,14 @@ src/mocks/swagger_mp.yaml
 1328 |                 $ref: "#/components/schemas/Error"
 1329 |           description: Internal Server Error
 1330 | 
-1331 |   /mediaplans/{mediaplanId}/projects/{projectId}:
+1331 |   /mediaplans/{mediaplanIdRef}/projects/{projectId}:
 1332 |     get:
 1333 |       summary: Get a Project
 1334 |       tags:
 1335 |         - Projects
 1336 |       parameters:
 1337 |         - in: path
-1338 |           name: mediaplanId
+1338 |           name: mediaplanIdRef
 1339 |           schema:
 1340 |             type: string
 1341 |             format: uuid
@@ -2857,7 +2857,7 @@ src/mocks/swagger_mp.yaml
 1407 |       parameters:
 1408 |         - description: The ID of the Mediaplan.
 1409 |           in: path
-1410 |           name: mediaplanId
+1410 |           name: mediaplanIdRef
 1411 |           required: true
 1412 |           schema:
 1413 |             format: uuid
@@ -2917,7 +2917,7 @@ src/mocks/swagger_mp.yaml
 1467 |       parameters:
 1468 |         - description: The ID of the Mediaplan.
 1469 |           in: path
-1470 |           name: mediaplanId
+1470 |           name: mediaplanIdRef
 1471 |           required: true
 1472 |           schema:
 1473 |             format: uuid
@@ -2951,14 +2951,14 @@ src/mocks/swagger_mp.yaml
 1501 |                 $ref: "#/components/schemas/Error"
 1502 |           description: Internal Server Error
 1503 | 
-1504 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns:
+1504 |   /mediaplans/{mediaplanIdRef}/projects/{projectId}/campaigns:
 1505 |     get:
 1506 |       summary: Get all campaigns for a given Project within a Mediaplan
 1507 |       tags:
 1508 |         - Campaigns
 1509 |       parameters:
 1510 |         - in: path
-1511 |           name: mediaplanId
+1511 |           name: mediaplanIdRef
 1512 |           schema:
 1513 |             type: string
 1514 |             format: uuid
@@ -3092,7 +3092,7 @@ src/mocks/swagger_mp.yaml
 1642 |       parameters:
 1643 |         - description: The ID of the Mediaplan.
 1644 |           in: path
-1645 |           name: mediaplanId
+1645 |           name: mediaplanIdRef
 1646 |           required: true
 1647 |           schema:
 1648 |             format: uuid
@@ -3151,7 +3151,7 @@ src/mocks/swagger_mp.yaml
 1701 |                 $ref: "#/components/schemas/Error"
 1702 |           description: Internal Server Error
 1703 | 
-1704 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}:
+1704 |   /mediaplans/{mediaplanIdRef}/projects/{projectId}/campaigns/{campaignId}:
 1705 |     get:
 1706 |       summary: Get a single Campaign by ID
 1707 |       # ... (rest of definition - unchanged) ...
@@ -3160,7 +3160,7 @@ src/mocks/swagger_mp.yaml
 1710 |       parameters:
 1711 |         - description: The ID of the Mediaplan.
 1712 |           in: path
-1713 |           name: mediaplanId
+1713 |           name: mediaplanIdRef
 1714 |           required: true
 1715 |           schema:
 1716 |             format: uuid
@@ -3213,7 +3213,7 @@ src/mocks/swagger_mp.yaml
 1763 |       parameters:
 1764 |         - description: The ID of the Mediaplan.
 1765 |           in: path
-1766 |           name: mediaplanId
+1766 |           name: mediaplanIdRef
 1767 |           required: true
 1768 |           schema:
 1769 |             format: uuid
@@ -3280,7 +3280,7 @@ src/mocks/swagger_mp.yaml
 1830 |       parameters:
 1831 |         - description: The ID of the Mediaplan.
 1832 |           in: path
-1833 |           name: mediaplanId
+1833 |           name: mediaplanIdRef
 1834 |           required: true
 1835 |           schema:
 1836 |             format: uuid
@@ -3321,7 +3321,7 @@ src/mocks/swagger_mp.yaml
 1871 |                 $ref: "#/components/schemas/Error"
 1872 |           description: Internal Server Error
 1873 | 
-1874 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}/lineitems:
+1874 |   /mediaplans/{mediaplanIdRef}/projects/{projectId}/campaigns/{campaignId}/lineitems:
 1875 |     get:
 1876 |       summary: Get all line items for a given Campaign
 1877 |       # ... (rest of definition - unchanged) ...
@@ -3330,7 +3330,7 @@ src/mocks/swagger_mp.yaml
 1880 |       parameters:
 1881 |         - description: The ID of the Mediaplan.
 1882 |           in: path
-1883 |           name: mediaplanId
+1883 |           name: mediaplanIdRef
 1884 |           required: true
 1885 |           schema:
 1886 |             format: uuid
@@ -4068,17 +4068,17 @@ src/router/index.ts
 14 |         component: () => import('../views/Login.vue'),
 15 |     },
 16 |     {
-17 |         path: '/mediaplans/:id',
+17 |         path: '/mediaplans/:mediaplanId',
 18 |         name: 'MediaplanDetail',
 19 |         component: () => import('../views/MediaplanDetail.vue'),
 20 |         props: true,
 21 |     },
 22 |     // *** NEUE ROUTE für Project Detail ***
 23 |     {
-24 |         path: '/mediaplans/:mediaplanId/projects/:projectId',
+24 |         path: '/mediaplans/:mediaplanIdRef/projects/:projectId',
 25 |         name: 'ProjectDetail',
 26 |         component: () => import('../views/ProjectDetail.vue'), // Pfad zur neuen Komponente prüfen
-27 |         props: true, // Übergibt mediaplanId und projectId als Props
+27 |         props: true, // Übergibt mediaplanIdRef und projectId als Props
 28 |         meta: { requiresAuth: true } // Annahme: Detail erfordert Login
 29 |     },
 30 |     // Additional routes here
@@ -4254,8 +4254,8 @@ src/stores/campaignStore.ts
 31 |      * Lädt eine Liste von Kampagnen für ein bestimmtes Projekt innerhalb eines Mediaplans.
 32 |      * Geht von einer paginierten API-Antwort aus.
 33 |      */
-34 |     async function fetchCampaigns(mediaplanId: string, projectId: string) {
-35 |         if (!mediaplanId || !projectId) {
+34 |     async function fetchCampaigns(mediaplanIdRef: string, projectId: string) {
+35 |         if (!mediaplanIdRef || !projectId) {
 36 |             error.value = "Mediaplan ID or Project ID is missing for fetching campaigns.";
 37 |             console.error(error.value);
 38 |             campaigns.value = [];
@@ -4265,7 +4265,7 @@ src/stores/campaignStore.ts
 42 |             return;
 43 |         }
 44 |         // Store context for pagination actions
-45 |         currentContextMediaplanId.value = mediaplanId;
+45 |         currentContextMediaplanId.value = mediaplanIdRef;
 46 |         currentContextProjectId.value = projectId;
 47 | 
 48 |         isLoading.value = true;
@@ -4278,7 +4278,7 @@ src/stores/campaignStore.ts
 55 |             // queryParams.append('sort', sortBy.value);
 56 |             // queryParams.append('order', sortOrder.value);
 57 | 
-58 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns?${queryParams.toString()}`;
+58 |             const url = `/mediaplans/${mediaplanIdRef}/projects/${projectId}/campaigns?${queryParams.toString()}`;
 59 | 
 60 |             // Annahme: API liefert paginierte Antwort
 61 |             const response = await customFetch(url) as CampaignListResponse;
@@ -4320,8 +4320,8 @@ src/stores/campaignStore.ts
 97 |     /**
 98 |      * Lädt die Details einer einzelnen Kampagne.
 99 |      */
-100 |     async function fetchCampaign(mediaplanId: string, projectId: string, campaignId: string) {
-101 |         if (!mediaplanId || !projectId || !campaignId) {
+100 |     async function fetchCampaign(mediaplanIdRef: string, projectId: string, campaignId: string) {
+101 |         if (!mediaplanIdRef || !projectId || !campaignId) {
 102 |             error.value = "Missing IDs to fetch campaign details.";
 103 |             console.error(error.value);
 104 |             selectedCampaign.value = null;
@@ -4331,7 +4331,7 @@ src/stores/campaignStore.ts
 108 |         error.value = null;
 109 |         selectedCampaign.value = null; // Reset
 110 |         try {
-111 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}`;
+111 |             const url = `/mediaplans/${mediaplanIdRef}/projects/${projectId}/campaigns/${campaignId}`;
 112 |             selectedCampaign.value = await customFetch(url) as Campaign;
 113 |         } catch (err) {
 114 |             error.value = err instanceof Error ? err.message : 'Failed to load campaign details';
@@ -4374,8 +4374,8 @@ src/stores/campaignStore.ts
 151 |     /**
 152 |      * Erstellt eine neue Kampagne.
 153 |      */
-154 |     async function createCampaign(mediaplanId: string, projectId: string, campaignData: CampaignCreate): Promise<Campaign | null> {
-155 |         if (!mediaplanId || !projectId) {
+154 |     async function createCampaign(mediaplanIdRef: string, projectId: string, campaignData: CampaignCreate): Promise<Campaign | null> {
+155 |         if (!mediaplanIdRef || !projectId) {
 156 |             error.value = "Missing IDs for creating campaign.";
 157 |             console.error(error.value);
 158 |             return null;
@@ -4383,7 +4383,7 @@ src/stores/campaignStore.ts
 160 |         isLoading.value = true;
 161 |         error.value = null;
 162 |         try {
-163 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns`;
+163 |             const url = `/mediaplans/${mediaplanIdRef}/projects/${projectId}/campaigns`;
 164 |             const newCampaign = await customFetch(url, {
 165 |                 method: 'POST',
 166 |                 headers: {'Content-Type': 'application/json'},
@@ -4391,7 +4391,7 @@ src/stores/campaignStore.ts
 168 |             }) as Campaign;
 169 | 
 170 |             // Optional: Liste neu laden oder die neue Kampagne manuell hinzufügen
-171 |             // fetchCampaigns(mediaplanId, projectId); // Einfachste Variante
+171 |             // fetchCampaigns(mediaplanIdRef, projectId); // Einfachste Variante
 172 |             return newCampaign;
 173 | 
 174 |         } catch (err) {
@@ -4625,11 +4625,11 @@ src/stores/mediaplanStore.ts
 79 |     /**
 80 |      * Fetch a single Mediaplan by ID
 81 |      */
-82 |     async function fetchMediaplan(id: string) {
+82 |     async function fetchMediaplan(mediaplanId: string) {
 83 |         isLoading.value = true
 84 |         error.value = null
 85 |         try {
-86 |             const res = await customFetch(`/mediaplans/${id}`) as Mediaplan
+86 |             const res = await customFetch(`/mediaplans/${mediaplanId}`) as Mediaplan
 87 |             selectedMediaplan.value = res
 88 |         } catch (err) {
 89 |             selectedMediaplan.value = null
@@ -4779,11 +4779,11 @@ src/stores/projectStore.ts
 37 | 
 38 |     // Getters
 39 |     const getProjectById = computed(() => {
-40 |         return (id: string) => projects.value.find(project => project._id === id) || null;
+40 |         return (mediaplanId: string) => projects.value.find(project => project._id === mediaplanId) || null;
 41 |     });
 42 | 
 43 |     // Actions
-44 |     async function fetchProjects(mediaplanId: string) {
+44 |     async function fetchProjects(mediaplanIdRef: string) {
 45 |         isLoading.value = true;
 46 |         error.value = null;
 47 | 
@@ -4793,7 +4793,7 @@ src/stores/projectStore.ts
 51 |             queryParams.append('page', currentPage.value.toString());
 52 |             queryParams.append('per_page', perPage.value.toString());
 53 | 
-54 |             const url = `/mediaplans/${mediaplanId}/projects?${queryParams.toString()}`;
+54 |             const url = `/mediaplans/${mediaplanIdRef}/projects?${queryParams.toString()}`;
 55 |             const response = await customFetch(url) as ProjectListResponse;
 56 | 
 57 |             projects.value = response.items;
@@ -4809,12 +4809,12 @@ src/stores/projectStore.ts
 67 |         }
 68 |     }
 69 | 
-70 |     async function fetchProject(mediaplanId: string, projectId: string) {
+70 |     async function fetchProject(mediaplanIdRef: string, projectId: string) {
 71 |         isLoading.value = true;
 72 |         error.value = null;
 73 | 
 74 |         try {
-75 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}`;
+75 |             const url = `/mediaplans/${mediaplanIdRef}/projects/${projectId}`;
 76 |             const response = await customFetch(url) as Project;
 77 |             selectedProject.value = response;
 78 |             return response;
@@ -4832,7 +4832,7 @@ src/stores/projectStore.ts
 90 |         error.value = null;
 91 | 
 92 |         try {
-93 |             const url = `/mediaplans/${projectData.mediaplanId}/projects`;
+93 |             const url = `/mediaplans/${projectData.mediaplanIdRef}/projects`;
 94 | 
 95 |             // For our implementation, we need to adjust the data structure to match the API expectations
 96 |             const payload = {
@@ -4922,31 +4922,31 @@ src/stores/projectStore.ts
 180 | 
 181 |             // Mock campaign types
 182 |             campaignTypes.value = [
-183 |                 {id: 'always-on', name: 'Always On'},
-184 |                 {id: 'awareness', name: 'Awareness'},
-185 |                 {id: 'consideration', name: 'Consideration'}
+183 |                 {mediaplanId: 'always-on', name: 'Always On'},
+184 |                 {mediaplanId: 'awareness', name: 'Awareness'},
+185 |                 {mediaplanId: 'consideration', name: 'Consideration'}
 186 |             ];
 187 | 
 188 |             // Mock phases
 189 |             phases.value = [
-190 |                 {id: 'sea', name: 'SEA'},
-191 |                 {id: 'planning', name: 'Planning'},
-192 |                 {id: 'execution', name: 'Execution'}
+190 |                 {mediaplanId: 'sea', name: 'SEA'},
+191 |                 {mediaplanId: 'planning', name: 'Planning'},
+192 |                 {mediaplanId: 'execution', name: 'Execution'}
 193 |             ];
 194 | 
 195 |             // Mock goals
 196 |             goals.value = [
-197 |                 {id: 'consideration', name: 'Consideration'},
-198 |                 {id: 'configurator', name: 'Configurator'},
-199 |                 {id: 'conversion', name: 'Conversion'}
+197 |                 {mediaplanId: 'consideration', name: 'Consideration'},
+198 |                 {mediaplanId: 'configurator', name: 'Configurator'},
+199 |                 {mediaplanId: 'conversion', name: 'Conversion'}
 200 |             ];
 201 | 
 202 |             // Mock builders
 203 |             builders.value = [
-204 |                 {id: 'sea', name: 'SEA'},
-205 |                 {id: 'social', name: 'Social'},
-206 |                 {id: 'display', name: 'Display'},
-207 |                 {id: '2layer', name: '2Layer'}
+204 |                 {mediaplanId: 'sea', name: 'SEA'},
+205 |                 {mediaplanId: 'social', name: 'Social'},
+206 |                 {mediaplanId: 'display', name: 'Display'},
+207 |                 {mediaplanId: '2layer', name: '2Layer'}
 208 |             ];
 209 | 
 210 |         } catch (err) {
@@ -5214,7 +5214,7 @@ src/types/project.ts
 57 |   duration?: ProjectDuration;
 58 |   detail?: string;
 59 |   budget?: Budget;
-60 |   mediaplanId?: string;
+60 |   mediaplanIdRef?: string;
 61 | }
 62 | 
 63 | // Project create request
@@ -5407,7 +5407,7 @@ src/views/MediaplanDetail.vue
 34 |               :is-loading="isLoadingProjects"
 35 |               :current-page="projectCurrentPage"
 36 |               :items-per-page="projectItemsPerPage"
-37 |               :mediaplan-id="mediaplanId"
+37 |               :mediaplan-mediaplanId="mediaplanIdRef"
 38 |               @update:options="handleProjectOptionsUpdate"
 39 |               @add-project="openCreateProjectDialog"
 40 |           />
@@ -5459,9 +5459,9 @@ src/views/MediaplanDetail.vue
 86 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
 87 | 
 88 | // --- Props & Route ---
-89 | const props = defineProps<{ id?: string }>()
+89 | const props = defineProps<{ mediaplanId?: string }>()
 90 | const route = useRoute()
-91 | const mediaplanId = ref(props.id || (route.params.id as string))
+91 | const mediaplanIdRef = ref(props.mediaplanId || (route.params.mediaplanId as string))
 92 | 
 93 | // --- Stores ---
 94 | const mediaplanStore = useMediaplanStore()
@@ -5496,17 +5496,17 @@ src/views/MediaplanDetail.vue
 123 |   const newPage = options.page - 1
 124 |   if (newPage !== projectCurrentPage.value) {
 125 |     projectStore.currentPage = newPage
-126 |     projectStore.fetchProjects(mediaplanId.value)
+126 |     projectStore.fetchProjects(mediaplanIdRef.value)
 127 |   }
 128 |   if (options.itemsPerPage !== projectItemsPerPage.value) {
 129 |     projectStore.perPage = options.itemsPerPage
 130 |     projectStore.currentPage = 0
-131 |     projectStore.fetchProjects(mediaplanId.value)
+131 |     projectStore.fetchProjects(mediaplanIdRef.value)
 132 |   }
 133 | }
 134 | 
 135 | const openCreateProjectDialog = () => {
-136 |   console.log('Trigger create project for Mediaplan ID:', mediaplanId.value)
+136 |   console.log('Trigger create project for Mediaplan ID:', mediaplanIdRef.value)
 137 |   // router.push or dialog logic here
 138 | }
 139 | 
@@ -5523,18 +5523,18 @@ src/views/MediaplanDetail.vue
 150 | 
 151 | // --- Lifecycle ---
 152 | onMounted(() => {
-153 |   if (!mediaplanId.value) {
+153 |   if (!mediaplanIdRef.value) {
 154 |     mediaplanStore.error = 'No mediaplan ID provided'
 155 |     return
 156 |   }
-157 |   mediaplanStore.fetchMediaplan(mediaplanId.value)
-158 |   projectStore.fetchProjects(mediaplanId.value)
+157 |   mediaplanStore.fetchMediaplan(mediaplanIdRef.value)
+158 |   projectStore.fetchProjects(mediaplanIdRef.value)
 159 | })
 160 | 
 161 | // --- Watchers ---
-162 | watch(() => route.params.id, (newId) => {
-163 |   if (typeof newId === 'string' && newId !== mediaplanId.value) {
-164 |     mediaplanId.value = newId
+162 | watch(() => route.params.mediaplanId, (newId) => {
+163 |   if (typeof newId === 'string' && newId !== mediaplanIdRef.value) {
+164 |     mediaplanIdRef.value = newId
 165 |     mediaplanStore.fetchMediaplan(newId)
 166 |     projectStore.fetchProjects(newId)
 167 |   }
@@ -5565,7 +5565,7 @@ src/views/MediaplanEdit.vue
 7 |             Edit Mediaplan
 8 |           </v-card-title>
 9 |           <v-card-text>
-10 |             <p>Mediaplan ID: {{ id }}</p>
+10 |             <p>Mediaplan ID: {{ mediaplanId }}</p>
 11 |             <p>This page would allow editing of the mediaplan details.</p>
 12 |           </v-card-text>
 13 |           <v-card-actions>
@@ -5584,7 +5584,7 @@ src/views/MediaplanEdit.vue
 26 | 
 27 | // Props
 28 | const props = defineProps<{
-29 |   id: string;
+29 |   mediaplanId: string;
 30 | }>();
 31 | 
 32 | // Router
@@ -5699,11 +5699,11 @@ src/views/Overview.vue
 98 |   }
 99 | }
 100 | 
-101 | function handleMediaplanCreated(id: string) {
-102 |   console.log('Mediaplan created:', id);
+101 | function handleMediaplanCreated(mediaplanId: string) {
+102 |   console.log('Mediaplan created:', mediaplanId);
 103 | }
 104 | 
-105 | function handleProjectCreated(id: string) {
+105 | function handleProjectCreated(mediaplanId: string) {
 106 |   snackbar.color = 'success';
 107 |   snackbar.text = 'Project created successfully';
 108 |   snackbar.show = true;
@@ -5739,10 +5739,10 @@ src/views/ProjectDetail.vue
 18 | import ProjectDetailTable from "@/components/project/ProjectDetailTable.vue"; // Pfad prüfen
 19 | 
 20 | // --- Props & Route ---
-21 | const props = defineProps<{ mediaplanId?: string; projectId?: string; }>();
+21 | const props = defineProps<{ mediaplanIdRef?: string; projectId?: string; }>();
 22 | const route = useRoute();
 23 | const router = useRouter();
-24 | const currentMediaplanId = ref(props.mediaplanId || route.params.mediaplanId as string);
+24 | const currentMediaplanId = ref(props.mediaplanIdRef || route.params.mediaplanIdRef as string);
 25 | const currentProjectId = ref(props.projectId || route.params.projectId as string);
 26 | 
 27 | // --- Stores ---
@@ -5822,7 +5822,7 @@ src/views/ProjectDetail.vue
 101 | 
 102 | // --- Watchers ---
 103 | // Beobachte Routenänderungen, um Daten neu zu laden
-104 | watch(() => [route.params.mediaplanId, route.params.projectId], ([newMpId, newPId]) => {
+104 | watch(() => [route.params.mediaplanIdRef, route.params.projectId], ([newMpId, newPId]) => {
 105 |   let needsReload = false;
 106 |   if (newMpId && typeof newMpId === 'string' && newMpId !== currentMediaplanId.value) {
 107 |     currentMediaplanId.value = newMpId;
@@ -6121,7 +6121,7 @@ src/components/overview/CreateFirstProjectDialog.vue
 185 | 
 186 | interface CreateFirstProjectDialogProps {
 187 |   modelValue: boolean
-188 |   mediaplanId: string
+188 |   mediaplanIdRef: string
 189 |   mediaplanName?: string
 190 |   poNumbers?: { _id: string; name: string; value: number }[]
 191 |   startDate?: string | Date | null
@@ -6158,10 +6158,10 @@ src/components/overview/CreateFirstProjectDialog.vue
 222 | 
 223 | const countries = computed(() => projectStore.countries || []);
 224 | const languageOptions = computed(() => projectStore.languages || []);
-225 | const builders = computed(() => projectStore.builders?.map(b => ({code: b.id, name: b.name})) || []);
-226 | const campaignTypes = computed(() => projectStore.campaignTypes?.map(t => ({code: t.id, name: t.name})) || []);
-227 | const phases = computed(() => projectStore.phases?.map(p => ({code: p.id, name: p.name})) || []);
-228 | const goals = computed(() => projectStore.goals?.map(g => ({code: g.id, name: g.name})) || []);
+225 | const builders = computed(() => projectStore.builders?.map(b => ({code: b.mediaplanId, name: b.name})) || []);
+226 | const campaignTypes = computed(() => projectStore.campaignTypes?.map(t => ({code: t.mediaplanId, name: t.name})) || []);
+227 | const phases = computed(() => projectStore.phases?.map(p => ({code: p.mediaplanId, name: p.name})) || []);
+228 | const goals = computed(() => projectStore.goals?.map(g => ({code: g.mediaplanId, name: g.name})) || []);
 229 | 
 230 | const formIsReady = computed(() => {
 231 |   return isFormValid.value &&
@@ -6220,7 +6220,7 @@ src/components/overview/CreateFirstProjectDialog.vue
 284 |     // Using a combination of country/language as placeholder.
 285 |     // You might need a dedicated input or different logic.
 286 |     const projectCreateData: ProjectCreate = {
-287 |       mediaplanId: props.mediaplanId,
+287 |       mediaplanIdRef: props.mediaplanIdRef,
 288 |       name: `Project ${selectedCountry.value.code}-${selectedLanguage.value}`, // Placeholder name
 289 |       country: selectedCountry.value, // Pass the whole country object
 290 |       language: selectedLanguage.value, // Pass language code
@@ -6345,10 +6345,10 @@ src/components/overview/CreateMediaplanButton.vue
 31 |   dialogVisible.value = true;
 32 | };
 33 | 
-34 | const handleMediaplanCreated = (mediaplanId: string) => {
+34 | const handleMediaplanCreated = (mediaplanIdRef: string) => {
 35 |   // Store the mediaplan ID but don't close the dialog yet
 36 |   // as the project creation will follow
-37 |   console.log('Mediaplan created with ID:', mediaplanId);
+37 |   console.log('Mediaplan created with ID:', mediaplanIdRef);
 38 | };
 39 | 
 40 | const handleProjectCreated = (projectId: string) => {
@@ -6385,7 +6385,7 @@ src/components/overview/CreateMediaplanDialog.vue
 13 |             <!-- Brand Selection -->
 14 |             <FormElementVrowVcol label="Brand Output" required>
 15 |               <v-select
-16 |                   id="brand-select"
+16 |                   mediaplanId="brand-select"
 17 |                   v-model="formData.brand._id"
 18 |                   :items="brands"
 19 |                   item-title="name"
@@ -6406,7 +6406,7 @@ src/components/overview/CreateMediaplanDialog.vue
 34 |             <!-- Mediaplan Name -->
 35 |             <FormElementVrowVcol label="Individual Name">
 36 |               <v-text-field
-37 |                   id="mediaplan-name"
+37 |                   mediaplanId="mediaplan-name"
 38 |                   v-model="formData.name"
 39 |                   placeholder="please type in an individual title"
 40 |                   :rules="[v => !!v || 'Name is required']"
@@ -6418,7 +6418,7 @@ src/components/overview/CreateMediaplanDialog.vue
 46 |               <v-row no-gutters>
 47 |                 <v-col class="mr-2">
 48 |                   <v-select
-49 |                       id="po-select"
+49 |                       mediaplanId="po-select"
 50 |                       v-model="selectedPOs"
 51 |                       :items="poNumbers"
 52 |                       item-title="name"
@@ -6448,7 +6448,7 @@ src/components/overview/CreateMediaplanDialog.vue
 76 |             <FormElementVrowVcol label="Creator" required>
 77 | 
 78 |               <v-text-field
-79 |                   id="creator-name"
+79 |                   mediaplanId="creator-name"
 80 |                   v-model="creatorName"
 81 |                   placeholder="Your name"
 82 |                   :rules="[v => !!v || 'Creator name is required']"
@@ -6459,7 +6459,7 @@ src/components/overview/CreateMediaplanDialog.vue
 87 | 
 88 |             <FormElementVrowVcol label="Department">
 89 |               <v-text-field
-90 |                   id="department"
+90 |                   mediaplanId="department"
 91 |                   v-model="department"
 92 |                   placeholder="Department name"
 93 |               />
@@ -6469,7 +6469,7 @@ src/components/overview/CreateMediaplanDialog.vue
 97 |             <!-- Date Range -->
 98 |             <FormElementVrowVcol label="Start date - End date" required>
 99 |               <DateRangePicker
-100 |                   id="date-range"
+100 |                   mediaplanId="date-range"
 101 |                   v-model="dateRange"
 102 |                   placeholder="Select start and end dates"
 103 |                   :rules="[v => !!v || 'Date range is required']"
@@ -6498,7 +6498,7 @@ src/components/overview/CreateMediaplanDialog.vue
 126 |   <!-- Create PO Dialog -->
 127 |   <CreatePoDialog
 128 |       v-model="createPODialogVisible"
-129 |       :initial-brand-id="formData.brand._id"
+129 |       :initial-brand-mediaplanId="formData.brand._id"
 130 |       @created="handlePoCreated"
 131 |   />
 132 | 
@@ -6507,7 +6507,7 @@ src/components/overview/CreateMediaplanDialog.vue
 135 |       mode="create-mediaplan"
 136 |       v-if="showProjectDialog"
 137 |       v-model="showProjectDialog"
-138 |       :mediaplan-id="createdMediaplanId"
+138 |       :mediaplan-mediaplanId="createdMediaplanId"
 139 |       :mediaplan-name="formData.name"
 140 |       :po-numbers="formData.po_numbers"
 141 |       :start-date="formData.start_date"
@@ -6539,7 +6539,7 @@ src/components/overview/CreateMediaplanDialog.vue
 167 | // Emits
 168 | const emit = defineEmits<{
 169 |   (e: 'update:modelValue', value: boolean): void;
-170 |   (e: 'created', mediaplanId: string): void;
+170 |   (e: 'created', mediaplanIdRef: string): void;
 171 |   (e: 'project-created', projectId: string): void;
 172 | }>();
 173 | 
@@ -6785,7 +6785,7 @@ src/components/overview/CreatePoDialog.vue
 17 |               <div class="mb-4">
 18 |                 <label for="client-department" class="text-body-2 mb-1 d-block">Client Department</label>
 19 |                 <v-text-field
-20 |                     id="client-department"
+20 |                     mediaplanId="client-department"
 21 |                     v-model="formData.clientDepartment"
 22 |                     placeholder="Enter the client's department name"
 23 |                     variant="outlined"
@@ -6796,7 +6796,7 @@ src/components/overview/CreatePoDialog.vue
 28 |               <div class="mb-4">
 29 |                 <label for="brand-select" class="text-body-2 mb-1 d-block">Brand*</label>
 30 |                 <v-select
-31 |                     id="brand-select"
+31 |                     mediaplanId="brand-select"
 32 |                     v-model="formData.brand"
 33 |                     :items="brands"
 34 |                     item-title="name"
@@ -6811,7 +6811,7 @@ src/components/overview/CreatePoDialog.vue
 43 |               <div class="mb-4">
 44 |                 <label for="client-name" class="text-body-2 mb-1 d-block">Client Name</label>
 45 |                 <v-text-field
-46 |                     id="client-name"
+46 |                     mediaplanId="client-name"
 47 |                     v-model="formData.clientName"
 48 |                     placeholder="Enter client's full name"
 49 |                     variant="outlined"
@@ -6822,7 +6822,7 @@ src/components/overview/CreatePoDialog.vue
 54 |               <div class="mb-4">
 55 |                 <label for="market-select" class="text-body-2 mb-1 d-block">Market*</label>
 56 |                 <v-select
-57 |                     id="market-select"
+57 |                     mediaplanId="market-select"
 58 |                     v-model="formData.market"
 59 |                     :items="markets"
 60 |                     item-title="name"
@@ -6837,7 +6837,7 @@ src/components/overview/CreatePoDialog.vue
 69 |               <div class="mb-4">
 70 |                 <label for="purpose-text" class="text-body-2 mb-1 d-block">Purpose</label>
 71 |                 <v-textarea
-72 |                     id="purpose-text"
+72 |                     mediaplanId="purpose-text"
 73 |                     v-model="formData.purpose"
 74 |                     placeholder="Describe the purpose of this purchase order"
 75 |                     variant="outlined"
@@ -6854,7 +6854,7 @@ src/components/overview/CreatePoDialog.vue
 86 |               <div class="mb-4">
 87 |                 <label for="po-number" class="text-body-2 mb-1 d-block">PO Number*</label>
 88 |                 <v-text-field
-89 |                     id="po-number"
+89 |                     mediaplanId="po-number"
 90 |                     v-model="formData.poNumber"
 91 |                     placeholder="Enter official purchase order number"
 92 |                     :rules="[v => !!v || 'PO Number is required']"
@@ -6867,7 +6867,7 @@ src/components/overview/CreatePoDialog.vue
 99 |                 <div class="flex-grow-1 mr-2">
 100 |                   <label for="budget" class="text-body-2 mb-1 d-block">Budget*</label>
 101 |                   <v-text-field
-102 |                       id="budget"
+102 |                       mediaplanId="budget"
 103 |                       v-model="formData.budget"
 104 |                       placeholder="Enter budget amount"
 105 |                       type="number"
@@ -6884,7 +6884,7 @@ src/components/overview/CreatePoDialog.vue
 116 |                 <div class="flex-grow-0" style="width: 100px">
 117 |                   <label for="currency" class="text-body-2 mb-1 d-block">Currency</label>
 118 |                   <v-select
-119 |                       id="currency"
+119 |                       mediaplanId="currency"
 120 |                       v-model="formData.currency"
 121 |                       :items="currencies"
 122 |                       variant="outlined"
@@ -6897,7 +6897,7 @@ src/components/overview/CreatePoDialog.vue
 129 |               <div class="mb-4">
 130 |                 <label for="validity-range" class="text-body-2 mb-1 d-block">Validity Period*</label>
 131 |                 <DateRangePicker
-132 |                     id="validity-range"
+132 |                     mediaplanId="validity-range"
 133 |                     v-model="dateRange"
 134 |                     label=""
 135 |                     placeholder="Select validity period"
@@ -6912,7 +6912,7 @@ src/components/overview/CreatePoDialog.vue
 144 |               <div class="mb-4">
 145 |                 <label for="contractor-department" class="text-body-2 mb-1 d-block">Contractor Department</label>
 146 |                 <v-text-field
-147 |                     id="contractor-department"
+147 |                     mediaplanId="contractor-department"
 148 |                     v-model="formData.contractorDepartment"
 149 |                     placeholder="Enter contractor's department name"
 150 |                     variant="outlined"
@@ -6923,7 +6923,7 @@ src/components/overview/CreatePoDialog.vue
 155 |               <div class="mb-4">
 156 |                 <label for="contractor-name" class="text-body-2 mb-1 d-block">Contractor Name</label>
 157 |                 <v-text-field
-158 |                     id="contractor-name"
+158 |                     mediaplanId="contractor-name"
 159 |                     v-model="formData.contractorName"
 160 |                     placeholder="Enter contractor's full name"
 161 |                     variant="outlined"
@@ -7344,7 +7344,7 @@ src/components/overview/MediaplanCard.vue
 3 |     <v-card 
 4 |       class="h-100 pa-3 mediaplan-card" 
 5 |       elevation="3" 
-6 |       :data-mediaplan-id="mediaplan._id"
+6 |       :data-mediaplan-mediaplanId="mediaplan._id"
 7 |       @click="handleCardClick"
 8 |     >
 9 |     <v-card-item class="pb-8">
@@ -7436,7 +7436,7 @@ src/components/overview/MediaplanCard.vue
 95 |       
 96 |       <!-- Options menu -->
 97 |       <mediaplan-options-menu
-98 |           :mediaplan-id="mediaplan._id"
+98 |           :mediaplan-mediaplanId="mediaplan._id"
 99 |           @action="handleMenuAction"
 100 |       />
 101 | 
@@ -7444,7 +7444,7 @@ src/components/overview/MediaplanCard.vue
 103 |       <v-btn
 104 |           variant="flat"
 105 |           color="primary"
-106 |           :to="{ name: 'MediaplanDetail', params: { id: mediaplan._id }}"
+106 |           :to="{ name: 'MediaplanDetail', params: { mediaplanId: mediaplan._id }}"
 107 |       >
 108 |         Show Mediaplan
 109 |       </v-btn>
@@ -7472,13 +7472,13 @@ src/components/overview/MediaplanCard.vue
 131 | }>();
 132 | 
 133 | const emit = defineEmits<{
-134 |   (e: 'view', id: string): void;
-135 |   (e: 'edit', id: string): void;
-136 |   (e: 'add-po', id: string): void;
-137 |   (e: 'export', id: string): void;
-138 |   (e: 'duplicate', id: string): void;
-139 |   (e: 'archive', id: string): void;
-140 |   (e: 'delete', id: string): void;
+134 |   (e: 'view', mediaplanId: string): void;
+135 |   (e: 'edit', mediaplanId: string): void;
+136 |   (e: 'add-po', mediaplanId: string): void;
+137 |   (e: 'export', mediaplanId: string): void;
+138 |   (e: 'duplicate', mediaplanId: string): void;
+139 |   (e: 'archive', mediaplanId: string): void;
+140 |   (e: 'delete', mediaplanId: string): void;
 141 | }>();
 142 | 
 143 | const router = useRouter();
@@ -7491,31 +7491,31 @@ src/components/overview/MediaplanCard.vue
 150 |   }
 151 |   
 152 |   // Navigate to detail page
-153 |   router.push({ name: 'MediaplanDetail', params: { id: props.mediaplan._id }});
+153 |   router.push({ name: 'MediaplanDetail', params: { mediaplanId: props.mediaplan._id }});
 154 | };
 155 |   
-156 | const handleMenuAction = (action: string, id: string) => {
+156 | const handleMenuAction = (action: string, mediaplanId: string) => {
 157 |   switch (action) {
 158 |     case 'view':
-159 |       router.push({ name: 'MediaplanDetail', params: { id }});
+159 |       router.push({ name: 'MediaplanDetail', params: { mediaplanId }});
 160 |       break;
 161 |     case 'edit':
-162 |       router.push({ name: 'MediaplanEdit', params: { id }});
+162 |       router.push({ name: 'MediaplanEdit', params: { mediaplanId }});
 163 |       break;
 164 |     case 'addPo':
-165 |       emit('add-po', id);
+165 |       emit('add-po', mediaplanId);
 166 |       break;
 167 |     case 'export':
-168 |       emit('export', id);
+168 |       emit('export', mediaplanId);
 169 |       break;
 170 |     case 'duplicate':
-171 |       emit('duplicate', id);
+171 |       emit('duplicate', mediaplanId);
 172 |       break;
 173 |     case 'archive':
-174 |       emit('archive', id);
+174 |       emit('archive', mediaplanId);
 175 |       break;
 176 |     case 'delete':
-177 |       emit('delete', id);
+177 |       emit('delete', mediaplanId);
 178 |       break;
 179 |   }
 180 | };
@@ -7869,8 +7869,8 @@ src/components/overview/MediaplanList.vue
 98 | 
 99 | 
 100 | // --- Methods ---
-101 | const viewMediaplan = (mediaplanId: string) => {
-102 |   router.push({name: 'MediaplanDetail', params: {id: mediaplanId}});
+101 | const viewMediaplan = (mediaplanIdRef: string) => {
+102 |   router.push({name: 'MediaplanDetail', params: {mediaplanId: mediaplanIdRef}});
 103 | };
 104 | 
 105 | // --- Interne Logik ---
@@ -7972,12 +7972,12 @@ src/components/overview/MediaplanOptionsMenu.vue
 72 | 
 73 | // Props
 74 | const props = defineProps<{
-75 |   mediaplanId: string;
+75 |   mediaplanIdRef: string;
 76 | }>();
 77 | 
 78 | // Emit events
 79 | const emit = defineEmits<{
-80 |   (e: 'action', action: string, mediaplanId: string): void;
+80 |   (e: 'action', action: string, mediaplanIdRef: string): void;
 81 | }>();
 82 | 
 83 | // State
@@ -7988,7 +7988,7 @@ src/components/overview/MediaplanOptionsMenu.vue
 88 |   // Prevent event propagation
 89 |   event?.stopPropagation();
 90 |   
-91 |   emit('action', action, props.mediaplanId);
+91 |   emit('action', action, props.mediaplanIdRef);
 92 |   isOpen.value = false;
 93 | };
 94 | </script>
@@ -8162,7 +8162,7 @@ src/components/project/EditOrCreateProjectDialog.vue
 17 |           <!-- Date Range -->
 18 |           <FormElementVrowVcol label="Start date - End date" required>
 19 |             <DateRangePicker
-20 |                 id="date-range"
+20 |                 mediaplanId="date-range"
 21 |                 v-model="dateRange"
 22 |                 placeholder="Select start and end dates"
 23 |                 :rules="[required]"
@@ -8388,7 +8388,7 @@ src/components/project/ProjectDetailTable.vue
 11 | const editProject = (project: Project) => {
 12 |   console.log('Edit project:', project._id);
 13 |   // Navigation zur Edit-Seite oder Dialog öffnen
-14 |   // router.push({ name: 'ProjectEdit', params: { mediaplanId: props.mediaplanId, projectId: project._id } });
+14 |   // router.push({ name: 'ProjectEdit', params: { mediaplanIdRef: props.mediaplanIdRef, projectId: project._id } });
 15 | };
 16 | </script>
 17 | 
@@ -8612,7 +8612,7 @@ src/components/mediaplan/MediaplanBreadcrumb.vue
 36 |     items.push({
 37 |       title: props.mediaplan.name || 'Mediaplan',
 38 |       // Link nur aktiv, wenn wir tiefer sind (also wenn ein Projekt übergeben wurde)
-39 |       to: props.project ? {name: 'MediaplanDetail', params: {id: props.mediaplan._id}} : undefined,
+39 |       to: props.project ? {name: 'MediaplanDetail', params: {mediaplanId: props.mediaplan._id}} : undefined,
 40 |       disabled: !props.project
 41 |     });
 42 | 
@@ -8622,7 +8622,7 @@ src/components/mediaplan/MediaplanBreadcrumb.vue
 46 |         // Link nur aktiv, wenn wir tiefer sind (also wenn campaignName übergeben wurde)
 47 |         to: props.campaignName ? {
 48 |           name: 'ProjectDetail',
-49 |           params: {mediaplanId: props.mediaplan._id, projectId: props.project._id}
+49 |           params: {mediaplanIdRef: props.mediaplan._id, projectId: props.project._id}
 50 |         } : undefined,
 51 |         disabled: !props.campaignName
 52 |       });
@@ -8843,7 +8843,7 @@ src/components/mediaplan/MediaplanInfo.vue
 17 |         color="primary" 
 18 |         variant="flat" 
 19 |         prepend-icon="mdi-pencil-outline"
-20 |         :to="`/mediaplans/${mediaplanId}/edit`"
+20 |         :to="`/mediaplans/${mediaplanIdRef}/edit`"
 21 |       >
 22 |         Edit
 23 |       </v-btn>
@@ -8936,7 +8936,7 @@ src/components/mediaplan/MediaplanInfo.vue
 110 | // Define props
 111 | interface Props {
 112 |   mediaplan: Mediaplan | null;
-113 |   mediaplanId: string;
+113 |   mediaplanIdRef: string;
 114 |   isLoading: boolean;
 115 |   error: string | null;
 116 | }
@@ -8973,7 +8973,7 @@ src/components/mediaplan/MediaplanPlanningView.vue
 16 |   isLoading: boolean;
 17 |   currentPage: number;
 18 |   itemsPerPage: number;
-19 |   mediaplanId: string; // *** Diese Prop ist entscheidend für den Link ***
+19 |   mediaplanIdRef: string; // *** Diese Prop ist entscheidend für den Link ***
 20 | }
 21 | 
 22 | const props = withDefaults(defineProps<Props>(), {
@@ -8982,7 +8982,7 @@ src/components/mediaplan/MediaplanPlanningView.vue
 25 |   isLoading: false,
 26 |   currentPage: 0,
 27 |   itemsPerPage: 10,
-28 |   mediaplanId: '' // Wichtig: Muss vom Parent (MediaplanDetail) übergeben werden!
+28 |   mediaplanIdRef: '' // Wichtig: Muss vom Parent (MediaplanDetail) übergeben werden!
 29 | });
 30 | 
 31 | // --- Emits ---
@@ -9070,9 +9070,9 @@ src/components/mediaplan/MediaplanPlanningView.vue
 113 | 
 114 |           <template v-slot:item.abbreviation="{ item }">
 115 |             <router-link
-116 |                 :to="{ name: 'ProjectDetail', params: { mediaplanId: props.mediaplanId, projectId: item._id } }"
+116 |                 :to="{ name: 'ProjectDetail', params: { mediaplanIdRef: props.mediaplanIdRef, projectId: item._id } }"
 117 |                 class="project-link d-flex align-center"
-118 |                 v-if="item.abbreviation && props.mediaplanId"
+118 |                 v-if="item.abbreviation && props.mediaplanIdRef"
 119 |                 @click.stop
 120 |             >
 121 |               <v-avatar size="32" class="mr-2 grey lighten-4"
@@ -9275,7 +9275,7 @@ src/components/mediaplan/MediaplanProjects.vue
 70 |               variant="text"
 71 |               density="comfortable"
 72 |               v-bind="props"
-73 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
+73 |               :to="`/mediaplans/${mediaplanIdRef}/projects/${item.raw._id}`"
 74 |             >
 75 |               <v-icon>mdi-eye</v-icon>
 76 |             </v-btn>
@@ -9289,7 +9289,7 @@ src/components/mediaplan/MediaplanProjects.vue
 84 |               variant="text"
 85 |               density="comfortable"
 86 |               v-bind="props"
-87 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
+87 |               :to="`/mediaplans/${mediaplanIdRef}/projects/${item.raw._id}/edit`"
 88 |             >
 89 |               <v-icon>mdi-pencil-outline</v-icon>
 90 |             </v-btn>
@@ -9336,7 +9336,7 @@ src/components/mediaplan/MediaplanProjects.vue
 131 | // Define props
 132 | interface Props {
 133 |   projects: Project[];
-134 |   mediaplanId: string;
+134 |   mediaplanIdRef: string;
 135 |   totalProjects: number;
 136 |   isLoading: boolean;
 137 |   error: string | null;
@@ -9521,7 +9521,7 @@ src/components/mediaplan/ProjectsList.vue
 66 |           icon
 67 |           variant="text"
 68 |           density="comfortable"
-69 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
+69 |           :to="`/mediaplans/${mediaplanIdRef}/projects/${item.raw._id}`"
 70 |         >
 71 |           <v-icon>mdi-eye</v-icon>
 72 |         </v-btn>
@@ -9529,7 +9529,7 @@ src/components/mediaplan/ProjectsList.vue
 74 |           icon
 75 |           variant="text"
 76 |           density="comfortable"
-77 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
+77 |           :to="`/mediaplans/${mediaplanIdRef}/projects/${item.raw._id}/edit`"
 78 |         >
 79 |           <v-icon>mdi-pencil-outline</v-icon>
 80 |         </v-btn>
@@ -9568,7 +9568,7 @@ src/components/mediaplan/ProjectsList.vue
 113 | // Define props
 114 | interface Props {
 115 |   projects: Project[];
-116 |   mediaplanId: string;
+116 |   mediaplanIdRef: string;
 117 |   totalItems: number;
 118 |   isLoading: boolean;
 119 |   error: string | null;

@@ -7,7 +7,7 @@
             Edit Mediaplan
           </v-card-title>
           <v-card-text>
-            <p>Mediaplan ID: {{ id }}</p>
+            <p>Mediaplan ID: {{ mediaplanId }}</p>
             <p>This page would allow editing of the mediaplan details.</p>
           </v-card-text>
           <v-card-actions>
@@ -26,7 +26,7 @@ import { useRouter } from 'vue-router';
 
 // Props
 const props = defineProps<{
-  id: string;
+  mediaplanId: string;
 }>();
 
 // Router

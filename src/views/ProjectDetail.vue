@@ -152,15 +152,7 @@ watch(errorCampaigns, (newError) => {
             :current-view="currentView"
             @update:search="updateSearchHandler"
             @update:current-view="val => currentView = val"
-        >
-          <template #campaign-type-select>
-            <!-- TODO v-select - select campaigntyppe -->
-          </template>
-        </MediaplanTopSection>
-
-        <!--        <ProjectDetailTable :project="project"
-                                    class="pb-3"/>-->
-
+        />
 
         <MediaplanPlanningViewDatatable
             :projects="project"
@@ -177,6 +169,7 @@ watch(errorCampaigns, (newError) => {
           <div class="main-content">
             <CampaignListView
                 v-if="currentView === 'planning'"
+                :mediaplan-id="currentMediaplanId"
                 :campaigns="campaigns"
                 :total-campaigns="totalCampaigns"
                 :is-loading="isLoadingCampaigns"

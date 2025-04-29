@@ -1,30 +1,28 @@
 <template>
   <!-- Wrapper with native tooltip showing the current level on hover -->
-  <div :title="levelDisplay">
-    <v-row class="mb-0">
-      <v-col cols="12" md="5" class="d-flex align-center pt-0 pb-0">
-        <MediaplanBreadcrumb :mediaplan="mediaplan" :project="project"/>
-      </v-col>
+  <v-row class="mb-0">
+    <v-col cols="12" md="5" class="d-flex align-center pt-0 pb-0">
+      <MediaplanBreadcrumb :mediaplan="mediaplan" :project="project"/>
+    </v-col>
 
-    </v-row>
+  </v-row>
 
-    <v-row class="mb-4" no-gutters>
-      <v-col>
-        <MediaplanViewToggle v-model="internalView"/>
-      </v-col>
-      <v-col class="d-flex pr-0">
-        <v-spacer></v-spacer>
-        <MediaplanHeader
-            :plan-budget="mediaplan?.budget?.total || 0"
-            :used-percentage="calculatePercentage(mediaplan?.budget?.used, mediaplan?.budget?.total)"
-            :search="search"
-            @update:search="val => emit('update:search', val)"
-            :is-loading="isLoading"
-        />
-      </v-col>
-    </v-row>
+  <v-row class="mb-7" no-gutters>
+    <v-col>
+      <MediaplanViewToggle v-model="internalView"/>
+    </v-col>
+    <v-col class="d-flex pr-0">
+      <v-spacer></v-spacer>
+      <MediaplanHeader
+          :plan-budget="mediaplan?.budget?.total || 0"
+          :used-percentage="calculatePercentage(mediaplan?.budget?.used, mediaplan?.budget?.total)"
+          :search="search"
+          @update:search="val => emit('update:search', val)"
+          :is-loading="isLoading"
+      />
+    </v-col>
+  </v-row>
 
-  </div>
 </template>
 
 <script setup lang="ts">

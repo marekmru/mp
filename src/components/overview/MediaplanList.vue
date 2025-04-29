@@ -99,12 +99,8 @@ const paginationInfo = computed(() => {
 
 // --- Methods ---
 const viewMediaplan = (mediaplanId: string) => {
-  router.push({name: 'MediaplanDetail', params: {id: mediaplanId}});
+  router.push({name: 'MediaplanDetail', params: {mediaplanId}});
 };
-
-// --- Interne Logik ---
-// Keine eigene Datenabfrage (fetchMediaplans) mehr
-// Kein eigener Ladezustand, Fehlerstatus, etc. - kommt alles über Props
 
 </script>
 

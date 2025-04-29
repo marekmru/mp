@@ -24,12 +24,13 @@
         <div class="main-content">
           <MediaplanPlanningView
               v-if="currentView === 'planning'"
+              type="multi"
               :projects="projects"
               :total-projects="totalProjects"
               :is-loading="isLoadingProjects"
               :current-page="projectCurrentPage"
               :items-per-page="projectItemsPerPage"
-              :mediaplan-id="mediaplanId"
+              :mediaplan-id="mediaplanIdRef"
               @update:options="handleProjectOptionsUpdate"
               @add-project="openCreateProjectDialog"
           />
@@ -81,9 +82,9 @@ import type {Project} from '@/types/project'
 import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
 
 // --- Props & Route ---
-const props = defineProps<{ id?: string }>()
+const props = defineProps<{ mediaplanId?: string }>()
 const route = useRoute()
-const mediaplanId = ref(props.id || (route.params.id as string))
+const mediaplanIdRef = ref(props.mediaplanId || (route.params.id as string))
 
 // --- Stores ---
 const mediaplanStore = useMediaplanStore()
@@ -118,17 +119,17 @@ const handleProjectOptionsUpdate = (options: {
   const newPage = options.page - 1
   if (newPage !== projectCurrentPage.value) {
     projectStore.currentPage = newPage
-    projectStore.fetchProjects(mediaplanId.value)
+    projectStore.fetchProjects(mediaplanIdRef.value)
   }
   if (options.itemsPerPage !== projectItemsPerPage.value) {
     projectStore.perPage = options.itemsPerPage
     projectStore.currentPage = 0
-    projectStore.fetchProjects(mediaplanId.value)
+    projectStore.fetchProjects(mediaplanIdRef.value)
   }
 }
 
 const openCreateProjectDialog = () => {
-  console.log('Trigger create project for Mediaplan ID:', mediaplanId.value)
+  console.log('Trigger create project for Mediaplan ID:', mediaplanIdRef.value)
   // router.push or dialog logic here
 }
 
@@ -145,18 +146,18 @@ const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'succe
 
 // --- Lifecycle ---
 onMounted(() => {
-  if (!mediaplanId.value) {
+  if (!mediaplanIdRef.value) {
     mediaplanStore.error = 'No mediaplan ID provided'
     return
   }
-  mediaplanStore.fetchMediaplan(mediaplanId.value)
-  projectStore.fetchProjects(mediaplanId.value)
+  mediaplanStore.fetchMediaplan(mediaplanIdRef.value)
+  projectStore.fetchProjects(mediaplanIdRef.value)
 })
 
 // --- Watchers ---
 watch(() => route.params.id, (newId) => {
-  if (typeof newId === 'string' && newId !== mediaplanId.value) {
-    mediaplanId.value = newId
+  if (typeof newId === 'string' && newId !== mediaplanIdRef.value) {
+    mediaplanIdRef.value = newId
     mediaplanStore.fetchMediaplan(newId)
     projectStore.fetchProjects(newId)
   }
