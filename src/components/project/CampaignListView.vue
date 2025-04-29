@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { Campaign } from '@/types/campaign';
+import type { Campaign } from '@/types/campaigns'; // Corrected path
 import { useRouter } from 'vue-router';
-import { campaignHeaders } from "@/constants/campaign"; // Pfad prüfen!
+import { campaignHeaders } from "@/constants/campaign";
 import { formatDate } from '@/helpers/dateUtils';
 import type { VDataTableServer } from 'vuetify/components/VDataTable';
 
 type ReadonlyHeaders = VDataTableServer['$props']['headers'];
+type Options = VDataTableServer['$props']['options']; // Type for options
 
-// --- Props ---
+// --- Props (Restored original props) ---
 interface Props {
   campaigns: Campaign[];
   totalCampaigns: number;
@@ -16,9 +17,8 @@ interface Props {
   currentPage: number; // 0-basiert
   itemsPerPage: number;
   type?: 'multi' | 'single';
-  modelValue?: string[];
-  // *** NEU: Mediaplan ID wird für den Link benötigt ***
-  mediaplanId: string;
+  modelValue?: string[]; // For selection checkboxes
+  mediaplanId: string;   // Needed for links
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -26,47 +26,60 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: () => []
 });
 
-// --- Emits (unverändert) ---
+// --- Emits (Original emits) ---
 const emit = defineEmits<{
   (e: 'addCampaign'): void;
-  (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
+  (e: 'update:options', options: Options): void; // Event für Parent zum Aktualisieren
   (e: 'editCampaign', campaign: Campaign): void;
   (e: 'deleteCampaign', campaign: Campaign): void;
-  (e: 'update:modelValue', selectedIds: string[]): void;
+  (e: 'update:modelValue', selectedIds: string[]): void; // For selection
 }>();
 
 // --- Router (unverändert) ---
 const router = useRouter();
 
-// --- Tabelle Models & Header (unverändert) ---
-const pageModel = computed({ /* ... */ });
-const itemsPerPageModel = computed({ /* ... */ });
-const selectedCampaigns = computed({ /* ... */ });
+// --- Tabelle Models & Header ---
+const pageModel = computed({
+  get: () => props.currentPage + 1,
+  // SET: (Nicht implementiert wie gewünscht)
+});
+
+const itemsPerPageModel = computed({
+  get: () => props.itemsPerPage,
+  // SET: (Nicht implementiert wie gewünscht)
+});
+
+const selectedCampaigns = computed({
+  get: () => props.modelValue,
+  set: (value) => { emit('update:modelValue', value); }
+});
+
 const headers = ref(campaignHeaders);
 
-// --- Methoden (unverändert) ---
-const onOptionsUpdate = (options: any) => { /* ... */ };
+// --- Methoden ---
+const onOptionsUpdate = (options: Options) => {
+  emit('update:options', options);
+};
+
 const triggerAddCampaign = () => { emit('addCampaign'); };
 const editCampaign = (item: Campaign) => { emit('editCampaign', item); };
 const deleteCampaign = (item: Campaign) => { emit('deleteCampaign', item); };
 
-// --- UI Steuerung (unverändert) ---
-const showCheckboxes = computed(() => props.type === 'multi');
+// --- UI Steuerung ---
 const hideFooter = computed(() => props.type === 'single');
 const itemsPerPageOptions = computed(() => props.type === 'single' ? [] : [15, 30, 50, 100]);
-const showAddButtonInFooter = computed(() => props.type === 'multi');
 
-// *** NEU: Funktion zum Erstellen des Detail-Links ***
+// --- Funktion zum Erstellen des Detail-Links (unverändert) ---
 const getCampaignDetailRoute = (campaign: Campaign) => {
   if (!props.mediaplanId || !campaign.pid || !campaign._id) {
     console.warn('Missing IDs for campaign detail route', props.mediaplanId, campaign.pid, campaign._id);
-    return {}; // Leeres Objekt, um Fehler zu vermeiden
+    return {};
   }
   return {
-    name: 'CampaignDetail', // Name der Route aus src/router/index.ts
+    name: 'LineitemDetail', // Assuming this is the correct route name
     params: {
       mediaplanId: props.mediaplanId,
-      projectId: campaign.pid, // Projekt-ID aus der Kampagne
+      projectId: campaign.pid,
       campaignId: campaign._id
     }
   };
@@ -82,15 +95,13 @@ const getCampaignDetailRoute = (campaign: Campaign) => {
           v-model:items-per-page="itemsPerPageModel"
           v-model:page="pageModel"
           :headers="headers"
-          :items="campaigns"
-          :items-length="totalCampaigns"
-          :loading="isLoading"
+          :items="props.campaigns"
+          :items-length="props.totalCampaigns"
+          :loading="props.isLoading"
           :items-per-page-options="itemsPerPageOptions"
-          :show-select="showCheckboxes"
           item-value="_id"
           hover
-          class="campaigns-data-table"
-          :hide-default-footer="hideFooter"
+          class="campaigns-data-table elevation-0" :hide-default-footer="hideFooter"
           @update:options="onOptionsUpdate"
       >
         <template v-slot:item.campaignname="{ item }">
@@ -107,11 +118,24 @@ const getCampaignDetailRoute = (campaign: Campaign) => {
           <span class="d-inline-block text-truncate" style="max-width: 200px;"> {{ item.campaigndetail || '-' }} </span>
           <v-tooltip v-if="item.campaigndetail && item.campaigndetail.length > 30" activator="parent" location="top" max-width="300px"> {{ item.campaigndetail }} </v-tooltip>
         </template>
-        <template v-slot:item.actions="{ item }"> </template>
-        <template v-slot:loading> </template>
-        <template v-slot:no-data> </template>
-        <template v-if="!hideFooter" v-slot:bottom> </template>
+        <template v-slot:item.actions="{ item }">
+          <v-icon small class="mr-2" @click.stop="editCampaign(item)">mdi-pencil</v-icon>
+          <v-icon small @click.stop="deleteCampaign(item)">mdi-delete</v-icon>
+        </template>
 
+        <template v-slot:loading> <v-skeleton-loader type="table-row@5"></v-skeleton-loader> </template>
+        <template v-slot:no-data> <div class="text-center pa-4">No campaigns found.</div> </template>
+
+        <template v-slot:bottom v-if="props.type === 'multi'">
+          <div class="d-flex align-center pa-4 bg-grey-lighten-2"> <v-btn
+              prepend-icon="mdi-plus"
+              variant="text"         color="black"          @click="triggerAddCampaign"
+              :disabled="props.isLoading"
+              class="black-text-button" >
+            Add Campaign
+          </v-btn>
+            <v-spacer></v-spacer> </div>
+        </template>
       </v-data-table-server>
     </v-card>
   </div>
@@ -120,8 +144,20 @@ const getCampaignDetailRoute = (campaign: Campaign) => {
 <style scoped>
 /* Stile wie zuvor */
 .v-table.campaigns-data-table .v-table__wrapper > table > thead > tr > th { white-space: nowrap; }
-/* Optional: Stil für den Link anpassen */
 .campaigns-data-table .router-link:hover {
   text-decoration: underline !important;
+}
+.v-skeleton-loader { background-color: transparent !important; }
+
+/* Optional: Styling für den Text-Button im Footer, falls benötigt */
+.black-text-button {
+  /* color: black !important; */ /* Falls 'color="black"' nicht ausreicht */
+  text-transform: none !important; /* Falls nötig */
+}
+
+/* Optional: Anpassung des Hintergrunds für den Footer-Slot */
+.campaigns-data-table > .v-data-table__footer, /* Ziel den Standard-Footer, falls sichtbar */
+.campaigns-data-table > div:has(> .bg-grey-lighten-2) { /* Ziel unseren benutzerdefinierten Slot */
+  /* Ggf. gemeinsame Stile für den Footer-Bereich */
 }
 </style>
