@@ -97,7 +97,6 @@
         </WithFormDefaults>
 
       </v-form>
-      <pre>{{project}}</pre>
     </v-card>
   </v-dialog>
 </template>

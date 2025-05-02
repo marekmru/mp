@@ -103,7 +103,7 @@
                 <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
               </template>
               <v-list density="compact">
-                <v-list-item @click.stop="editProject(item)">
+                <v-list-item @click.stop="openEditProject(item)">
                   <v-list-item-title>Edit</v-list-item-title>
                 </v-list-item>
                 <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">

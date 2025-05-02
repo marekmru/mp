@@ -12,7 +12,7 @@ type Options = VDataTableServer['$props']['options']; // Type for options
 
 // --- Props (Restored original props) ---
 interface Props {
-  campaigns: Campaign[];
+  items: Campaign[];
   totalCampaigns: number;
   isLoading: boolean;
   currentPage: number; // 0-basiert
@@ -56,8 +56,6 @@ const selectedCampaigns = computed({
     emit('update:modelValue', value);
   }
 });
-
-const headers = ref(campaignHeaders);
 
 // --- Methoden ---
 const onOptionsUpdate = (options: Options) => {
@@ -103,20 +101,23 @@ const getCampaignDetailRoute = (campaign: Campaign) => {
 </script>
 
 <template>
+
   <div class="campaign-list-container">
     <v-card class="campaigns-table elevation-1">
       <v-data-table-server
           v-model="selectedCampaigns"
           v-model:items-per-page="itemsPerPageModel"
           v-model:page="pageModel"
-          :headers="headers"
-          :items="props.campaigns"
+          :headers="campaignHeaders"
+          :items="props.items"
           :items-length="props.totalCampaigns"
           :loading="props.isLoading"
           :items-per-page-options="itemsPerPageOptions"
           item-value="_id"
           hover
-          class="campaigns-data-table elevation-0" :hide-default-footer="hideFooter"
+          class="campaigns-data-table"
+          :hide-default-footer="hideFooter"
+          :hide-default-header="hideFooter"
           @update:options="onOptionsUpdate"
       >
         <template v-slot:item.campaignname="{ item }">
@@ -131,37 +132,27 @@ const getCampaignDetailRoute = (campaign: Campaign) => {
             <span>{{ item.campaignname }}</span>
           </div>
         </template>
-        <template v-slot:item.created_at="{ item }"> {{ formatDate(item.created_at) }}</template>
-        <template v-slot:item.updated_at="{ item }"> {{
-            item.updated_at ? formatDate(item.updated_at) : '-'
-          }}
-        </template>
-        <template v-slot:item.campaigndetail="{ item }">
-          <span class="d-inline-block text-truncate" style="max-width: 200px;"> {{ item.campaigndetail || '-' }} </span>
-          <v-tooltip v-if="item.campaigndetail && item.campaigndetail.length > 30" activator="parent" location="top"
-                     max-width="300px"> {{ item.campaigndetail }}
-          </v-tooltip>
-        </template>
+
+
         <template v-slot:item.actions="{ item }">
-          <v-btn icon density="compact" size="small" variant="text" @click.stop="editProject(item)">
+          <v-btn icon density="compact" size="small" variant="text" @click.stop="openEditProject(item)" class="mr-2">
             <v-icon>mdi-pencil-outline</v-icon>
-            <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+            <v-tooltip activator="parent" location="top">Edit Campaign</v-tooltip>
           </v-btn>
           <v-menu>
             <template v-slot:activator="{ props: menuProps }">
               <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
             </template>
             <v-list density="compact">
-              <v-list-item @click.stop="editProject(item)">
+              <v-list-item @click.stop="() => console.log('Edit Campaign:', item._id)">
                 <v-list-item-title>Edit</v-list-item-title>
               </v-list-item>
-              <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
+              <v-list-item @click.stop="() => console.log('Delete Campaign:', item._id)" class="text-error">
                 <v-list-item-title>Delete</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
         </template>
-
         <template v-slot:loading>
           <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
         </template>

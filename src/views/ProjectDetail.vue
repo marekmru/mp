@@ -171,7 +171,7 @@ watch(errorCampaigns, (newError) => {
             <CampaignListView
                 v-if="currentView === 'planning'"
                 :mediaplan-id="currentMediaplanId"
-                :campaigns="campaigns"
+                :items="campaigns"
                 :total-campaigns="totalCampaigns"
                 :is-loading="isLoadingCampaigns"
                 :current-page="campaignCurrentPage"

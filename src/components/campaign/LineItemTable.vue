@@ -2,7 +2,7 @@
   <v-card flat class="mt-4 lineitem-table-card">
     <v-data-table-server
         v-model="selectedItems"
-        :headers="headers"
+        :headers="lineitemHeaders"
         :items="items"
         :items-length="totalItems"
         :loading="isLoading"
@@ -47,20 +47,23 @@
       </template>
 
       <template v-slot:item.actions="{ item }">
-        <v-tooltip location="top" text="Edit Line Item">
-          <template v-slot:activator="{ props }">
-            <v-btn icon variant="text" size="small" v-bind="props" @click.stop="$emit('edit-item', item)">
-              <v-icon>mdi-pencil-outline</v-icon>
-            </v-btn>
+        <v-btn icon density="compact" size="small" variant="text" @click.stop="() => console.log('Edit Lineitem:', item._id)" class="mr-2">
+          <v-icon>mdi-pencil-outline</v-icon>
+          <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+        </v-btn>
+        <v-menu>
+          <template v-slot:activator="{ props: menuProps }">
+            <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
           </template>
-        </v-tooltip>
-        <v-tooltip location="top" text="Delete Line Item">
-          <template v-slot:activator="{ props }">
-            <v-btn icon variant="text" size="small" color="error" v-bind="props" @click.stop="$emit('delete-item', item)">
-              <v-icon>mdi-delete-outline</v-icon>
-            </v-btn>
-          </template>
-        </v-tooltip>
+          <v-list density="compact">
+            <v-list-item  @click.stop="() => console.log('Edit Lineitem:', item._id)">
+              <v-list-item-title>Edit</v-list-item-title>
+            </v-list-item>
+            <v-list-item @click.stop="() => console.log('Delete Lineitemjk:', item._id)" class="text-error">
+              <v-list-item-title>Delete</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
       </template>
 
     </v-data-table-server>
@@ -71,7 +74,8 @@
 import { ref, computed, watch, PropType } from 'vue';
 import type { VDataTableServer } from 'vuetify/components/VDataTable';
 import { formatDate } from '@/helpers/dateUtils';
-import type { Lineitem } from '@/types/lineitem'; // Pfad anpassen
+import type { Lineitem } from '@/types/lineitem';
+import {lineitemHeaders} from "@/constants/lineitem.ts"; // Pfad anpassen
 
 type ReadonlyHeaders = VDataTableServer['$props']['headers'];
 
@@ -80,10 +84,6 @@ const props = defineProps({
     type: Array as PropType<Lineitem[]>,
     required: true,
     default: () => []
-  },
-  headers: {
-    type: Array as PropType<ReadonlyHeaders>,
-    required: true
   },
   isLoading: {
     type: Boolean,
@@ -164,22 +164,5 @@ watch(() => props.modelValue, (newVal) => {
 </script>
 
 <style scoped>
-.lineitem-table-card {
-  border: 1px solid #eee;
-}
-/* Stile für lineitem-data-table aus src/style.css anwenden */
-:deep(.v-table.lineitem-data-table .v-table__wrapper > table > thead > tr > th) {
-  background-color: #E6E6E6 !important;
-  border-bottom: 5px solid #fff !important;
-  white-space: nowrap; /* Verhindert Umbruch im Header */
-}
-:deep(.v-table.lineitem-data-table .v-table__wrapper > table > tbody > tr > td) {
-  background-color: #ffffff !important;
-  border-bottom: 5px solid #fff !important;
-}
-:deep(.v-data-table__td .v-tooltip > .v-overlay__content) {
-  background: rgba(0,0,0,0.8);
-  color: white;
-  font-size: 0.75rem;
-}
+
 </style>

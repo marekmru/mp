@@ -20,25 +20,21 @@
             :builder-type="'display'"
             @update:search="updateSearchTerm"
         />
+        <CampaignListView
+            :mediaplan-id="mediaplanIdRef"
+            :items="campaigns"
+            :total-campaigns="1"
+            :is-loading="isLoading"
+            :current-page="0"
+            :items-per-page="1"
+            type="single"
+            class="pb-3"
+        />
 
-        <v-card class="mt-4" flat>
-          <v-card-title>Campaign Details</v-card-title>
-          <v-card-text>
-            <v-row>
-              <v-col cols="12" sm="6" md="4"><v-list-item density="compact"><v-list-item-subtitle>Campaign Name</v-list-item-subtitle><v-list-item-title>{{ campaign.campaignname }}</v-list-item-title></v-list-item></v-col>
-              <v-col cols="12" sm="6" md="4"><v-list-item density="compact"><v-list-item-subtitle>Campaign Type</v-list-item-subtitle><v-list-item-title>{{ campaign.campaigntype }}</v-list-item-title></v-list-item></v-col>
-              <v-col cols="12" sm="6" md="4"><v-list-item density="compact"><v-list-item-subtitle>Language</v-list-item-subtitle><v-list-item-title>{{ campaign.language }}</v-list-item-title></v-list-item></v-col>
-              <v-col cols="12" sm="6" md="4"><v-list-item density="compact"><v-list-item-subtitle>Product</v-list-item-subtitle><v-list-item-title>{{ campaign.product }}</v-list-item-title></v-list-item></v-col>
-              <v-col cols="12" sm="6" md="4"><v-list-item density="compact"><v-list-item-subtitle>Subsegment</v-list-item-subtitle><v-list-item-title>{{ campaign.subsegment }}</v-list-item-title></v-list-item></v-col>
-              <v-col cols="12" sm="6" md="4"><v-list-item density="compact"><v-list-item-subtitle>Type</v-list-item-subtitle><v-list-item-title>{{ campaign.type }}</v-list-item-title></v-list-item></v-col>
-              <v-col cols="12"><v-list-item density="compact"><v-list-item-subtitle>Details</v-list-item-subtitle><v-list-item-title>{{ campaign.campaigndetail || '-' }}</v-list-item-title></v-list-item></v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
 
         <LineitemTable
             class="mt-5"
-            :lineitems="lineitems"
+            :items="lineitems"
             :is-loading="isLoadingLineitems"
             @add-lineitem="()=>{}"
             @view-lineitem="()=>{}"
@@ -84,6 +80,8 @@ import type { Lineitem } from '@/types/lineitem';
 import type { Project } from '@/types/project';
 import type { Mediaplan } from '@/types/mediaplan';
 import {useLineitemStore} from "@/stores/lineitemStore.ts";
+import MediaplanPlanningViewDatatable from "@/components/mediaplan/MediaplanPlanningViewDatatable.vue";
+import CampaignListView from "@/components/project/CampaignListView.vue";
 
 // Props & Route
 const props = defineProps<{
@@ -113,6 +111,11 @@ const searchTerm = ref(''); // Wird von TopSection gesetzt, aber hier nicht dire
 
 // Computed Properties
 const campaign = computed<Campaign | null>(() => campaignStore.selectedCampaign);
+const campaigns = computed(() => {
+  return campaignStore.selectedCampaign ? [campaignStore.selectedCampaign] : []
+});
+
+
 const parentProject = computed<Project | null>(() => projectStore.selectedProject);
 const parentMediaplan = computed<Mediaplan | null>(() => mediaplanStore.selectedMediaplan);
 const lineitems = computed<Lineitem[]>(() => lineitemStore.lineitems);
