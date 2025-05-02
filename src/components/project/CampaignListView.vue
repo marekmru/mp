@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import type { Campaign } from '@/types/campaigns'; // Corrected path
-import { useRouter } from 'vue-router';
-import { campaignHeaders } from "@/constants/campaign";
-import { formatDate } from '@/helpers/dateUtils';
-import type { VDataTableServer } from 'vuetify/components/VDataTable';
+import {computed, ref} from 'vue';
+import type {Campaign} from '@/types/campaigns'; // Corrected path
+import {useRouter} from 'vue-router';
+import {campaignHeaders} from "@/constants/campaign";
+import {formatDate} from '@/helpers/dateUtils';
+import type {VDataTableServer} from 'vuetify/components/VDataTable';
+import {getBrandLogo} from "@/helpers/brandUtils.ts";
 
 type ReadonlyHeaders = VDataTableServer['$props']['headers'];
 type Options = VDataTableServer['$props']['options']; // Type for options
@@ -51,7 +52,9 @@ const itemsPerPageModel = computed({
 
 const selectedCampaigns = computed({
   get: () => props.modelValue,
-  set: (value) => { emit('update:modelValue', value); }
+  set: (value) => {
+    emit('update:modelValue', value);
+  }
 });
 
 const headers = ref(campaignHeaders);
@@ -61,9 +64,21 @@ const onOptionsUpdate = (options: Options) => {
   emit('update:options', options);
 };
 
-const triggerAddCampaign = () => { emit('addCampaign'); };
-const editCampaign = (item: Campaign) => { emit('editCampaign', item); };
-const deleteCampaign = (item: Campaign) => { emit('deleteCampaign', item); };
+const triggerAddCampaign = () => {
+  emit('addCampaign');
+};
+const editCampaign = (item: Campaign) => {
+  emit('editCampaign', item);
+};
+const deleteCampaign = (item: Campaign) => {
+  emit('deleteCampaign', item);
+};
+
+// Add missing method stubs
+const editProject = (item: Campaign) => {
+  console.log('Edit project:', item);
+  // TODO: Implement edit project logic
+};
 
 // --- UI Steuerung ---
 const hideFooter = computed(() => props.type === 'single');
@@ -107,34 +122,64 @@ const getCampaignDetailRoute = (campaign: Campaign) => {
         <template v-slot:item.campaignname="{ item }">
           <router-link
               :to="getCampaignDetailRoute(item)"
-              class="text-decoration-none text-primary font-weight-medium"
-              @click.stop >
+              v-if="item.campaignname && type==='multi'"
+              class="name-link d-flex align-center"
+              @click.stop>
             {{ item.campaignname }}
           </router-link>
+          <div class="d-flex align-center" v-else-if="item.campaignname">
+            <span>{{ item.campaignname }}</span>
+          </div>
         </template>
         <template v-slot:item.created_at="{ item }"> {{ formatDate(item.created_at) }}</template>
-        <template v-slot:item.updated_at="{ item }"> {{ item.updated_at ? formatDate(item.updated_at) : '-' }} </template>
+        <template v-slot:item.updated_at="{ item }"> {{
+            item.updated_at ? formatDate(item.updated_at) : '-'
+          }}
+        </template>
         <template v-slot:item.campaigndetail="{ item }">
           <span class="d-inline-block text-truncate" style="max-width: 200px;"> {{ item.campaigndetail || '-' }} </span>
-          <v-tooltip v-if="item.campaigndetail && item.campaigndetail.length > 30" activator="parent" location="top" max-width="300px"> {{ item.campaigndetail }} </v-tooltip>
+          <v-tooltip v-if="item.campaigndetail && item.campaigndetail.length > 30" activator="parent" location="top"
+                     max-width="300px"> {{ item.campaigndetail }}
+          </v-tooltip>
         </template>
         <template v-slot:item.actions="{ item }">
-          <v-icon small class="mr-2" @click.stop="editCampaign(item)">mdi-pencil</v-icon>
-          <v-icon small @click.stop="deleteCampaign(item)">mdi-delete</v-icon>
+          <v-btn icon density="compact" size="small" variant="text" @click.stop="editProject(item)">
+            <v-icon>mdi-pencil-outline</v-icon>
+            <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+          </v-btn>
+          <v-menu>
+            <template v-slot:activator="{ props: menuProps }">
+              <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
+            </template>
+            <v-list density="compact">
+              <v-list-item @click.stop="editProject(item)">
+                <v-list-item-title>Edit</v-list-item-title>
+              </v-list-item>
+              <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
+                <v-list-item-title>Delete</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </template>
 
-        <template v-slot:loading> <v-skeleton-loader type="table-row@5"></v-skeleton-loader> </template>
-        <template v-slot:no-data> <div class="text-center pa-4">No campaigns found.</div> </template>
+        <template v-slot:loading>
+          <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
+        </template>
+        <template v-slot:no-data>
+          <div class="text-center pa-4">No campaigns found.</div>
+        </template>
 
         <template v-slot:bottom v-if="props.type === 'multi'">
-          <div class="d-flex align-center pa-4 bg-grey-lighten-2"> <v-btn
-              prepend-icon="mdi-plus"
-              variant="text"         color="black"          @click="triggerAddCampaign"
-              :disabled="props.isLoading"
-              class="black-text-button" >
-            Add Campaign
-          </v-btn>
-            <v-spacer></v-spacer> </div>
+          <div class="d-flex align-center pa-4 bg-grey-lighten-2">
+            <v-btn
+                prepend-icon="mdi-plus"
+                variant="text" color="black" @click="triggerAddCampaign"
+                :disabled="props.isLoading"
+                class="black-text-button">
+              Add Campaign
+            </v-btn>
+            <v-spacer></v-spacer>
+          </div>
         </template>
       </v-data-table-server>
     </v-card>
@@ -142,12 +187,17 @@ const getCampaignDetailRoute = (campaign: Campaign) => {
 </template>
 
 <style scoped>
-/* Stile wie zuvor */
-.v-table.campaigns-data-table .v-table__wrapper > table > thead > tr > th { white-space: nowrap; }
+.v-table.campaigns-data-table .v-table__wrapper > table > thead > tr > th {
+  white-space: nowrap;
+}
+
 .campaigns-data-table .router-link:hover {
   text-decoration: underline !important;
 }
-.v-skeleton-loader { background-color: transparent !important; }
+
+.v-skeleton-loader {
+  background-color: transparent !important;
+}
 
 /* Optional: Styling für den Text-Button im Footer, falls benötigt */
 .black-text-button {

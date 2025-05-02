@@ -30,7 +30,7 @@
           <template v-slot:item.abbreviation="{ item }">
             <router-link
                 :to="{ name: 'ProjectDetail', params: { mediaplanId: props.mediaplanId, projectId: item._id } }"
-                class="project-link d-flex align-center"
+                class="name-link d-flex align-center"
                 v-if="item.abbreviation && props.mediaplanId && type==='multi'"
                 @click.stop
             >
@@ -236,14 +236,5 @@ const onProjectSaved = (project: Project) => {
 
 <style scoped>
 /* ... (Styles bleiben) ... */
-.project-link {
-  color: white; /* Oder eine andere passende Farbe im Dark Theme */
-  text-decoration: none;
-  font-weight: 500;
-}
 
-.project-link:hover {
-  text-decoration: underline;
-  color: #E0E0E0; /* Leichte Aufhellung beim Hover */
-}
 </style>

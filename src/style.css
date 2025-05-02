@@ -52,3 +52,29 @@
     /* padding-right: 6px;*/
 
 }
+
+.name-link {
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.name-link:hover {
+    text-decoration: underline;
+}
+
+
+.v-table .name-link {
+    color: rgba(0, 0, 0, 0.87);
+}
+
+.v-table .name-link {
+    color: #000;
+}
+
+.v-table.v-theme--dark .name-link {
+    color: #fff;
+}
+
+.v-table.v-theme--dark .name-link {
+    color: #E0E0E0;
+}

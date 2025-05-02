@@ -18,7 +18,6 @@
             :search="searchTerm" :is-loading="isLoading"
             :current-view="'planning'"
             @update:search="updateSearchTerm"
-            # @update:current-view=""
         />
 
         <v-card class="mt-4" flat>

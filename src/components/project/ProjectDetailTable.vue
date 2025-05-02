@@ -27,16 +27,11 @@ const editProject = (project: Project) => {
           item-value="_id"
           density="compact"
       >
-        <template v-slot:item.edit="{ item }">
-          <v-btn icon density="compact" variant="text"  @click.stop="editProject(item)">
-            <v-icon>mdi-pencil-outline</v-icon>
-            <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
-          </v-btn>
-        </template>
+
         <template #item.abbreviation="{ item }">
           <div class="d-flex align-center">
             <v-avatar size="32" class="mr-2 grey lighten-4" :image="getBrandLogo(item.descriptive_vars?.brand)" />
-            <span>{{ item.abbreviation }}</span>
+            <span>{{ item.abbreviation }} </span>
           </div>
         </template>
 
@@ -76,6 +71,10 @@ const editProject = (project: Project) => {
           <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
         </template>
         <template v-slot:item.actions="{ item }">
+          <v-btn icon density="compact" size="small" variant="text" @click.stop="editProject(item)">
+            <v-icon>mdi-pencil-outline</v-icon>
+            <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+          </v-btn>
           <v-menu>
             <template v-slot:activator="{ props: menuProps }">
               <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
