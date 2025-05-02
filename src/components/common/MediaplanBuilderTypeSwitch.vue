@@ -15,7 +15,7 @@
 
 <script setup>
 
-import {ref, watch, defineEmits, defineProps} from 'vue'
+import {ref, watch, defineEmits} from 'vue'
 
 const emit = defineEmits(['update:builderType'])
 const props = defineProps({

@@ -1874,7 +1874,6 @@ paths:
   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}/lineitems:
     get:
       summary: Get all line items for a given Campaign
-      # ... (rest of definition - unchanged) ...
       tags:
         - LineItems
       parameters:
@@ -1901,13 +1900,47 @@ paths:
             type: string
       responses:
         "200":
+          description: Successful response - returns a list of line items.
           content:
             application/json:
               schema:
+                type: array # Current spec indicates an array response
                 items:
                   $ref: "#/components/schemas/LineItem"
-                type: array
-          description: Successful response - returns a list of line items.
+              # --- START EXAMPLE for LineItems ---
+              example:
+                - _id: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d" # UUID
+                  pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Example Project ID
+                  # mid and cid might be added by the frontend/store, not present in API response
+                  lineitemname: "Display_Banner_300x250_Summer_Generic_Prospecting"
+                  product: "Generic"
+                  phase: "Prospecting"
+                  goals: "Awareness"
+                  targetingtactic: "Contextual"
+                  creatives: ["creative-001", "creative-002"]
+                  created_at: "2024-10-20T10:30:00Z"
+                  updated_at: "2024-10-21T11:00:00Z"
+                - _id: "2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e" # UUID
+                  pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Example Project ID
+                  lineitemname: "Display_Video_15s_Summer_Generic_Retargeting"
+                  product: "Generic"
+                  phase: "Retargeting"
+                  goals: "Consideration"
+                  targetingtactic: "Behavioral"
+                  creatives: ["creative-003"]
+                  created_at: "2024-10-20T11:00:00Z"
+                  updated_at: null # Example with null updated_at
+                - _id: "3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f" # UUID
+                  pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Example Project ID
+                  lineitemname: "Video_30s_Summer_Brand_Awareness"
+                  product: "Brand"
+                  phase: "Awareness"
+                  goals: "Reach"
+                  targetingtactic: "Demographic"
+                  creatives: ["creative-004", "creative-005", "creative-006"]
+                  created_at: "2024-10-22T09:00:00Z"
+                  updated_at: "2024-10-22T09:00:00Z"
+              # --- END EXAMPLE ---
         "400":
           content:
             application/json:
@@ -1926,6 +1959,78 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
           description: Internal Server Error
+
+  /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}/lineitems/{lineItemId}:
+    get:
+      summary: Get a single Line Item by ID
+      tags:
+        - LineItems
+      parameters:
+        - description: The ID of the Mediaplan.
+          in: path
+          name: mediaplanId
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - description: The ID of the Project.
+          in: path
+          name: projectId
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - description: The ID of the Campaign.
+          in: path
+          name: campaignId
+          required: true
+          schema:
+            format: uuid
+            type: string
+        - description: The ID of the Line Item.
+          in: path
+          name: lineItemId
+          required: true
+          schema:
+            format: uuid
+            type: string
+      responses:
+        "200":
+          description: Successful response - returns the Line Item.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LineItem"
+              example:
+                _id: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d" # Matches example from list
+                pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                # mid and cid might be added by the frontend/store, not present in API response
+                lineitemname: "Display_Banner_300x250_Summer_Generic_Prospecting"
+                product: "Generic"
+                phase: "Prospecting"
+                goals: "Awareness"
+                targetingtactic: "Contextual"
+                creatives: ["creative-001", "creative-002"]
+                created_at: "2024-10-20T10:30:00Z"
+                updated_at: "2024-10-21T11:00:00Z"
+        "400":
+          description: Bad Request (e.g., invalid ID format)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Mediaplan, Project, Campaign, or Line Item not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
 components:
   schemas:

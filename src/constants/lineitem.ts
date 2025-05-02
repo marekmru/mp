@@ -18,4 +18,4 @@ export const lineitemHeaders: ReadonlyHeaders = [
     { title: '', key: 'actions', sortable: false, align: 'center' } // Beispiel für Aktionen
 ];
 
-// Stelle sicher, dass die 'key'-Werte mit den Feldern im LineItem-Objekt übereinstimmen.
+// Stelle sicher, dass die 'key'-Werte mit den Feldern im Lineitem-Objekt übereinstimmen.

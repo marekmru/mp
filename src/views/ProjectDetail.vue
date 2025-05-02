@@ -150,6 +150,7 @@ watch(errorCampaigns, (newError) => {
             :search="search"
             :is-loading="isLoadingProject || mediaplanStore.isLoading"
             :current-view="currentView"
+            :builder-type="'display'"
             @update:search="updateSearchHandler"
             @update:current-view="val => currentView = val"
         />

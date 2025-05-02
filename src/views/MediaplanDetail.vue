@@ -17,6 +17,7 @@
             :search="search"
             :is-loading="isLoadingMediaplan"
             :current-view="currentView"
+            :builder-type="'display'"
             @update:search="updateSearch"
             @update:current-view="val => currentView = val"
         />

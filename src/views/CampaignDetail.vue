@@ -17,6 +17,7 @@
             :campaign="campaign"
             :search="searchTerm" :is-loading="isLoading"
             :current-view="'planning'"
+            :builder-type="'display'"
             @update:search="updateSearchTerm"
         />
 
@@ -39,8 +40,8 @@
             class="mt-5"
             :lineitems="lineitems"
             :is-loading="isLoadingLineitems"
-            # @add-lineitem="openAddLineitemDialog"
-            # @view-lineitem="handleViewLineitem"
+            @add-lineitem="()=>{}"
+            @view-lineitem="()=>{}"
         />
 
       </template>
@@ -75,14 +76,14 @@ import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
 import LineitemTable from '@/components/campaign/LineitemTable.vue'; // Spezifische Tabelle
 // Stores
 import { useCampaignStore } from '@/stores/campaignStore';
-import { useLineitemStore } from '@/stores/lineitemStore';
 import { useProjectStore } from '@/stores/projectStore';
 import { useMediaplanStore } from '@/stores/mediaplanStore';
 // Types
 import type { Campaign } from '@/types/campaign';
-import type { LineItem } from '@/types/lineitem';
+import type { Lineitem } from '@/types/lineitem';
 import type { Project } from '@/types/project';
 import type { Mediaplan } from '@/types/mediaplan';
+import {useLineitemStore} from "@/stores/lineitemStore.ts";
 
 // Props & Route
 const props = defineProps<{
@@ -114,7 +115,7 @@ const searchTerm = ref(''); // Wird von TopSection gesetzt, aber hier nicht dire
 const campaign = computed<Campaign | null>(() => campaignStore.selectedCampaign);
 const parentProject = computed<Project | null>(() => projectStore.selectedProject);
 const parentMediaplan = computed<Mediaplan | null>(() => mediaplanStore.selectedMediaplan);
-const lineitems = computed<LineItem[]>(() => lineitemStore.lineitems);
+const lineitems = computed<Lineitem[]>(() => lineitemStore.lineitems);
 const isLoadingLineitems = computed(() => lineitemStore.isLoading);
 // Kein Zugriff auf Line Item Paginierung/Sortierung hier, da v-data-table dies clientseitig macht
 
@@ -167,7 +168,7 @@ const openAddLineitemDialog = () => {
   // Logik zum Öffnen des Dialogs
 };
 
-const handleViewLineitem = (item: LineItem) => {
+const handleViewLineitem = (item: Lineitem) => {
   console.log('View Lineitem (Event received):', item._id);
   showSnackbar("Viewing line item details is not supported by the API yet.", "info");
   // Logik zum Anzeigen der Details (z.B. in einem Dialog)

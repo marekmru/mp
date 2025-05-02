@@ -71,13 +71,13 @@
 import { ref, computed, watch, PropType } from 'vue';
 import type { VDataTableServer } from 'vuetify/components/VDataTable';
 import { formatDate } from '@/helpers/dateUtils';
-import type { LineItem } from '@/types/lineitem'; // Pfad anpassen
+import type { Lineitem } from '@/types/lineitem'; // Pfad anpassen
 
 type ReadonlyHeaders = VDataTableServer['$props']['headers'];
 
 const props = defineProps({
   items: {
-    type: Array as PropType<LineItem[]>,
+    type: Array as PropType<Lineitem[]>,
     required: true,
     default: () => []
   },
