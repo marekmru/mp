@@ -49,8 +49,8 @@
 .v-table .v-table__wrapper > table > tbody > tr > td:last-child {
     padding-right: 8px;
     padding-left: 12px;
-    /* padding-right: 6px;*/
-
+    width: 102px;
+    max-width: 102px;
 }
 
 .name-link {

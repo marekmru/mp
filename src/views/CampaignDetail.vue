@@ -33,11 +33,23 @@
 
 
         <LineitemTable
-            class="mt-5"
-            :items="lineitems"
-            :is-loading="isLoadingLineitems"
-            @add-lineitem="()=>{}"
-            @view-lineitem="()=>{}"
+          class="mt-5"
+          :items="lineitems"
+          :is-loading="isLoadingLineitems"
+          :total-items="totalLineitems"
+          :current-page="currentPage"
+          :items-per-page="perPage"
+          :sort-by-server="sortBy"
+          :search="searchTerm"
+          :model-value="selectedLineitemIds"
+          @add-lineitem="openAddLineitemDialog"
+          @view-lineitem="handleViewLineitem"
+          @update:model-value="val => selectedLineitemIds.value = val"
+          @update:options="({ page, itemsPerPage, sortBy }) => {
+            lineitemStore.currentPage = page;
+            lineitemStore.perPage = itemsPerPage;
+            lineitemStore.sortBy = sortBy;
+          }"
         />
 
       </template>
@@ -121,6 +133,12 @@ const parentMediaplan = computed<Mediaplan | null>(() => mediaplanStore.selected
 const lineitems = computed<Lineitem[]>(() => lineitemStore.lineitems);
 const isLoadingLineitems = computed(() => lineitemStore.isLoading);
 // Kein Zugriff auf Line Item Paginierung/Sortierung hier, da v-data-table dies clientseitig macht
+
+const totalLineitems = computed(() => lineitemStore.totalItems);
+const currentPage = computed(() => lineitemStore.currentPage);
+const perPage = computed(() => lineitemStore.perPage);
+const sortBy = computed(() => lineitemStore.sortBy);
+const selectedLineitemIds = ref<string[]>([]);
 
 // Snackbar
 const snackbar = reactive({ show: false, text: '', color: 'success' });

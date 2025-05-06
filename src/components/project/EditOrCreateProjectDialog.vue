@@ -10,10 +10,8 @@
 
       <v-form ref="form" @submit.prevent="onSubmit" v-model="isFormValid" validate-on="input">
         <WithFormDefaults>
-
           <!-- Country & Language -->
           <CountryLanguageSelector v-model="countryLanguage"/>
-
           <!-- Date Range -->
           <FormElementVrowVcol label="Start date - End date" required>
             <DateRangePicker
@@ -27,7 +25,18 @@
           </FormElementVrowVcol>
 
           <FormElementVrowVcol label="PO Number">
-            <v-text-field v-model="project.poNumber" placeholder="Optional PO Number"/>
+            <v-select
+                id="po-select"
+                v-model="project.poNumber"
+                :items="poNumbers"
+                item-title="name"
+                item-value="_id"
+                placeholder="Select POs"
+                :rules="[(v && v.length > 0) || 'At least one PO is required']"
+                multiple
+                chips
+                closable-chips
+            />
           </FormElementVrowVcol>
 
           <FormElementVrowVcol label="Builder" required>
@@ -220,6 +229,7 @@ const builders = computed(() => projectStore.builders);
 const campaignTypes = computed(() => projectStore.campaignTypes);
 const phases = computed(() => projectStore.phases);
 const goals = computed(() => projectStore.goals);
+const poNumbers = computed(() => projectStore.poNumbers);
 
 const onSubmit = async () => {
   const isValid = await form.value.validate();

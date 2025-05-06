@@ -12,6 +12,7 @@
           <v-card-text class="pa-0">
             <!-- Brand Selection -->
             <FormElementVrowVcol label="Brand Output" required>
+              <pre>{{ brands }}</pre>
               <v-select
                   id="brand-select"
                   v-model="formData.brand._id"
@@ -20,7 +21,22 @@
                   item-value="_id"
                   placeholder="Please Select a brand"
                   :rules="[v => !!v || 'Brand is required']"
-              />
+              >
+                <template v-slot:selection="{ item }">
+                  <v-avatar size="32" class="mr-2 grey lighten-4"
+                            :image="getBrandLogo({ _id: item.value, name: item.title })"></v-avatar>
+                  {{ item.title }}
+                </template>
+                <template v-slot:item="{ item, props }">
+                  <v-list-item v-bind="props">
+                    <template v-slot:prepend>
+                      <v-avatar size="32" class="mr-2 grey lighten-4"
+                                :image="getBrandLogo({ _id: item.value, name: item.title })"></v-avatar>
+                    </template>
+                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                  </v-list-item>
+                </template>
+              </v-select>
             </FormElementVrowVcol>
 
             <!-- Mediaplan Type -->
@@ -159,6 +175,7 @@ import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
 import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
 import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
 import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
+import {getBrandLogo} from "@/helpers/brandUtils.ts";
 
 // Props
 const props = defineProps<{

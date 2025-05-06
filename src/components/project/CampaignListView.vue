@@ -178,27 +178,4 @@ const getCampaignDetailRoute = (campaign: Campaign) => {
 </template>
 
 <style scoped>
-.v-table.campaigns-data-table .v-table__wrapper > table > thead > tr > th {
-  white-space: nowrap;
-}
-
-.campaigns-data-table .router-link:hover {
-  text-decoration: underline !important;
-}
-
-.v-skeleton-loader {
-  background-color: transparent !important;
-}
-
-/* Optional: Styling für den Text-Button im Footer, falls benötigt */
-.black-text-button {
-  /* color: black !important; */ /* Falls 'color="black"' nicht ausreicht */
-  text-transform: none !important; /* Falls nötig */
-}
-
-/* Optional: Anpassung des Hintergrunds für den Footer-Slot */
-.campaigns-data-table > .v-data-table__footer, /* Ziel den Standard-Footer, falls sichtbar */
-.campaigns-data-table > div:has(> .bg-grey-lighten-2) { /* Ziel unseren benutzerdefinierten Slot */
-  /* Ggf. gemeinsame Stile für den Footer-Bereich */
-}
 </style>

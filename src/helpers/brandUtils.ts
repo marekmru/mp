@@ -1,18 +1,18 @@
 // src/helpers/brandUtils.ts
 
-import type { Brand, EntityReference } from '@/types/mediaplan';
+import type { Brand, EntityReference } from '@/types/mediaplan.ts';
 
 /**
  * Determines if a brand has a logo
  */
 export const hasBrandLogo = (brand?: Brand | EntityReference): boolean => {
   if (!brand) return false;
-  
+
   // Check if it's a Brand with logo property
   if ('logo' in brand) {
     return !!brand.logo;
   }
-  
+
   // Default logos for known brands
   const knownBrands = ['BMW', 'MINI'];
   return knownBrands.includes(brand.name);
@@ -29,7 +29,8 @@ export const getBrandLogo = (brand?: Brand | EntityReference | string): string =
   if (!brand) return '/img/brands/logoipsum.svg';
 
   if (typeof brand === 'string') {
-    return brandLogos[brand] || '/img/brands/logoipsum.svg';
+    const key = brand.toUpperCase();
+    return brandLogos[key] || '/img/brands/logoipsum.svg';
   }
 
   if ('logo' in brand && brand.logo) {
@@ -43,12 +44,12 @@ export const getBrandLogo = (brand?: Brand | EntityReference | string): string =
  */
 export const getBrandInitials = (brand?: Brand | EntityReference): string => {
   if (!brand || !brand.name) return '?';
-  
+
   const words = brand.name.split(' ');
-  
+
   if (words.length === 1) {
     return words[0].substring(0, 2).toUpperCase();
   }
-  
+
   return words.slice(0, 2).map(word => word.charAt(0).toUpperCase()).join('');
 };

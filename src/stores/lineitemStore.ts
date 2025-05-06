@@ -15,6 +15,13 @@ export const useLineitemStore = defineStore('lineItem', () => {
     const isLoading = ref(false);
     const error = ref<string | null>(null);
 
+    // New state variables for pagination and sorting
+    const totalItems = ref(0);
+    const totalPages = ref(0);
+    const currentPage = ref(0);
+    const perPage = ref(10);
+    const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([]);
+
     // Store context IDs for potential reload actions or context checking
     const currentContextMediaplanId = ref<string | null>(null);
     const currentContextProjectId = ref<string | null>(null);
@@ -67,6 +74,9 @@ export const useLineitemStore = defineStore('lineItem', () => {
                     pid: projectId, // pid should already be there from API
                     cid: campaignId
                 }));
+                totalItems.value = response.length;
+                totalPages.value = 1; // No real pagination yet
+                currentPage.value = 0;
             } else {
                 console.warn(
                     'Received unexpected response format for line items, expected an array.',
@@ -191,6 +201,12 @@ export const useLineitemStore = defineStore('lineItem', () => {
         currentContextMediaplanId, // Expose context if needed externally
         currentContextProjectId,
         currentContextCampaignId,
+
+        totalItems,
+        totalPages,
+        currentPage,
+        perPage,
+        sortBy,
 
         // Actions
         fetchLineitems,

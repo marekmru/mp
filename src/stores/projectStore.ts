@@ -21,6 +21,13 @@ export const useProjectStore = defineStore('project', () => {
     const isLoading = ref(false);
     const error = ref<string | null>(null);
 
+    // Added pagination and sorting state variables
+    const totalItems = ref(0);
+    const totalPages = ref(0);
+    const currentPage = ref(0);
+    const perPage = ref(10);
+    const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([]);
+
     // Options for project form
     const countries = ref<ProjectCountry[]>([]);
     const languages = ref<ProjectLanguage[]>([]);
@@ -28,12 +35,6 @@ export const useProjectStore = defineStore('project', () => {
     const phases = ref<ProjectPhase[]>([]);
     const goals = ref<ProjectGoal[]>([]);
     const builders = ref<ProjectBuilder[]>([]);
-
-    // Pagination state
-    const totalItems = ref(0);
-    const totalPages = ref(0);
-    const currentPage = ref(0);
-    const perPage = ref(10);
 
     // Getters
     const getProjectById = computed(() => {
@@ -230,6 +231,7 @@ export const useProjectStore = defineStore('project', () => {
         totalPages,
         currentPage,
         perPage,
+        sortBy,
 
         // Getters
         getProjectById,
