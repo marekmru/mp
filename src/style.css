@@ -2,23 +2,19 @@
     text-transform: none !important;
 }
 
-/* Gemeinsame Border-Regel */
 .v-table .v-table__wrapper > table > thead > tr > th,
 .v-table .v-table__wrapper > table > tbody > tr > td {
     border-bottom: 5px solid #fff !important;
 }
 
-/* --- Project --- */
 .v-theme--dark.v-table.projects-data-table .v-table__wrapper > table > thead > tr > th {
     background-color: #4D4D4D;
 }
-
 
 .v-theme--dark.v-table.projects-data-table .v-table__wrapper > table > tbody > tr > td {
     background-color: #666666;
 }
 
-/* --- Campaign --- */
 .v-table.campaigns-data-table .v-table__wrapper > table > thead > tr > th {
     background-color: #BBBBBB !important;
 }
@@ -27,7 +23,6 @@
     background-color: #E6E6E6 !important;
 }
 
-/* --- Lineitem --- */
 .v-table.lineitem-data-table .v-table__wrapper > table > thead > tr > th {
     background-color: #E6E6E6 !important;
 }
@@ -36,7 +31,6 @@
     background-color: #ffffff !important;
 }
 
-/* last dol left shadow */
 /*.v-table .v-table__wrapper > table > thead > tr > th:last-child,*/
 .v-table .v-table__wrapper > table > tbody > tr > td:last-child {
     position: relative;

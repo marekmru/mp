@@ -12,10 +12,9 @@
           <v-card-text class="pa-0">
             <!-- Brand Selection -->
             <FormElementVrowVcol label="Brand Output" required>
-              <pre>{{ brands }}</pre>
               <v-select
                   id="brand-select"
-                  v-model="formData.brand._id"
+                  v-model="formData.brand"
                   :items="brands"
                   item-title="name"
                   item-value="_id"
@@ -23,17 +22,25 @@
                   :rules="[v => !!v || 'Brand is required']"
               >
                 <template v-slot:selection="{ item }">
-                  <v-avatar size="32" class="mr-2 grey lighten-4"
-                            :image="getBrandLogo({ _id: item.value, name: item.title })"></v-avatar>
-                  {{ item.title }}
+                  <template v-if="formData.brand">
+                    <v-avatar
+                        size="24"
+                        class="mr-2 grey lighten-4"
+                        :image="getBrandLogo({ _id: item.value, name: item.raw.name })"
+                    />
+                    {{ item.raw.name }}
+                  </template>
                 </template>
+
                 <template v-slot:item="{ item, props }">
-                  <v-list-item v-bind="props">
+                  <v-list-item v-bind="props" :title="item.raw.name">
                     <template v-slot:prepend>
-                      <v-avatar size="32" class="mr-2 grey lighten-4"
-                                :image="getBrandLogo({ _id: item.value, name: item.title })"></v-avatar>
+                      <v-avatar
+                          size="32"
+                          class="mr-2 grey lighten-4"
+                          :image="getBrandLogo({ _id: item.value, name: item.raw.name })"
+                      />
                     </template>
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
                   </v-list-item>
                 </template>
               </v-select>
@@ -142,7 +149,7 @@
   <!-- Create PO Dialog -->
   <CreatePoDialog
       v-model="createPODialogVisible"
-      :initial-brand-id="formData.brand._id"
+      :initial-brand-id="formData.brand?._id"
       @created="handlePoCreated"
   />
 
@@ -228,9 +235,7 @@ const formData = reactive<MediaplanCreate>({
   status: 'Draft', // Default status
   start_date: '',
   end_date: '',
-  brand: {
-    _id: '',
-  },
+  brand: null,
   budget: {
     total: 0,
     used: 0,
