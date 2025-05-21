@@ -1,7 +1,7 @@
 // File: src/stores/mediaplanStore.ts
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import customFetch from '@/helpers/customFetch';
+import {defineStore} from 'pinia';
+import {ref, computed} from 'vue';
+import  customFetch from '@/helpers/customFetch';
 import type {
     FilterSources,
     Mediaplan,
@@ -14,12 +14,12 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
     // --- State ---
     const sources = ref<FilterSources>({
         brands: [
-            { _id: 'bmw', name: 'BMW' },
-            { _id: 'mini', name: 'MINI' }
+            {_id: 'bmw', name: 'BMW'},
+            {_id: 'mini', name: 'MINI'}
         ],
         countries: [
-            { abbreviation: 'DE', value: 'Germany', category: null },
-            { abbreviation: 'AT', value: 'Austria', category: null },
+            {abbreviation: 'DE', value: 'Germany', category: null},
+            {abbreviation: 'AT', value: 'Austria', category: null},
             // …other mock countries…
         ],
         subsegments: [],
@@ -27,21 +27,21 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
         campaigntypes: [],
         languages: []
     });
-    const mediaplans  = ref<Mediaplan[]>([]);
-    const isLoading   = ref(false);
-    const error       = ref<string | null>(null);
+    const mediaplans = ref<Mediaplan[]>([]);
+    const isLoading = ref(false);
+    const error = ref<string | null>(null);
     const selectedMediaplan = ref<Mediaplan | null>(null)
 
 
     // Pagination
-    const totalItems  = ref(0);
-    const totalPages  = ref(0);
+    const totalItems = ref(0);
+    const totalPages = ref(0);
     const currentPage = ref(0);
-    const perPage     = ref(10);
+    const perPage = ref(10);
 
     // Filters & Sorting
-    const filters   = ref<MediaplanFilter>({ search: '', status: '' });
-    const sortBy    = ref('updated_at');
+    const filters = ref<MediaplanFilter>({search: '', status: ''});
+    const sortBy = ref('updated_at');
     const sortOrder = ref<'asc' | 'desc'>('desc');
 
     const hasFilters = computed(() =>
@@ -60,12 +60,12 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
         try {
             const res = await customFetch('/mediaplans/sources?type=overview') as SourcesResponse;
             sources.value = {
-                brands:       res.data.brand       ?? [],
-                countries:    res.data.country     ?? [],
-                subsegments:  res.data.subsegment  ?? [],
-                products:     res.data.product     ?? [],
-                campaigntypes:res.data.campaigntype ?? [],
-                languages:    res.data.language    ?? []
+                brands: res.data.brand ?? [],
+                countries: res.data.country ?? [],
+                subsegments: res.data.subsegment ?? [],
+                products: res.data.product ?? [],
+                campaigntypes: res.data.campaigntype ?? [],
+                languages: res.data.language ?? []
             };
         } catch {
             // keep the mock data
@@ -73,6 +73,7 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
             isLoading.value = false;
         }
     }
+
 // Inside defineStore in mediaplanStore.ts
 
 
@@ -92,16 +93,17 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
             isLoading.value = false
         }
     }
+
     /** Fetch paginated & filtered list */
     async function fetchMediaplans() {
         isLoading.value = true;
         error.value = null;
         try {
             const params = new URLSearchParams({
-                page:        currentPage.value.toString(),
-                per_page:    perPage.value.toString(),
-                sort:        sortBy.value,
-                order:       sortOrder.value,
+                page: currentPage.value.toString(),
+                per_page: perPage.value.toString(),
+                sort: sortBy.value,
+                order: sortOrder.value,
             });
 
             // apply filters
@@ -115,12 +117,13 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
                 params.append('filter', JSON.stringify(active));
             }
 
-            const url = `/mediaplans?${params.toString()}`;
+            const url = `/mediaplans`
+            // ?${params.toString()}`;
             const resp = await customFetch(url) as MediaplanListResponse;
 
-            mediaplans.value  = resp.items;
-            totalItems.value  = resp.total_items;
-            totalPages.value  = resp.total_pages;
+            mediaplans.value = resp.items;
+            totalItems.value = resp.total_items;
+            totalPages.value = resp.total_pages;
             currentPage.value = resp.current_page;
         } catch (err) {
             error.value = err instanceof Error ? err.message : 'Error fetching mediaplans';
@@ -133,21 +136,21 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
 
     /** Update a single filter and reload */
     function setFilter(key: keyof MediaplanFilter, value: unknown) {
-        filters.value = { ...filters.value, [key]: value };
+        filters.value = {...filters.value, [key]: value};
         currentPage.value = 0;
         fetchMediaplans();
     }
 
     /** Clear all filters back to defaults */
     function clearFilters() {
-        filters.value = { search: '', status: '' };
+        filters.value = {search: '', status: ''};
         currentPage.value = 0;
         fetchMediaplans();
     }
 
     /** Change sorting and reload */
     function setSorting(field: string, order: 'asc' | 'desc') {
-        sortBy.value    = field;
+        sortBy.value = field;
         sortOrder.value = order;
         fetchMediaplans();
     }
@@ -160,7 +163,7 @@ export const useMediaplanStore = defineStore('mediaplan', () => {
 
     /** Initialize both sources and list */
     function init() {
-        fetchSources();
+       //  fetchSources();
         fetchMediaplans();
     }
 

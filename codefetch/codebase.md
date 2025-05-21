@@ -36,7 +36,7 @@ index.html
 7 |     <title>Mediaplan</title>
 8 | </head>
 9 | <body>
-10 | <div mediaplanId="app"></div>
+10 | <div id="app"></div>
 11 | <script type="module" src="/src/main.ts"></script>
 12 | </body>
 13 | </html>
@@ -209,38 +209,76 @@ src/style.css
 2 |     text-transform: none !important;
 3 | }
 4 | 
-5 | /* Gemeinsame Border-Regel */
-6 | .v-table .v-table__wrapper > table > thead > tr > th,
-7 | .v-table .v-table__wrapper > table > tbody > tr > td {
-8 |     border-bottom: 5px solid #fff !important;
-9 | }
-10 | 
-11 | /* --- Project --- */
-12 | .v-theme--dark.v-table.projects-data-table .v-table__wrapper > table > thead > tr > th {
-13 |     background-color: #4D4D4D;
-14 | }
-15 | 
-16 | .v-theme--dark.v-table.projects-data-table .v-table__wrapper > table > tbody > tr > td {
-17 |     background-color: #666666;
-18 | }
-19 | 
-20 | /* --- Campaign --- */
-21 | .v-table.campaigns-data-table .v-table__wrapper > table > thead > tr > th {
-22 |     background-color: #BBBBBB !important;
-23 | }
-24 | 
-25 | .v-table.campaigns-data-table .v-table__wrapper > table > tbody > tr > td {
-26 |     background-color: #E6E6E6 !important;
-27 | }
-28 | 
-29 | /* --- Lineitem --- */
-30 | .v-table.lineitem-data-table .v-table__wrapper > table > thead > tr > th {
-31 |     background-color: #E6E6E6 !important;
+5 | .v-table .v-table__wrapper > table > thead > tr > th,
+6 | .v-table .v-table__wrapper > table > tbody > tr > td {
+7 |     border-bottom: 5px solid #fff !important;
+8 | }
+9 | 
+10 | .v-theme--dark.v-table.projects-data-table .v-table__wrapper > table > thead > tr > th {
+11 |     background-color: #4D4D4D;
+12 | }
+13 | 
+14 | .v-theme--dark.v-table.projects-data-table .v-table__wrapper > table > tbody > tr > td {
+15 |     background-color: #666666;
+16 | }
+17 | 
+18 | .v-table.campaigns-data-table .v-table__wrapper > table > thead > tr > th {
+19 |     background-color: #BBBBBB !important;
+20 | }
+21 | 
+22 | .v-table.campaigns-data-table .v-table__wrapper > table > tbody > tr > td {
+23 |     background-color: #E6E6E6 !important;
+24 | }
+25 | 
+26 | .v-table.lineitem-data-table .v-table__wrapper > table > thead > tr > th {
+27 |     background-color: #E6E6E6 !important;
+28 | }
+29 | 
+30 | .v-table.lineitem-data-table .v-table__wrapper > table > tbody > tr > td {
+31 |     background-color: #ffffff !important;
 32 | }
 33 | 
-34 | .v-table.lineitem-data-table .v-table__wrapper > table > tbody > tr > td {
-35 |     background-color: #ffffff !important;
-36 | }
+34 | /*.v-table .v-table__wrapper > table > thead > tr > th:last-child,*/
+35 | .v-table .v-table__wrapper > table > tbody > tr > td:last-child {
+36 |     position: relative;
+37 |     box-shadow: -6px 0px 8px -4px rgba(0, 0, 0, 0.33);
+38 |     overflow: visible;
+39 |     z-index: 1;
+40 | }
+41 | 
+42 | .v-table .v-table__wrapper > table > thead > tr > th:last-child,
+43 | .v-table .v-table__wrapper > table > tbody > tr > td:last-child {
+44 |     padding-right: 8px;
+45 |     padding-left: 12px;
+46 |     width: 102px;
+47 |     max-width: 102px;
+48 | }
+49 | 
+50 | .name-link {
+51 |     text-decoration: none;
+52 |     font-weight: 500;
+53 | }
+54 | 
+55 | .name-link:hover {
+56 |     text-decoration: underline;
+57 | }
+58 | 
+59 | 
+60 | .v-table .name-link {
+61 |     color: rgba(0, 0, 0, 0.87);
+62 | }
+63 | 
+64 | .v-table .name-link {
+65 |     color: #000;
+66 | }
+67 | 
+68 | .v-table.v-theme--dark .name-link {
+69 |     color: #fff;
+70 | }
+71 | 
+72 | .v-table.v-theme--dark .name-link {
+73 |     color: #E0E0E0;
+74 | }
 ```
 
 src/vite-env.d.ts
@@ -302,23 +340,39 @@ src/components/TopBar.vue
 src/constants/campaign.ts
 ```
 1 | // src/constants/campaign.ts
-2 | import { ref } from 'vue';
+2 | import {ref} from 'vue';
 3 | 
 4 | export const campaignHeaders = ref([
-5 |     { title: '', key: 'edit', sortable: false },
-6 |     { title: 'Product', key: 'product', sortable: true },
-7 |     { title: 'Lang', key: 'language', sortable: true },
-8 |     { title: 'Detail', key: 'campaigndetail', sortable: false },
-9 |     { title: 'Phase', key: 'phase', sortable: true },
-10 |     { title: 'Channel Type', key: 'channeltype', sortable: true },
-11 |     { title: 'Channel Name', key: 'channelname', sortable: true },
-12 |     { title: 'Goal', key: 'goal', sortable: true },
-13 |     { title: 'Tactic', key: 'tactic', sortable: true },
-14 |     { title: 'Device', key: 'device', sortable: true },
-15 |     { title: 'Budget', key: 'budget', sortable: false },
-16 |     { title: '', key: 'lock', sortable: false, align: 'center' },
-17 |     { title: '', key: 'actions', sortable: false, align: 'center'}
-18 | ]);
+5 |     {title: 'Campaign Name', key: 'campaignname', sortable: true, align: 'start'}, // Hinzugefügt
+6 |     {title: 'Budget', key: 'budget', sortable: false},
+7 |     {title: '', key: 'lock', sortable: false, align: 'center'},
+8 |     { title: '', key: 'actions', sortable: false, align: 'center' }
+9 | ]);
+```
+
+src/constants/lineitem.ts
+```
+1 | import type { VDataTableServer } from 'vuetify/components/VDataTable';
+2 | 
+3 | type ReadonlyHeaders = VDataTableServer['$props']['headers'];
+4 | 
+5 | // Headers für die Line Item Tabelle
+6 | export const lineitemHeaders: ReadonlyHeaders = [
+7 |     // Checkbox Spalte wird durch 'show-select' in v-data-table-server aktiviert, kein expliziter Header nötig,
+8 |     // aber wir können einen leeren Header für die Ausrichtung hinzufügen, falls gewünscht.
+9 |     // { title: '', key: 'data-table-select', sortable: false, width: '1rem' }, // Optional für Styling/Breite
+10 |     { title: 'Line Item Name', key: 'lineitemname', sortable: true, align: 'start' },
+11 |     { title: 'Product', key: 'product', sortable: true },
+12 |     { title: 'Phase', key: 'phase', sortable: true },
+13 |     { title: 'Goal', key: 'goals', sortable: true },
+14 |     { title: 'Tactic', key: 'targetingtactic', sortable: true },
+15 |     { title: 'Created', key: 'created_at', sortable: true },
+16 |     // { title: 'Updated', key: 'updated_at', sortable: true }, // Falls benötigt
+17 |     // { title: 'Creatives', key: 'creatives', sortable: false }, // Benötigt spezielle Darstellung
+18 |     { title: '', key: 'actions', sortable: false, align: 'center' } // Beispiel für Aktionen
+19 | ];
+20 | 
+21 | // Stelle sicher, dass die 'key'-Werte mit den Feldern im Lineitem-Objekt übereinstimmen.
 ```
 
 src/constants/mediaplanStatuses.ts
@@ -382,15 +436,15 @@ src/constants/mediaplanStatuses.ts
 src/constants/project.ts
 ```
 1 | export const projectHeaders = [
-2 |     { title: '', key: 'edit', sortable: false, width: '50px' },
-3 |     { title: 'Name', key: 'abbreviation', sortable: true, align: 'start' },
-4 |     { title: 'Country', key: 'descriptive_vars.country', sortable: true },
-5 |     { title: 'Duration', key: 'duration.formatted', sortable: false },
-6 |     { title: 'Detail', key: 'detail', sortable: true },
-7 |     { title: 'Campaign Type', key: 'default_vars.campaigntype', sortable: true },
-8 |     { title: 'Subsegment', key: 'default_vars.subsegment', sortable: true },
-9 |     { title: 'Budget', key: 'budget', sortable: true },
-10 |     { title: '', key: 'is_locked', sortable: true, align: 'center' },
+2 |     { title: 'Name', key: 'abbreviation', sortable: true, align: 'start' },
+3 |     { title: 'Country', key: 'descriptive_vars.country', sortable: true },
+4 |     { title: 'Duration', key: 'duration.formatted', sortable: false },
+5 |     { title: 'Detail', key: 'detail', sortable: true },
+6 |     { title: 'Campaign Type', key: 'default_vars.campaigntype', sortable: true },
+7 |     { title: 'Subsegment', key: 'default_vars.subsegment', sortable: true },
+8 |     { title: 'Budget', key: 'budget', sortable: true },
+9 |     { title: '', key: 'is_locked', sortable: true, align: 'center' },
+10 |     //{ title: '', key: 'edit', sortable: false, width: '50px' },
 11 |     { title: '', key: 'actions', sortable: false, align: 'center' }
 12 | ];
 ```
@@ -399,19 +453,19 @@ src/helpers/brandUtils.ts
 ```
 1 | // src/helpers/brandUtils.ts
 2 | 
-3 | import type { Brand, EntityReference } from '@/types/mediaplan';
+3 | import type { Brand, EntityReference } from '@/types/mediaplan.ts';
 4 | 
 5 | /**
 6 |  * Determines if a brand has a logo
 7 |  */
 8 | export const hasBrandLogo = (brand?: Brand | EntityReference): boolean => {
 9 |   if (!brand) return false;
-10 |   
+10 | 
 11 |   // Check if it's a Brand with logo property
 12 |   if ('logo' in brand) {
 13 |     return !!brand.logo;
 14 |   }
-15 |   
+15 | 
 16 |   // Default logos for known brands
 17 |   const knownBrands = ['BMW', 'MINI'];
 18 |   return knownBrands.includes(brand.name);
@@ -428,29 +482,30 @@ src/helpers/brandUtils.ts
 29 |   if (!brand) return '/img/brands/logoipsum.svg';
 30 | 
 31 |   if (typeof brand === 'string') {
-32 |     return brandLogos[brand] || '/img/brands/logoipsum.svg';
-33 |   }
-34 | 
-35 |   if ('logo' in brand && brand.logo) {
-36 |     return brand.logo;
-37 |   }
-38 | 
-39 |   return brandLogos[brand.name] || '/img/brands/logoipsum.svg';
-40 | };
-41 | /**
-42 |  * Gets brand initials for brands without logos
-43 |  */
-44 | export const getBrandInitials = (brand?: Brand | EntityReference): string => {
-45 |   if (!brand || !brand.name) return '?';
-46 |   
-47 |   const words = brand.name.split(' ');
-48 |   
-49 |   if (words.length === 1) {
-50 |     return words[0].substring(0, 2).toUpperCase();
-51 |   }
-52 |   
-53 |   return words.slice(0, 2).map(word => word.charAt(0).toUpperCase()).join('');
-54 | };
+32 |     const key = brand.toUpperCase();
+33 |     return brandLogos[key] || '/img/brands/logoipsum.svg';
+34 |   }
+35 | 
+36 |   if ('logo' in brand && brand.logo) {
+37 |     return brand.logo;
+38 |   }
+39 | 
+40 |   return brandLogos[brand.name] || '/img/brands/logoipsum.svg';
+41 | };
+42 | /**
+43 |  * Gets brand initials for brands without logos
+44 |  */
+45 | export const getBrandInitials = (brand?: Brand | EntityReference): string => {
+46 |   if (!brand || !brand.name) return '?';
+47 | 
+48 |   const words = brand.name.split(' ');
+49 | 
+50 |   if (words.length === 1) {
+51 |     return words[0].substring(0, 2).toUpperCase();
+52 |   }
+53 | 
+54 |   return words.slice(0, 2).map(word => word.charAt(0).toUpperCase()).join('');
+55 | };
 ```
 
 src/helpers/campaignTypeUtils.ts
@@ -1868,7 +1923,7 @@ src/mocks/swagger_mp.yaml
 418 |                 $ref: "#/components/schemas/Error"
 419 |           description: Internal Server Error
 420 | 
-421 |   /mediaplans/{mediaplanId}:
+421 |   /mediaplans/{id}:
 422 |     get:
 423 |       summary: Get a single Mediaplan by ID
 424 |       # ... (rest of definition - unchanged) ...
@@ -1877,7 +1932,7 @@ src/mocks/swagger_mp.yaml
 427 |       parameters:
 428 |         - description: The unique identifier of the Mediaplan.
 429 |           in: path
-430 |           name: mediaplanId
+430 |           name: id
 431 |           required: true
 432 |           schema:
 433 |             format: uuid
@@ -1916,7 +1971,7 @@ src/mocks/swagger_mp.yaml
 466 |       parameters:
 467 |         - description: The unique identifier of the Mediaplan.
 468 |           in: path
-469 |           name: mediaplanId
+469 |           name: id
 470 |           required: true
 471 |           schema:
 472 |             format: uuid
@@ -1969,7 +2024,7 @@ src/mocks/swagger_mp.yaml
 519 |       parameters:
 520 |         - description: The unique identifier of the Mediaplan.
 521 |           in: path
-522 |           name: mediaplanId
+522 |           name: id
 523 |           required: true
 524 |           schema:
 525 |             format: uuid
@@ -1996,7 +2051,7 @@ src/mocks/swagger_mp.yaml
 546 |                 $ref: "#/components/schemas/Error"
 547 |           description: Internal Server Error
 548 | 
-549 |   /mediaplans/{mediaplanIdRef}/projects:
+549 |   /mediaplans/{mediaplanId}/projects:
 550 |     get:
 551 |       summary: Get all projects for a given Mediaplan
 552 |       # ... (rest of definition including previous example - unchanged) ...
@@ -2005,7 +2060,7 @@ src/mocks/swagger_mp.yaml
 555 |       parameters:
 556 |         - description: The ID of the Mediaplan.
 557 |           in: path
-558 |           name: mediaplanIdRef
+558 |           name: mediaplanId
 559 |           required: true
 560 |           schema:
 561 |             format: uuid
@@ -2704,7 +2759,7 @@ src/mocks/swagger_mp.yaml
 1254 |       parameters:
 1255 |         - description: The ID of the Mediaplan to which the project belongs.
 1256 |           in: path
-1257 |           name: mediaplanIdRef
+1257 |           name: mediaplanId
 1258 |           required: true
 1259 |           schema:
 1260 |             format: uuid
@@ -2778,14 +2833,14 @@ src/mocks/swagger_mp.yaml
 1328 |                 $ref: "#/components/schemas/Error"
 1329 |           description: Internal Server Error
 1330 | 
-1331 |   /mediaplans/{mediaplanIdRef}/projects/{projectId}:
+1331 |   /mediaplans/{mediaplanId}/projects/{projectId}:
 1332 |     get:
 1333 |       summary: Get a Project
 1334 |       tags:
 1335 |         - Projects
 1336 |       parameters:
 1337 |         - in: path
-1338 |           name: mediaplanIdRef
+1338 |           name: mediaplanId
 1339 |           schema:
 1340 |             type: string
 1341 |             format: uuid
@@ -2857,7 +2912,7 @@ src/mocks/swagger_mp.yaml
 1407 |       parameters:
 1408 |         - description: The ID of the Mediaplan.
 1409 |           in: path
-1410 |           name: mediaplanIdRef
+1410 |           name: mediaplanId
 1411 |           required: true
 1412 |           schema:
 1413 |             format: uuid
@@ -2917,7 +2972,7 @@ src/mocks/swagger_mp.yaml
 1467 |       parameters:
 1468 |         - description: The ID of the Mediaplan.
 1469 |           in: path
-1470 |           name: mediaplanIdRef
+1470 |           name: mediaplanId
 1471 |           required: true
 1472 |           schema:
 1473 |             format: uuid
@@ -2951,14 +3006,14 @@ src/mocks/swagger_mp.yaml
 1501 |                 $ref: "#/components/schemas/Error"
 1502 |           description: Internal Server Error
 1503 | 
-1504 |   /mediaplans/{mediaplanIdRef}/projects/{projectId}/campaigns:
+1504 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns:
 1505 |     get:
 1506 |       summary: Get all campaigns for a given Project within a Mediaplan
 1507 |       tags:
 1508 |         - Campaigns
 1509 |       parameters:
 1510 |         - in: path
-1511 |           name: mediaplanIdRef
+1511 |           name: mediaplanId
 1512 |           schema:
 1513 |             type: string
 1514 |             format: uuid
@@ -3092,7 +3147,7 @@ src/mocks/swagger_mp.yaml
 1642 |       parameters:
 1643 |         - description: The ID of the Mediaplan.
 1644 |           in: path
-1645 |           name: mediaplanIdRef
+1645 |           name: mediaplanId
 1646 |           required: true
 1647 |           schema:
 1648 |             format: uuid
@@ -3151,7 +3206,7 @@ src/mocks/swagger_mp.yaml
 1701 |                 $ref: "#/components/schemas/Error"
 1702 |           description: Internal Server Error
 1703 | 
-1704 |   /mediaplans/{mediaplanIdRef}/projects/{projectId}/campaigns/{campaignId}:
+1704 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}:
 1705 |     get:
 1706 |       summary: Get a single Campaign by ID
 1707 |       # ... (rest of definition - unchanged) ...
@@ -3160,7 +3215,7 @@ src/mocks/swagger_mp.yaml
 1710 |       parameters:
 1711 |         - description: The ID of the Mediaplan.
 1712 |           in: path
-1713 |           name: mediaplanIdRef
+1713 |           name: mediaplanId
 1714 |           required: true
 1715 |           schema:
 1716 |             format: uuid
@@ -3181,817 +3236,716 @@ src/mocks/swagger_mp.yaml
 1731 |             type: string
 1732 |       responses:
 1733 |         "200":
-1734 |           content:
-1735 |             application/json:
-1736 |               schema:
-1737 |                 $ref: "#/components/schemas/Campaign"
-1738 |           description: Successful response - returns the Campaign.
-1739 |         "400":
-1740 |           content:
-1741 |             application/json:
-1742 |               schema:
-1743 |                 $ref: "#/components/schemas/Error"
-1744 |           description: Bad Request (e.g., invalid ID format)
-1745 |         "404":
-1746 |           content:
-1747 |             application/json:
-1748 |               schema:
-1749 |                 $ref: "#/components/schemas/Error"
-1750 |           description: Mediaplan, Project, or Campaign not found.
-1751 |         "500":
-1752 |           content:
-1753 |             application/json:
-1754 |               schema:
-1755 |                 $ref: "#/components/schemas/Error"
-1756 |           description: Internal Server Error
-1757 | 
-1758 |     put:
-1759 |       summary: Update a Campaign (replace entire resource)
-1760 |       # ... (rest of definition - unchanged) ...
-1761 |       tags:
-1762 |         - Campaigns
-1763 |       parameters:
-1764 |         - description: The ID of the Mediaplan.
-1765 |           in: path
-1766 |           name: mediaplanIdRef
-1767 |           required: true
-1768 |           schema:
-1769 |             format: uuid
-1770 |             type: string
-1771 |         - description: The ID of the Project.
-1772 |           in: path
-1773 |           name: projectId
-1774 |           required: true
-1775 |           schema:
-1776 |             format: uuid
-1777 |             type: string
-1778 |         - description: The ID of the Campaign to update.
+1734 |           description: Successful response - returns the Campaign.
+1735 |           content:
+1736 |             application/json:
+1737 |               schema:
+1738 |                 $ref: "#/components/schemas/Campaign"
+1739 |               # --- START EXAMPLE ---
+1740 |               example:
+1741 |                 _id: "c1f0a3e2-b1d9-4a1e-8b7d-a3b8d4e16c2f" # Matches a potential campaignId from the path
+1742 |                 campaignname: "SE_MINI_NC-AO-24_Summer_Display_DEU_Generic"
+1743 |                 pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Matches a potential projectId from the path
+1744 |                 campaigndetail": "Generic Summer Banner Ads - Standard Sizes"
+1745 |                 campaigntype: "Always On"
+1746 |                 created_at: "2025-05-01T10:00:00Z"
+1747 |                 language: "DEU"
+1748 |                 product: "Generic"
+1749 |                 subsegment: "New Car"
+1750 |                 type: "display"
+1751 |                 updated_at: "2025-05-02T11:05:00Z" # Current time: 2025-05-02T14:00:48+02:00
+1752 |               # --- END EXAMPLE ---
+1753 |         "400":
+1754 |           content:
+1755 |             application/json:
+1756 |               schema:
+1757 |                 $ref: "#/components/schemas/Error"
+1758 |           description: Bad Request (e.g., invalid ID format)
+1759 |         "404":
+1760 |           content:
+1761 |             application/json:
+1762 |               schema:
+1763 |                 $ref: "#/components/schemas/Error"
+1764 |           description: Mediaplan, Project, or Campaign not found.
+1765 |         "500":
+1766 |           content:
+1767 |             application/json:
+1768 |               schema:
+1769 |                 $ref: "#/components/schemas/Error"
+1770 |           description: Internal Server Error
+1771 | 
+1772 |     put:
+1773 |       summary: Update a Campaign (replace entire resource)
+1774 |       # ... (rest of definition - unchanged) ...
+1775 |       tags:
+1776 |         - Campaigns
+1777 |       parameters:
+1778 |         - description: The ID of the Mediaplan.
 1779 |           in: path
-1780 |           name: campaignId
+1780 |           name: mediaplanId
 1781 |           required: true
 1782 |           schema:
 1783 |             format: uuid
 1784 |             type: string
-1785 |       requestBody:
-1786 |         content:
-1787 |           application/json:
-1788 |             schema:
-1789 |               $ref: "#/components/schemas/Campaign"
-1790 |         required: true
-1791 |       responses:
-1792 |         "200":
-1793 |           content:
-1794 |             application/json:
-1795 |               schema:
-1796 |                 $ref: "#/components/schemas/Campaign"
-1797 |           description: Campaign updated successfully.
-1798 |         "204":
-1799 |           description: Campaign updated successfully.
-1800 |         "400":
-1801 |           content:
-1802 |             application/json:
-1803 |               schema:
-1804 |                 $ref: "#/components/schemas/Error"
-1805 |           description: Bad Request
-1806 |         "404":
+1785 |         - description: The ID of the Project.
+1786 |           in: path
+1787 |           name: projectId
+1788 |           required: true
+1789 |           schema:
+1790 |             format: uuid
+1791 |             type: string
+1792 |         - description: The ID of the Campaign to update.
+1793 |           in: path
+1794 |           name: campaignId
+1795 |           required: true
+1796 |           schema:
+1797 |             format: uuid
+1798 |             type: string
+1799 |       requestBody:
+1800 |         content:
+1801 |           application/json:
+1802 |             schema:
+1803 |               $ref: "#/components/schemas/Campaign"
+1804 |         required: true
+1805 |       responses:
+1806 |         "200":
 1807 |           content:
 1808 |             application/json:
 1809 |               schema:
-1810 |                 $ref: "#/components/schemas/Error"
-1811 |           description: Mediaplan, Project, or Campaign not found
-1812 |         "422":
-1813 |           content:
-1814 |             application/json:
-1815 |               schema:
-1816 |                 $ref: "#/components/schemas/Error"
-1817 |           description: Unprocessable Entity
-1818 |         "500":
-1819 |           content:
-1820 |             application/json:
-1821 |               schema:
-1822 |                 $ref: "#/components/schemas/Error"
-1823 |           description: Internal Server Error
-1824 | 
-1825 |     delete:
-1826 |       summary: Delete a Campaign
-1827 |       # ... (rest of definition - unchanged) ...
-1828 |       tags:
-1829 |         - Campaigns
-1830 |       parameters:
-1831 |         - description: The ID of the Mediaplan.
-1832 |           in: path
-1833 |           name: mediaplanIdRef
-1834 |           required: true
-1835 |           schema:
-1836 |             format: uuid
-1837 |             type: string
-1838 |         - description: The ID of the Project.
-1839 |           in: path
-1840 |           name: projectId
-1841 |           required: true
-1842 |           schema:
-1843 |             format: uuid
-1844 |             type: string
-1845 |         - description: The ID of the Campaign to delete.
+1810 |                 $ref: "#/components/schemas/Campaign"
+1811 |           description: Campaign updated successfully.
+1812 |         "204":
+1813 |           description: Campaign updated successfully.
+1814 |         "400":
+1815 |           content:
+1816 |             application/json:
+1817 |               schema:
+1818 |                 $ref: "#/components/schemas/Error"
+1819 |           description: Bad Request
+1820 |         "404":
+1821 |           content:
+1822 |             application/json:
+1823 |               schema:
+1824 |                 $ref: "#/components/schemas/Error"
+1825 |           description: Mediaplan, Project, or Campaign not found
+1826 |         "422":
+1827 |           content:
+1828 |             application/json:
+1829 |               schema:
+1830 |                 $ref: "#/components/schemas/Error"
+1831 |           description: Unprocessable Entity
+1832 |         "500":
+1833 |           content:
+1834 |             application/json:
+1835 |               schema:
+1836 |                 $ref: "#/components/schemas/Error"
+1837 |           description: Internal Server Error
+1838 | 
+1839 |     delete:
+1840 |       summary: Delete a Campaign
+1841 |       # ... (rest of definition - unchanged) ...
+1842 |       tags:
+1843 |         - Campaigns
+1844 |       parameters:
+1845 |         - description: The ID of the Mediaplan.
 1846 |           in: path
-1847 |           name: campaignId
+1847 |           name: mediaplanId
 1848 |           required: true
 1849 |           schema:
 1850 |             format: uuid
 1851 |             type: string
-1852 |       responses:
-1853 |         "204":
-1854 |           description: Campaign deleted successfully.
-1855 |         "400":
-1856 |           content:
-1857 |             application/json:
-1858 |               schema:
-1859 |                 $ref: "#/components/schemas/Error"
-1860 |           description: Bad Request
-1861 |         "404":
-1862 |           content:
-1863 |             application/json:
-1864 |               schema:
-1865 |                 $ref: "#/components/schemas/Error"
-1866 |           description: Mediaplan, Project, or Campaign not found
-1867 |         "500":
-1868 |           content:
-1869 |             application/json:
-1870 |               schema:
-1871 |                 $ref: "#/components/schemas/Error"
-1872 |           description: Internal Server Error
-1873 | 
-1874 |   /mediaplans/{mediaplanIdRef}/projects/{projectId}/campaigns/{campaignId}/lineitems:
-1875 |     get:
-1876 |       summary: Get all line items for a given Campaign
-1877 |       # ... (rest of definition - unchanged) ...
-1878 |       tags:
-1879 |         - LineItems
-1880 |       parameters:
-1881 |         - description: The ID of the Mediaplan.
-1882 |           in: path
-1883 |           name: mediaplanIdRef
-1884 |           required: true
-1885 |           schema:
-1886 |             format: uuid
-1887 |             type: string
-1888 |         - description: The ID of the Project.
-1889 |           in: path
-1890 |           name: projectId
-1891 |           required: true
-1892 |           schema:
-1893 |             format: uuid
-1894 |             type: string
-1895 |         - description: The ID of the Campaign.
-1896 |           in: path
-1897 |           name: campaignId
-1898 |           required: true
-1899 |           schema:
-1900 |             format: uuid
-1901 |             type: string
-1902 |       responses:
-1903 |         "200":
-1904 |           content:
-1905 |             application/json:
-1906 |               schema:
-1907 |                 items:
-1908 |                   $ref: "#/components/schemas/LineItem"
-1909 |                 type: array
-1910 |           description: Successful response - returns a list of line items.
-1911 |         "400":
-1912 |           content:
-1913 |             application/json:
-1914 |               schema:
-1915 |                 $ref: "#/components/schemas/Error"
-1916 |           description: Bad Request
-1917 |         "404":
+1852 |         - description: The ID of the Project.
+1853 |           in: path
+1854 |           name: projectId
+1855 |           required: true
+1856 |           schema:
+1857 |             format: uuid
+1858 |             type: string
+1859 |         - description: The ID of the Campaign to delete.
+1860 |           in: path
+1861 |           name: campaignId
+1862 |           required: true
+1863 |           schema:
+1864 |             format: uuid
+1865 |             type: string
+1866 |       responses:
+1867 |         "204":
+1868 |           description: Campaign deleted successfully.
+1869 |         "400":
+1870 |           content:
+1871 |             application/json:
+1872 |               schema:
+1873 |                 $ref: "#/components/schemas/Error"
+1874 |           description: Bad Request
+1875 |         "404":
+1876 |           content:
+1877 |             application/json:
+1878 |               schema:
+1879 |                 $ref: "#/components/schemas/Error"
+1880 |           description: Mediaplan, Project, or Campaign not found
+1881 |         "500":
+1882 |           content:
+1883 |             application/json:
+1884 |               schema:
+1885 |                 $ref: "#/components/schemas/Error"
+1886 |           description: Internal Server Error
+1887 | 
+1888 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}/lineitems:
+1889 |     get:
+1890 |       summary: Get all line items for a given Campaign
+1891 |       tags:
+1892 |         - LineItems
+1893 |       parameters:
+1894 |         - description: The ID of the Mediaplan.
+1895 |           in: path
+1896 |           name: mediaplanId
+1897 |           required: true
+1898 |           schema:
+1899 |             format: uuid
+1900 |             type: string
+1901 |         - description: The ID of the Project.
+1902 |           in: path
+1903 |           name: projectId
+1904 |           required: true
+1905 |           schema:
+1906 |             format: uuid
+1907 |             type: string
+1908 |         - description: The ID of the Campaign.
+1909 |           in: path
+1910 |           name: campaignId
+1911 |           required: true
+1912 |           schema:
+1913 |             format: uuid
+1914 |             type: string
+1915 |       responses:
+1916 |         "200":
+1917 |           description: Successful response - returns a list of line items.
 1918 |           content:
 1919 |             application/json:
 1920 |               schema:
-1921 |                 $ref: "#/components/schemas/Error"
-1922 |           description: Mediaplan, Project, or Campaign not found.
-1923 |         "500":
-1924 |           content:
-1925 |             application/json:
-1926 |               schema:
-1927 |                 $ref: "#/components/schemas/Error"
-1928 |           description: Internal Server Error
-1929 | 
-1930 | components:
-1931 |   schemas:
-1932 |     # ... (Error, ChangelogEntry, EntityReference, MediaplanFilter, MediaplanCreate, PONumber, Mediaplan - unchanged) ...
-1933 |     Error:
-1934 |       properties:
-1935 |         _id:
-1936 |           description: Unique identifier for this error instance.
-1937 |           example: 1@mediaplan-app-2025-6d57887bb4-8t9z7
-1938 |           type: string
-1939 |         code:
-1940 |           description: HTTP status code.
-1941 |           example: 400
-1942 |           type: integer
-1943 |         error:
-1944 |           description: Specific error details.
-1945 |           example: Somethin went wrong.
-1946 |           type: string
-1947 |         message:
-1948 |           description: A general message describing the error category.
-1949 |           example: Bad Request
-1950 |           type: string
-1951 |         timestamp:
-1952 |           description: Timestamp of when the error occurred.
-1953 |           example: "2025-03-11T13:31:06.443086Z"
-1954 |           format: date-time
-1955 |           type: string
-1956 |         version:
-1957 |           description: Application version where the error occurred.
-1958 |           example: mediaplan/0.1.45
-1959 |           type: string
-1960 |       type: object
-1961 |     ChangelogEntry:
-1962 |       properties:
-1963 |         date:
-1964 |           description: Date and time of the changelog entry.
-1965 |           example: "2024-10-27T14:30:00Z"
-1966 |           format: date-time
-1967 |           type: string
-1968 |         text:
-1969 |           description: Description of the change.
-1970 |           example: Added new feature for campaign optimization.
-1971 |           type: string
-1972 |         tool:
-1973 |           description: The tool associated with this changelog entry.
-1974 |           enum:
-1975 |             - CampaignBuilder
-1976 |             - Linkshortener
-1977 |             - Mediaplan
-1978 |           example: CampaignBuilder
-1979 |           type: string
-1980 |       required:
-1981 |         - date
-1982 |         - tool
-1983 |         - text
-1984 |       type: object
-1985 |     EntityReference:
-1986 |       properties:
-1987 |         _id:
-1988 |           description: Unique identifier.
-1989 |           example: user-002
-1990 |           format: uuid
-1991 |           type: string
-1992 |         name:
-1993 |           description: Name of the entity.
-1994 |           example: Alice Smith
-1995 |           type: string
-1996 |       required:
-1997 |         - _id
-1998 |         - name
-1999 |       type: object
-2000 |     MediaplanFilter:
-2001 |       properties:
-2002 |         brand_id:
-2003 |           description: Filter by Brand ID.
-2004 |           format: uuid
-2005 |           type: string
-2006 |         search:
-2007 |           description: Search term for filtering by name or other relevant fields.
-2008 |           type: string
-2009 |         start_date_after:
-2010 |           description: Filter for mediaplans starting after this date.
-2011 |           format: date-time
-2012 |           type: string
-2013 |         start_date_before:
-2014 |           description: Filter for mediaplans starting before this date.
-2015 |           format: date-time
-2016 |           type: string
-2017 |         status:
-2018 |           description: Filter by status.
-2019 |           enum:
-2020 |             - In Planning
-2021 |             - Draft
-2022 |             - For Approval
-2023 |           type: string
-2024 |       type: object
-2025 |     MediaplanCreate:
-2026 |       properties:
-2027 |         brand:
-2028 |           properties:
-2029 |             _id:
-2030 |               description: ID of the associated brand.
-2031 |               format: uuid
-2032 |               type: string
-2033 |           required:
-2034 |             - _id
-2035 |           type: object
-2036 |         budget:
-2037 |           properties:
-2038 |             total:
-2039 |               description: Total budget allocated.
-2040 |               format: double
-2041 |               type: number
-2042 |           type: object
-2043 |         end_date:
-2044 |           description: End date of the Mediaplan.
-2045 |           example: "2024-08-31T18:00:00Z"
-2046 |           format: date-time
-2047 |           type: string
-2048 |         name:
-2049 |           description: Name of the Mediaplan.
-2050 |           example: Summer Campaign 2024
-2051 |           type: string
-2052 |         po_numbers:
-2053 |           items:
-2054 |             $ref: "#/components/schemas/PONumber"
-2055 |           type: array
-2056 |         start_date:
-2057 |           description: Start date of the Mediaplan.
-2058 |           example: "2024-07-15T10:00:00Z"
-2059 |           format: date-time
-2060 |           type: string
-2061 |         status:
-2062 |           description: Status of the Mediaplan.
-2063 |           enum:
-2064 |             - In Planning
-2065 |             - Draft
-2066 |             - For Approval
-2067 |           example: Draft
-2068 |           type: string
-2069 |       required:
-2070 |         - name
-2071 |         - status
-2072 |         - start_date
-2073 |         - end_date
-2074 |         - brand
-2075 |         - budget
-2076 |       type: object
-2077 |     PONumber:
-2078 |       properties:
-2079 |         _id:
-2080 |           description: Unique identifier of the PO Number.
-2081 |           example: po-001
-2082 |           type: string
-2083 |         name:
-2084 |           description: Name or description of the PO Number.
-2085 |           example: "4700551823"
+1921 |                 type: array # Current spec indicates an array response
+1922 |                 items:
+1923 |                   $ref: "#/components/schemas/LineItem"
+1924 |               # --- START EXAMPLE for LineItems ---
+1925 |               example:
+1926 |                 - _id: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d" # UUID
+1927 |                   pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Example Project ID
+1928 |                   # mid and cid might be added by the frontend/store, not present in API response
+1929 |                   lineitemname: "Display_Banner_300x250_Summer_Generic_Prospecting"
+1930 |                   product: "Generic"
+1931 |                   phase: "Prospecting"
+1932 |                   goals: "Awareness"
+1933 |                   targetingtactic: "Contextual"
+1934 |                   creatives: ["creative-001", "creative-002"]
+1935 |                   created_at: "2024-10-20T10:30:00Z"
+1936 |                   updated_at: "2024-10-21T11:00:00Z"
+1937 |                 - _id: "2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e" # UUID
+1938 |                   pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Example Project ID
+1939 |                   lineitemname: "Display_Video_15s_Summer_Generic_Retargeting"
+1940 |                   product: "Generic"
+1941 |                   phase: "Retargeting"
+1942 |                   goals: "Consideration"
+1943 |                   targetingtactic: "Behavioral"
+1944 |                   creatives: ["creative-003"]
+1945 |                   created_at: "2024-10-20T11:00:00Z"
+1946 |                   updated_at: null # Example with null updated_at
+1947 |                 - _id: "3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f" # UUID
+1948 |                   pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479" # Example Project ID
+1949 |                   lineitemname: "Video_30s_Summer_Brand_Awareness"
+1950 |                   product: "Brand"
+1951 |                   phase: "Awareness"
+1952 |                   goals: "Reach"
+1953 |                   targetingtactic: "Demographic"
+1954 |                   creatives: ["creative-004", "creative-005", "creative-006"]
+1955 |                   created_at: "2024-10-22T09:00:00Z"
+1956 |                   updated_at: "2024-10-22T09:00:00Z"
+1957 |               # --- END EXAMPLE ---
+1958 |         "400":
+1959 |           content:
+1960 |             application/json:
+1961 |               schema:
+1962 |                 $ref: "#/components/schemas/Error"
+1963 |           description: Bad Request
+1964 |         "404":
+1965 |           content:
+1966 |             application/json:
+1967 |               schema:
+1968 |                 $ref: "#/components/schemas/Error"
+1969 |           description: Mediaplan, Project, or Campaign not found.
+1970 |         "500":
+1971 |           content:
+1972 |             application/json:
+1973 |               schema:
+1974 |                 $ref: "#/components/schemas/Error"
+1975 |           description: Internal Server Error
+1976 | 
+1977 |   /mediaplans/{mediaplanId}/projects/{projectId}/campaigns/{campaignId}/lineitems/{lineItemId}:
+1978 |     get:
+1979 |       summary: Get a single Line Item by ID
+1980 |       tags:
+1981 |         - LineItems
+1982 |       parameters:
+1983 |         - description: The ID of the Mediaplan.
+1984 |           in: path
+1985 |           name: mediaplanId
+1986 |           required: true
+1987 |           schema:
+1988 |             format: uuid
+1989 |             type: string
+1990 |         - description: The ID of the Project.
+1991 |           in: path
+1992 |           name: projectId
+1993 |           required: true
+1994 |           schema:
+1995 |             format: uuid
+1996 |             type: string
+1997 |         - description: The ID of the Campaign.
+1998 |           in: path
+1999 |           name: campaignId
+2000 |           required: true
+2001 |           schema:
+2002 |             format: uuid
+2003 |             type: string
+2004 |         - description: The ID of the Line Item.
+2005 |           in: path
+2006 |           name: lineItemId
+2007 |           required: true
+2008 |           schema:
+2009 |             format: uuid
+2010 |             type: string
+2011 |       responses:
+2012 |         "200":
+2013 |           description: Successful response - returns the Line Item.
+2014 |           content:
+2015 |             application/json:
+2016 |               schema:
+2017 |                 $ref: "#/components/schemas/LineItem"
+2018 |               example:
+2019 |                 _id: "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d" # Matches example from list
+2020 |                 pid: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+2021 |                 # mid and cid might be added by the frontend/store, not present in API response
+2022 |                 lineitemname: "Display_Banner_300x250_Summer_Generic_Prospecting"
+2023 |                 product: "Generic"
+2024 |                 phase: "Prospecting"
+2025 |                 goals: "Awareness"
+2026 |                 targetingtactic: "Contextual"
+2027 |                 creatives: ["creative-001", "creative-002"]
+2028 |                 created_at: "2024-10-20T10:30:00Z"
+2029 |                 updated_at: "2024-10-21T11:00:00Z"
+2030 |         "400":
+2031 |           description: Bad Request (e.g., invalid ID format)
+2032 |           content:
+2033 |             application/json:
+2034 |               schema:
+2035 |                 $ref: "#/components/schemas/Error"
+2036 |         "404":
+2037 |           description: Mediaplan, Project, Campaign, or Line Item not found.
+2038 |           content:
+2039 |             application/json:
+2040 |               schema:
+2041 |                 $ref: "#/components/schemas/Error"
+2042 |         "500":
+2043 |           description: Internal Server Error
+2044 |           content:
+2045 |             application/json:
+2046 |               schema:
+2047 |                 $ref: "#/components/schemas/Error"
+2048 | 
+2049 | components:
+2050 |   schemas:
+2051 |     # ... (Error, ChangelogEntry, EntityReference, MediaplanFilter, MediaplanCreate, PONumber, Mediaplan - unchanged) ...
+2052 |     Error:
+2053 |       properties:
+2054 |         _id:
+2055 |           description: Unique identifier for this error instance.
+2056 |           example: 1@mediaplan-app-2025-6d57887bb4-8t9z7
+2057 |           type: string
+2058 |         code:
+2059 |           description: HTTP status code.
+2060 |           example: 400
+2061 |           type: integer
+2062 |         error:
+2063 |           description: Specific error details.
+2064 |           example: Somethin went wrong.
+2065 |           type: string
+2066 |         message:
+2067 |           description: A general message describing the error category.
+2068 |           example: Bad Request
+2069 |           type: string
+2070 |         timestamp:
+2071 |           description: Timestamp of when the error occurred.
+2072 |           example: "2025-03-11T13:31:06.443086Z"
+2073 |           format: date-time
+2074 |           type: string
+2075 |         version:
+2076 |           description: Application version where the error occurred.
+2077 |           example: mediaplan/0.1.45
+2078 |           type: string
+2079 |       type: object
+2080 |     ChangelogEntry:
+2081 |       properties:
+2082 |         date:
+2083 |           description: Date and time of the changelog entry.
+2084 |           example: "2024-10-27T14:30:00Z"
+2085 |           format: date-time
 2086 |           type: string
-2087 |         value:
-2088 |           description: The numerical value of the PO Number.
-2089 |           example: 450.0
-2090 |           format: float
-2091 |           type: number
-2092 |       required:
-2093 |         - _id
-2094 |         - name
-2095 |         - value
-2096 |       type: object
-2097 |     Mediaplan:
-2098 |       properties:
-2099 |         _id:
-2100 |           description: Unique identifier of the Mediaplan.
-2101 |           example: f47ac10b-58cc-4372-a567-0e02b2c3d399
-2102 |           format: uuid
-2103 |           type: string
-2104 |         brand:
-2105 |           $ref: "#/components/schemas/EntityReference"
-2106 |           description: Reference to the Brand information.
-2107 |         budget:
-2108 |           description: Budget details for the Mediaplan.
-2109 |           properties:
-2110 |             available:
-2111 |               description: Budget remaining.
-2112 |               example: 374.5
-2113 |               format: double
-2114 |               type: number
-2115 |             total:
-2116 |               description: Total budget allocated.
-2117 |               example: 1250.0
-2118 |               format: double
-2119 |               type: number
-2120 |             used:
-2121 |               description: Amount of budget used.
-2122 |               example: 875.5
-2123 |               format: double
-2124 |               type: number
-2125 |           required:
-2126 |             - total
-2127 |             - used
-2128 |             - available
-2129 |           type: object
-2130 |         created_at:
-2131 |           description: Timestamp of creation.
-2132 |           example: "2024-11-28T14:15:00Z"
-2133 |           format: date-time
-2134 |           type: string
-2135 |         created_by:
-2136 |           $ref: "#/components/schemas/EntityReference"
-2137 |           description: Reference to the user who created the Mediaplan.
-2138 |         end_date:
-2139 |           description: End date of the Mediaplan.
-2140 |           example: "2025-03-25T00:00:00Z"
-2141 |           format: date-time
+2087 |         text:
+2088 |           description: Description of the change.
+2089 |           example: Added new feature for campaign optimization.
+2090 |           type: string
+2091 |         tool:
+2092 |           description: The tool associated with this changelog entry.
+2093 |           enum:
+2094 |             - CampaignBuilder
+2095 |             - Linkshortener
+2096 |             - Mediaplan
+2097 |           example: CampaignBuilder
+2098 |           type: string
+2099 |       required:
+2100 |         - date
+2101 |         - tool
+2102 |         - text
+2103 |       type: object
+2104 |     EntityReference:
+2105 |       properties:
+2106 |         _id:
+2107 |           description: Unique identifier.
+2108 |           example: user-002
+2109 |           format: uuid
+2110 |           type: string
+2111 |         name:
+2112 |           description: Name of the entity.
+2113 |           example: Alice Smith
+2114 |           type: string
+2115 |       required:
+2116 |         - _id
+2117 |         - name
+2118 |       type: object
+2119 |     MediaplanFilter:
+2120 |       properties:
+2121 |         brand_id:
+2122 |           description: Filter by Brand ID.
+2123 |           format: uuid
+2124 |           type: string
+2125 |         search:
+2126 |           description: Search term for filtering by name or other relevant fields.
+2127 |           type: string
+2128 |         start_date_after:
+2129 |           description: Filter for mediaplans starting after this date.
+2130 |           format: date-time
+2131 |           type: string
+2132 |         start_date_before:
+2133 |           description: Filter for mediaplans starting before this date.
+2134 |           format: date-time
+2135 |           type: string
+2136 |         status:
+2137 |           description: Filter by status.
+2138 |           enum:
+2139 |             - In Planning
+2140 |             - Draft
+2141 |             - For Approval
 2142 |           type: string
-2143 |         name:
-2144 |           description: Name of the Mediaplan.
-2145 |           example: Campaign Launch Q1
-2146 |           type: string
-2147 |         po_numbers:
-2148 |           description: List of associated Purchase Order numbers.
-2149 |           example:
-2150 |             - _id: po-001
-2151 |               name: "4700551823"
-2152 |               value: 450.0
-2153 |             - _id: po-002
-2154 |               name: "4700551911"
-2155 |               value: 425.5
-2156 |           items:
-2157 |             $ref: "#/components/schemas/PONumber"
-2158 |           type: array
-2159 |         start_date:
-2160 |           description: Start date of the Mediaplan.
-2161 |           example: "2025-02-10T00:00:00Z"
-2162 |           format: date-time
-2163 |           type: string
-2164 |         status:
-2165 |           description: Status of the Mediaplan.
-2166 |           enum:
-2167 |             - In Planning
-2168 |             - Draft
-2169 |             - For Approval
-2170 |           example: In Planning
-2171 |           type: string
-2172 |         updated_at:
-2173 |           description: Timestamp of last update.
-2174 |           example: "2024-12-05T09:30:00Z"
-2175 |           format: date-time
-2176 |           type: string
-2177 |       required:
-2178 |         - _id
-2179 |         - name
-2180 |         - status
-2181 |         - start_date
-2182 |         - end_date
-2183 |         - brand
-2184 |         - budget
-2185 |         - created_by
-2186 |         - created_at
-2187 |         - updated_at
-2188 |       type: object
-2189 | 
-2190 |     Project:
-2191 |       type: object
-2192 |       properties:
-2193 |         _id:
-2194 |           type: string
-2195 |           format: uuid
-2196 |           description: Unique identifier of the Project.
-2197 |         abbreviation:
-2198 |           type: string
-2199 |           description: Abbreviation for the project.
-2200 |         created_at:
+2143 |       type: object
+2144 |     MediaplanCreate:
+2145 |       properties:
+2146 |         brand:
+2147 |           properties:
+2148 |             _id:
+2149 |               description: ID of the associated brand.
+2150 |               format: uuid
+2151 |               type: string
+2152 |           required:
+2153 |             - _id
+2154 |           type: object
+2155 |         budget:
+2156 |           properties:
+2157 |             total:
+2158 |               description: Total budget allocated.
+2159 |               format: double
+2160 |               type: number
+2161 |           type: object
+2162 |         end_date:
+2163 |           description: End date of the Mediaplan.
+2164 |           example: "2024-08-31T18:00:00Z"
+2165 |           format: date-time
+2166 |           type: string
+2167 |         name:
+2168 |           description: Name of the Mediaplan.
+2169 |           example: Summer Campaign 2024
+2170 |           type: string
+2171 |         po_numbers:
+2172 |           items:
+2173 |             $ref: "#/components/schemas/PONumber"
+2174 |           type: array
+2175 |         start_date:
+2176 |           description: Start date of the Mediaplan.
+2177 |           example: "2024-07-15T10:00:00Z"
+2178 |           format: date-time
+2179 |           type: string
+2180 |         status:
+2181 |           description: Status of the Mediaplan.
+2182 |           enum:
+2183 |             - In Planning
+2184 |             - Draft
+2185 |             - For Approval
+2186 |           example: Draft
+2187 |           type: string
+2188 |       required:
+2189 |         - name
+2190 |         - status
+2191 |         - start_date
+2192 |         - end_date
+2193 |         - brand
+2194 |         - budget
+2195 |       type: object
+2196 |     PONumber:
+2197 |       properties:
+2198 |         _id:
+2199 |           description: Unique identifier of the PO Number.
+2200 |           example: po-001
 2201 |           type: string
-2202 |           format: date-time
-2203 |           description: Project creation timestamp.
-2204 |         budget:
-2205 |           type: object
-2206 |           description: Budget information for the project.
-2207 |           properties:
-2208 |             used:
-2209 |               type: number
-2210 |               format: float
-2211 |               example: 12500.50
-2212 |               description: The amount of budget that has been used.
-2213 |             total:
-2214 |               type: number
-2215 |               format: float
-2216 |               example: 50000.00
-2217 |               description: The total budget amount.
-2218 |             available:
-2219 |               type: number
-2220 |               format: float
-2221 |               example: 37499.50
-2222 |               description: The remaining available budget.
-2223 |         example:
-2224 |           used: 12500.50
-2225 |           total: 50000.00
-2226 |           available: 37499.50
-2227 |         default_vars:
-2228 |           type: object
-2229 |           description: Default variables for the project.
-2230 |           properties:
-2231 |             targeturls:
-2232 |               type: string
-2233 |               nullable: true
-2234 |               description: Target URLs (can be null).
-2235 |             subsegment:
-2236 |               type: string
-2237 |               nullable: true
-2238 |               description: Subsegment (can be null).
-2239 |             campaigntype:
-2240 |               type: string
-2241 |               nullable: true
-2242 |               description: Campaign type (can be null).
-2243 |             language:
-2244 |               type: string
-2245 |               nullable: true
-2246 |               description: Language (can be null).
-2247 |             campaigndetail:
-2248 |               type: string
-2249 |               nullable: true
-2250 |               description: Campaign detail (can be null).
-2251 |             adtype:
-2252 |               type: string
-2253 |               nullable: true
-2254 |               description: Ad type (can be null).
-2255 |             dimension:
-2256 |               type: string
-2257 |               nullable: true
-2258 |               description: Dimension (can be null).
-2259 |         descriptive_vars:
-2260 |           type: object
-2261 |           description: Descriptive variables for the project.
-2262 |           properties:
-2263 |             brand:
-2264 |               type: string
-2265 |               description: Brand name.
-2266 |             country:
-2267 |               type: string
-2268 |               description: Country code.
-2269 |             bmwponumber:
-2270 |               type: string
-2271 |               description: BMW purchase order number.
-2272 |             adobecampaignname:
-2273 |               type: string
-2274 |               description: Adobe campaign name.
-2275 |             subsegment:
-2276 |               type: string
-2277 |               description: Subsegment.
-2278 |             campaigntype:
-2279 |               type: string
-2280 |               description: Campaign type.
-2281 |             projectname:
-2282 |               type: string
-2283 |               description: Project name.
-2284 |             year:
-2285 |               type: integer
-2286 |               description: Year.
-2287 |         is_locked:
-2288 |           type: boolean
-2289 |           description: Indicates if the project is locked.
-2290 |         labels:
-2291 |           type: array
-2292 |           items:
-2293 |             type: string
-2294 |           description: Labels associated with project
-2295 |         lock_state:
-2296 |           type: integer
-2297 |           description: Lock state of the project.
-2298 |         owner:
-2299 |           type: string
-2300 |           description: Owner of the project.
-2301 |         updated_at:
-2302 |           type: string
-2303 |           format: date-time
-2304 |           nullable: true
-2305 |           description: Project last update timestamp.
-2306 |         uploaded_at:
-2307 |           type: string
-2308 |           format: date-time
-2309 |           description: Project upload timestamp.
-2310 |         # Optional fields based on mock data (add here if part of schema)
-2311 |         duration:
-2312 |           type: object
-2313 |           properties:
-2314 |             start_date:
-2315 |               type: string
-2316 |               format: date-time
-2317 |             end_date:
-2318 |               type: string
-2319 |               format: date-time
-2320 |             formatted:
-2321 |               type: string
-2322 |         detail:
-2323 |           type: string
-2324 |           nullable: true
-2325 |       required:
-2326 |         - _id
-2327 |         - abbreviation
-2328 |         - created_at
-2329 |         - default_vars
-2330 |         - descriptive_vars
-2331 |         - is_locked
-2332 |         - lock_state
-2333 |         # Removed message, version, timestamp from required
-2334 |         - owner
-2335 |         - uploaded_at
-2336 |         # updated_at is nullable
-2337 | 
-2338 |     ProjectCreate:
-2339 |       # ... (unchanged) ...
-2340 |       properties:
-2341 |         default_vars:
-2342 |           description: Default variables for the project.
-2343 |           properties:
-2344 |             adtype:
-2345 |               description: Ad type (can be null).
-2346 |               nullable: true
-2347 |               type: string
-2348 |             campaigndetail:
-2349 |               description: Campaign detail (can be null).
-2350 |               nullable: true
+2202 |         name:
+2203 |           description: Name or description of the PO Number.
+2204 |           example: "4700551823"
+2205 |           type: string
+2206 |         value:
+2207 |           description: The numerical value of the PO Number.
+2208 |           example: 450.0
+2209 |           format: float
+2210 |           type: number
+2211 |       required:
+2212 |         - _id
+2213 |         - name
+2214 |         - value
+2215 |       type: object
+2216 |     Mediaplan:
+2217 |       properties:
+2218 |         _id:
+2219 |           description: Unique identifier of the Mediaplan.
+2220 |           example: f47ac10b-58cc-4372-a567-0e02b2c3d399
+2221 |           format: uuid
+2222 |           type: string
+2223 |         brand:
+2224 |           $ref: "#/components/schemas/EntityReference"
+2225 |           description: Reference to the Brand information.
+2226 |         budget:
+2227 |           description: Budget details for the Mediaplan.
+2228 |           properties:
+2229 |             available:
+2230 |               description: Budget remaining.
+2231 |               example: 374.5
+2232 |               format: double
+2233 |               type: number
+2234 |             total:
+2235 |               description: Total budget allocated.
+2236 |               example: 1250.0
+2237 |               format: double
+2238 |               type: number
+2239 |             used:
+2240 |               description: Amount of budget used.
+2241 |               example: 875.5
+2242 |               format: double
+2243 |               type: number
+2244 |           required:
+2245 |             - total
+2246 |             - used
+2247 |             - available
+2248 |           type: object
+2249 |         created_at:
+2250 |           description: Timestamp of creation.
+2251 |           example: "2024-11-28T14:15:00Z"
+2252 |           format: date-time
+2253 |           type: string
+2254 |         created_by:
+2255 |           $ref: "#/components/schemas/EntityReference"
+2256 |           description: Reference to the user who created the Mediaplan.
+2257 |         end_date:
+2258 |           description: End date of the Mediaplan.
+2259 |           example: "2025-03-25T00:00:00Z"
+2260 |           format: date-time
+2261 |           type: string
+2262 |         name:
+2263 |           description: Name of the Mediaplan.
+2264 |           example: Campaign Launch Q1
+2265 |           type: string
+2266 |         po_numbers:
+2267 |           description: List of associated Purchase Order numbers.
+2268 |           example:
+2269 |             - _id: po-001
+2270 |               name: "4700551823"
+2271 |               value: 450.0
+2272 |             - _id: po-002
+2273 |               name: "4700551911"
+2274 |               value: 425.5
+2275 |           items:
+2276 |             $ref: "#/components/schemas/PONumber"
+2277 |           type: array
+2278 |         start_date:
+2279 |           description: Start date of the Mediaplan.
+2280 |           example: "2025-02-10T00:00:00Z"
+2281 |           format: date-time
+2282 |           type: string
+2283 |         status:
+2284 |           description: Status of the Mediaplan.
+2285 |           enum:
+2286 |             - In Planning
+2287 |             - Draft
+2288 |             - For Approval
+2289 |           example: In Planning
+2290 |           type: string
+2291 |         updated_at:
+2292 |           description: Timestamp of last update.
+2293 |           example: "2024-12-05T09:30:00Z"
+2294 |           format: date-time
+2295 |           type: string
+2296 |       required:
+2297 |         - _id
+2298 |         - name
+2299 |         - status
+2300 |         - start_date
+2301 |         - end_date
+2302 |         - brand
+2303 |         - budget
+2304 |         - created_by
+2305 |         - created_at
+2306 |         - updated_at
+2307 |       type: object
+2308 | 
+2309 |     Project:
+2310 |       type: object
+2311 |       properties:
+2312 |         _id:
+2313 |           type: string
+2314 |           format: uuid
+2315 |           description: Unique identifier of the Project.
+2316 |         abbreviation:
+2317 |           type: string
+2318 |           description: Abbreviation for the project.
+2319 |         created_at:
+2320 |           type: string
+2321 |           format: date-time
+2322 |           description: Project creation timestamp.
+2323 |         budget:
+2324 |           type: object
+2325 |           description: Budget information for the project.
+2326 |           properties:
+2327 |             used:
+2328 |               type: number
+2329 |               format: float
+2330 |               example: 12500.50
+2331 |               description: The amount of budget that has been used.
+2332 |             total:
+2333 |               type: number
+2334 |               format: float
+2335 |               example: 50000.00
+2336 |               description: The total budget amount.
+2337 |             available:
+2338 |               type: number
+2339 |               format: float
+2340 |               example: 37499.50
+2341 |               description: The remaining available budget.
+2342 |         example:
+2343 |           used: 12500.50
+2344 |           total: 50000.00
+2345 |           available: 37499.50
+2346 |         default_vars:
+2347 |           type: object
+2348 |           description: Default variables for the project.
+2349 |           properties:
+2350 |             targeturls:
 2351 |               type: string
-2352 |             campaigntype:
-2353 |               description: Campaign type (can be null).
-2354 |               nullable: true
+2352 |               nullable: true
+2353 |               description: Target URLs (can be null).
+2354 |             subsegment:
 2355 |               type: string
-2356 |             dimension:
-2357 |               description: Dimension (can be null).
-2358 |               nullable: true
+2356 |               nullable: true
+2357 |               description: Subsegment (can be null).
+2358 |             campaigntype:
 2359 |               type: string
-2360 |             language:
-2361 |               description: Language (can be null).
-2362 |               nullable: true
+2360 |               nullable: true
+2361 |               description: Campaign type (can be null).
+2362 |             language:
 2363 |               type: string
-2364 |             subsegment:
-2365 |               description: Subsegment (can be null).
-2366 |               nullable: true
+2364 |               nullable: true
+2365 |               description: Language (can be null).
+2366 |             campaigndetail:
 2367 |               type: string
-2368 |             targeturls:
-2369 |               description: Target URLs (can be null).
-2370 |               nullable: true
+2368 |               nullable: true
+2369 |               description: Campaign detail (can be null).
+2370 |             adtype:
 2371 |               type: string
-2372 |           type: object
-2373 |         descriptive_vars:
-2374 |           description: Descriptive variables for the project.
-2375 |           properties:
-2376 |             adobecampaignname:
-2377 |               description: Adobe campaign name.
-2378 |               type: string
-2379 |             bmwponumber:
-2380 |               description: BMW purchase order number.
-2381 |               type: string
+2372 |               nullable: true
+2373 |               description: Ad type (can be null).
+2374 |             dimension:
+2375 |               type: string
+2376 |               nullable: true
+2377 |               description: Dimension (can be null).
+2378 |         descriptive_vars:
+2379 |           type: object
+2380 |           description: Descriptive variables for the project.
+2381 |           properties:
 2382 |             brand:
-2383 |               description: Brand name.
-2384 |               type: string
-2385 |             campaigntype:
-2386 |               description: Campaign type.
-2387 |               type: string
-2388 |             country:
-2389 |               description: Country code.
-2390 |               type: string
-2391 |             subsegment:
-2392 |               description: Subsegment.
-2393 |               type: string
-2394 |           type: object
-2395 |         labels:
-2396 |           description: Labels associated with project
-2397 |           items:
-2398 |             type: string
-2399 |           type: array
-2400 |       type: object
-2401 | 
-2402 |     CampaignCreate:
-2403 |       # ... (unchanged) ...
-2404 |       properties:
-2405 |         campaignname:
-2406 |           description: Name of the campaign.
-2407 |           type: string
-2408 |         campaigndetail:
-2409 |           description: Details about the campaign.
-2410 |           nullable: true
-2411 |           type: string
-2412 |         campaigntype:
-2413 |           description: Type of the campaign.
-2414 |           type: string
-2415 |         language:
-2416 |           description: Language of the campaign.
-2417 |           type: string
-2418 |         pid:
-2419 |           description: ID of the parent Project.  IMPORTANT!
-2420 |           format: uuid
+2383 |               type: string
+2384 |               description: Brand name.
+2385 |             country:
+2386 |               type: string
+2387 |               description: Country code.
+2388 |             bmwponumber:
+2389 |               type: string
+2390 |               description: BMW purchase order number.
+2391 |             adobecampaignname:
+2392 |               type: string
+2393 |               description: Adobe campaign name.
+2394 |             subsegment:
+2395 |               type: string
+2396 |               description: Subsegment.
+2397 |             campaigntype:
+2398 |               type: string
+2399 |               description: Campaign type.
+2400 |             projectname:
+2401 |               type: string
+2402 |               description: Project name.
+2403 |             year:
+2404 |               type: integer
+2405 |               description: Year.
+2406 |         is_locked:
+2407 |           type: boolean
+2408 |           description: Indicates if the project is locked.
+2409 |         labels:
+2410 |           type: array
+2411 |           items:
+2412 |             type: string
+2413 |           description: Labels associated with project
+2414 |         lock_state:
+2415 |           type: integer
+2416 |           description: Lock state of the project.
+2417 |         owner:
+2418 |           type: string
+2419 |           description: Owner of the project.
+2420 |         updated_at:
 2421 |           type: string
-2422 |         product:
-2423 |           description: Product associated with the campaign.
-2424 |           type: string
-2425 |         subsegment:
-2426 |           description: Subsegment of the campaign.
-2427 |           type: string
-2428 |         type:
-2429 |           description: Campaign type (e.g., display, video).
-2430 |           type: string
-2431 |       required:
-2432 |         - campaignname
-2433 |         - pid
-2434 |         - campaigntype
-2435 |       type: object
-2436 | 
-2437 |     Campaign:
-2438 |       type: object
-2439 |       properties:
-2440 |         _id:
-2441 |           type: string
-2442 |           format: uuid
-2443 |           description: Unique identifier of the Campaign.
-2444 |         campaignname:
-2445 |           type: string
-2446 |           description: Name of the campaign.
-2447 |         pid:
-2448 |           type: string
-2449 |           format: uuid
-2450 |           description: ID of the parent Project.
-2451 |         campaigndetail:
-2452 |           type: string
-2453 |           nullable: true
-2454 |           description: Details about the campaign.
-2455 |         campaigntype:
-2456 |           type: string
-2457 |           description: Type of the campaign.
-2458 |         created_at:
-2459 |           type: string
-2460 |           format: date-time
-2461 |           description: Campaign creation timestamp.
-2462 |         language:
-2463 |           type: string
-2464 |           description: Language of the campaign.
-2465 |         product:
-2466 |           type: string
-2467 |           description: Product associated with the campaign.
-2468 |         subsegment:
-2469 |           type: string
-2470 |           description: Subsegment of the campaign.
-2471 |         type:
-2472 |           type: string
-2473 |           description: Campaign type (e.g., display, video).
-2474 |         updated_at:
-2475 |           type: string
-2476 |           format: date-time
-2477 |           nullable: true
-2478 |           description: Campaign last update timestamp.
-2479 |       required:
-2480 |         - _id
-2481 |         - campaignname
-2482 |         - pid
-2483 |         - campaigntype
-2484 |         - created_at
-2485 |         - language
-2486 |         - product
-2487 |         - subsegment
-2488 |         - type
-2489 | 
-2490 |     LineItem:
-2491 |       # ... (unchanged) ...
-2492 |       properties:
-2493 |         _id:
-2494 |           description: Unique identifier of the Line Item.
-2495 |           format: uuid
-2496 |           type: string
-2497 |         created_at:
-2498 |           description: Line item creation timestamp.
-2499 |           format: date-time
-2500 |           type: string
-2501 |         creatives:
-2502 |           description: Array of creative IDs.
-2503 |           items:
-2504 |             type: string
-2505 |           type: array
-2506 |         goals:
-2507 |           description: Goal of the line item.
-2508 |           type: string
-2509 |         lineitem:
-2510 |           description: (Clarify purpose)
-2511 |           type: string
-2512 |         lineitemname:
-2513 |           description: Name of the line item.
-2514 |           type: string
-2515 |         mid:
-2516 |           description: (Clarify purpose)
-2517 |           type: string
-2518 |         phase:
-2519 |           description: Phase of the line item.
-2520 |           type: string
-2521 |         pid:
-2522 |           description: ID of the parent Project.
-2523 |           format: uuid
-2524 |           type: string
-2525 |         product:
-2526 |           description: Product associated with the line item.
-2527 |           type: string
-2528 |         targetingtactic:
-2529 |           description: Targeting tactic.
-2530 |           type: string
-2531 |         updated_at:
-2532 |           description: Line item last update timestamp.
-2533 |           format: date-time
-2534 |           type: string
-2535 |       required:
-2536 |         - _id
-2537 |         - pid
-2538 |         - lineitemname
-2539 |         - created_at
-2540 |         - goals
-2541 |         - phase
-2542 |         - product
-2543 |         - targetingtactic
-2544 |       type: object
+2422 |           format: date-time
+2423 |           nullable: true
+2424 |           description: Project last update timestamp.
+2425 |         uploaded_at:
+2426 |           type: string
+2427 |           format: date-time
+2428 |           description: Project upload timestamp.
+2429 |         # Optional fields based on mock data (add here if part of schema)
+2430 |         duration:
+2431 |           type: object
+2432 |           properties:
+2433 |             start_date:
+2434 |               type: string
+2435 |               format: date-time
+2436 |             end_date:
+2437 |               type: string
+2438 |               format: date-time
+2439 |             formatted:
+2440 |               type: string
+2441 |         detail:
+2442 |           type: string
+[TRUNCATED]
 ```
 
 src/plugins/vuetify.ts
@@ -4073,32 +4027,38 @@ src/router/index.ts
 19 |         component: () => import('../views/MediaplanDetail.vue'),
 20 |         props: true,
 21 |     },
-22 |     // *** NEUE ROUTE für Project Detail ***
-23 |     {
-24 |         path: '/mediaplans/:mediaplanIdRef/projects/:projectId',
-25 |         name: 'ProjectDetail',
-26 |         component: () => import('../views/ProjectDetail.vue'), // Pfad zur neuen Komponente prüfen
-27 |         props: true, // Übergibt mediaplanIdRef und projectId als Props
-28 |         meta: { requiresAuth: true } // Annahme: Detail erfordert Login
-29 |     },
-30 |     // Additional routes here
-31 | ]
-32 | 
-33 | const router = createRouter({
-34 |     history: createWebHashHistory(import.meta.env.BASE_URL),
-35 |     routes,
-36 | })
-37 | router.beforeEach((to, from, next) => {
-38 | /*    const authStore = useAuthStore()
-39 |     console.log('Navigation Guard:', to.name, authStore.isAuthenticated)
-40 |     if (to.name !== 'Login' && !authStore.isAuthenticated) {
-41 |         next({name: 'Login'})
-42 |     } else {
-43 |         next()
-44 |     }*/
-45 |     next()
-46 | })
-47 | export default router
+22 |     {
+23 |         path: '/mediaplans/:mediaplanId/projects/:projectId',
+24 |         name: 'ProjectDetail',
+25 |         component: () => import('../views/ProjectDetail.vue'), // Pfad zur neuen Komponente prüfen
+26 |         props: true, // Übergibt mediaplanId und projectId als Props
+27 |         //meta: { requiresAuth: true } // Annahme: Detail erfordert Login
+28 |     },
+29 |     {
+30 |         path: '/mediaplans/:mediaplanId/projects/:projectId/campaigns/:campaignId/lineitems', // Pfad anpassen nach Bedarf
+31 |         name: 'LineitemDetail',
+32 |         component: () => import('../views/CampaignDetail.vue'), // Pfad zur neuen Komponente
+33 |         props: true, // Übergibt mediaplanId, projectId und campaignId als Props
+34 |         //meta: { requiresAuth: true } // Annahme: Detail erfordert Login
+35 |     },
+36 |     // Additional routes here
+37 | ]
+38 | 
+39 | const router = createRouter({
+40 |     history: createWebHashHistory(import.meta.env.BASE_URL),
+41 |     routes,
+42 | })
+43 | router.beforeEach((to, from, next) => {
+44 | /*    const authStore = useAuthStore()
+45 |     console.log('Navigation Guard:', to.name, authStore.isAuthenticated)
+46 |     if (to.name !== 'Login' && !authStore.isAuthenticated) {
+47 |         next({name: 'Login'})
+48 |     } else {
+49 |         next()
+50 |     }*/
+51 |     next()
+52 | })
+53 | export default router
 ```
 
 src/stores/auth.ts
@@ -4254,8 +4214,8 @@ src/stores/campaignStore.ts
 31 |      * Lädt eine Liste von Kampagnen für ein bestimmtes Projekt innerhalb eines Mediaplans.
 32 |      * Geht von einer paginierten API-Antwort aus.
 33 |      */
-34 |     async function fetchCampaigns(mediaplanIdRef: string, projectId: string) {
-35 |         if (!mediaplanIdRef || !projectId) {
+34 |     async function fetchCampaigns(mediaplanId: string, projectId: string) {
+35 |         if (!mediaplanId || !projectId) {
 36 |             error.value = "Mediaplan ID or Project ID is missing for fetching campaigns.";
 37 |             console.error(error.value);
 38 |             campaigns.value = [];
@@ -4265,7 +4225,7 @@ src/stores/campaignStore.ts
 42 |             return;
 43 |         }
 44 |         // Store context for pagination actions
-45 |         currentContextMediaplanId.value = mediaplanIdRef;
+45 |         currentContextMediaplanId.value = mediaplanId;
 46 |         currentContextProjectId.value = projectId;
 47 | 
 48 |         isLoading.value = true;
@@ -4278,7 +4238,7 @@ src/stores/campaignStore.ts
 55 |             // queryParams.append('sort', sortBy.value);
 56 |             // queryParams.append('order', sortOrder.value);
 57 | 
-58 |             const url = `/mediaplans/${mediaplanIdRef}/projects/${projectId}/campaigns?${queryParams.toString()}`;
+58 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns?${queryParams.toString()}`;
 59 | 
 60 |             // Annahme: API liefert paginierte Antwort
 61 |             const response = await customFetch(url) as CampaignListResponse;
@@ -4320,8 +4280,8 @@ src/stores/campaignStore.ts
 97 |     /**
 98 |      * Lädt die Details einer einzelnen Kampagne.
 99 |      */
-100 |     async function fetchCampaign(mediaplanIdRef: string, projectId: string, campaignId: string) {
-101 |         if (!mediaplanIdRef || !projectId || !campaignId) {
+100 |     async function fetchCampaign(mediaplanId: string, projectId: string, campaignId: string) {
+101 |         if (!mediaplanId || !projectId || !campaignId) {
 102 |             error.value = "Missing IDs to fetch campaign details.";
 103 |             console.error(error.value);
 104 |             selectedCampaign.value = null;
@@ -4331,7 +4291,7 @@ src/stores/campaignStore.ts
 108 |         error.value = null;
 109 |         selectedCampaign.value = null; // Reset
 110 |         try {
-111 |             const url = `/mediaplans/${mediaplanIdRef}/projects/${projectId}/campaigns/${campaignId}`;
+111 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}`;
 112 |             selectedCampaign.value = await customFetch(url) as Campaign;
 113 |         } catch (err) {
 114 |             error.value = err instanceof Error ? err.message : 'Failed to load campaign details';
@@ -4374,8 +4334,8 @@ src/stores/campaignStore.ts
 151 |     /**
 152 |      * Erstellt eine neue Kampagne.
 153 |      */
-154 |     async function createCampaign(mediaplanIdRef: string, projectId: string, campaignData: CampaignCreate): Promise<Campaign | null> {
-155 |         if (!mediaplanIdRef || !projectId) {
+154 |     async function createCampaign(mediaplanId: string, projectId: string, campaignData: CampaignCreate): Promise<Campaign | null> {
+155 |         if (!mediaplanId || !projectId) {
 156 |             error.value = "Missing IDs for creating campaign.";
 157 |             console.error(error.value);
 158 |             return null;
@@ -4383,7 +4343,7 @@ src/stores/campaignStore.ts
 160 |         isLoading.value = true;
 161 |         error.value = null;
 162 |         try {
-163 |             const url = `/mediaplans/${mediaplanIdRef}/projects/${projectId}/campaigns`;
+163 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns`;
 164 |             const newCampaign = await customFetch(url, {
 165 |                 method: 'POST',
 166 |                 headers: {'Content-Type': 'application/json'},
@@ -4391,7 +4351,7 @@ src/stores/campaignStore.ts
 168 |             }) as Campaign;
 169 | 
 170 |             // Optional: Liste neu laden oder die neue Kampagne manuell hinzufügen
-171 |             // fetchCampaigns(mediaplanIdRef, projectId); // Einfachste Variante
+171 |             // fetchCampaigns(mediaplanId, projectId); // Einfachste Variante
 172 |             return newCampaign;
 173 | 
 174 |         } catch (err) {
@@ -4542,12 +4502,232 @@ src/stores/createMediaplanStore.ts
 110 | });
 ```
 
+src/stores/lineitemStore.ts
+```
+1 | // src/stores/lineItemStore.ts
+2 | import { defineStore } from 'pinia';
+3 | import { ref } from 'vue';
+4 | import customFetch from '@/helpers/customFetch'; // Adjust path if necessary
+5 | import type {
+6 |     Lineitem,
+7 |     LineitemListResponse,
+8 |     LineitemCreate,
+9 | } from '@/types/lineitem'; // Adjust path if necessary
+10 | 
+11 | export const useLineitemStore = defineStore('lineItem', () => {
+12 |     // --- State ---
+13 |     const lineitems = ref<Lineitem[]>([]);
+14 |     const selectedLineitem = ref<Lineitem | null>(null);
+15 |     const isLoading = ref(false);
+16 |     const error = ref<string | null>(null);
+17 | 
+18 |     // New state variables for pagination and sorting
+19 |     const totalItems = ref(0);
+20 |     const totalPages = ref(0);
+21 |     const currentPage = ref(0);
+22 |     const perPage = ref(10);
+23 |     const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([]);
+24 | 
+25 |     // Store context IDs for potential reload actions or context checking
+26 |     const currentContextMediaplanId = ref<string | null>(null);
+27 |     const currentContextProjectId = ref<string | null>(null);
+28 |     const currentContextCampaignId = ref<string | null>(null);
+29 | 
+30 |     // --- Actions ---
+31 | 
+32 |     /**
+33 |      * Fetches the list of Line Items for a specific Campaign within a Project and Mediaplan.
+34 |      * NOTE: Based on the current Swagger spec, this endpoint returns an array, not a paginated response.
+35 |      * If the API changes to support pagination, this function and the state need updates.
+36 |      * @param {string} mediaplanId - The ID of the Mediaplan.
+37 |      * @param {string} projectId - The ID of the Project.
+38 |      * @param {string} campaignId - The ID of the Campaign.
+39 |      */
+40 |     async function fetchLineitems(
+41 |         mediaplanId: string,
+42 |         projectId: string,
+43 |         campaignId: string
+44 |     ) {
+45 |         if (!mediaplanId || !projectId || !campaignId) {
+46 |             error.value =
+47 |                 'Mediaplan ID, Project ID, or Campaign ID is missing for fetching line items.';
+48 |             console.error(error.value);
+49 |             lineitems.value = [];
+50 |             return;
+51 |         }
+52 | 
+53 |         // Store context
+54 |         currentContextMediaplanId.value = mediaplanId;
+55 |         currentContextProjectId.value = projectId;
+56 |         currentContextCampaignId.value = campaignId;
+57 | 
+58 |         isLoading.value = true;
+59 |         error.value = null;
+60 |         try {
+61 |             // Construct the API URL
+62 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems`;
+63 | 
+64 |             // Make the API call
+65 |             // Expecting LineitemListResponse which is currently typed as Lineitem[]
+66 |             const response = (await customFetch(url)) as LineitemListResponse;
+67 | 
+68 |             // Validate response format (expecting an array)
+69 |             if (Array.isArray(response)) {
+70 |                 lineitems.value = response.map(item => ({
+71 |                     ...item,
+72 |                     // Add context IDs if not provided by API but needed locally
+73 |                     mid: mediaplanId,
+74 |                     pid: projectId, // pid should already be there from API
+75 |                     cid: campaignId
+76 |                 }));
+77 |                 totalItems.value = response.length;
+78 |                 totalPages.value = 1; // No real pagination yet
+79 |                 currentPage.value = 0;
+80 |             } else {
+81 |                 console.warn(
+82 |                     'Received unexpected response format for line items, expected an array.',
+83 |                     response
+84 |                 );
+85 |                 lineitems.value = []; // Reset state on unexpected format
+86 |                 error.value = 'Unexpected response format from server.';
+87 |             }
+88 |         } catch (err) {
+89 |             error.value =
+90 |                 err instanceof Error
+91 |                     ? err.message
+92 |                     : 'An error occurred while fetching line items';
+93 |             console.error('Error fetching line items:', err);
+94 |             lineitems.value = []; // Reset state on error
+95 |         } finally {
+96 |             isLoading.value = false;
+97 |         }
+98 |     }
+99 | 
+100 |     /**
+101 |      * Fetches details for a single Line Item. (Optional but recommended)
+102 |      * @param {string} mediaplanId - The ID of the Mediaplan.
+103 |      * @param {string} projectId - The ID of the Project.
+104 |      * @param {string} campaignId - The ID of the Campaign.
+105 |      * @param {string} lineItemId - The ID of the Line Item to fetch.
+106 |      */
+107 |     async function fetchLineitem(
+108 |         mediaplanId: string,
+109 |         projectId: string,
+110 |         campaignId: string,
+111 |         lineItemId: string
+112 |     ) {
+113 |         if (!mediaplanId || !projectId || !campaignId || !lineItemId) {
+114 |             error.value = 'Missing IDs to fetch line item details.';
+115 |             console.error(error.value);
+116 |             selectedLineitem.value = null;
+117 |             return;
+118 |         }
+119 |         isLoading.value = true; // Consider a separate loading state if needed
+120 |         error.value = null;
+121 |         selectedLineitem.value = null; // Reset before fetching
+122 |         try {
+123 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems/${lineItemId}`;
+124 |             const response = (await customFetch(url)) as Lineitem;
+125 |             selectedLineitem.value = {
+126 |                 ...response,
+127 |                 // Add context IDs if not provided by API but needed locally
+128 |                 mid: mediaplanId,
+129 |                 pid: projectId, // pid should already be there from API
+130 |                 cid: campaignId
+131 |             };
+132 |         } catch (err) {
+133 |             error.value =
+134 |                 err instanceof Error
+135 |                     ? err.message
+136 |                     : 'Failed to load line item details';
+137 |             console.error(`Error fetching line item ${lineItemId}:`, err);
+138 |             selectedLineitem.value = null;
+139 |         } finally {
+140 |             isLoading.value = false;
+141 |         }
+142 |     }
+143 | 
+144 |     /**
+145 |      * Creates a new Line Item for a specific Campaign. (Optional but recommended)
+146 |      * @param {string} mediaplanId - The ID of the Mediaplan.
+147 |      * @param {string} projectId - The ID of the Project.
+148 |      * @param {string} campaignId - The ID of the Campaign.
+149 |      * @param {LineitemCreate} lineItemData - The data for the new Line Item.
+150 |      * @returns {Promise<Lineitem | null>} The created Line Item or null on failure.
+151 |      */
+152 |     async function createLineitem(
+153 |         mediaplanId: string,
+154 |         projectId: string,
+155 |         campaignId: string,
+156 |         lineItemData: LineitemCreate
+157 |     ): Promise<Lineitem | null> {
+158 |         if (!mediaplanId || !projectId || !campaignId) {
+159 |             error.value = 'Missing IDs for creating line item.';
+160 |             console.error(error.value);
+161 |             return null;
+162 |         }
+163 |         isLoading.value = true; // Consider a separate loading state
+164 |         error.value = null;
+165 |         try {
+166 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems`;
+167 |             const newLinteItem = (await customFetch(url, {
+168 |                 method: 'POST',
+169 |                 headers: { 'Content-Type': 'application/json' },
+170 |                 body: JSON.stringify(lineItemData),
+171 |             })) as Lineitem;
+172 | 
+173 |             // Optional: Refetch the list or manually add the new item
+174 |             // For simplicity, refetching is often easier unless performance is critical
+175 |             await fetchLineitems(mediaplanId, projectId, campaignId);
+176 | 
+177 |             return {
+178 |                 ...newLinteItem,
+179 |                 // Add context IDs if not provided by API but needed locally
+180 |                 mid: mediaplanId,
+181 |                 pid: projectId, // pid should already be there from API
+182 |                 cid: campaignId
+183 |             };
+184 |         } catch (err) {
+185 |             error.value =
+186 |                 err instanceof Error ? err.message : 'Failed to create line item';
+187 |             console.error('Error creating line item:', err);
+188 |             return null;
+189 |         } finally {
+190 |             isLoading.value = false;
+191 |         }
+192 |     }
+193 | 
+194 |     // --- Return Store API ---
+195 |     return {
+196 |         // State
+197 |         lineitems,
+198 |         selectedLineitem,
+199 |         isLoading,
+200 |         error,
+201 |         currentContextMediaplanId, // Expose context if needed externally
+202 |         currentContextProjectId,
+203 |         currentContextCampaignId,
+204 | 
+205 |         totalItems,
+206 |         totalPages,
+207 |         currentPage,
+208 |         perPage,
+209 |         sortBy,
+210 | 
+211 |         // Actions
+212 |         fetchLineitems,
+213 |         fetchLineitem, // Expose if needed
+214 |         createLineitem, // Expose if needed
+215 |     };
+216 | });
+```
+
 src/stores/mediaplanStore.ts
 ```
 1 | // File: src/stores/mediaplanStore.ts
-2 | import { defineStore } from 'pinia';
-3 | import { ref, computed } from 'vue';
-4 | import customFetch from '@/helpers/customFetch';
+2 | import {defineStore} from 'pinia';
+3 | import {ref, computed} from 'vue';
+4 | import  customFetch from '@/helpers/customFetch';
 5 | import type {
 6 |     FilterSources,
 7 |     Mediaplan,
@@ -4560,12 +4740,12 @@ src/stores/mediaplanStore.ts
 14 |     // --- State ---
 15 |     const sources = ref<FilterSources>({
 16 |         brands: [
-17 |             { _id: 'bmw', name: 'BMW' },
-18 |             { _id: 'mini', name: 'MINI' }
+17 |             {_id: 'bmw', name: 'BMW'},
+18 |             {_id: 'mini', name: 'MINI'}
 19 |         ],
 20 |         countries: [
-21 |             { abbreviation: 'DE', value: 'Germany', category: null },
-22 |             { abbreviation: 'AT', value: 'Austria', category: null },
+21 |             {abbreviation: 'DE', value: 'Germany', category: null},
+22 |             {abbreviation: 'AT', value: 'Austria', category: null},
 23 |             // …other mock countries…
 24 |         ],
 25 |         subsegments: [],
@@ -4573,21 +4753,21 @@ src/stores/mediaplanStore.ts
 27 |         campaigntypes: [],
 28 |         languages: []
 29 |     });
-30 |     const mediaplans  = ref<Mediaplan[]>([]);
-31 |     const isLoading   = ref(false);
-32 |     const error       = ref<string | null>(null);
+30 |     const mediaplans = ref<Mediaplan[]>([]);
+31 |     const isLoading = ref(false);
+32 |     const error = ref<string | null>(null);
 33 |     const selectedMediaplan = ref<Mediaplan | null>(null)
 34 | 
 35 | 
 36 |     // Pagination
-37 |     const totalItems  = ref(0);
-38 |     const totalPages  = ref(0);
+37 |     const totalItems = ref(0);
+38 |     const totalPages = ref(0);
 39 |     const currentPage = ref(0);
-40 |     const perPage     = ref(10);
+40 |     const perPage = ref(10);
 41 | 
 42 |     // Filters & Sorting
-43 |     const filters   = ref<MediaplanFilter>({ search: '', status: '' });
-44 |     const sortBy    = ref('updated_at');
+43 |     const filters = ref<MediaplanFilter>({search: '', status: ''});
+44 |     const sortBy = ref('updated_at');
 45 |     const sortOrder = ref<'asc' | 'desc'>('desc');
 46 | 
 47 |     const hasFilters = computed(() =>
@@ -4606,12 +4786,12 @@ src/stores/mediaplanStore.ts
 60 |         try {
 61 |             const res = await customFetch('/mediaplans/sources?type=overview') as SourcesResponse;
 62 |             sources.value = {
-63 |                 brands:       res.data.brand       ?? [],
-64 |                 countries:    res.data.country     ?? [],
-65 |                 subsegments:  res.data.subsegment  ?? [],
-66 |                 products:     res.data.product     ?? [],
-67 |                 campaigntypes:res.data.campaigntype ?? [],
-68 |                 languages:    res.data.language    ?? []
+63 |                 brands: res.data.brand ?? [],
+64 |                 countries: res.data.country ?? [],
+65 |                 subsegments: res.data.subsegment ?? [],
+66 |                 products: res.data.product ?? [],
+67 |                 campaigntypes: res.data.campaigntype ?? [],
+68 |                 languages: res.data.language ?? []
 69 |             };
 70 |         } catch {
 71 |             // keep the mock data
@@ -4619,123 +4799,126 @@ src/stores/mediaplanStore.ts
 73 |             isLoading.value = false;
 74 |         }
 75 |     }
-76 | // Inside defineStore in mediaplanStore.ts
-77 | 
+76 | 
+77 | // Inside defineStore in mediaplanStore.ts
 78 | 
-79 |     /**
-80 |      * Fetch a single Mediaplan by ID
-81 |      */
-82 |     async function fetchMediaplan(mediaplanId: string) {
-83 |         isLoading.value = true
-84 |         error.value = null
-85 |         try {
-86 |             const res = await customFetch(`/mediaplans/${mediaplanId}`) as Mediaplan
-87 |             selectedMediaplan.value = res
-88 |         } catch (err) {
-89 |             selectedMediaplan.value = null
-90 |             error.value = err instanceof Error ? err.message : 'Error fetching mediaplan'
-91 |         } finally {
-92 |             isLoading.value = false
-93 |         }
-94 |     }
-95 |     /** Fetch paginated & filtered list */
-96 |     async function fetchMediaplans() {
-97 |         isLoading.value = true;
-98 |         error.value = null;
-99 |         try {
-100 |             const params = new URLSearchParams({
-101 |                 page:        currentPage.value.toString(),
-102 |                 per_page:    perPage.value.toString(),
-103 |                 sort:        sortBy.value,
-104 |                 order:       sortOrder.value,
-105 |             });
-106 | 
-107 |             // apply filters
-108 |             const active: Record<string, any> = {};
-109 |             Object.entries(filters.value).forEach(([k, v]) => {
-110 |                 if (v !== '' && v != null) {
-111 |                     active[k] = v;
-112 |                 }
-113 |             });
-114 |             if (Object.keys(active).length) {
-115 |                 params.append('filter', JSON.stringify(active));
-116 |             }
-117 | 
-118 |             const url = `/mediaplans?${params.toString()}`;
-119 |             const resp = await customFetch(url) as MediaplanListResponse;
-120 | 
-121 |             mediaplans.value  = resp.items;
-122 |             totalItems.value  = resp.total_items;
-123 |             totalPages.value  = resp.total_pages;
-124 |             currentPage.value = resp.current_page;
-125 |         } catch (err) {
-126 |             error.value = err instanceof Error ? err.message : 'Error fetching mediaplans';
-127 |             mediaplans.value = [];
-128 |             totalItems.value = totalPages.value = 0;
-129 |         } finally {
-130 |             isLoading.value = false;
-131 |         }
-132 |     }
-133 | 
-134 |     /** Update a single filter and reload */
-135 |     function setFilter(key: keyof MediaplanFilter, value: unknown) {
-136 |         filters.value = { ...filters.value, [key]: value };
-137 |         currentPage.value = 0;
-138 |         fetchMediaplans();
-139 |     }
-140 | 
-141 |     /** Clear all filters back to defaults */
-142 |     function clearFilters() {
-143 |         filters.value = { search: '', status: '' };
-144 |         currentPage.value = 0;
-145 |         fetchMediaplans();
-146 |     }
-147 | 
-148 |     /** Change sorting and reload */
-149 |     function setSorting(field: string, order: 'asc' | 'desc') {
-150 |         sortBy.value    = field;
-151 |         sortOrder.value = order;
-152 |         fetchMediaplans();
-153 |     }
-154 | 
-155 |     /** Change page and reload */
-156 |     function setPage(page: number) {
-157 |         currentPage.value = page;
-158 |         fetchMediaplans();
-159 |     }
-160 | 
-161 |     /** Initialize both sources and list */
-162 |     function init() {
-163 |         fetchSources();
-164 |         fetchMediaplans();
-165 |     }
-166 | 
-167 |     return {
-168 |         // state
-169 |         sources,
-170 |         mediaplans,
-171 |         selectedMediaplan,
-172 |         isLoading,
-173 |         error,
-174 |         totalItems,
-175 |         totalPages,
-176 |         currentPage,
-177 |         perPage,
-178 |         filters,
-179 |         sortBy,
-180 |         sortOrder,
-181 |         hasFilters,
-182 |         // actions
-183 |         fetchSources,
-184 |         fetchMediaplans,
-185 |         fetchMediaplan,
-186 |         setFilter,
-187 |         clearFilters,
-188 |         setSorting,
-189 |         setPage,
-190 |         init
-191 |     }
-192 | });
+79 | 
+80 |     /**
+81 |      * Fetch a single Mediaplan by ID
+82 |      */
+83 |     async function fetchMediaplan(id: string) {
+84 |         isLoading.value = true
+85 |         error.value = null
+86 |         try {
+87 |             const res = await customFetch(`/mediaplans/${id}`) as Mediaplan
+88 |             selectedMediaplan.value = res
+89 |         } catch (err) {
+90 |             selectedMediaplan.value = null
+91 |             error.value = err instanceof Error ? err.message : 'Error fetching mediaplan'
+92 |         } finally {
+93 |             isLoading.value = false
+94 |         }
+95 |     }
+96 | 
+97 |     /** Fetch paginated & filtered list */
+98 |     async function fetchMediaplans() {
+99 |         isLoading.value = true;
+100 |         error.value = null;
+101 |         try {
+102 |             const params = new URLSearchParams({
+103 |                 page: currentPage.value.toString(),
+104 |                 per_page: perPage.value.toString(),
+105 |                 sort: sortBy.value,
+106 |                 order: sortOrder.value,
+107 |             });
+108 | 
+109 |             // apply filters
+110 |             const active: Record<string, any> = {};
+111 |             Object.entries(filters.value).forEach(([k, v]) => {
+112 |                 if (v !== '' && v != null) {
+113 |                     active[k] = v;
+114 |                 }
+115 |             });
+116 |             if (Object.keys(active).length) {
+117 |                 params.append('filter', JSON.stringify(active));
+118 |             }
+119 | 
+120 |             const url = `/mediaplans`
+121 |             // ?${params.toString()}`;
+122 |             const resp = await customFetch(url) as MediaplanListResponse;
+123 | 
+124 |             mediaplans.value = resp.items;
+125 |             totalItems.value = resp.total_items;
+126 |             totalPages.value = resp.total_pages;
+127 |             currentPage.value = resp.current_page;
+128 |         } catch (err) {
+129 |             error.value = err instanceof Error ? err.message : 'Error fetching mediaplans';
+130 |             mediaplans.value = [];
+131 |             totalItems.value = totalPages.value = 0;
+132 |         } finally {
+133 |             isLoading.value = false;
+134 |         }
+135 |     }
+136 | 
+137 |     /** Update a single filter and reload */
+138 |     function setFilter(key: keyof MediaplanFilter, value: unknown) {
+139 |         filters.value = {...filters.value, [key]: value};
+140 |         currentPage.value = 0;
+141 |         fetchMediaplans();
+142 |     }
+143 | 
+144 |     /** Clear all filters back to defaults */
+145 |     function clearFilters() {
+146 |         filters.value = {search: '', status: ''};
+147 |         currentPage.value = 0;
+148 |         fetchMediaplans();
+149 |     }
+150 | 
+151 |     /** Change sorting and reload */
+152 |     function setSorting(field: string, order: 'asc' | 'desc') {
+153 |         sortBy.value = field;
+154 |         sortOrder.value = order;
+155 |         fetchMediaplans();
+156 |     }
+157 | 
+158 |     /** Change page and reload */
+159 |     function setPage(page: number) {
+160 |         currentPage.value = page;
+161 |         fetchMediaplans();
+162 |     }
+163 | 
+164 |     /** Initialize both sources and list */
+165 |     function init() {
+166 |        //  fetchSources();
+167 |         fetchMediaplans();
+168 |     }
+169 | 
+170 |     return {
+171 |         // state
+172 |         sources,
+173 |         mediaplans,
+174 |         selectedMediaplan,
+175 |         isLoading,
+176 |         error,
+177 |         totalItems,
+178 |         totalPages,
+179 |         currentPage,
+180 |         perPage,
+181 |         filters,
+182 |         sortBy,
+183 |         sortOrder,
+184 |         hasFilters,
+185 |         // actions
+186 |         fetchSources,
+187 |         fetchMediaplans,
+188 |         fetchMediaplan,
+189 |         setFilter,
+190 |         clearFilters,
+191 |         setSorting,
+192 |         setPage,
+193 |         init
+194 |     }
+195 | });
 ```
 
 src/stores/projectStore.ts
@@ -4763,226 +4946,1165 @@ src/stores/projectStore.ts
 21 |     const isLoading = ref(false);
 22 |     const error = ref<string | null>(null);
 23 | 
-24 |     // Options for project form
-25 |     const countries = ref<ProjectCountry[]>([]);
-26 |     const languages = ref<ProjectLanguage[]>([]);
-27 |     const campaignTypes = ref<ProjectCampaignType[]>([]);
-28 |     const phases = ref<ProjectPhase[]>([]);
-29 |     const goals = ref<ProjectGoal[]>([]);
-30 |     const builders = ref<ProjectBuilder[]>([]);
-31 | 
-32 |     // Pagination state
-33 |     const totalItems = ref(0);
-34 |     const totalPages = ref(0);
-35 |     const currentPage = ref(0);
-36 |     const perPage = ref(10);
-37 | 
-38 |     // Getters
-39 |     const getProjectById = computed(() => {
-40 |         return (mediaplanId: string) => projects.value.find(project => project._id === mediaplanId) || null;
-41 |     });
-42 | 
-43 |     // Actions
-44 |     async function fetchProjects(mediaplanIdRef: string) {
-45 |         isLoading.value = true;
-46 |         error.value = null;
-47 | 
-48 |         try {
-49 |             // Build query parameters
-50 |             const queryParams = new URLSearchParams();
-51 |             queryParams.append('page', currentPage.value.toString());
-52 |             queryParams.append('per_page', perPage.value.toString());
-53 | 
-54 |             const url = `/mediaplans/${mediaplanIdRef}/projects?${queryParams.toString()}`;
-55 |             const response = await customFetch(url) as ProjectListResponse;
+24 |     // Added pagination and sorting state variables
+25 |     const totalItems = ref(0);
+26 |     const totalPages = ref(0);
+27 |     const currentPage = ref(0);
+28 |     const perPage = ref(10);
+29 |     const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([]);
+30 | 
+31 |     // Options for project form
+32 |     const countries = ref<ProjectCountry[]>([]);
+33 |     const languages = ref<ProjectLanguage[]>([]);
+34 |     const campaignTypes = ref<ProjectCampaignType[]>([]);
+35 |     const phases = ref<ProjectPhase[]>([]);
+36 |     const goals = ref<ProjectGoal[]>([]);
+37 |     const builders = ref<ProjectBuilder[]>([]);
+38 | 
+39 |     // Getters
+40 |     const getProjectById = computed(() => {
+41 |         return (id: string) => projects.value.find(project => project._id === id) || null;
+42 |     });
+43 | 
+44 |     // Actions
+45 |     async function fetchProjects(mediaplanId: string) {
+46 |         isLoading.value = true;
+47 |         error.value = null;
+48 | 
+49 |         try {
+50 |             // Build query parameters
+51 |             const queryParams = new URLSearchParams();
+52 |             queryParams.append('page', currentPage.value.toString());
+53 |             queryParams.append('per_page', perPage.value.toString());
+54 | 
+55 |             const url = `/mediaplans/${mediaplanId}/projects?${queryParams.toString()}`;
+56 |             const response = await customFetch(url) as ProjectListResponse;
+57 | 
+58 |             projects.value = response.items;
+59 |             totalItems.value = response.total_items;
+60 |             totalPages.value = response.total_pages;
+61 |             currentPage.value = response.current_page;
+62 | 
+63 |         } catch (err) {
+64 |             error.value = err instanceof Error ? err.message : 'An error occurred while fetching projects';
+65 |             console.error('Error fetching projects:', err);
+66 |         } finally {
+67 |             isLoading.value = false;
+68 |         }
+69 |     }
+70 | 
+71 |     async function fetchProject(mediaplanId: string, projectId: string) {
+72 |         isLoading.value = true;
+73 |         error.value = null;
+74 | 
+75 |         try {
+76 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}`;
+77 |             const response = await customFetch(url) as Project;
+78 |             selectedProject.value = response;
+79 |             return response;
+80 |         } catch (err) {
+81 |             error.value = err instanceof Error ? err.message : 'An error occurred while fetching project';
+82 |             console.error('Error fetching project:', err);
+83 |             throw err;
+84 |         } finally {
+85 |             isLoading.value = false;
+86 |         }
+87 |     }
+88 | 
+89 |     async function createProject(projectData: ProjectCreate) {
+90 |         isLoading.value = true;
+91 |         error.value = null;
+92 | 
+93 |         try {
+94 |             const url = `/mediaplans/${projectData.mediaplanId}/projects`;
+95 | 
+96 |             // For our implementation, we need to adjust the data structure to match the API expectations
+97 |             const payload = {
+98 |                 abbreviation: projectData.name,
+99 |                 default_vars: {
+100 |                     targeturls: null,
+101 |                     subsegment: projectData.phase,
+102 |                     campaigntype: projectData.campaignType,
+103 |                     language: projectData.language,
+104 |                     campaigndetail: null,
+105 |                     adtype: "Banner",
+106 |                     dimension: "300x250"
+107 |                 },
+108 |                 descriptive_vars: {
+109 |                     brand: "BMW", // This would typically be dynamic
+110 |                     country: projectData.country.code,
+111 |                     bmwponumber: "PO12345", // This would be dynamic based on the selected PO
+112 |                     adobecampaignname: projectData.name,
+113 |                     subsegment: projectData.phase,
+114 |                     campaigntype: projectData.campaignType,
+115 |                     projectname: projectData.name,
+116 |                     year: new Date().getFullYear()
+117 |                 },
+118 |                 is_locked: false,
+119 |                 labels: [],
+120 |                 lock_state: 0,
+121 |                 owner: "user123", // Would be the current user
+122 |                 message: "OK",
+123 |                 version: "v1"
+124 |             };
+125 | 
+126 |             // For demo purposes, log the payload
+127 |             console.log('Creating project with data:', payload);
+128 | 
+129 |             // In a real implementation, we would send the API request
+130 |             /*
+131 |             const response = await customFetch(url, {
+132 |               method: 'POST',
+133 |               headers: {
+134 |                 'Content-Type': 'application/json',
+135 |               },
+136 |               body: JSON.stringify(payload),
+137 |             });
+138 | 
+139 |             return response._id;
+140 |             */
+141 | 
+142 |             // For demo, simulate successful creation
+143 |             await new Promise(resolve => setTimeout(resolve, 500));
+144 | 
+145 |             // Return a mock project ID
+146 |             return `project-${Date.now()}`;
+147 | 
+148 |         } catch (err) {
+149 |             error.value = err instanceof Error ? err.message : 'An error occurred while creating project';
+150 |             console.error('Error creating project:', err);
+151 |             throw err;
+152 |         } finally {
+153 |             isLoading.value = false;
+154 |         }
+155 |     }
+156 | 
+157 |     async function fetchProjectOptions() {
+158 |         isLoading.value = true;
+159 |         error.value = null;
+160 | 
+161 |         try {
+162 |             // In a real application, we would fetch these from the API
+163 |             // For this demo, we're using mock data
+164 | 
+165 |             // Mock countries
+166 |             countries.value = [
+167 |                 {code: 'AT', name: 'Austria'},
+168 |                 {code: 'DE', name: 'Germany'},
+169 |                 {code: 'PL', name: 'Poland'},
+170 |                 {code: 'US', name: 'United States'}
+171 |             ];
+172 | 
+173 |             // --- CORRECTED Mock languages ---
+174 |             languages.value = [
+175 |                 {code: 'DEU', name: 'German', country_codes: ['DE', 'AT']}, // Added country_codes
+176 |                 {code: 'ENG', name: 'English', country_codes: ['US']},      // Added country_codes
+177 |                 {code: 'POL', name: 'Polish', country_codes: ['PL']}       // Added country_codes
+178 |                 // Add other languages and their associated country codes as needed
+179 |             ];
+180 |             // --- END CORRECTION ---
+181 | 
+182 |             // Mock campaign types
+183 |             campaignTypes.value = [
+184 |                 {id: 'always-on', name: 'Always On'},
+185 |                 {id: 'awareness', name: 'Awareness'},
+186 |                 {id: 'consideration', name: 'Consideration'}
+187 |             ];
+188 | 
+189 |             // Mock phases
+190 |             phases.value = [
+191 |                 {id: 'sea', name: 'SEA'},
+192 |                 {id: 'planning', name: 'Planning'},
+193 |                 {id: 'execution', name: 'Execution'}
+194 |             ];
+195 | 
+196 |             // Mock goals
+197 |             goals.value = [
+198 |                 {id: 'consideration', name: 'Consideration'},
+199 |                 {id: 'configurator', name: 'Configurator'},
+200 |                 {id: 'conversion', name: 'Conversion'}
+201 |             ];
+202 | 
+203 |             // Mock builders
+204 |             builders.value = [
+205 |                 {id: 'sea', name: 'SEA'},
+206 |                 {id: 'social', name: 'Social'},
+207 |                 {id: 'display', name: 'Display'},
+208 |                 {id: '2layer', name: '2Layer'}
+209 |             ];
+210 | 
+211 |         } catch (err) {
+212 |             error.value = err instanceof Error ? err.message : 'An error occurred while fetching project options';
+213 |             console.error('Error fetching project options:', err);
+214 |         } finally {
+215 |             isLoading.value = false;
+216 |         }
+217 |     }
+218 |     return {
+219 |         // State
+220 |         projects,
+221 |         selectedProject,
+222 |         isLoading,
+223 |         error,
+224 |         countries,
+225 |         languages,
+226 |         campaignTypes,
+227 |         phases,
+228 |         goals,
+229 |         builders,
+230 |         totalItems,
+231 |         totalPages,
+232 |         currentPage,
+233 |         perPage,
+234 |         sortBy,
+235 | 
+236 |         // Getters
+237 |         getProjectById,
+238 | 
+239 |         // Actions
+240 |         fetchProjects,
+241 |         fetchProject,
+242 |         createProject,
+243 |         fetchProjectOptions
+244 |     };
+245 | });
+```
+
+src/validations/validations.ts
+```
+1 | // src/validations/validations.ts
+2 | import * as yup from 'yup';
+3 | 
+4 | export const loginValidationSchema = yup.object({
+5 |     username: yup.string().required('Username is required').max(100, 'Username must be less than 100 characters'),
+6 |     password: yup.string().required('Password is required').min(2, 'Password must be at least 2 characters'),
+7 | });
+8 | 
+9 | 
+10 | 
+11 | // Füge hier weitere Validierungsschemata hinzu
+```
+
+src/views/CampaignDetail.vue
+```
+1 | <template>
+2 |   <MainLayout>
+3 |     <div class="campaign-detail">
+4 |       <v-alert v-if="error" type="error" density="compact" class="mb-4" closable>
+5 |         {{ error }}
+6 |       </v-alert>
+7 | 
+8 |       <div v-if="isLoading && !campaign" class="text-center my-10">
+9 |         <v-progress-circular indeterminate color="primary" size="40"/>
+10 |         <p class="mt-2 text-disabled">Loading Campaign Data...</p>
+11 |       </div>
+12 | 
+13 |       <template v-if="campaign">
+14 |         <MediaplanTopSection
+15 |             :mediaplan="parentMediaplan"
+16 |             :project="parentProject"
+17 |             :campaign="campaign"
+18 |             :search="searchTerm" :is-loading="isLoading"
+19 |             :current-view="'planning'"
+20 |             :builder-type="'display'"
+21 |             @update:search="updateSearchTerm"
+22 |         />
+23 |         <CampaignListView
+24 |             :mediaplan-id="mediaplanIdRef"
+25 |             :items="campaigns"
+26 |             :total-campaigns="1"
+27 |             :is-loading="isLoading"
+28 |             :current-page="0"
+29 |             :items-per-page="1"
+30 |             type="single"
+31 |             class="pb-3"
+32 |         />
+33 | 
+34 | 
+35 |         <LineitemTable
+36 |           class="mt-5"
+37 |           :items="lineitems"
+38 |           :is-loading="isLoadingLineitems"
+39 |           :total-items="totalLineitems"
+40 |           :current-page="currentPage"
+41 |           :items-per-page="perPage"
+42 |           :sort-by-server="sortBy"
+43 |           :search="searchTerm"
+44 |           :model-value="selectedLineitemIds"
+45 |           @add-lineitem="openAddLineitemDialog"
+46 |           @view-lineitem="handleViewLineitem"
+47 |           @update:model-value="val => selectedLineitemIds.value = val"
+48 |           @update:options="({ page, itemsPerPage, sortBy }) => {
+49 |             lineitemStore.currentPage = page;
+50 |             lineitemStore.perPage = itemsPerPage;
+51 |             lineitemStore.sortBy = sortBy;
+52 |           }"
+53 |         />
+54 | 
+55 |       </template>
 56 | 
-57 |             projects.value = response.items;
-58 |             totalItems.value = response.total_items;
-59 |             totalPages.value = response.total_pages;
-60 |             currentPage.value = response.current_page;
-61 | 
-62 |         } catch (err) {
-63 |             error.value = err instanceof Error ? err.message : 'An error occurred while fetching projects';
-64 |             console.error('Error fetching projects:', err);
-65 |         } finally {
-66 |             isLoading.value = false;
-67 |         }
-68 |     }
-69 | 
-70 |     async function fetchProject(mediaplanIdRef: string, projectId: string) {
-71 |         isLoading.value = true;
-72 |         error.value = null;
-73 | 
-74 |         try {
-75 |             const url = `/mediaplans/${mediaplanIdRef}/projects/${projectId}`;
-76 |             const response = await customFetch(url) as Project;
-77 |             selectedProject.value = response;
-78 |             return response;
-79 |         } catch (err) {
-80 |             error.value = err instanceof Error ? err.message : 'An error occurred while fetching project';
-81 |             console.error('Error fetching project:', err);
-82 |             throw err;
-83 |         } finally {
-84 |             isLoading.value = false;
-85 |         }
-86 |     }
-87 | 
-88 |     async function createProject(projectData: ProjectCreate) {
-89 |         isLoading.value = true;
-90 |         error.value = null;
-91 | 
-92 |         try {
-93 |             const url = `/mediaplans/${projectData.mediaplanIdRef}/projects`;
-94 | 
-95 |             // For our implementation, we need to adjust the data structure to match the API expectations
-96 |             const payload = {
-97 |                 abbreviation: projectData.name,
-98 |                 default_vars: {
-99 |                     targeturls: null,
-100 |                     subsegment: projectData.phase,
-101 |                     campaigntype: projectData.campaignType,
-102 |                     language: projectData.language,
-103 |                     campaigndetail: null,
-104 |                     adtype: "Banner",
-105 |                     dimension: "300x250"
-106 |                 },
-107 |                 descriptive_vars: {
-108 |                     brand: "BMW", // This would typically be dynamic
-109 |                     country: projectData.country.code,
-110 |                     bmwponumber: "PO12345", // This would be dynamic based on the selected PO
-111 |                     adobecampaignname: projectData.name,
-112 |                     subsegment: projectData.phase,
-113 |                     campaigntype: projectData.campaignType,
-114 |                     projectname: projectData.name,
-115 |                     year: new Date().getFullYear()
-116 |                 },
-117 |                 is_locked: false,
-118 |                 labels: [],
-119 |                 lock_state: 0,
-120 |                 owner: "user123", // Would be the current user
-121 |                 message: "OK",
-122 |                 version: "v1"
-123 |             };
-124 | 
-125 |             // For demo purposes, log the payload
-126 |             console.log('Creating project with data:', payload);
-127 | 
-128 |             // In a real implementation, we would send the API request
-129 |             /*
-130 |             const response = await customFetch(url, {
-131 |               method: 'POST',
-132 |               headers: {
-133 |                 'Content-Type': 'application/json',
-134 |               },
-135 |               body: JSON.stringify(payload),
-136 |             });
-137 | 
-138 |             return response._id;
-139 |             */
-140 | 
-141 |             // For demo, simulate successful creation
-142 |             await new Promise(resolve => setTimeout(resolve, 500));
-143 | 
-144 |             // Return a mock project ID
-145 |             return `project-${Date.now()}`;
-146 | 
-147 |         } catch (err) {
-148 |             error.value = err instanceof Error ? err.message : 'An error occurred while creating project';
-149 |             console.error('Error creating project:', err);
-150 |             throw err;
-151 |         } finally {
-152 |             isLoading.value = false;
-153 |         }
-154 |     }
-155 | 
-156 |     async function fetchProjectOptions() {
-157 |         isLoading.value = true;
-158 |         error.value = null;
-159 | 
-160 |         try {
-161 |             // In a real application, we would fetch these from the API
-162 |             // For this demo, we're using mock data
-163 | 
-164 |             // Mock countries
-165 |             countries.value = [
-166 |                 {code: 'AT', name: 'Austria'},
-167 |                 {code: 'DE', name: 'Germany'},
-168 |                 {code: 'PL', name: 'Poland'},
-169 |                 {code: 'US', name: 'United States'}
-170 |             ];
-171 | 
-172 |             // --- CORRECTED Mock languages ---
-173 |             languages.value = [
-174 |                 {code: 'DEU', name: 'German', country_codes: ['DE', 'AT']}, // Added country_codes
-175 |                 {code: 'ENG', name: 'English', country_codes: ['US']},      // Added country_codes
-176 |                 {code: 'POL', name: 'Polish', country_codes: ['PL']}       // Added country_codes
-177 |                 // Add other languages and their associated country codes as needed
-178 |             ];
-179 |             // --- END CORRECTION ---
+57 |       <template v-else-if="!isLoading && !campaign && error">
+58 |         <div class="text-center my-10 text-disabled">
+59 |           <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
+60 |           <p>Could not load Campaign data.</p>
+61 |           <p class="text-caption">{{ error }}</p>
+62 |           <v-btn color="primary" @click="goBack">Go Back</v-btn>
+63 |         </div>
+64 |       </template>
+65 | 
+66 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+67 |         {{ snackbar.text }}
+68 |         <template v-slot:actions>
+69 |           <v-btn icon @click="snackbar.show = false"><v-icon>mdi-close</v-icon></v-btn>
+70 |         </template>
+71 |       </v-snackbar>
+72 | 
+73 |     </div>
+74 |   </MainLayout>
+75 | </template>
+76 | 
+77 | <script setup lang="ts">
+78 | import { ref, computed, onMounted, reactive, watch } from 'vue';
+79 | import { useRoute, useRouter } from 'vue-router';
+80 | 
+81 | // Komponenten
+82 | import MainLayout from '@/layouts/MainLayout.vue';
+83 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
+84 | import LineitemTable from '@/components/campaign/LineitemTable.vue'; // Spezifische Tabelle
+85 | // Stores
+86 | import { useCampaignStore } from '@/stores/campaignStore';
+87 | import { useProjectStore } from '@/stores/projectStore';
+88 | import { useMediaplanStore } from '@/stores/mediaplanStore';
+89 | // Types
+90 | import type { Campaign } from '@/types/campaign';
+91 | import type { Lineitem } from '@/types/lineitem';
+92 | import type { Project } from '@/types/project';
+93 | import type { Mediaplan } from '@/types/mediaplan';
+94 | import {useLineitemStore} from "@/stores/lineitemStore.ts";
+95 | import MediaplanPlanningViewDatatable from "@/components/mediaplan/MediaplanPlanningViewDatatable.vue";
+96 | import CampaignListView from "@/components/project/CampaignListView.vue";
+97 | 
+98 | // Props & Route
+99 | const props = defineProps<{
+100 |   mediaplanId?: string;
+101 |   projectId?: string;
+102 |   campaignId?: string;
+103 | }>()
+104 | const route = useRoute();
+105 | const router = useRouter();
+106 | 
+107 | // IDs
+108 | const mediaplanIdRef = ref(props.mediaplanId || (route.params.mediaplanId as string));
+109 | const projectIdRef = ref(props.projectId || (route.params.projectId as string));
+110 | const campaignIdRef = ref(props.campaignId || (route.params.campaignId as string));
+111 | 
+112 | // Stores
+113 | const campaignStore = useCampaignStore();
+114 | const lineitemStore = useLineitemStore();
+115 | const projectStore = useProjectStore();
+116 | const mediaplanStore = useMediaplanStore();
+117 | 
+118 | // State
+119 | const isLoading = ref(false);
+120 | const error = ref<string | null>(null);
+121 | const searchTerm = ref(''); // Wird von TopSection gesetzt, aber hier nicht direkt zum Filtern verwendet
+122 | // const canAddLineitems = ref(false); // Noch nicht implementiert
+123 | 
+124 | // Computed Properties
+125 | const campaign = computed<Campaign | null>(() => campaignStore.selectedCampaign);
+126 | const campaigns = computed(() => {
+127 |   return campaignStore.selectedCampaign ? [campaignStore.selectedCampaign] : []
+128 | });
+129 | 
+130 | 
+131 | const parentProject = computed<Project | null>(() => projectStore.selectedProject);
+132 | const parentMediaplan = computed<Mediaplan | null>(() => mediaplanStore.selectedMediaplan);
+133 | const lineitems = computed<Lineitem[]>(() => lineitemStore.lineitems);
+134 | const isLoadingLineitems = computed(() => lineitemStore.isLoading);
+135 | // Kein Zugriff auf Line Item Paginierung/Sortierung hier, da v-data-table dies clientseitig macht
+136 | 
+137 | const totalLineitems = computed(() => lineitemStore.totalItems);
+138 | const currentPage = computed(() => lineitemStore.currentPage);
+139 | const perPage = computed(() => lineitemStore.perPage);
+140 | const sortBy = computed(() => lineitemStore.sortBy);
+141 | const selectedLineitemIds = ref<string[]>([]);
+142 | 
+143 | // Snackbar
+144 | const snackbar = reactive({ show: false, text: '', color: 'success' });
+145 | 
+146 | // --- Methoden ---
+147 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => {
+148 |   snackbar.text = text;
+149 |   snackbar.color = color;
+150 |   snackbar.show = true;
+151 | };
+152 | 
+153 | const loadData = async () => {
+154 |   if (!mediaplanIdRef.value || !projectIdRef.value || !campaignIdRef.value) {
+155 |     error.value = "Missing ID for loading campaign details.";
+156 |     showSnackbar(error.value, "error");
+157 |     return;
+158 |   }
+159 |   isLoading.value = true;
+160 |   error.value = null;
+161 |   try {
+162 |     await Promise.all([
+163 |       campaignStore.fetchCampaign(mediaplanIdRef.value, projectIdRef.value, campaignIdRef.value),
+164 |       projectStore.fetchProject(mediaplanIdRef.value, projectIdRef.value), // Kontext
+165 |       mediaplanStore.fetchMediaplan(mediaplanIdRef.value), // Kontext
+166 |       lineitemStore.fetchLineitems(mediaplanIdRef.value, projectIdRef.value, campaignIdRef.value) // Kinder
+167 |     ]);
+168 |     // canAddLineitems.value = checkApi(); // Wenn API für Add existiert
+169 | 
+170 |   } catch (err: any) {
+171 |     error.value = `Failed to load campaign data: ${err.message || err}`;
+172 |     showSnackbar(error.value, 'error');
+173 |     campaignStore.selectedCampaign = null;
+174 |     projectStore.selectedProject = null;
+175 |     mediaplanStore.selectedMediaplan = null;
+176 |   } finally {
+177 |     isLoading.value = false;
+178 |   }
+179 | };
 180 | 
-181 |             // Mock campaign types
-182 |             campaignTypes.value = [
-183 |                 {mediaplanId: 'always-on', name: 'Always On'},
-184 |                 {mediaplanId: 'awareness', name: 'Awareness'},
-185 |                 {mediaplanId: 'consideration', name: 'Consideration'}
-186 |             ];
-187 | 
-188 |             // Mock phases
-189 |             phases.value = [
-190 |                 {mediaplanId: 'sea', name: 'SEA'},
-191 |                 {mediaplanId: 'planning', name: 'Planning'},
-192 |                 {mediaplanId: 'execution', name: 'Execution'}
-193 |             ];
-194 | 
-195 |             // Mock goals
-196 |             goals.value = [
-197 |                 {mediaplanId: 'consideration', name: 'Consideration'},
-198 |                 {mediaplanId: 'configurator', name: 'Configurator'},
-199 |                 {mediaplanId: 'conversion', name: 'Conversion'}
-200 |             ];
+181 | const updateSearchTerm = (newSearchTerm: string) => {
+182 |   searchTerm.value = newSearchTerm;
+183 |   // Hier keine Aktion nötig, da die Tabelle clientseitig filtert (oder Suche ignoriert)
+184 | };
+185 | 
+186 | const openAddLineitemDialog = () => {
+187 |   console.log('Add Lineitem for Campaign:', campaignIdRef.value);
+188 |   showSnackbar("Adding line items is not supported by the API yet.", "info");
+189 |   // Logik zum Öffnen des Dialogs
+190 | };
+191 | 
+192 | const handleViewLineitem = (item: Lineitem) => {
+193 |   console.log('View Lineitem (Event received):', item._id);
+194 |   showSnackbar("Viewing line item details is not supported by the API yet.", "info");
+195 |   // Logik zum Anzeigen der Details (z.B. in einem Dialog)
+196 | }
+197 | 
+198 | const goBack = () => {
+199 |   router.back();
+200 | }
 201 | 
-202 |             // Mock builders
-203 |             builders.value = [
-204 |                 {mediaplanId: 'sea', name: 'SEA'},
-205 |                 {mediaplanId: 'social', name: 'Social'},
-206 |                 {mediaplanId: 'display', name: 'Display'},
-207 |                 {mediaplanId: '2layer', name: '2Layer'}
-208 |             ];
-209 | 
-210 |         } catch (err) {
-211 |             error.value = err instanceof Error ? err.message : 'An error occurred while fetching project options';
-212 |             console.error('Error fetching project options:', err);
-213 |         } finally {
-214 |             isLoading.value = false;
-215 |         }
-216 |     }
-217 |     return {
-218 |         // State
-219 |         projects,
-220 |         selectedProject,
-221 |         isLoading,
-222 |         error,
-223 |         countries,
-224 |         languages,
-225 |         campaignTypes,
-226 |         phases,
-227 |         goals,
-228 |         builders,
-229 |         totalItems,
-230 |         totalPages,
-231 |         currentPage,
-232 |         perPage,
-233 | 
-234 |         // Getters
-235 |         getProjectById,
-236 | 
-237 |         // Actions
-238 |         fetchProjects,
-239 |         fetchProject,
-240 |         createProject,
-241 |         fetchProjectOptions
-242 |     };
-243 | });
+202 | // Lifecycle & Watchers
+203 | onMounted(() => {
+204 |   loadData();
+205 | });
+206 | 
+207 | watch(() => [route.params.mediaplanId, route.params.projectId, route.params.campaignId],
+208 |     ([newMpId, newPId, newCId], [oldMpId, oldPId, oldCId]) => {
+209 |       let needsReload = false;
+210 |       if (typeof newMpId === 'string' && newMpId !== oldMpId) { mediaplanIdRef.value = newMpId; needsReload = true; }
+211 |       if (typeof newPId === 'string' && newPId !== oldPId) { projectIdRef.value = newPId; needsReload = true; }
+212 |       if (typeof newCId === 'string' && newCId !== oldCId) { campaignIdRef.value = newCId; needsReload = true; }
+213 |       if (needsReload) { loadData(); }
+214 |     },
+215 |     { immediate: false }
+216 | );
+217 | 
+218 | watch(error, (err) => { if (err && !snackbar.show) { /* Fehler in loadData behandelt */ } });
+219 | 
+220 | </script>
+221 | 
+222 | <style scoped>
+223 | .campaign-detail {
+224 |   min-height: calc(100vh - 64px);
+225 | }
+226 | </style>
+```
+
+src/views/Login.vue
+```
+1 | <template>
+2 |   <v-container fluid style="max-width: 1600px" class="d-flex justify-center">
+3 |     <v-sheet class="pa-6" rounded elevation="4" max-width="480" width="100%" style="margin-top: 100px;">
+4 |       <v-form @submit.prevent="onSubmit" class="form-container">
+5 |         <h4 class="text-h4 font-weight-medium mb-3">
+6 |           Welcome to the BMW Group Mediaplan.
+7 |         </h4>
+8 |         <v-text-field
+9 |             v-model="name.value.value"
+10 |             :error-messages="name.errorMessage.value"
+11 |             label="Name"
+12 |             variant="outlined"
+13 |             clearable
+14 |             class="mb-3"
+15 |         />
+16 | 
+17 |         <v-text-field
+18 |             v-model="password.value.value"
+19 |             :error-messages="password.errorMessage.value"
+20 |             label="Password"
+21 |             type="password"
+22 |             variant="outlined"
+23 |             clearable
+24 |             class="mb-6"
+25 |         />
+26 | 
+27 |         <v-alert
+28 |             v-if="authStore.error"
+29 |             class="mb-4"
+30 |             type="error"
+31 |             variant="tonal"
+32 |             border="start"
+33 |             closable
+34 |             @close="authStore.error = null"
+35 |             icon="mdi-alert-circle-outline"
+36 |         >
+37 |           {{ authStore.error }}
+38 |         </v-alert>
+39 | 
+40 |         <v-row justify="end">
+41 |           <v-col cols="auto">
+42 |             <v-btn :disabled="authStore.isLoading" type="submit" color="primary">
+43 |               Login
+44 |             </v-btn>
+45 |           </v-col>
+46 |         </v-row>
+47 |       </v-form>
+48 |     </v-sheet>
+49 |   </v-container>
+50 | </template>
+51 | 
+52 | <script setup lang="ts">
+53 | import {reactive} from 'vue'; // No need to import ref if not used independently
+54 | import {useAuthStore} from '../stores/auth';
+55 | import {useRouter} from 'vue-router';
+56 | import {useField, useForm} from 'vee-validate';
+57 | import {VAlert} from 'vuetify/components'; // Correct import for VAlert
+58 | 
+59 | const router = useRouter();
+60 | const authStore = useAuthStore();
+61 | const validationSchema = {
+62 |   name(value: string) { // Type annotation for value
+63 |     if (value?.length >= 2) {
+64 |       return true;
+65 |     }
+66 |     return 'Name needs to be at least 2 characters.';
+67 |   },
+68 |   password(value: string) { // Type annotation for value
+69 |     if (value?.length >= 6) {
+70 |       return true;
+71 |     }
+72 |     return 'Password needs to be at least 6 characters.';
+73 |   },
+74 | }
+75 | 
+76 | 
+77 | const {handleSubmit, handleReset} = useForm({ //Removed the Reset, not used
+78 |   validationSchema
+79 | });
+80 | 
+81 | const name = useField('name', validationSchema,
+82 |     {
+83 |       initialValue: 'onebuilderPlanner'
+84 |     }
+85 | );
+86 | const password = useField('password', validationSchema,
+87 |     {
+88 |       initialValue: 'OnebuilderPlanner1'
+89 |     });
+90 | 
+91 | const onSubmit = handleSubmit(async (values) => {
+92 |   // No need for local errorMessage, use authStore.error
+93 |   // No need for local form.pending, use authStore.isLoading
+94 | 
+95 |   try {
+96 |     await authStore.login(values.name, values.password);
+97 |     // Redirect *after* successful login (handled in the store)
+98 |     if (authStore.isAuthenticated) {
+99 |       router.push('/');
+100 |     }
+101 | 
+102 |   } catch (error: any) {
+103 |     //  Error handling is now done in the store, so we don't need this here.
+104 |     //  The store will set authStore.error appropriately.
+105 |     console.error("Login Error in Component:", error); // Good for debugging
+106 |   }
+107 |   // No finally block needed, authStore.isLoading is handled in the store.
+108 | });
+109 | </script>
+110 | 
+111 | <style scoped>
+112 | .form-container {
+113 |   max-width: 430px;
+114 |   margin: 0 auto;
+115 | }
+116 | </style>
+```
+
+src/views/MediaplanDetail.vue
+```
+1 | <template>
+2 |   <MainLayout>
+3 |     <div class="mediaplan-detail">
+4 |       <v-alert v-if="errorMediaplan" type="error" density="compact" class="mb-4" closable>
+5 |         {{ errorMediaplan }}
+6 |       </v-alert>
+7 | 
+8 |       <div v-if="isLoadingMediaplan && !mediaplan" class="text-center my-10">
+9 |         <v-progress-circular indeterminate color="primary" size="40"/>
+10 |         <p class="mt-2 text-disabled">Loading Mediaplan...</p>
+11 |       </div>
+12 | 
+13 |       <template v-if="!isLoadingMediaplan && mediaplan">
+14 |         <MediaplanTopSection
+15 |             :mediaplan="mediaplan"
+16 |             :project="null"
+17 |             :search="search"
+18 |             :is-loading="isLoadingMediaplan"
+19 |             :current-view="currentView"
+20 |             :builder-type="'display'"
+21 |             @update:search="updateSearch"
+22 |             @update:current-view="val => currentView = val"
+23 |         />
+24 | 
+25 |         <div class="main-content">
+26 |           <MediaplanPlanningView
+27 |               v-if="currentView === 'planning'"
+28 |               type="multi"
+29 |               :projects="projects"
+30 |               :total-projects="totalProjects"
+31 |               :is-loading="isLoadingProjects"
+32 |               :current-page="projectCurrentPage"
+33 |               :items-per-page="projectItemsPerPage"
+34 |               :mediaplan-id="mediaplanIdRef"
+35 |               @update:options="handleProjectOptionsUpdate"
+36 |               @add-project="openCreateProjectDialog"
+37 |           />
+38 | 
+39 |           <MediaplanBudgetView v-else :mediaplan="mediaplan"/>
+40 | 
+41 |           <v-alert
+42 |               v-if="projectError && currentView === 'planning'"
+43 |               type="error"
+44 |               density="compact"
+45 |               class="mt-4"
+46 |               closable
+47 |           >
+48 |             Failed to load projects: {{ projectError }}
+49 |           </v-alert>
+50 |         </div>
+51 |       </template>
+52 | 
+53 |       <template v-else-if="!isLoadingMediaplan && !mediaplan && errorMediaplan">
+54 |         <div class="text-center my-10 text-disabled">
+55 |           <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
+56 |           <p>Could not load Mediaplan data.</p>
+57 |         </div>
+58 |       </template>
+59 | 
+60 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+61 |         {{ snackbar.text }}
+62 |         <template v-slot:actions>
+63 |           <v-btn icon @click="snackbar.show = false">
+64 |             <v-icon>mdi-close</v-icon>
+65 |           </v-btn>
+66 |         </template>
+67 |       </v-snackbar>
+68 |     </div>
+69 |   </MainLayout>
+70 | </template>
+71 | 
+72 | <script setup lang="ts">
+73 | import {ref, computed, onMounted, reactive, watch} from 'vue'
+74 | import {useRoute} from 'vue-router'
+75 | 
+76 | import MainLayout from '@/layouts/MainLayout.vue'
+77 | import MediaplanPlanningView from '@/components/mediaplan/MediaplanPlanningViewDatatable.vue'
+78 | import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue'
+79 | import {useMediaplanStore} from '@/stores/mediaplanStore'
+80 | import {useProjectStore} from '@/stores/projectStore'
+81 | import type {Mediaplan} from '@/types/mediaplan'
+82 | import type {Project} from '@/types/project'
+83 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
+84 | 
+85 | // --- Props & Route ---
+86 | const props = defineProps<{ mediaplanId?: string }>()
+87 | const route = useRoute()
+88 | const mediaplanIdRef = ref(props.mediaplanId || (route.params.id as string))
+89 | 
+90 | // --- Stores ---
+91 | const mediaplanStore = useMediaplanStore()
+92 | const projectStore = useProjectStore()
+93 | 
+94 | // --- Computed Properties ---
+95 | const mediaplan = computed<Mediaplan | null>(() => mediaplanStore.selectedMediaplan)
+96 | const isLoadingMediaplan = computed(() => mediaplanStore.isLoading)
+97 | const errorMediaplan = computed(() => mediaplanStore.error)
+98 | 
+99 | const projects = computed<Project[]>(() => projectStore.projects)
+100 | const totalProjects = computed(() => projectStore.totalItems)
+101 | const isLoadingProjects = computed(() => projectStore.isLoading)
+102 | const projectError = computed(() => projectStore.error)
+103 | const projectCurrentPage = computed(() => projectStore.currentPage)
+104 | const projectItemsPerPage = computed(() => projectStore.perPage)
+105 | 
+106 | // --- UI State ---
+107 | const currentView = ref<'planning' | 'budget'>('planning')
+108 | const search = ref('')
+109 | 
+110 | // --- Snackbar ---
+111 | const snackbar = reactive({show: false, text: '', color: 'success'})
+112 | 
+113 | // --- Methods ---
+114 | const handleProjectOptionsUpdate = (options: {
+115 |   page: number
+116 |   itemsPerPage: number
+117 |   sortBy?: any[]
+118 |   sortDesc?: boolean[]
+119 | }) => {
+120 |   const newPage = options.page - 1
+121 |   if (newPage !== projectCurrentPage.value) {
+122 |     projectStore.currentPage = newPage
+123 |     projectStore.fetchProjects(mediaplanIdRef.value)
+124 |   }
+125 |   if (options.itemsPerPage !== projectItemsPerPage.value) {
+126 |     projectStore.perPage = options.itemsPerPage
+127 |     projectStore.currentPage = 0
+128 |     projectStore.fetchProjects(mediaplanIdRef.value)
+129 |   }
+130 | }
+131 | 
+132 | const openCreateProjectDialog = () => {
+133 |   console.log('Trigger create project for Mediaplan ID:', mediaplanIdRef.value)
+134 |   // router.push or dialog logic here
+135 | }
+136 | 
+137 | const updateSearch = (val: string) => {
+138 |   search.value = val
+139 |   // ggf. Filter-Logik hier
+140 | }
+141 | 
+142 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => {
+143 |   snackbar.text = text
+144 |   snackbar.color = color
+145 |   snackbar.show = true
+146 | }
+147 | 
+148 | // --- Lifecycle ---
+149 | onMounted(() => {
+150 |   if (!mediaplanIdRef.value) {
+151 |     mediaplanStore.error = 'No mediaplan ID provided'
+152 |     return
+153 |   }
+154 |   mediaplanStore.fetchMediaplan(mediaplanIdRef.value)
+155 |   projectStore.fetchProjects(mediaplanIdRef.value)
+156 | })
+157 | 
+158 | // --- Watchers ---
+159 | watch(() => route.params.id, (newId) => {
+160 |   if (typeof newId === 'string' && newId !== mediaplanIdRef.value) {
+161 |     mediaplanIdRef.value = newId
+162 |     mediaplanStore.fetchMediaplan(newId)
+163 |     projectStore.fetchProjects(newId)
+164 |   }
+165 | })
+166 | 
+167 | watch(errorMediaplan, (err) => err && showSnackbar(`Error loading mediaplan: ${err}`, 'error'))
+168 | watch(projectError, (err) => err && showSnackbar(`Error loading projects: ${err}`, 'error'))
+169 | </script>
+170 | 
+171 | <style scoped>
+172 | .mediaplan-detail {
+173 |   min-height: calc(100vh - 64px);
+174 | }
+175 | 
+176 | .main-content {
+177 |   min-height: 60vh;
+178 | }
+179 | </style>
+```
+
+src/views/MediaplanEdit.vue
+```
+1 | <template>
+2 |   <v-container>
+3 |     <v-row>
+4 |       <v-col cols="12">
+5 |         <v-card>
+6 |           <v-card-title class="text-h4">
+7 |             Edit Mediaplan
+8 |           </v-card-title>
+9 |           <v-card-text>
+10 |             <p>Mediaplan ID: {{ mediaplanId }}</p>
+11 |             <p>This page would allow editing of the mediaplan details.</p>
+12 |           </v-card-text>
+13 |           <v-card-actions>
+14 |             <v-btn color="primary" @click="goBack">
+15 |               Back to Overview
+16 |             </v-btn>
+17 |           </v-card-actions>
+18 |         </v-card>
+19 |       </v-col>
+20 |     </v-row>
+21 |   </v-container>
+22 | </template>
+23 | 
+24 | <script setup lang="ts">
+25 | import { useRouter } from 'vue-router';
+26 | 
+27 | // Props
+28 | const props = defineProps<{
+29 |   mediaplanId: string;
+30 | }>();
+31 | 
+32 | // Router
+33 | const router = useRouter();
+34 | 
+35 | // Methods
+36 | const goBack = () => {
+37 |   router.push('/');
+38 | };
+39 | </script>
+```
+
+src/views/Overview.vue
+```
+1 | <!-- File: src/views/Overview.vue -->
+2 | <template>
+3 |   <MainLayout>
+4 |     <v-row class="pb-6 pt-1">
+5 |       <v-col>
+6 |         <MediaplanFilters
+7 |             :filters="filters"
+8 |             :sources="sources"
+9 |             :loading="isLoading"
+10 |             :sort-by="sortBy"
+11 |             :sort-order="sortOrder"
+12 |             @update:filter="handleFilterUpdate"
+13 |             @update:sort="handleSortUpdate"
+14 |         />
+15 |       </v-col>
+16 |     </v-row>
+17 | 
+18 |     <MediaplanList
+19 |         :mediaplans="mediaplans"
+20 |         :is-loading="isLoading"
+21 |         :total-pages="totalPages"
+22 |         :total-items="totalItems"
+23 |         :current-page="currentPage"
+24 |         :items-per-page="perPage"
+25 |         @update:page="handlePageUpdate"
+26 |         @update:items-per-page="handleItemsPerPageUpdate"
+27 |     />
+28 | 
+29 |     <CreateMediaplanDialog
+30 |         v-model="showCreateMediaplanDialog"
+31 |         @created="handleMediaplanCreated"
+32 |         @project-created="handleProjectCreated"
+33 |     />
+34 | 
+35 |     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+36 |       {{ snackbar.text }}
+37 |     </v-snackbar>
+38 |   </MainLayout>
+39 | </template>
+40 | 
+41 | <script setup lang="ts">
+42 | import { onMounted, computed, ref, reactive } from 'vue';
+43 | import MainLayout from '@/layouts/MainLayout.vue';
+44 | import MediaplanFilters from '@/components/overview/MediaplanFilters.vue';
+45 | import MediaplanList from '@/components/overview/MediaplanList.vue';
+46 | import CreateMediaplanDialog from '@/components/overview/CreateMediaplanDialog.vue';
+47 | import { useMediaplanStore } from '@/stores/mediaplanStore';
+48 | import type { MediaplanFilter } from '@/types';
+49 | 
+50 | // --- Store ---
+51 | const store = useMediaplanStore();
+52 | 
+53 | // --- Computed from store ---
+54 | const filters     = computed(() => store.filters);
+55 | const sortBy      = computed(() => store.sortBy);
+56 | const sortOrder   = computed(() => store.sortOrder);
+57 | const currentPage = computed(() => store.currentPage);
+58 | const perPage     = computed(() => store.perPage);
+59 | const totalPages  = computed(() => store.totalPages);
+60 | const totalItems  = computed(() => store.totalItems);
+61 | const mediaplans  = computed(() => store.mediaplans);
+62 | const isLoading   = computed(() => store.isLoading);
+63 | const sources     = computed(() => store.sources);
+64 | 
+65 | // --- Dialog control ---
+66 | const showCreateMediaplanDialog = ref(false);
+67 | 
+68 | // --- Snackbar ---
+69 | const snackbar = reactive({
+70 |   show: false,
+71 |   text: '',
+72 |   color: 'success'
+73 | });
+74 | 
+75 | // --- Event Handlers ---
+76 | function handleFilterUpdate(key: keyof MediaplanFilter, value: any) {
+77 |   store.setFilter(key, value);
+78 | }
+79 | 
+80 | function handleSortUpdate(payload: { sortBy: string; sortOrder: 'asc' | 'desc' }) {
+81 |   if (payload.sortBy !== sortBy.value || payload.sortOrder !== sortOrder.value) {
+82 |     store.setSorting(payload.sortBy, payload.sortOrder);
+83 |   }
+84 | }
+85 | 
+86 | function handlePageUpdate(newPage: number) {
+87 |   // v-pagination is 1-based; our store is 0-based
+88 |   const zeroPage = newPage - 1;
+89 |   if (zeroPage !== currentPage.value) {
+90 |     store.setPage(zeroPage);
+91 |   }
+92 | }
+93 | 
+94 | function handleItemsPerPageUpdate(newPerPage: number) {
+95 |   if (newPerPage !== perPage.value) {
+96 |     store.perPage = newPerPage;
+97 |     store.setPage(0);
+98 |   }
+99 | }
+100 | 
+101 | function handleMediaplanCreated(id: string) {
+102 |   console.log('Mediaplan created:', id);
+103 | }
+104 | 
+105 | function handleProjectCreated(id: string) {
+106 |   snackbar.color = 'success';
+107 |   snackbar.text = 'Project created successfully';
+108 |   snackbar.show = true;
+109 |   showCreateMediaplanDialog.value = false;
+110 | }
+111 | 
+112 | // --- Init ---
+113 | onMounted(() => {
+114 |   store.init();
+115 | });
+116 | </script>
+```
+
+src/views/ProjectDetail.vue
+```
+1 | <script setup lang="ts">
+2 | import {ref, computed, onMounted, reactive, watch} from 'vue';
+3 | import {useRouter, useRoute} from 'vue-router';
+4 | import MainLayout from '@/layouts/MainLayout.vue';
+5 | import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue';
+6 | // import ProjectToolbar from '@/components/project/ProjectToolbar.vue';
+7 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue';
+8 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue';
+9 | import CampaignListView from '@/components/project/CampaignListView.vue';
+10 | import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue';
+11 | import {useMediaplanStore} from '@/stores/mediaplanStore';
+12 | import {useProjectStore} from '@/stores/projectStore';
+13 | import {useCampaignStore} from '@/stores/campaignStore';
+14 | import type {Project} from '@/types/project';
+15 | import {formatDateRange} from '@/helpers/dateUtils';
+16 | import {calculatePercentage} from '@/helpers/currencyUtils';
+17 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
+18 | import ProjectDetailTable from "@/components/project/ProjectDetailTable.vue";
+19 | import MediaplanPlanningViewDatatable from "@/components/mediaplan/MediaplanPlanningViewDatatable.vue"; // Pfad prüfen
+20 | 
+21 | // --- Props & Route ---
+22 | const props = defineProps<{ mediaplanId?: string; projectId?: string; }>();
+23 | const route = useRoute();
+24 | const router = useRouter();
+25 | const currentMediaplanId = ref(props.mediaplanId || route.params.mediaplanId as string);
+26 | const currentProjectId = ref(props.projectId || route.params.projectId as string);
+27 | 
+28 | // --- Stores ---
+29 | const mediaplanStore = useMediaplanStore();
+30 | const projectStore = useProjectStore();
+31 | const campaignStore = useCampaignStore();
+32 | 
+33 | // --- Computed Properties ---
+34 | const parentMediaplan = computed(() => mediaplanStore.selectedMediaplan);
+35 | const project = computed(() => {
+36 |   return projectStore.selectedProject ? [projectStore.selectedProject] : []
+37 | });
+38 | const isLoadingProject = computed(() => projectStore.isLoading);
+39 | const errorProject = computed(() => projectStore.error);
+40 | const campaigns = computed(() => campaignStore.campaigns);
+41 | const totalCampaigns = computed(() => campaignStore.totalItems);
+42 | const isLoadingCampaigns = computed(() => campaignStore.isLoading);
+43 | const errorCampaigns = computed(() => campaignStore.error);
+44 | const campaignCurrentPage = computed(() => campaignStore.currentPage);
+45 | const campaignItemsPerPage = computed(() => campaignStore.perPage);
+46 | 
+47 | // --- UI State ---
+48 | // currentView wird jetzt für den MediaplanViewToggle benötigt
+49 | const currentView = ref<string>('planning'); // 'planning' or 'budget'
+50 | const search = ref<string>('');
+51 | 
+52 | // --- Snackbar ---
+53 | const snackbar = reactive({show: false, text: '', color: 'success'});
+54 | 
+55 | // --- Methods ---
+56 | const handleCampaignOptionsUpdate = (options: { /* ... */ page: number; itemsPerPage: number; }) => {
+57 |   const newZeroBasedPage = options.page - 1;
+58 |   let needsReload = false;
+59 |   if (newZeroBasedPage !== campaignCurrentPage.value) {
+60 |     campaignStore.currentPage = newZeroBasedPage;
+61 |     needsReload = true;
+62 |   }
+63 |   if (options.itemsPerPage !== campaignItemsPerPage.value) {
+64 |     campaignStore.perPage = options.itemsPerPage;
+65 |     if (campaignStore.currentPage !== 0) campaignStore.currentPage = 0;
+66 |     needsReload = true;
+67 |   }
+68 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
+69 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
+70 |   }
+71 | };
+72 | 
+73 | const openCreateCampaignDialog = () => { /* ... */
+74 |   console.log('Trigger create campaign');
+75 | };
+76 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => { /* ... */
+77 |   snackbar.text = text;
+78 |   snackbar.color = color;
+79 |   snackbar.show = true;
+80 | };
+81 | 
+82 | // Handler für das @update:search Event von MediaplanHeader
+83 | const updateSearchHandler = (value: string | null) => {
+84 |   search.value = value || '';
+85 |   // Hier Logik zum Filtern der Kampagnen basierend auf 'search.value' hinzufügen, falls gewünscht
+86 |   // z.B. campaignStore.setFilter('search', search.value); campaignStore.fetchCampaigns(...)
+87 | };
+88 | 
+89 | 
+90 | // --- Lifecycle Hooks ---
+91 | onMounted(() => {
+92 |   if (!currentMediaplanId.value || !currentProjectId.value) {
+93 |     console.error('Missing ID(s) for Project Detail view');
+94 |     errorProject.value = 'Missing Mediaplan or Project ID.'; // Set error directly or via store
+95 |     return;
+96 |   }
+97 |   projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
+98 |   campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
+99 |   // Lade den Parent-Mediaplan nur, wenn er noch nicht geladen ist oder ein anderer ist
+100 |   if (!parentMediaplan.value || parentMediaplan.value._id !== currentMediaplanId.value) {
+101 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
+102 |   }
+103 | });
+104 | 
+105 | // --- Watchers ---
+106 | // Beobachte Routenänderungen, um Daten neu zu laden
+107 | watch(() => [route.params.mediaplanId, route.params.projectId], ([newMpId, newPId]) => {
+108 |   let needsReload = false;
+109 |   if (newMpId && typeof newMpId === 'string' && newMpId !== currentMediaplanId.value) {
+110 |     currentMediaplanId.value = newMpId;
+111 |     needsReload = true;
+112 |   }
+113 |   if (newPId && typeof newPId === 'string' && newPId !== currentProjectId.value) {
+114 |     currentProjectId.value = newPId;
+115 |     needsReload = true;
+116 |   }
+117 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
+118 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
+119 |     projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
+120 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
+121 |   }
+122 | }, {deep: true});
+123 | 
+124 | watch(errorProject, (newError) => {
+125 |   if (newError) showSnackbar(`Error loading project: ${newError}`, 'error');
+126 | });
+127 | watch(errorCampaigns, (newError) => {
+128 |   if (newError) showSnackbar(`Error loading campaigns: ${newError}`, 'error');
+129 | });
+130 | 
+131 | // Optional: Watch search changes for immediate filtering
+132 | // watch(search, (newValue) => { ... });
+133 | </script>
+134 | 
+135 | <template>
+136 |   <MainLayout>
+137 |     <div class="project-detail">
+138 |       <v-alert v-if="errorProject && !isLoadingProject" type="error" density="compact" class="mb-4" closable>
+139 |         Error loading project details: {{ errorProject }}
+140 |       </v-alert>
+141 |       <div v-if="isLoadingProject && !project" class="text-center my-10">
+142 |         <v-progress-circular indeterminate color="primary" size="40"></v-progress-circular>
+143 |         <p class="mt-2 text-disabled">Loading Project...</p>
+144 |       </div>
+145 | 
+146 |       <template v-if="!isLoadingProject && project">
+147 |         <MediaplanTopSection
+148 |             :mediaplan="parentMediaplan"
+149 |             :project="project"
+150 |             :search="search"
+151 |             :is-loading="isLoadingProject || mediaplanStore.isLoading"
+152 |             :current-view="currentView"
+153 |             :builder-type="'display'"
+154 |             @update:search="updateSearchHandler"
+155 |             @update:current-view="val => currentView = val"
+156 |         />
+157 | 
+158 |         <MediaplanPlanningViewDatatable
+159 |             :projects="project"
+160 |             :is-loading="isLoadingProject"
+161 |             :mediaplan-id="route.params.mediaplanId"
+162 |             :current-page="0"
+163 |             :total-projects="1"
+164 |             :items-per-page="1"
+165 |             type="single"
+166 |             class="pb-3"
+167 |         />
+168 | 
+169 |         <template v-if="project">
+170 |           <div class="main-content">
+171 |             <CampaignListView
+172 |                 v-if="currentView === 'planning'"
+173 |                 :mediaplan-id="currentMediaplanId"
+174 |                 :items="campaigns"
+175 |                 :total-campaigns="totalCampaigns"
+176 |                 :is-loading="isLoadingCampaigns"
+177 |                 :current-page="campaignCurrentPage"
+178 |                 :items-per-page="campaignItemsPerPage"
+179 |                 @update:options="handleCampaignOptionsUpdate"
+180 |                 @add-campaign="openCreateCampaignDialog"
+181 |             />
+182 |             <MediaplanBudgetView
+183 |                 v-else-if="currentView === 'budget' && parentMediaplan"
+184 |                 :mediaplan="parentMediaplan"
+185 |             />
+186 |             <div v-else-if="currentView === 'budget' && !parentMediaplan">
+187 |               Loading budget data...
+188 |             </div>
+189 | 
+190 |             <v-alert v-if="errorCampaigns && currentView === 'planning'" type="error" density="compact" class="mt-4"
+191 |                      closable>
+192 |               Failed to load campaigns: {{ errorCampaigns }}
+193 |             </v-alert>
+194 |           </div>
+195 |         </template>
+196 |         <template v-else-if="!isLoadingProject && errorProject">
+197 |           <div class="text-center my-10 text-disabled">
+198 |             <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
+199 |             <p>Could not load Project data.</p>
+200 |           </div>
+201 |         </template>
+202 |       </template>
+203 | 
+204 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+205 |         {{ snackbar.text }}
+206 |         <template v-slot:actions>
+207 |           <v-btn icon="mdi-close" @click="snackbar.show = false"></v-btn>
+208 |         </template>
+209 |       </v-snackbar>
+210 |     </div>
+211 |   </MainLayout>
+212 | </template>
+213 | 
+214 | <style scoped>
+215 | .project-detail {
+216 |   padding-bottom: 20px;
+217 | }
+218 | 
+219 | .main-content {
+220 |   min-height: 60vh;
+221 | }
+222 | </style>
 ```
 
 src/types/campaigns.ts
@@ -5030,9 +6152,46 @@ src/types/index.ts
 2 | // This file exports all types from the directory
 3 | 
 4 | export * from './mediaplan';
-5 | /*export * from './project';
-6 | export * from './campaign';*/
-7 | // Add more exports as needed
+5 | export * from './project'; // Assuming project types are needed elsewhere
+6 | export * from './campaigns'; // Assuming campaign types are needed elsewhere
+7 | export * from './lineitem'; // Added export for Lineitem types
+8 | 
+9 | // Add more exports as needed
+```
+
+src/types/lineitem.ts
+```
+1 | import { ref } from 'vue';
+2 | import type { Lineitem, LineitemListResponse } from '@/types/lineitem';
+3 | 
+4 | export function useLineitemStore() {
+5 |   const lineitems = ref<Lineitem[]>([]);
+6 |   const totalItems = ref(0);
+7 |   const totalPages = ref(0);
+8 |   const currentPage = ref(1);
+9 |   const perPage = ref(10);
+10 |   const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([]);
+11 | 
+12 |   async function fetchLineitems() {
+13 |     // Fetch line items from API
+14 |     const response: LineitemListResponse = await fetch('/api/lineitems').then(res => res.json());
+15 |     lineitems.value = response;
+16 | 
+17 |     totalItems.value = response.length;
+18 |     totalPages.value = 1; // No real pagination yet
+19 |     currentPage.value = 1;
+20 |   }
+21 | 
+22 |   return {
+23 |     lineitems,
+24 |     fetchLineitems,
+25 |     totalItems,
+26 |     totalPages,
+27 |     currentPage,
+28 |     perPage,
+29 |     sortBy,
+30 |   };
+31 | }
 ```
 
 src/types/mediaplan.ts
@@ -5214,7 +6373,7 @@ src/types/project.ts
 57 |   duration?: ProjectDuration;
 58 |   detail?: string;
 59 |   budget?: Budget;
-60 |   mediaplanIdRef?: string;
+60 |   mediaplanId?: string;
 61 | }
 62 | 
 63 | // Project create request
@@ -5234,708 +6393,1566 @@ src/types/project.ts
 77 | }
 ```
 
-src/validations/validations.ts
-```
-1 | // src/validations/validations.ts
-2 | import * as yup from 'yup';
-3 | 
-4 | export const loginValidationSchema = yup.object({
-5 |     username: yup.string().required('Username is required').max(100, 'Username must be less than 100 characters'),
-6 |     password: yup.string().required('Password is required').min(2, 'Password must be at least 2 characters'),
-7 | });
-8 | 
-9 | 
-10 | 
-11 | // Füge hier weitere Validierungsschemata hinzu
-```
-
-src/views/Login.vue
+src/components/campaign/LineItemTable.vue
 ```
 1 | <template>
-2 |   <v-container fluid style="max-width: 1600px" class="d-flex justify-center">
-3 |     <v-sheet class="pa-6" rounded elevation="4" max-width="480" width="100%" style="margin-top: 100px;">
-4 |       <v-form @submit.prevent="onSubmit" class="form-container">
-5 |         <h4 class="text-h4 font-weight-medium mb-3">
-6 |           Welcome to the BMW Group Mediaplan.
-7 |         </h4>
-8 |         <v-text-field
-9 |             v-model="name.value.value"
-10 |             :error-messages="name.errorMessage.value"
-11 |             label="Name"
-12 |             variant="outlined"
-13 |             clearable
-14 |             class="mb-3"
-15 |         />
-16 | 
-17 |         <v-text-field
-18 |             v-model="password.value.value"
-19 |             :error-messages="password.errorMessage.value"
-20 |             label="Password"
-21 |             type="password"
-22 |             variant="outlined"
-23 |             clearable
-24 |             class="mb-6"
-25 |         />
-26 | 
-27 |         <v-alert
-28 |             v-if="authStore.error"
-29 |             class="mb-4"
-30 |             type="error"
-31 |             variant="tonal"
-32 |             border="start"
-33 |             closable
-34 |             @close="authStore.error = null"
-35 |             icon="mdi-alert-circle-outline"
-36 |         >
-37 |           {{ authStore.error }}
-38 |         </v-alert>
-39 | 
-40 |         <v-row justify="end">
-41 |           <v-col cols="auto">
-42 |             <v-btn :disabled="authStore.isLoading" type="submit" color="primary">
-43 |               Login
-44 |             </v-btn>
-45 |           </v-col>
-46 |         </v-row>
-47 |       </v-form>
-48 |     </v-sheet>
-49 |   </v-container>
-50 | </template>
-51 | 
-52 | <script setup lang="ts">
-53 | import {reactive} from 'vue'; // No need to import ref if not used independently
-54 | import {useAuthStore} from '../stores/auth';
-55 | import {useRouter} from 'vue-router';
-56 | import {useField, useForm} from 'vee-validate';
-57 | import {VAlert} from 'vuetify/components'; // Correct import for VAlert
-58 | 
-59 | const router = useRouter();
-60 | const authStore = useAuthStore();
-61 | const validationSchema = {
-62 |   name(value: string) { // Type annotation for value
-63 |     if (value?.length >= 2) {
-64 |       return true;
-65 |     }
-66 |     return 'Name needs to be at least 2 characters.';
-67 |   },
-68 |   password(value: string) { // Type annotation for value
-69 |     if (value?.length >= 6) {
-70 |       return true;
-71 |     }
-72 |     return 'Password needs to be at least 6 characters.';
-73 |   },
-74 | }
-75 | 
-76 | 
-77 | const {handleSubmit, handleReset} = useForm({ //Removed the Reset, not used
-78 |   validationSchema
-79 | });
-80 | 
-81 | const name = useField('name', validationSchema,
-82 |     {
-83 |       initialValue: 'onebuilderPlanner'
-84 |     }
-85 | );
-86 | const password = useField('password', validationSchema,
-87 |     {
-88 |       initialValue: 'OnebuilderPlanner1'
-89 |     });
-90 | 
-91 | const onSubmit = handleSubmit(async (values) => {
-92 |   // No need for local errorMessage, use authStore.error
-93 |   // No need for local form.pending, use authStore.isLoading
-94 | 
-95 |   try {
-96 |     await authStore.login(values.name, values.password);
-97 |     // Redirect *after* successful login (handled in the store)
-98 |     if (authStore.isAuthenticated) {
-99 |       router.push('/');
-100 |     }
-101 | 
-102 |   } catch (error: any) {
-103 |     //  Error handling is now done in the store, so we don't need this here.
-104 |     //  The store will set authStore.error appropriately.
-105 |     console.error("Login Error in Component:", error); // Good for debugging
-106 |   }
-107 |   // No finally block needed, authStore.isLoading is handled in the store.
-108 | });
-109 | </script>
-110 | 
-111 | <style scoped>
-112 | .form-container {
-113 |   max-width: 430px;
-114 |   margin: 0 auto;
-115 | }
-116 | </style>
-```
-
-src/views/MediaplanDetail.vue
-```
-1 | <template>
-2 |   <MainLayout>
-3 |     <div class="mediaplan-detail">
-4 |       <v-alert v-if="errorMediaplan" type="error" density="compact" class="mb-4" closable>
-5 |         {{ errorMediaplan }}
-6 |       </v-alert>
-7 | 
-8 |       <div v-if="isLoadingMediaplan && !mediaplan" class="text-center my-10">
-9 |         <v-progress-circular indeterminate color="primary" size="40" />
-10 |         <p class="mt-2 text-disabled">Loading Mediaplan...</p>
-11 |       </div>
-12 | 
-13 |       <template v-if="!isLoadingMediaplan && mediaplan">
-14 |         <MediaplanTopSection
-15 |             :mediaplan="mediaplan"
-16 |             :project="null"
-17 |             :search="search"
-18 |             :is-loading="isLoadingMediaplan"
-19 |             :current-view="currentView"
-20 |             @update:search="updateSearch"
-21 |             @update:current-view="val => currentView = val"
-22 |         >
-23 |           <!-- Slot für späteren Campaign-Type-Select, falls benötigt -->
-24 |           <template #campaign-type-select>
-25 |             <!-- ggf. v-select hier -->
-26 |           </template>
-27 |         </MediaplanTopSection>
-28 | 
-29 |         <div class="main-content">
-30 |           <MediaplanPlanningView
-31 |               v-if="currentView === 'planning'"
-32 |               :projects="projects"
-33 |               :total-projects="totalProjects"
-34 |               :is-loading="isLoadingProjects"
-35 |               :current-page="projectCurrentPage"
-36 |               :items-per-page="projectItemsPerPage"
-37 |               :mediaplan-mediaplanId="mediaplanIdRef"
-38 |               @update:options="handleProjectOptionsUpdate"
-39 |               @add-project="openCreateProjectDialog"
-40 |           />
-41 | 
-42 |           <MediaplanBudgetView v-else :mediaplan="mediaplan" />
-43 | 
-44 |           <v-alert
-45 |               v-if="projectError && currentView === 'planning'"
-46 |               type="error"
-47 |               density="compact"
-48 |               class="mt-4"
-49 |               closable
-50 |           >
-51 |             Failed to load projects: {{ projectError }}
-52 |           </v-alert>
-53 |         </div>
-54 |       </template>
-55 | 
-56 |       <template v-else-if="!isLoadingMediaplan && !mediaplan && errorMediaplan">
-57 |         <div class="text-center my-10 text-disabled">
-58 |           <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
-59 |           <p>Could not load Mediaplan data.</p>
-60 |         </div>
-61 |       </template>
-62 | 
-63 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-64 |         {{ snackbar.text }}
-65 |         <template v-slot:actions>
-66 |           <v-btn icon @click="snackbar.show = false">
-67 |             <v-icon>mdi-close</v-icon>
-68 |           </v-btn>
-69 |         </template>
-70 |       </v-snackbar>
-71 |     </div>
-72 |   </MainLayout>
-73 | </template>
-74 | 
-75 | <script setup lang="ts">
-76 | import { ref, computed, onMounted, reactive, watch } from 'vue'
-77 | import { useRoute } from 'vue-router'
-78 | 
-79 | import MainLayout from '@/layouts/MainLayout.vue'
-80 | import MediaplanPlanningView from '@/components/mediaplan/MediaplanPlanningView.vue'
-81 | import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue'
-82 | import { useMediaplanStore } from '@/stores/mediaplanStore'
-83 | import { useProjectStore } from '@/stores/projectStore'
-84 | import type { Mediaplan } from '@/types/mediaplan'
-85 | import type { Project } from '@/types/project'
-86 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
-87 | 
-88 | // --- Props & Route ---
-89 | const props = defineProps<{ mediaplanId?: string }>()
-90 | const route = useRoute()
-91 | const mediaplanIdRef = ref(props.mediaplanId || (route.params.mediaplanId as string))
-92 | 
-93 | // --- Stores ---
-94 | const mediaplanStore = useMediaplanStore()
-95 | const projectStore = useProjectStore()
-96 | 
-97 | // --- Computed Properties ---
-98 | const mediaplan = computed<Mediaplan | null>(() => mediaplanStore.selectedMediaplan)
-99 | const isLoadingMediaplan = computed(() => mediaplanStore.isLoading)
-100 | const errorMediaplan = computed(() => mediaplanStore.error)
-101 | 
-102 | const projects = computed<Project[]>(() => projectStore.projects)
-103 | const totalProjects = computed(() => projectStore.totalItems)
-104 | const isLoadingProjects = computed(() => projectStore.isLoading)
-105 | const projectError = computed(() => projectStore.error)
-106 | const projectCurrentPage = computed(() => projectStore.currentPage)
-107 | const projectItemsPerPage = computed(() => projectStore.perPage)
-108 | 
-109 | // --- UI State ---
-110 | const currentView = ref<'planning' | 'budget'>('planning')
-111 | const search = ref('')
-112 | 
-113 | // --- Snackbar ---
-114 | const snackbar = reactive({ show: false, text: '', color: 'success' })
-115 | 
-116 | // --- Methods ---
-117 | const handleProjectOptionsUpdate = (options: {
-118 |   page: number
-119 |   itemsPerPage: number
-120 |   sortBy?: any[]
-121 |   sortDesc?: boolean[]
-122 | }) => {
-123 |   const newPage = options.page - 1
-124 |   if (newPage !== projectCurrentPage.value) {
-125 |     projectStore.currentPage = newPage
-126 |     projectStore.fetchProjects(mediaplanIdRef.value)
-127 |   }
-128 |   if (options.itemsPerPage !== projectItemsPerPage.value) {
-129 |     projectStore.perPage = options.itemsPerPage
-130 |     projectStore.currentPage = 0
-131 |     projectStore.fetchProjects(mediaplanIdRef.value)
-132 |   }
-133 | }
-134 | 
-135 | const openCreateProjectDialog = () => {
-136 |   console.log('Trigger create project for Mediaplan ID:', mediaplanIdRef.value)
-137 |   // router.push or dialog logic here
-138 | }
-139 | 
-140 | const updateSearch = (val: string) => {
-141 |   search.value = val
-142 |   // ggf. Filter-Logik hier
-143 | }
-144 | 
-145 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => {
-146 |   snackbar.text = text
-147 |   snackbar.color = color
-148 |   snackbar.show = true
-149 | }
-150 | 
-151 | // --- Lifecycle ---
-152 | onMounted(() => {
-153 |   if (!mediaplanIdRef.value) {
-154 |     mediaplanStore.error = 'No mediaplan ID provided'
-155 |     return
-156 |   }
-157 |   mediaplanStore.fetchMediaplan(mediaplanIdRef.value)
-158 |   projectStore.fetchProjects(mediaplanIdRef.value)
-159 | })
-160 | 
-161 | // --- Watchers ---
-162 | watch(() => route.params.mediaplanId, (newId) => {
-163 |   if (typeof newId === 'string' && newId !== mediaplanIdRef.value) {
-164 |     mediaplanIdRef.value = newId
-165 |     mediaplanStore.fetchMediaplan(newId)
-166 |     projectStore.fetchProjects(newId)
-167 |   }
-168 | })
-169 | 
-170 | watch(errorMediaplan, (err) => err && showSnackbar(`Error loading mediaplan: ${err}`, 'error'))
-171 | watch(projectError, (err) => err && showSnackbar(`Error loading projects: ${err}`, 'error'))
-172 | </script>
-173 | 
-174 | <style scoped>
-175 | .mediaplan-detail {
-176 |   min-height: calc(100vh - 64px);
-177 | }
-178 | .main-content {
-179 |   min-height: 60vh;
-180 | }
-181 | </style>
-```
-
-src/views/MediaplanEdit.vue
-```
-1 | <template>
-2 |   <v-container>
-3 |     <v-row>
-4 |       <v-col cols="12">
-5 |         <v-card>
-6 |           <v-card-title class="text-h4">
-7 |             Edit Mediaplan
-8 |           </v-card-title>
-9 |           <v-card-text>
-10 |             <p>Mediaplan ID: {{ mediaplanId }}</p>
-11 |             <p>This page would allow editing of the mediaplan details.</p>
-12 |           </v-card-text>
-13 |           <v-card-actions>
-14 |             <v-btn color="primary" @click="goBack">
-15 |               Back to Overview
-16 |             </v-btn>
-17 |           </v-card-actions>
-18 |         </v-card>
-19 |       </v-col>
-20 |     </v-row>
-21 |   </v-container>
-22 | </template>
+2 |   <v-card flat class="mt-4 lineitem-table-card">
+3 |     <v-data-table-server
+4 |         v-model="selectedItems"
+5 |         :headers="lineitemHeaders"
+6 |         :items="items"
+7 |         :items-length="totalItems"
+8 |         :loading="isLoading"
+9 |         :search="search"
+10 |         :page="currentPageInternal"
+11 |         :items-per-page="itemsPerPageInternal"
+12 |         :sort-by="sortBy"
+13 |         class="elevation-0 lineitem-data-table"
+14 |         item-value="_id"
+15 |         show-select
+16 |         select-strategy="page"
+17 |         @update:options="handleOptionsUpdate"
+18 |         @update:model-value="updateSelection"
+19 |     >
+20 |       <template v-slot:loading>
+21 |         <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
+22 |       </template>
 23 | 
-24 | <script setup lang="ts">
-25 | import { useRouter } from 'vue-router';
-26 | 
-27 | // Props
-28 | const props = defineProps<{
-29 |   mediaplanId: string;
-30 | }>();
-31 | 
-32 | // Router
-33 | const router = useRouter();
-34 | 
-35 | // Methods
-36 | const goBack = () => {
-37 |   router.push('/');
-38 | };
-39 | </script>
+24 |       <template v-slot:item.created_at="{ value }">
+25 |         {{ formatDate(value) }}
+26 |       </template>
+27 |       <template v-slot:item.updated_at="{ value }">
+28 |         {{ formatDate(value) }}
+29 |       </template>
+30 | 
+31 |       <template v-slot:item.lineitemname="{ item }">
+32 |         <v-tooltip location="top" :text="item.lineitemname">
+33 |           <template v-slot:activator="{ props }">
+34 |                 <span v-bind="props" class="d-inline-block text-truncate" style="max-width: 250px;">
+35 |                     {{ item.lineitemname }}
+36 |                 </span>
+37 |           </template>
+38 |         </v-tooltip>
+39 |       </template>
+40 | 
+41 |       <template v-slot:no-data>
+42 |         <div class="text-center pa-4 text-disabled">
+43 |           <v-icon size="x-large" class="mb-2">mdi-database-off-outline</v-icon>
+44 |           <p v-if="search">No line items found matching your search "{{ search }}".</p>
+45 |           <p v-else>No line items found for this campaign.</p>
+46 |         </div>
+47 |       </template>
+48 | 
+49 |       <template v-slot:item.actions="{ item }">
+50 |         <v-btn icon density="compact" size="small" variant="text" @click.stop="() => console.log('Edit Lineitem:', item._id)" class="mr-2">
+51 |           <v-icon>mdi-pencil-outline</v-icon>
+52 |           <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+53 |         </v-btn>
+54 |         <v-menu>
+55 |           <template v-slot:activator="{ props: menuProps }">
+56 |             <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
+57 |           </template>
+58 |           <v-list density="compact">
+59 |             <v-list-item  @click.stop="() => console.log('Edit Lineitem:', item._id)">
+60 |               <v-list-item-title>Edit</v-list-item-title>
+61 |             </v-list-item>
+62 |             <v-list-item @click.stop="() => console.log('Delete Lineitemjk:', item._id)" class="text-error">
+63 |               <v-list-item-title>Delete</v-list-item-title>
+64 |             </v-list-item>
+65 |           </v-list>
+66 |         </v-menu>
+67 |       </template>
+68 | 
+69 |     </v-data-table-server>
+70 |   </v-card>
+71 | </template>
+72 | 
+73 | <script setup lang="ts">
+74 | import { ref, computed, watch, PropType } from 'vue';
+75 | import type { VDataTableServer } from 'vuetify/components/VDataTable';
+76 | import { formatDate } from '@/helpers/dateUtils';
+77 | import type { Lineitem } from '@/types/lineitem';
+78 | import {lineitemHeaders} from "@/constants/lineitem.ts"; // Pfad anpassen
+79 | 
+80 | type ReadonlyHeaders = VDataTableServer['$props']['headers'];
+81 | 
+82 | const props = defineProps({
+83 |   items: {
+84 |     type: Array as PropType<Lineitem[]>,
+85 |     required: true,
+86 |     default: () => []
+87 |   },
+88 |   isLoading: {
+89 |     type: Boolean,
+90 |     default: false
+91 |   },
+92 |   totalItems: {
+93 |     type: Number,
+94 |     required: true
+95 |   },
+96 |   currentPage: { // 0-basiert vom Store
+97 |     type: Number,
+98 |     required: true
+99 |   },
+100 |   itemsPerPage: {
+101 |     type: Number,
+102 |     required: true
+103 |   },
+104 |   sortByServer: {
+105 |     type: Array as PropType<{ key: string; order: 'asc' | 'desc' }[]>,
+106 |     default: () => []
+107 |   },
+108 |   search: { // Suchbegriff von außen
+109 |     type: String,
+110 |     default: ''
+111 |   },
+112 |   // V-model für ausgewählte Elemente
+113 |   modelValue: {
+114 |     type: Array as PropType<string[]>, // Array von IDs (_id)
+115 |     default: () => []
+116 |   }
+117 | });
+118 | 
+119 | const emit = defineEmits(['update:options', 'update:modelValue', 'add-item', 'edit-item', 'delete-item']);
+120 | 
+121 | // Lokaler State für Tabelle
+122 | const currentPageInternal = ref(props.currentPage + 1); // Tabelle ist 1-basiert
+123 | const itemsPerPageInternal = ref(props.itemsPerPage);
+124 | const sortBy = ref(props.sortByServer);
+125 | 
+126 | // Lokaler State für v-model der Tabelle
+127 | const selectedItems = ref<string[]>(props.modelValue);
+128 | 
+129 | // Handler für Optionen (Paginierung, Sortierung)
+130 | const handleOptionsUpdate = (options: { page: number; itemsPerPage: number; sortBy: { key: string; order: 'asc' | 'desc' }[] }) => {
+131 |   currentPageInternal.value = options.page;
+132 |   itemsPerPageInternal.value = options.itemsPerPage;
+133 |   sortBy.value = options.sortBy;
+134 | 
+135 |   emit('update:options', {
+136 |     page: options.page - 1, // An Parent 0-basiert
+137 |     itemsPerPage: options.itemsPerPage,
+138 |     sortBy: options.sortBy
+139 |   });
+140 | };
+141 | 
+142 | // Handler für Selektionsänderung
+143 | const updateSelection = (newSelection: string[]) => {
+144 |   selectedItems.value = newSelection;
+145 |   emit('update:modelValue', newSelection); // Parent informieren
+146 | }
+147 | 
+148 | // Watchers zur Synchronisierung mit Parent Props
+149 | watch(() => props.currentPage, (newVal) => {
+150 |   currentPageInternal.value = newVal + 1;
+151 | });
+152 | watch(() => props.itemsPerPage, (newVal) => {
+153 |   itemsPerPageInternal.value = newVal;
+154 | });
+155 | watch(() => props.sortByServer, (newVal) => {
+156 |   sortBy.value = newVal;
+157 | }, { deep: true });
+158 | watch(() => props.modelValue, (newVal) => {
+159 |   if (JSON.stringify(newVal) !== JSON.stringify(selectedItems.value)) {
+160 |     selectedItems.value = newVal;
+161 |   }
+162 | }, { deep: true });
+163 | 
+164 | </script>
+165 | 
+166 | <style scoped>
+167 | 
+168 | </style>
 ```
 
-src/views/Overview.vue
+src/components/common/CountryFlag.vue
 ```
-1 | <!-- File: src/views/Overview.vue -->
-2 | <template>
-3 |   <MainLayout>
-4 |     <v-row class="pb-6 pt-1">
-5 |       <v-col>
-6 |         <MediaplanFilters
-7 |             :filters="filters"
-8 |             :sources="sources"
-9 |             :loading="isLoading"
-10 |             :sort-by="sortBy"
-11 |             :sort-order="sortOrder"
-12 |             @update:filter="handleFilterUpdate"
-13 |             @update:sort="handleSortUpdate"
-14 |         />
-15 |       </v-col>
-16 |     </v-row>
-17 | 
-18 |     <MediaplanList
-19 |         :mediaplans="mediaplans"
-20 |         :is-loading="isLoading"
-21 |         :total-pages="totalPages"
-22 |         :total-items="totalItems"
-23 |         :current-page="currentPage"
-24 |         :items-per-page="perPage"
-25 |         @update:page="handlePageUpdate"
-26 |         @update:items-per-page="handleItemsPerPageUpdate"
-27 |     />
+1 | <template>
+2 |   <span :class="`fi fi-${country.toLowerCase()}`" :style="flagStyle"></span>
+3 | </template>
+4 | 
+5 | <script setup lang="ts">
+6 | import {computed} from 'vue';
+7 | import 'flag-icons/css/flag-icons.min.css';
+8 | 
+9 | const props = defineProps<{
+10 |   country: string;
+11 |   size?: string;
+12 | }>();
+13 | 
+14 | const flagStyle = computed(() => {
+15 |   return {
+16 |     fontSize: props.size || '1rem',
+17 |     lineHeight: 1,
+18 |     verticalAlign: 'middle',
+19 |     display: 'inline-block'
+20 |   };
+21 | });
+22 | </script>
+23 | 
+24 | <style scoped>
+25 | 
+26 | 
+27 | span[class^="fi"] {
 28 | 
-29 |     <CreateMediaplanDialog
-30 |         v-model="showCreateMediaplanDialog"
-31 |         @created="handleMediaplanCreated"
-32 |         @project-created="handleProjectCreated"
-33 |     />
-34 | 
-35 |     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-36 |       {{ snackbar.text }}
-37 |     </v-snackbar>
-38 |   </MainLayout>
-39 | </template>
-40 | 
-41 | <script setup lang="ts">
-42 | import { onMounted, computed, ref, reactive } from 'vue';
-43 | import MainLayout from '@/layouts/MainLayout.vue';
-44 | import MediaplanFilters from '@/components/overview/MediaplanFilters.vue';
-45 | import MediaplanList from '@/components/overview/MediaplanList.vue';
-46 | import CreateMediaplanDialog from '@/components/overview/CreateMediaplanDialog.vue';
-47 | import { useMediaplanStore } from '@/stores/mediaplanStore';
-48 | import type { MediaplanFilter } from '@/types';
-49 | 
-50 | // --- Store ---
-51 | const store = useMediaplanStore();
-52 | 
-53 | // --- Computed from store ---
-54 | const filters     = computed(() => store.filters);
-55 | const sortBy      = computed(() => store.sortBy);
-56 | const sortOrder   = computed(() => store.sortOrder);
-57 | const currentPage = computed(() => store.currentPage);
-58 | const perPage     = computed(() => store.perPage);
-59 | const totalPages  = computed(() => store.totalPages);
-60 | const totalItems  = computed(() => store.totalItems);
-61 | const mediaplans  = computed(() => store.mediaplans);
-62 | const isLoading   = computed(() => store.isLoading);
-63 | const sources     = computed(() => store.sources);
-64 | 
-65 | // --- Dialog control ---
-66 | const showCreateMediaplanDialog = ref(false);
-67 | 
-68 | // --- Snackbar ---
-69 | const snackbar = reactive({
-70 |   show: false,
-71 |   text: '',
-72 |   color: 'success'
-73 | });
+29 | }
+30 | 
+31 | </style>
+```
+
+src/components/common/FormattedCurrencyInput.vue
+```
+1 | <!-- src/components/form/CurrencyInput.vue -->
+2 | <template>
+3 |   <v-text-field
+4 |       v-model="displayValue"
+5 |       v-bind="attrs"
+6 |       type="text"
+7 |       inputmode="decimal"
+8 |       autocomplete="off"
+9 |       @keydown="onKeyDown"
+10 |       @input="onInput"
+11 |       @blur="onBlur"
+12 |   />
+13 | </template>
+14 | 
+15 | <script setup lang="ts">
+16 | import {ref, watch, useAttrs} from 'vue'
+17 | 
+18 | // Define only our custom props
+19 | const props = defineProps<{
+20 |   modelValue: number | null
+21 |   decimal?: 'comma' | 'dot'
+22 |   allowDecimals?: boolean
+23 | }>()
+24 | 
+25 | // Emit the numeric value back to the parent
+26 | const emit = defineEmits<{
+27 |   (e: 'update:modelValue', value: number | null): void
+28 | }>()
+29 | 
+30 | // Capture and pass through all other <v-text-field> props
+31 | const attrs = useAttrs()
+32 | 
+33 | // Internal display value (formatted string)
+34 | const displayValue = ref('')
+35 | 
+36 | // Default prop values
+37 | const decimal = props.decimal ?? 'comma'
+38 | const allowDecimals = props.allowDecimals ?? true
+39 | 
+40 | // Format number to string (1.000,00 or 1,000.00)
+41 | function format(value: number | null): string {
+42 |   if (value == null) return ''
+43 | 
+44 |   const hasDecimals = value % 1 !== 0
+45 | 
+46 |   return new Intl.NumberFormat(
+47 |       decimal === 'dot' ? 'en-US' : 'de-DE',
+48 |       {
+49 |         minimumFractionDigits: hasDecimals && allowDecimals ? 2 : 0,
+50 |         maximumFractionDigits: allowDecimals ? 2 : 0
+51 |       }
+52 |   ).format(value)
+53 | }
+54 | 
+55 | // Parse user input string to number
+56 | function parse(value: string): number | null {
+57 |   const sanitized = value
+58 |       .replace(/\s/g, '')
+59 |       .replace(decimal === 'comma' ? /\./g : /,/g, '') // remove 1.000
+60 |       .replace(decimal === 'comma' ? /,/g : /\./g, '.') // 1.000,00 → 1000.00
+61 | 
+62 |   const number = parseFloat(sanitized)
+63 |   return isNaN(number) ? null : number
+64 | }
+65 | 
+66 | // Initial sync: modelValue → display
+67 | watch(() => props.modelValue, (val) => {
+68 |   displayValue.value = format(val)
+69 | }, {immediate: true})
+70 | 
+71 | // Key restriction handler
+72 | function onKeyDown(e: KeyboardEvent) {
+73 |   const decimalChar = decimal === 'comma' ? ',' : '.'
 74 | 
-75 | // --- Event Handlers ---
-76 | function handleFilterUpdate(key: keyof MediaplanFilter, value: any) {
-77 |   store.setFilter(key, value);
-78 | }
+75 |   const isAllowed = [
+76 |     'Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight',
+77 |     ...Array.from({length: 10}, (_, i) => `${i}`)
+78 |   ]
 79 | 
-80 | function handleSortUpdate(payload: { sortBy: string; sortOrder: 'asc' | 'desc' }) {
-81 |   if (payload.sortBy !== sortBy.value || payload.sortOrder !== sortOrder.value) {
-82 |     store.setSorting(payload.sortBy, payload.sortOrder);
-83 |   }
-84 | }
-85 | 
-86 | function handlePageUpdate(newPage: number) {
-87 |   // v-pagination is 1-based; our store is 0-based
-88 |   const zeroPage = newPage - 1;
-89 |   if (zeroPage !== currentPage.value) {
-90 |     store.setPage(zeroPage);
-91 |   }
+80 |   if (allowDecimals) isAllowed.push(decimalChar)
+81 | 
+82 |   if (!isAllowed.includes(e.key)) {
+83 |     e.preventDefault()
+84 |   }
+85 | }
+86 | 
+87 | // Input handler (while typing)
+88 | function onInput(e: Event) {
+89 |   const val = (e.target as HTMLInputElement).value
+90 |   displayValue.value = val
+91 |   emit('update:modelValue', parse(val))
 92 | }
 93 | 
-94 | function handleItemsPerPageUpdate(newPerPage: number) {
-95 |   if (newPerPage !== perPage.value) {
-96 |     store.perPage = newPerPage;
-97 |     store.setPage(0);
-98 |   }
-99 | }
-100 | 
-101 | function handleMediaplanCreated(mediaplanId: string) {
-102 |   console.log('Mediaplan created:', mediaplanId);
-103 | }
-104 | 
-105 | function handleProjectCreated(mediaplanId: string) {
-106 |   snackbar.color = 'success';
-107 |   snackbar.text = 'Project created successfully';
-108 |   snackbar.show = true;
-109 |   showCreateMediaplanDialog.value = false;
-110 | }
-111 | 
-112 | // --- Init ---
-113 | onMounted(() => {
-114 |   store.init();
-115 | });
-116 | </script>
+94 | // Format final value on blur
+95 | function onBlur() {
+96 |   displayValue.value = format(parse(displayValue.value))
+97 | }
+98 | </script>
 ```
 
-src/views/ProjectDetail.vue
+src/components/common/MediaplanBuilderTypeSwitch.vue
 ```
-1 | <script setup lang="ts">
-2 | import { ref, computed, onMounted, reactive, watch } from 'vue';
-3 | import { useRouter, useRoute } from 'vue-router';
-4 | import MainLayout from '@/layouts/MainLayout.vue';
-5 | import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue';
-6 | // import ProjectToolbar from '@/components/project/ProjectToolbar.vue';
-7 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue';
-8 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue';
-9 | import CampaignListView from '@/components/project/CampaignListView.vue';
-10 | import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue';
-11 | import { useMediaplanStore } from '@/stores/mediaplanStore';
-12 | import { useProjectStore } from '@/stores/projectStore';
-13 | import { useCampaignStore } from '@/stores/campaignStore';
-14 | import type { Project } from '@/types/project';
-15 | import { formatDateRange } from '@/helpers/dateUtils';
-16 | import { calculatePercentage } from '@/helpers/currencyUtils';
-17 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
-18 | import ProjectDetailTable from "@/components/project/ProjectDetailTable.vue"; // Pfad prüfen
+1 | <template>
+2 |     <v-select
+3 |         v-model="localBuilderType"
+4 |         :items="builderOptions"
+5 |         item-title="name"
+6 |         item-value="id"
+7 |         density="compact"
+8 |         hide-details
+9 |         variant="outlined"
+10 |         class="ml-2"
+11 |         style="max-width: 140px"
+12 |         @update:model-value="emit('update:builderType', $event)"
+13 |     />
+14 | </template>
+15 | 
+16 | <script setup>
+17 | 
+18 | import {ref, watch, defineEmits} from 'vue'
 19 | 
-20 | // --- Props & Route ---
-21 | const props = defineProps<{ mediaplanIdRef?: string; projectId?: string; }>();
-22 | const route = useRoute();
-23 | const router = useRouter();
-24 | const currentMediaplanId = ref(props.mediaplanIdRef || route.params.mediaplanIdRef as string);
-25 | const currentProjectId = ref(props.projectId || route.params.projectId as string);
+20 | const emit = defineEmits(['update:builderType'])
+21 | const props = defineProps({
+22 |   builderType: {type: String, default: 'sea'}
+23 | })
+24 | 
+25 | const localBuilderType = ref(props.builderType)
+26 | watch(() => props.builderType, (val) => localBuilderType.value = val)
+27 | 
+28 | const builderOptions = [
+29 |   {id: 'sea', name: 'SEA'},
+30 |   {id: 'social', name: 'Social'},
+31 |   {id: 'display', name: 'Display'},
+32 |   {id: '2layer', name: '2-Layer'}
+33 | ]
+34 | </script>
+```
+
+src/components/common/MediaplanTopSection.vue
+```
+1 | <template>
+2 |   <!-- Top breadcrumb row -->
+3 |   <v-row class="mb-0">
+4 |     <v-col cols="12" md="5" class="d-flex align-center pt-0 pb-0">
+5 |       <MediaplanBreadcrumb :mediaplan="mediaplan" :project="project"/>
+6 |     </v-col>
+7 |   </v-row>
+8 | 
+9 |   <!-- Main control bar -->
+10 |   <v-row class="mb-7" no-gutters align="center">
+11 |     <!-- Left side: Builder type & view toggle -->
+12 |     <v-col class="d-flex align-center">
+13 |       <MediaplanViewToggle
+14 |           v-model="internalView"
+15 |           class="ml-4"
+16 |       />
+17 |       <MediaplanBuilderTypeSwitch
+18 |           :builder-type="selectedBuilderType"
+19 |           @update:builderType="selectedBuilderType = $event"
+20 |       />
+21 |     </v-col>
+22 | 
+23 |     <!-- Right side: Header with budget and search -->
+24 |     <v-col class="d-flex justify-end pr-0">
+25 |       <MediaplanHeader
+26 |           :plan-budget="mediaplan?.budget?.total || 0"
+27 |           :used-percentage="calculatePercentage(mediaplan?.budget?.used, mediaplan?.budget?.total)"
+28 |           :search="search"
+29 |           @update:search="val => emit('update:search', val)"
+30 |           :is-loading="isLoading"
+31 |       />
+32 |     </v-col>
+33 |   </v-row>
+34 | </template>
+35 | 
+36 | <script setup lang="ts">
+37 | import {toRefs, computed} from 'vue'
+38 | import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue'
+39 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue'
+40 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue'
+41 | import MediaplanBuilderTypeSwitch from '@/components/common/MediaplanBuilderTypeSwitch.vue'
+42 | 
+43 | import type {Mediaplan} from '@/types/mediaplan'
+44 | import type {Project} from '@/types/project'
+45 | import type {Campaign} from '@/types/campaign'
+46 | 
+47 | const props = defineProps<{
+48 |   mediaplan: Mediaplan | null
+49 |   project: Project | null
+50 |   campaign?: Campaign | null
+51 |   search: string
+52 |   isLoading: boolean
+53 |   currentView: 'planning' | 'budget'
+54 |   builderType: 'sea' | 'social' | 'display' | '2layer'
+55 | }>()
+56 | 
+57 | const emit = defineEmits<{
+58 |   (e: 'update:search', value: string): void
+59 |   (e: 'update:current-view', value: 'planning' | 'budget'): void
+60 |   (e: 'update:builderType', value: 'sea' | 'social' | 'display' | '2layer'): void
+61 | }>()
+62 | 
+63 | const {mediaplan, project, campaign, search, isLoading, currentView, builderType} = toRefs(props)
+64 | 
+65 | // Sync the internal view toggle with prop
+66 | const internalView = computed<'planning' | 'budget'>({
+67 |   get: () => currentView.value,
+68 |   set: val => emit('update:current-view', val),
+69 | })
+70 | 
+71 | // Sync builder type selection
+72 | const selectedBuilderType = computed<'sea' | 'social' | 'display' | '2layer'>({
+73 |   get: () => builderType.value,
+74 |   set: val => emit('update:builderType', val),
+75 | })
+76 | 
+77 | // Determine breadcrumb level
+78 | const levelDisplay = computed(() => {
+79 |   if (campaign?.value) return 'Campaign'
+80 |   if (project.value) return 'Project'
+81 |   return 'Mediaplan'
+82 | })
+83 | 
+84 | function calculatePercentage(used: number | undefined, total: number | undefined): number {
+85 |   if (!used || !total) return 0
+86 |   return (used / total) * 100
+87 | }
+88 | </script>
+89 | 
+90 | <style scoped>
+91 | /* Optional: eigene Styles hier hinzufügen */
+92 | </style>
+```
+
+src/components/common/NotificationSnackbar.vue
+```
+1 | <template>
+2 |   <v-snackbar
+3 |     v-model="notification.show"
+4 |     :color="notification.type"
+5 |     :timeout="notification.timeout"
+6 |     class="notification-snackbar"
+7 |   >
+8 |     <div class="d-flex align-center">
+9 |       <v-icon :icon="getIconForType(notification.type)" class="mr-3" />
+10 |       <span>{{ notification.text }}</span>
+11 |     </div>
+12 |     <template v-slot:actions v-if="notification.closable">
+13 |       <v-btn
+14 |         icon
+15 |         variant="text"
+16 |         @click="closeNotification"
+17 |         size="small"
+18 |       >
+19 |         <v-icon>mdi-close</v-icon>
+20 |       </v-btn>
+21 |     </template>
+22 |   </v-snackbar>
+23 | </template>
+24 | 
+25 | <script setup lang="ts">
+26 | import { notification, closeNotification, NotificationType } from '@/helpers/notificationUtils';
+27 | 
+28 | /**
+29 |  * Gets the appropriate icon for the notification type
+30 |  * @param type Notification type
+31 |  * @returns Material Design Icon name
+32 |  */
+33 | const getIconForType = (type: NotificationType): string => {
+34 |   switch (type) {
+35 |     case NotificationType.SUCCESS:
+36 |       return 'mdi-check-circle';
+37 |     case NotificationType.ERROR:
+38 |       return 'mdi-alert-circle';
+39 |     case NotificationType.WARNING:
+40 |       return 'mdi-alert';
+41 |     case NotificationType.INFO:
+42 |     default:
+43 |       return 'mdi-information';
+44 |   }
+45 | };
+46 | </script>
+47 | 
+48 | <style scoped>
+49 | .notification-snackbar {
+50 |   z-index: 9999;
+51 | }
+52 | </style>
+```
+
+src/components/common/PaginationControls.vue
+```
+1 | <template>
+2 |   <div class="d-flex justify-center align-center my-4">
+3 |     <v-pagination
+4 |         v-model="modelValue"
+5 |         :length="length"
+6 |         :disabled="disabled"
+7 |         :total-visible="totalVisible"
+8 |         rounded="circle"
+9 |         @update:model-value="updatePage"
+10 |     />
+11 | 
+12 |     <div v-if="showItemsPerPage" class="ml-4 d-flex align-center">
+13 |       <span class="text-caption mr-2">Items per page:</span>
+14 |       <v-select
+15 |           v-model="itemsPerPage"
+16 |           :items="itemsPerPageOptions"
+17 |           density="compact"
+18 |           variant="outlined"
+19 |           hide-details
+20 |           class="items-per-page-select"
+21 |           @update:model-value="updateItemsPerPage"
+22 |       />
+23 |     </div>
+24 |   </div>
+25 | </template>
 26 | 
-27 | // --- Stores ---
-28 | const mediaplanStore = useMediaplanStore();
-29 | const projectStore = useProjectStore();
-30 | const campaignStore = useCampaignStore();
-31 | 
-32 | // --- Computed Properties ---
-33 | const parentMediaplan = computed(() => mediaplanStore.selectedMediaplan);
-34 | const project = computed(() => projectStore.selectedProject);
-35 | const isLoadingProject = computed(() => projectStore.isLoading);
-36 | const errorProject = computed(() => projectStore.error);
-37 | const campaigns = computed(() => campaignStore.campaigns);
-38 | const totalCampaigns = computed(() => campaignStore.totalItems);
-39 | const isLoadingCampaigns = computed(() => campaignStore.isLoading);
-40 | const errorCampaigns = computed(() => campaignStore.error);
-41 | const campaignCurrentPage = computed(() => campaignStore.currentPage);
-42 | const campaignItemsPerPage = computed(() => campaignStore.perPage);
-43 | 
-44 | // --- UI State ---
-45 | // currentView wird jetzt für den MediaplanViewToggle benötigt
-46 | const currentView = ref<string>('planning'); // 'planning' or 'budget'
-47 | const search = ref<string>('');
-48 | 
-49 | // --- Snackbar ---
-50 | const snackbar = reactive({ show: false, text: '', color: 'success' });
-51 | 
-52 | // --- Methods ---
-53 | const handleCampaignOptionsUpdate = (options: { /* ... */ page: number; itemsPerPage: number; }) => {
-54 |   const newZeroBasedPage = options.page - 1;
-55 |   let needsReload = false;
-56 |   if (newZeroBasedPage !== campaignCurrentPage.value) {
-57 |     campaignStore.currentPage = newZeroBasedPage;
-58 |     needsReload = true;
-59 |   }
-60 |   if (options.itemsPerPage !== campaignItemsPerPage.value) {
-61 |     campaignStore.perPage = options.itemsPerPage;
-62 |     if (campaignStore.currentPage !== 0) campaignStore.currentPage = 0;
-63 |     needsReload = true;
-64 |   }
-65 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
-66 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
-67 |   }
-68 | };
-69 | 
-70 | const openCreateCampaignDialog = () => { /* ... */
-71 |   console.log('Trigger create campaign');
-72 | };
-73 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => { /* ... */
-74 |   snackbar.text = text;
-75 |   snackbar.color = color;
-76 |   snackbar.show = true;
-77 | };
+27 | <script setup lang="ts">
+28 | import { computed, ref, watch } from 'vue';
+29 | 
+30 | interface Props {
+31 |   modelValue: number;
+32 |   length: number;
+33 |   disabled?: boolean;
+34 |   totalVisible?: number;
+35 |   showItemsPerPage?: boolean;
+36 |   itemsPerPageValue?: number;
+37 |   itemsPerPageOptions?: number[];
+38 | }
+39 | 
+40 | const props = withDefaults(defineProps<Props>(), {
+41 |   disabled: false,
+42 |   totalVisible: 7,
+43 |   showItemsPerPage: true,
+44 |   itemsPerPageValue: 10,
+45 |   itemsPerPageOptions: () => [10, 25, 50, 100]
+46 | });
+47 | 
+48 | const emit = defineEmits<{
+49 |   (e: 'update:model-value', value: number): void;
+50 |   (e: 'update:items-per-page', value: number): void;
+51 | }>();
+52 | 
+53 | // Internal model value for v-pagination (needs to be 1-based)
+54 | const modelValue = computed({
+55 |   get: () => props.modelValue + 1, // Convert from 0-based to 1-based
+56 |   set: (value: number) => {
+57 |     emit('update:model-value', value - 1); // Convert from 1-based to 0-based
+58 |   }
+59 | });
+60 | 
+61 | // Items per page handling
+62 | const itemsPerPage = ref(props.itemsPerPageValue);
+63 | 
+64 | // When props change, update the local state
+65 | watch(() => props.itemsPerPageValue, (newValue) => {
+66 |   itemsPerPage.value = newValue;
+67 | });
+68 | 
+69 | const updatePage = (page: number) => {
+70 |   emit('update:model-value', page - 1); // Convert from 1-based to 0-based
+71 | };
+72 | 
+73 | const updateItemsPerPage = (value: number) => {
+74 |   itemsPerPage.value = value;
+75 |   emit('update:items-per-page', value);
+76 | };
+77 | </script>
 78 | 
-79 | // Handler für das @update:search Event von MediaplanHeader
-80 | const updateSearchHandler = (value: string | null) => {
-81 |   search.value = value || '';
-82 |   // Hier Logik zum Filtern der Kampagnen basierend auf 'search.value' hinzufügen, falls gewünscht
-83 |   // z.B. campaignStore.setFilter('search', search.value); campaignStore.fetchCampaigns(...)
-84 | };
-85 | 
-86 | 
-87 | // --- Lifecycle Hooks ---
-88 | onMounted(() => {
-89 |   if (!currentMediaplanId.value || !currentProjectId.value) {
-90 |     console.error('Missing ID(s) for Project Detail view');
-91 |     errorProject.value = 'Missing Mediaplan or Project ID.'; // Set error directly or via store
-92 |     return;
-93 |   }
-94 |   projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
-95 |   campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
-96 |   // Lade den Parent-Mediaplan nur, wenn er noch nicht geladen ist oder ein anderer ist
-97 |   if (!parentMediaplan.value || parentMediaplan.value._id !== currentMediaplanId.value) {
-98 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
-99 |   }
-100 | });
+79 | <style scoped>
+80 | .items-per-page-select {
+81 |   width: 80px;
+82 | }
+83 | </style>
+```
+
+src/components/mediaplan/DeleteProjectDialog.vue
+```
+1 | <template>
+2 |   <v-dialog v-model="internalValue" max-width="500" persistent>
+3 |     <v-card>
+4 |       <v-toolbar color="error" density="comfortable" dark>
+5 |         <v-toolbar-title>Confirm Delete</v-toolbar-title>
+6 |       </v-toolbar>
+7 |       
+8 |       <v-card-text class="pa-6">
+9 |         <v-alert
+10 |           v-if="error"
+11 |           type="error"
+12 |           variant="tonal"
+13 |           class="mb-4"
+14 |           closable
+15 |         >
+16 |           {{ error }}
+17 |         </v-alert>
+18 |         
+19 |         <p class="text-body-1">
+20 |           Are you sure you want to delete the project <strong>{{ project?.name }}</strong>?
+21 |         </p>
+22 |         <p class="text-body-2 mt-2 text-red">
+23 |           This action cannot be undone.
+24 |         </p>
+25 |       </v-card-text>
+26 |       
+27 |       <v-card-actions class="pa-6 pt-0">
+28 |         <v-spacer></v-spacer>
+29 |         <v-btn 
+30 |           variant="text" 
+31 |           @click="closeDialog"
+32 |           :disabled="isLoading"
+33 |         >
+34 |           Cancel
+35 |         </v-btn>
+36 |         <v-btn 
+37 |           color="error" 
+38 |           variant="flat"
+39 |           :loading="isLoading"
+40 |           @click="confirmDeletion"
+41 |         >
+42 |           Delete Project
+43 |         </v-btn>
+44 |       </v-card-actions>
+45 |     </v-card>
+46 |   </v-dialog>
+47 | </template>
+48 | 
+49 | <script setup lang="ts">
+50 | import { computed } from 'vue';
+51 | import type { Project } from '@/types/project';
+52 | 
+53 | // Define props
+54 | interface Props {
+55 |   modelValue: boolean;
+56 |   project: Project | null;
+57 |   isLoading: boolean;
+58 |   error: string | null;
+59 | }
+60 | 
+61 | // Define emits
+62 | const emit = defineEmits<{
+63 |   (e: 'update:modelValue', value: boolean): void;
+64 |   (e: 'confirm'): void;
+65 |   (e: 'cancel'): void;
+66 | }>();
+67 | 
+68 | // Computed property for v-model binding
+69 | const internalValue = computed({
+70 |   get: () => props.modelValue,
+71 |   set: (value: boolean) => emit('update:modelValue', value)
+72 | });
+73 | 
+74 | const closeDialog = () => {
+75 |   emit('cancel');
+76 | };
+77 | 
+78 | const confirmDeletion = () => {
+79 |   emit('confirm');
+80 | };
+81 | 
+82 | // Receive props with defaults
+83 | const props = withDefaults(defineProps<Props>(), {
+84 |   project: null,
+85 |   error: null
+86 | });
+87 | </script>
+```
+
+src/components/mediaplan/MediaplanBreadcrumb.vue
+```
+1 | // src/components/mediaplan/MediaplanBreadcrumb.vue (Angepasst)
+2 | 
+3 | <script setup lang="ts">
+4 | import {computed} from 'vue';
+5 | import {useRouter} from 'vue-router';
+6 | import type {Mediaplan} from '@/types/mediaplan'; // Pfad prüfen
+7 | import type {Project} from '@/types/project';
+8 | import {getBrandLogo} from "@/helpers/brandUtils.ts";   // Pfad prüfen
+9 | const router = useRouter();
+10 | 
+11 | // --- Props ---
+12 | // Akzeptiert jetzt optional ein ganzes Project-Objekt
+13 | interface Props {
+14 |   mediaplan?: Mediaplan | null;
+15 |   project?: Project | null;     // NEU: Akzeptiert Project-Objekt statt nur Name
+16 |   campaignName?: string;        // Bleibt vorerst als String
+17 | }
+18 | 
+19 | // Define events
+20 | const emit = defineEmits(['back']);
+21 | 
+22 | // Props mit Defaults
+23 | const props = withDefaults(defineProps<Props>(), {
+24 |   mediaplan: null,
+25 |   project: null,
+26 |   campaignName: '',
+27 | });
+28 | 
+29 | // --- Computed Properties für die Anzeige ---
+30 | const breadcrumbItems = computed(() => {
+31 |   const items = [];
+32 |   // Immer Home/Übersicht als Basis? Oder dynamisch? Hier als Beispiel statisch.
+33 |   items.push({title: 'Mediaplans', to: '/', disabled: !props.mediaplan});
+34 | 
+35 |   if (props.mediaplan) {
+36 |     items.push({
+37 |       title: props.mediaplan.name || 'Mediaplan',
+38 |       // Link nur aktiv, wenn wir tiefer sind (also wenn ein Projekt übergeben wurde)
+39 |       to: props.project ? {name: 'MediaplanDetail', params: {mediaplanId: props.mediaplan._id}} : undefined,
+40 |       disabled: !props.project
+41 |     });
+42 | 
+43 |     if (props.project) {
+44 |       items.push({
+45 |         title: props.project.abbreviation || props.project.descriptive_vars?.projectname || 'Project',
+46 |         // Link nur aktiv, wenn wir tiefer sind (also wenn campaignName übergeben wurde)
+47 |         to: props.campaignName ? {
+48 |           name: 'ProjectDetail',
+49 |           params: {mediaplanId: props.mediaplan._id, projectId: props.project._id}
+50 |         } : undefined,
+51 |         disabled: !props.campaignName
+52 |       });
+53 | 
+54 |       if (props.campaignName) {
+55 |         items.push({
+56 |           title: props.campaignName,
+57 |           // Kein Link für das letzte Element
+58 |           disabled: true
+59 |         });
+60 |       }
+61 |     }
+62 |   }
+63 |   return items;
+64 | });
+65 | 
+66 | 
+67 | // --- Methods ---
+68 | const handleBack = () => {
+69 |   emit('back'); // Event auslösen
+70 |   // Gehe zur Mediaplan-Übersicht (oder eine Ebene höher, falls möglich/gewünscht)
+71 |   router.push({name: 'Overview'}); // Gehe zur allgemeinen Übersicht
+72 | };
+73 | 
+74 | </script>
+75 | 
+76 | <template>
+77 |   <div class="d-flex align-center">
+78 |     <v-btn
+79 |         icon
+80 |         variant="text"
+81 |         size="small"
+82 |         class="mr-1"
+83 |         @click="handleBack"
+84 |         aria-label="Go back to overview"
+85 |     >
+86 |       <v-icon> mdi-arrow-u-left-top
+87 |       </v-icon>
+88 |       <v-tooltip activator="parent" location="bottom">Back to Overview</v-tooltip>
+89 |     </v-btn>
+90 | 
+91 |     <div class="breadcrumb-content d-flex align-center flex-wrap">
+92 |       <div class="brand-logo mr-2 flex-shrink-0" v-if="mediaplan?.brand">
+93 |         <v-img
+94 |             :src="getBrandLogo(mediaplan.brand)"
+95 |             :alt="mediaplan.brand.name || ''"
+96 |             width="50"
+97 |             height="25"
+98 |             contain
+99 |         ></v-img>
+100 |       </div>
 101 | 
-102 | // --- Watchers ---
-103 | // Beobachte Routenänderungen, um Daten neu zu laden
-104 | watch(() => [route.params.mediaplanIdRef, route.params.projectId], ([newMpId, newPId]) => {
-105 |   let needsReload = false;
-106 |   if (newMpId && typeof newMpId === 'string' && newMpId !== currentMediaplanId.value) {
-107 |     currentMediaplanId.value = newMpId;
-108 |     needsReload = true;
-109 |   }
-110 |   if (newPId && typeof newPId === 'string' && newPId !== currentProjectId.value) {
-111 |     currentProjectId.value = newPId;
-112 |     needsReload = true;
-113 |   }
-114 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
-115 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
-116 |     projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
-117 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
-118 |   }
-119 | }, { deep: true });
-120 | 
-121 | watch(errorProject, (newError) => {
-122 |   if (newError) showSnackbar(`Error loading project: ${newError}`, 'error');
-123 | });
-124 | watch(errorCampaigns, (newError) => {
-125 |   if (newError) showSnackbar(`Error loading campaigns: ${newError}`, 'error');
-126 | });
-127 | 
-128 | // Optional: Watch search changes for immediate filtering
-129 | // watch(search, (newValue) => { ... });
-130 | </script>
+102 |       <v-breadcrumbs :items="breadcrumbItems" class="pa-0">
+103 |         <template v-slot:title="{ item }">
+104 |               <span :class="{ 'text-disabled': item.disabled }">
+105 |                   {{ item.title }}
+106 |               </span>
+107 |         </template>
+108 |       </v-breadcrumbs>
+109 | 
+110 |     </div>
+111 |   </div>
+112 | </template>
+113 | 
+114 | <style scoped>
+115 | .breadcrumb-content {
+116 |   min-height: 40px; /* Höhe beibehalten */
+117 |   overflow: hidden; /* Verhindert Umbruchprobleme bei sehr langen Namen */
+118 | }
+119 | 
+120 | .brand-logo {
+121 |   display: flex;
+122 |   align-items: center;
+123 |   justify-content: center;
+124 | }
+125 | 
+126 | /* Optional: Stelle sicher, dass Breadcrumbs nicht zu viel Platz einnehmen */
+127 | .v-breadcrumbs {
+128 |   flex-grow: 1;
+129 |   /* white-space: nowrap; */ /* Verhindert Umbruch, ggf. mit text-overflow */
+130 | }
 131 | 
-132 | <template>
-133 |   <MainLayout>
-134 |     <div class="project-detail">
-135 |       <v-alert v-if="errorProject && !isLoadingProject" type="error" density="compact" class="mb-4" closable>
-136 |         Error loading project details: {{ errorProject }}
-137 |       </v-alert>
-138 |       <div v-if="isLoadingProject && !project" class="text-center my-10">
-139 |         <v-progress-circular indeterminate color="primary" size="40"></v-progress-circular>
-140 |         <p class="mt-2 text-disabled">Loading Project...</p>
-141 |       </div>
-142 | 
-143 |       <template v-if="!isLoadingProject && project">
-144 |         <MediaplanTopSection
-145 |             :mediaplan="parentMediaplan"
-146 |             :project="project"
-147 |             :search="search"
-148 |             :is-loading="isLoadingProject || mediaplanStore.isLoading"
-149 |             :current-view="currentView"
-150 |             @update:search="updateSearchHandler"
-151 |             @update:current-view="val => currentView = val"
-152 |         >
-153 |           <template #campaign-type-select>
-154 |             <!-- TODO v-select - select campaigntyppe -->
-155 |           </template>
-156 |         </MediaplanTopSection>
+132 | .v-breadcrumbs :deep(.v-breadcrumbs-item) {
+133 |   font-size: 0.86rem; /* Etwas kleinere Schrift */
+134 | }
+135 | 
+136 | .text-disabled {
+137 |   color: #757575 !important; /* Vuetify Standard für disabled */
+138 | }
+139 | </style>
+```
+
+src/components/mediaplan/MediaplanBudgetView.vue
+```
+1 | <template>
+2 |   <div class="budget-view-container">
+3 |     <v-card class="pa-6">
+4 |       <v-card-title class="text-h5 mb-4">Budget View</v-card-title>
+5 |       <v-card-text>
+6 |         <p class="text-body-1">
+7 |           This is a placeholder for the Budget View. This section will be implemented later.
+8 |         </p>
+9 |         <v-divider class="my-4"></v-divider>
+10 |         <p class="text-body-2 text-grey">
+11 |           The Budget View will allow users to manage financial aspects of campaigns, track spending, and allocate resources.
+12 |         </p>
+13 |       </v-card-text>
+14 |     </v-card>
+15 |   </div>
+16 | </template>
+17 | 
+18 | <script setup lang="ts">
+19 | // No props or state needed for this placeholder component
+20 | </script>
+21 | 
+22 | <style scoped>
+23 | .budget-view-container {
+24 |   margin-top: 16px;
+25 | }
+26 | </style>
+```
+
+src/components/mediaplan/MediaplanHeader.vue
+```
+1 | <template>
+2 |   <v-row align="center" justify="end" style="height: 57px;" class="mr-0">
+3 |     <div class="d-flex align-center border-b border-grey-lighten-2 mr-2 h-100">
+4 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Plan Budget:</div>
+5 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">{{ formatCurrency(planBudget) }}</div>
+6 | 
+7 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Used:</div>
+8 |       <v-progress-linear
+9 |           :model-value="usedPercentage"
+10 |           color="success"
+11 |           height="8"
+12 |           class="ml-2 mr-4"
+13 |           style="width: 100px"
+14 |       ></v-progress-linear>
+15 |       <span class="text-subtitle-1 text-grey-darken-1">{{ usedPercentage }}%</span>
+16 |     </div>
+17 | 
+18 |     <v-text-field
+19 |         max-width="120px"
+20 |         min-width="100px"
+21 |         v-model="search"
+22 |         placeholder="Search..."
+23 |         hide-details
+24 |         class="mr-2" append-inner-icon="mdi-magnify"
+25 |         @update:modelValue="$emit('update:search', $event)"
+26 |         bg-color="white"
+27 |     ></v-text-field>
+28 | 
+29 |     <v-btn icon="mdi-dots-horizontal" variant="plain">
+30 |     </v-btn>
+31 |   </v-row>
+32 | </template>
+33 | 
+34 | <script setup lang="ts">
+35 | import {ref, watch} from 'vue';
+36 | 
+37 | // Define props
+38 | interface Props {
+39 |   planBudget: number;
+40 |   usedPercentage: number;
+41 |   search: string;
+42 | }
+43 | 
+44 | // Define events
+45 | defineEmits([
+46 |   'update:search'
+47 | ]);
+48 | 
+49 | // Receive props with defaults
+50 | const props = withDefaults(defineProps<Props>(), {
+51 |   planBudget: 0,
+52 |   usedPercentage: 0,
+53 |   search: ''
+54 | });
+55 | 
+56 | // Local state
+57 | const search = ref(props.search);
+58 | 
+59 | // Watch for prop changes
+60 | watch(() => props.search, (newValue) => {
+61 |   search.value = newValue;
+62 | });
+63 | 
+64 | // Format currency
+65 | const formatCurrency = (value: number): string => {
+66 |   // Empfehlung: 'de-DE' für korrekte Euro-Formatierung in Deutschland
+67 |   return new Intl.NumberFormat('de-DE', {
+68 |     style: 'currency',
+69 |     currency: 'EUR',
+70 |     minimumFractionDigits: 0,
+71 |     maximumFractionDigits: 0
+72 |   }).format(value);
+73 | };
+74 | </script>
+```
+
+src/components/mediaplan/MediaplanPlanningViewDatatable.vue
+```
+1 | <template>
+2 |   <div class="planning-view-container mt-4">
+3 |     <EditOrCreateProjectDialog
+4 |         v-model="isProjectDialogOpen"
+5 |         :is-edit="!!selectedProject"
+6 |         :initial-data="selectedProject || undefined"
+7 |         @saved="onProjectSaved"
+8 |     />
+9 |     <v-card class="projects-table elevation-0" variant="flat">
+10 |       <v-theme-provider theme="dark">
+11 |         <v-data-table-server
+12 |             v-model:items-per-page="itemsPerPageModel"
+13 |             v-model:page="pageModel"
+14 |             :headers="projectHeaders"
+15 |             :hide-default-header="type === 'single'"
+16 |             :hide-default-footer="type==='single'"
+17 |             :items="projects"
+18 |             :items-length="totalProjects"
+19 |             :loading="isLoading"
+20 |             item-value="_id"
+21 |             hover
+22 |             class="projects-data-table"
+23 |             @update:options="onOptionsUpdate"
+24 | 
+25 |         >
+26 | <!--          <template v-slot:item.edit="{ item }">
+27 | 
+28 |           </template>-->
+29 | 
+30 |           <template v-slot:item.abbreviation="{ item }">
+31 |             <router-link
+32 |                 :to="{ name: 'ProjectDetail', params: { mediaplanId: props.mediaplanId, projectId: item._id } }"
+33 |                 class="name-link d-flex align-center"
+34 |                 v-if="item.abbreviation && props.mediaplanId && type==='multi'"
+35 |                 @click.stop
+36 |             >
+37 |               <v-avatar size="32" class="mr-2 grey lighten-4"
+38 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
+39 |               <span>{{ item.abbreviation }}</span>
+40 |               <v-tooltip activator="parent" location="top">Open project</v-tooltip>
+41 |             </router-link>
+42 |             <div class="d-flex align-center" v-else-if="item.abbreviation">
+43 |               <v-avatar size="32" class="mr-2 grey lighten-4"
+44 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
+45 |               <span>{{ item.abbreviation }}</span>
+46 |             </div>
+47 |             <div v-else>N/A</div>
+48 |           </template>
+49 | 
+50 |           <template v-slot:item.descriptive_vars.country="{ item }">
+51 |             <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
+52 |               <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2"/>
+53 |               <span>{{ item.descriptive_vars.country }}</span>
+54 |             </div>
+55 |             <div v-else>N/A</div>
+56 |           </template>
+57 | 
+58 |           <template v-slot:item.duration.formatted="{ item }">
+59 |             <div class="d-flex align-center" v-if="item.duration?.formatted">
+60 |               <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
+61 |               <span>{{ item.duration.formatted }}</span>
+62 |             </div>
+63 |             <div v-else>N/A</div>
+64 |           </template>
+65 | 
+66 |           <template v-slot:item.detail="{ item }">
+67 |             <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
+68 |             <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top"
+69 |                        max-width="300px">{{ item.detail }}
+70 |             </v-tooltip>
+71 |           </template>
+72 | 
+73 |           <template v-slot:item.default_vars.campaigntype="{ item }">
+74 |             {{ item.default_vars?.campaigntype || 'N/A' }}
+75 |           </template>
+76 | 
+77 |           <template v-slot:item.default_vars.subsegment="{ item }">
+78 |             {{ item.default_vars?.subsegment || 'N/A' }}
+79 |           </template>
+80 |           <template v-slot:item.budget="{ item }">
+81 |             <BudgetProgress
+82 |                 :used-budget="item?.budget?.used"
+83 |                 :total-budget="item?.budget?.total"
+84 |                 color="success"
+85 |                 bg-color="#ffffff"
+86 |             />
+87 |           </template>
+88 | 
+89 |           <template v-slot:item.is_locked="{ item }">
+90 |             <v-icon v-if="item.is_locked != null" :color="item.is_locked ? 'warning' : 'white'">
+91 |               {{ item.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant' }}
+92 |             </v-icon>
+93 |             <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
+94 |           </template>
+95 | 
+96 |           <template v-slot:item.actions="{ item }">
+97 |             <v-btn icon density="compact" size="small" variant="text" @click.stop="openEditProject(item)" class="mr-2">
+98 |               <v-icon>mdi-pencil-outline</v-icon>
+99 |               <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+100 |             </v-btn>
+101 |             <v-menu>
+102 |               <template v-slot:activator="{ props: menuProps }">
+103 |                 <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
+104 |               </template>
+105 |               <v-list density="compact">
+106 |                 <v-list-item @click.stop="openEditProject(item)">
+107 |                   <v-list-item-title>Edit</v-list-item-title>
+108 |                 </v-list-item>
+109 |                 <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
+110 |                   <v-list-item-title>Delete</v-list-item-title>
+111 |                 </v-list-item>
+112 |               </v-list>
+113 |             </v-menu>
+114 |           </template>
+115 | 
+116 |           <template v-slot:loading>
+117 |             <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
+118 |           </template>
+119 |           <template v-slot:no-data v-if="type === 'multi'">
+120 | 
+121 |             <div class="text-center pa-4 text-disabled">
+122 |               <v-icon size="large" class="mb-2">mdi-database-off-outline</v-icon>
+123 |               <p>No projects found for this mediaplan.</p>
+124 |             </div>
+125 |           </template>
+126 | 
+127 |           <template v-slot:bottom v-if="type === 'multi'">
+128 |             <div class="d-flex align-center pa-4 bg-grey-lighten-2">
+129 |               <v-btn
+130 |                   prepend-icon="mdi-plus"
+131 |                   class="black-text-button"
+132 |                   variant="text"
+133 |                   color="black"
+134 |                   @click="addProject"
+135 |                   :disabled="isLoading"
+136 |               >
+137 |                 Add Project
+138 |               </v-btn>
+139 |             </div>
+140 |           </template>
+141 |         </v-data-table-server>
+142 |       </v-theme-provider>
+143 |     </v-card>
+144 |   </div>
+145 | 
+146 | </template>
+147 | 
+148 | <script setup lang="ts">
+149 | import {ref, watch, computed} from 'vue';
+150 | import {useRouter} from 'vue-router';
+151 | import CountryFlag from '@/components/common/CountryFlag.vue';
+152 | import {getBrandLogo} from "@/helpers/brandUtils";
+153 | import type {Project} from '@/types/project';
+154 | import {projectHeaders} from "@/constants/project.ts";
+155 | import EditOrCreateProjectDialog from "@/components/project/EditOrCreateProjectDialog.vue";
+156 | import BudgetProgress from "@/components/common/dialog/BudgetProgress.vue";
 157 | 
-158 |         <ProjectDetailTable :project="project" class="pb-3"/>
-159 | 
-160 |         <template v-if="project">
-161 |           <div class="main-content">
-162 |             <CampaignListView
-163 |                 v-if="currentView === 'planning'"
-164 |                 :campaigns="campaigns"
-165 |                 :total-campaigns="totalCampaigns"
-166 |                 :is-loading="isLoadingCampaigns"
-167 |                 :current-page="campaignCurrentPage"
-168 |                 :items-per-page="campaignItemsPerPage"
-169 |                 @update:options="handleCampaignOptionsUpdate"
-170 |                 @add-campaign="openCreateCampaignDialog"
-171 |             />
-172 |             <MediaplanBudgetView
-173 |                 v-else-if="currentView === 'budget' && parentMediaplan"
-174 |                 :mediaplan="parentMediaplan"
-175 |             />
-176 |             <div v-else-if="currentView === 'budget' && !parentMediaplan">
-177 |               Loading budget data... </div>
-178 | 
-179 |             <v-alert v-if="errorCampaigns && currentView === 'planning'" type="error" density="compact" class="mt-4"
-180 |                      closable>
-181 |               Failed to load campaigns: {{ errorCampaigns }}
-182 |             </v-alert>
-183 |           </div>
-184 |         </template>
-185 |         <template v-else-if="!isLoadingProject && errorProject">
-186 |           <div class="text-center my-10 text-disabled">
-187 |             <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
-188 |             <p>Could not load Project data.</p>
-189 |           </div>
-190 |         </template>
-191 |       </template>
-192 | 
-193 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-194 |         {{ snackbar.text }}
-195 |         <template v-slot:actions>
-196 |           <v-btn icon="mdi-close" @click="snackbar.show = false"></v-btn>
-197 |         </template>
-198 |       </v-snackbar>
-199 |     </div>
-200 |   </MainLayout>
-201 | </template>
-202 | 
-203 | <style scoped>
-204 | .project-detail {
-205 |   padding-bottom: 20px;
-206 | }
-207 | 
-208 | .main-content {
-209 |   min-height: 60vh;
-210 | }
-211 | </style>
+158 | /* Single for Display on Overviewpage, multi for complete datatable*/
+159 | type ComponentType = 'single' | 'multi';
+160 | 
+161 | // --- Props ---
+162 | interface Props {
+163 |   type: ComponentType | null | undefined;
+164 |   projects: Project[];
+165 |   totalProjects: number;
+166 |   isLoading: boolean;
+167 |   currentPage: number | null;
+168 |   itemsPerPage: number;
+169 |   mediaplanId: string;
+170 | }
+171 | 
+172 | const props = withDefaults(defineProps<Props>(), {
+173 |   type: 'multi',
+174 |   projects: () => [],
+175 |   totalProjects: 0,
+176 |   isLoading: false,
+177 |   currentPage: 0,
+178 |   itemsPerPage: 10,
+179 |   mediaplanId: null // Wichtig: Muss vom Parent (MediaplanDetail) übergeben werden!
+180 | 
+181 | });
+182 | 
+183 | // --- Emits ---
+184 | const emit = defineEmits<{
+185 |   (e: 'addProject'): void;
+186 |   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
+187 | }>();
+188 | 
+189 | // Router Instanz
+190 | const router = useRouter();
+191 | 
+192 | // --- Computed Properties für Tabelle ---
+193 | const pageModel = computed({
+194 |   get: () => props.currentPage + 1,
+195 |   set: (value) => {
+196 |   }
+197 | });
+198 | 
+199 | const itemsPerPageModel = computed({
+200 |   get: () => props.itemsPerPage,
+201 |   set: (value) => {
+202 |   }
+203 | });
+204 | 
+205 | 
+206 | // --- Methoden ---
+207 | const onOptionsUpdate = (options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }) => {
+208 |   emit('update:options', options);
+209 | };
+210 | 
+211 | const addProject = () => {
+212 |   emit('addProject');
+213 | };
+214 | 
+215 | const isProjectDialogOpen = ref(false);
+216 | const selectedProject = ref<Project | null>(null);
+217 | 
+218 | const openCreateProject = () => {
+219 |   selectedProject.value = null;
+220 |   isProjectDialogOpen.value = true;
+221 | };
+222 | 
+223 | const openEditProject = (project: Project) => {
+224 |   selectedProject.value = project;
+225 |   isProjectDialogOpen.value = true;
+226 | };
+227 | 
+228 | const onProjectSaved = (project: Project) => {
+229 |   isProjectDialogOpen.value = false;
+230 |   console.log(project)
+231 |   // Example: refetch list here if needed
+232 |   // await fetchProjects()
+233 | };
+234 | </script>
+235 | 
+236 | 
+237 | <style scoped>
+238 | /* ... (Styles bleiben) ... */
+239 | 
+240 | </style>
+```
+
+src/components/mediaplan/MediaplanProjects.vue
+```
+1 | <template>
+2 |   <v-card>
+3 |     <v-toolbar flat color="primary" density="comfortable">
+4 |       <v-toolbar-title>Projects</v-toolbar-title>
+5 |       <v-spacer></v-spacer>
+6 |       <v-btn 
+7 |         variant="outlined" 
+8 |         prepend-icon="mdi-plus" 
+9 |         @click="$emit('createProject')"
+10 |         :disabled="isLoading"
+11 |         color="white"
+12 |       >
+13 |         Add Project
+14 |       </v-btn>
+15 |     </v-toolbar>
+16 |     
+17 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
+18 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
+19 |     </div>
+20 |     
+21 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
+22 |       <v-alert type="error" title="Error Loading Projects">
+23 |         {{ error }}
+24 |       </v-alert>
+25 |     </div>
+26 |     
+27 |     <v-data-table-server
+28 |       v-else
+29 |       v-model:items-per-page="itemsPerPage"
+30 |       v-model:page="page"
+31 |       :headers="projectHeaders"
+32 |       :items="projects"
+33 |       :items-length="totalProjects"
+34 |       :loading="isLoading"
+35 |       class="elevation-0"
+36 |       @update:options="onOptionsUpdate"
+37 |     >
+38 |       <!-- Country column with flag -->
+39 |       <template v-slot:item.country="{ item }">
+40 |         <div class="d-flex align-center">
+41 |           <v-avatar size="24" class="mr-2">
+42 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
+43 |           </v-avatar>
+44 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
+45 |         </div>
+46 |       </template>
+47 |       
+48 |       <!-- Campaign Type column -->
+49 |       <template v-slot:item.campaignType="{ item }">
+50 |         <v-chip
+51 |           size="small"
+52 |           :color="getCampaignTypeColor(item.raw.campaignType)"
+53 |           class="text-capitalize"
+54 |         >
+55 |           {{ item.raw.campaignType }}
+56 |         </v-chip>
+57 |       </template>
+58 |       
+59 |       <!-- Created date column -->
+60 |       <template v-slot:item.createdAt="{ item }">
+61 |         {{ formatDate(item.raw.createdAt) }}
+62 |       </template>
+63 |       
+64 |       <!-- Actions column -->
+65 |       <template v-slot:item.actions="{ item }">
+66 |         <v-tooltip text="View Details">
+67 |           <template v-slot:activator="{ props }">
+68 |             <v-btn
+69 |               icon
+70 |               variant="text"
+71 |               density="comfortable"
+72 |               v-bind="props"
+73 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
+74 |             >
+75 |               <v-icon>mdi-eye</v-icon>
+76 |             </v-btn>
+77 |           </template>
+78 |         </v-tooltip>
+79 |         
+80 |         <v-tooltip text="Edit Project">
+81 |           <template v-slot:activator="{ props }">
+82 |             <v-btn
+83 |               icon
+84 |               variant="text"
+85 |               density="comfortable"
+86 |               v-bind="props"
+87 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
+88 |             >
+89 |               <v-icon>mdi-pencil-outline</v-icon>
+90 |             </v-btn>
+91 |           </template>
+92 |         </v-tooltip>
+93 |         
+94 |         <v-tooltip text="Delete Project">
+95 |           <template v-slot:activator="{ props }">
+96 |             <v-btn
+97 |               icon
+98 |               variant="text"
+99 |               density="comfortable"
+100 |               color="error"
+101 |               v-bind="props"
+102 |               @click="$emit('deleteProject', item.raw)"
+103 |             >
+104 |               <v-icon>mdi-delete</v-icon>
+105 |             </v-btn>
+106 |           </template>
+107 |         </v-tooltip>
+108 |       </template>
+109 |       
+110 |       <!-- Empty state -->
+111 |       <template v-slot:no-data>
+112 |         <v-sheet class="d-flex flex-column align-center justify-center pa-6" height="300">
+113 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
+114 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
+115 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
+116 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="$emit('createProject')">
+117 |             Add First Project
+118 |           </v-btn>
+119 |         </v-sheet>
+120 |       </template>
+121 |     </v-data-table-server>
+122 |   </v-card>
+123 | </template>
+124 | 
+125 | <script setup lang="ts">
+126 | import { ref, watch } from 'vue';
+127 | import { formatDate } from '@/helpers/dateUtils';
+128 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
+129 | import type { Project } from '@/types/project';
+130 | 
+131 | // Define props
+132 | interface Props {
+133 |   projects: Project[];
+134 |   mediaplanId: string;
+135 |   totalProjects: number;
+136 |   isLoading: boolean;
+137 |   error: string | null;
+138 | }
+139 | 
+140 | // Define emits
+141 | const emit = defineEmits<{
+142 |   (e: 'createProject'): void;
+143 |   (e: 'deleteProject', project: Project): void;
+144 |   (e: 'update:page', page: number): void;
+145 |   (e: 'update:itemsPerPage', itemsPerPage: number): void;
+146 | }>();
+147 | 
+148 | // Component state
+149 | const page = ref<number>(1);
+150 | const itemsPerPage = ref<number>(10);
+151 | 
+152 | // Watch for pagination changes
+153 | watch([page, itemsPerPage], () => {
+154 |   emit('update:page', page.value);
+155 |   emit('update:itemsPerPage', itemsPerPage.value);
+156 | });
+157 | 
+158 | // Project Table Headers
+159 | const projectHeaders = [
+160 |   { title: 'Name', key: 'name', sortable: true },
+161 |   { title: 'Country', key: 'country', sortable: true },
+162 |   { title: 'Language', key: 'language', sortable: true },
+163 |   { title: 'Campaign Type', key: 'campaignType', sortable: true },
+164 |   { title: 'Phase', key: 'phase', sortable: true },
+165 |   { title: 'Goal', key: 'goal', sortable: true },
+166 |   { title: 'Created At', key: 'createdAt', sortable: true },
+167 |   { title: 'Actions', key: 'actions', sortable: false, align: 'end' },
+168 | ];
+169 | 
+170 | // Method to handle datatable option updates (sorting, etc)
+171 | const onOptionsUpdate = (options: any) => {
+172 |   // You can add additional logic here for sorting if needed
+173 |   // For now, we just update pagination
+174 |   page.value = options.page;
+175 |   itemsPerPage.value = options.itemsPerPage;
+176 | };
+177 | 
+178 | // Receive props with defaults
+179 | const props = withDefaults(defineProps<Props>(), {
+180 |   projects: () => [],
+181 |   totalProjects: 0,
+182 |   error: null
+183 | });
+184 | </script>
+185 | 
+186 | <style scoped>
+187 | .error-container {
+188 |   border-radius: 4px;
+189 |   background-color: rgba(var(--v-theme-error), 0.1);
+190 | }
+191 | </style>
+```
+
+src/components/mediaplan/MediaplanViewToggle.vue
+```
+1 | <template>
+2 |   <div class="view-toggle-container">
+3 |     <v-btn-toggle
+4 |         v-model="selectedView"
+5 |         class="view-toggle"
+6 |         density="comfortable"
+7 |         @update:modelValue="$emit('update:modelValue', $event)"
+8 |     >
+9 |       <v-btn value="planning">Planning view</v-btn>
+10 |       <v-btn value="budget">Budget view</v-btn>
+11 |     </v-btn-toggle>
+12 |   </div>
+13 | </template>
+14 | 
+15 | <script setup lang="ts">
+16 | import { ref, watch } from 'vue'
+17 | 
+18 | // Define props
+19 | interface Props {
+20 |   modelValue: string
+21 | }
+22 | 
+23 | defineEmits(['update:modelValue'])
+24 | const props = defineProps<Props>()
+25 | 
+26 | const selectedView = ref(props.modelValue)
+27 | 
+28 | watch(
+29 |     () => props.modelValue,
+30 |     (newValue) => {
+31 |       selectedView.value = newValue
+32 |     },
+33 |     { immediate: true }
+34 | )
+35 | </script>
+36 | 
+37 | <style scoped>
+38 | .view-toggle .v-btn {
+39 |   background-color: white;
+40 |   color: black;
+41 |   border: 1px solid #ccc;
+42 |   border-radius: 0;
+43 |   font-weight: 500;
+44 | }
+45 | 
+46 | .view-toggle .v-btn.v-btn--active {
+47 |   background-color: black;
+48 |   color: white;
+49 |   border-color: black;
+50 | }
+51 | </style>
+```
+
+src/components/mediaplan/ProjectsList.vue
+```
+1 | <template>
+2 |   <v-card>
+3 |     <v-card-title class="d-flex justify-space-between align-center py-4 px-6">
+4 |       <div class="text-h6">Projects</div>
+5 |       <v-btn 
+6 |         color="primary" 
+7 |         prepend-icon="mdi-plus" 
+8 |         @click="emit('createProject')"
+9 |       >
+10 |         Add Project
+11 |       </v-btn>
+12 |     </v-card-title>
+13 |     
+14 |     <v-divider></v-divider>
+15 |     
+16 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
+17 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
+18 |     </div>
+19 |     
+20 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
+21 |       <v-alert type="error" title="Error Loading Projects">
+22 |         {{ error }}
+23 |       </v-alert>
+24 |     </div>
+25 |     
+26 |     <v-data-table-server
+27 |       v-else
+28 |       v-model:items-per-page="itemsPerPage"
+29 |       v-model:page="page"
+30 |       :headers="projectHeaders"
+31 |       :items="projects"
+32 |       :items-length="totalItems"
+33 |       :loading="isLoading"
+34 |       class="elevation-0"
+35 |       @update:options="onOptionsUpdate"
+36 |     >
+37 |       <!-- Country column with flag -->
+38 |       <template v-slot:item.country="{ item }">
+39 |         <div class="d-flex align-center">
+40 |           <v-avatar size="24" class="mr-2">
+41 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
+42 |           </v-avatar>
+43 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
+44 |         </div>
+45 |       </template>
+46 |       
+47 |       <!-- Campaign Type column -->
+48 |       <template v-slot:item.campaignType="{ item }">
+49 |         <v-chip
+50 |           size="small"
+51 |           :color="getCampaignTypeColor(item.raw.campaignType)"
+52 |           class="text-capitalize"
+53 |         >
+54 |           {{ item.raw.campaignType }}
+55 |         </v-chip>
+56 |       </template>
+57 |       
+58 |       <!-- Created date column -->
+59 |       <template v-slot:item.createdAt="{ item }">
+60 |         {{ formatDate(item.raw.createdAt) }}
+61 |       </template>
+62 |       
+63 |       <!-- Actions column -->
+64 |       <template v-slot:item.actions="{ item }">
+65 |         <v-btn
+66 |           icon
+67 |           variant="text"
+68 |           density="comfortable"
+69 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
+70 |         >
+71 |           <v-icon>mdi-eye</v-icon>
+72 |         </v-btn>
+73 |         <v-btn
+74 |           icon
+75 |           variant="text"
+76 |           density="comfortable"
+77 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
+78 |         >
+79 |           <v-icon>mdi-pencil-outline</v-icon>
+80 |         </v-btn>
+81 |         <v-btn
+82 |           icon
+83 |           variant="text"
+84 |           density="comfortable"
+85 |           color="error"
+86 |           @click="emit('deleteProject', item.raw)"
+87 |         >
+88 |           <v-icon>mdi-delete</v-icon>
+89 |         </v-btn>
+90 |       </template>
+91 |       
+92 |       <!-- Empty state -->
+93 |       <template v-slot:no-data>
+94 |         <div class="d-flex flex-column align-center justify-center pa-6">
+95 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
+96 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
+97 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
+98 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="emit('createProject')">
+99 |             Add First Project
+100 |           </v-btn>
+101 |         </div>
+102 |       </template>
+103 |     </v-data-table-server>
+104 |   </v-card>
+105 | </template>
+106 | 
+107 | <script setup lang="ts">
+108 | import { ref, watch } from 'vue';
+109 | import { formatDate } from '@/helpers/dateUtils';
+110 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
+111 | import type { Project } from '@/types/project';
+112 | 
+113 | // Define props
+114 | interface Props {
+115 |   projects: Project[];
+116 |   mediaplanId: string;
+117 |   totalItems: number;
+118 |   isLoading: boolean;
+119 |   error: string | null;
+120 | }
+121 | 
+122 | // Define emits
+123 | const emit = defineEmits<{
+124 |   (e: 'createProject'): void;
+125 |   (e: 'deleteProject', project: Project): void;
+126 |   (e: 'updatePage', page: number): void;
+127 |   (e: 'updateItemsPerPage', itemsPerPage: number): void;
+128 | }>();
+129 | 
+130 | //
 ```
 
 src/components/overview/CreateFirstProjectDialog.vue
 ```
 1 | <template>
-2 |   <v-dialog :model-value="modelValue" @update:model-value="handleClose" persistent max-width="550px">
+2 |   <v-dialog :model-value="modelValue" @update:model-value="handleClose" persistent max-width="450px">
 3 |     <v-card class="px-6 pa-4">
 4 |       <DialogHeader
 5 |           title="Create new Mediaplan"
@@ -6121,7 +8138,7 @@ src/components/overview/CreateFirstProjectDialog.vue
 185 | 
 186 | interface CreateFirstProjectDialogProps {
 187 |   modelValue: boolean
-188 |   mediaplanIdRef: string
+188 |   mediaplanId: string
 189 |   mediaplanName?: string
 190 |   poNumbers?: { _id: string; name: string; value: number }[]
 191 |   startDate?: string | Date | null
@@ -6158,10 +8175,10 @@ src/components/overview/CreateFirstProjectDialog.vue
 222 | 
 223 | const countries = computed(() => projectStore.countries || []);
 224 | const languageOptions = computed(() => projectStore.languages || []);
-225 | const builders = computed(() => projectStore.builders?.map(b => ({code: b.mediaplanId, name: b.name})) || []);
-226 | const campaignTypes = computed(() => projectStore.campaignTypes?.map(t => ({code: t.mediaplanId, name: t.name})) || []);
-227 | const phases = computed(() => projectStore.phases?.map(p => ({code: p.mediaplanId, name: p.name})) || []);
-228 | const goals = computed(() => projectStore.goals?.map(g => ({code: g.mediaplanId, name: g.name})) || []);
+225 | const builders = computed(() => projectStore.builders?.map(b => ({code: b.id, name: b.name})) || []);
+226 | const campaignTypes = computed(() => projectStore.campaignTypes?.map(t => ({code: t.id, name: t.name})) || []);
+227 | const phases = computed(() => projectStore.phases?.map(p => ({code: p.id, name: p.name})) || []);
+228 | const goals = computed(() => projectStore.goals?.map(g => ({code: g.id, name: g.name})) || []);
 229 | 
 230 | const formIsReady = computed(() => {
 231 |   return isFormValid.value &&
@@ -6220,7 +8237,7 @@ src/components/overview/CreateFirstProjectDialog.vue
 284 |     // Using a combination of country/language as placeholder.
 285 |     // You might need a dedicated input or different logic.
 286 |     const projectCreateData: ProjectCreate = {
-287 |       mediaplanIdRef: props.mediaplanIdRef,
+287 |       mediaplanId: props.mediaplanId,
 288 |       name: `Project ${selectedCountry.value.code}-${selectedLanguage.value}`, // Placeholder name
 289 |       country: selectedCountry.value, // Pass the whole country object
 290 |       language: selectedLanguage.value, // Pass language code
@@ -6345,10 +8362,10 @@ src/components/overview/CreateMediaplanButton.vue
 31 |   dialogVisible.value = true;
 32 | };
 33 | 
-34 | const handleMediaplanCreated = (mediaplanIdRef: string) => {
+34 | const handleMediaplanCreated = (mediaplanId: string) => {
 35 |   // Store the mediaplan ID but don't close the dialog yet
 36 |   // as the project creation will follow
-37 |   console.log('Mediaplan created with ID:', mediaplanIdRef);
+37 |   console.log('Mediaplan created with ID:', mediaplanId);
 38 | };
 39 | 
 40 | const handleProjectCreated = (projectId: string) => {
@@ -6385,383 +8402,405 @@ src/components/overview/CreateMediaplanDialog.vue
 13 |             <!-- Brand Selection -->
 14 |             <FormElementVrowVcol label="Brand Output" required>
 15 |               <v-select
-16 |                   mediaplanId="brand-select"
-17 |                   v-model="formData.brand._id"
+16 |                   id="brand-select"
+17 |                   v-model="formData.brand"
 18 |                   :items="brands"
 19 |                   item-title="name"
 20 |                   item-value="_id"
 21 |                   placeholder="Please Select a brand"
 22 |                   :rules="[v => !!v || 'Brand is required']"
-23 |               />
-24 |             </FormElementVrowVcol>
-25 | 
-26 |             <!-- Mediaplan Type -->
-27 |             <FormElementVrowVcol pb="pb-3" label="Mediaplan Type" required>
-28 |               <v-radio-group v-model="mediaplanType" inline>
-29 |                 <v-radio value="po" label="PO Based"/>
-30 |                 <v-radio value="draft" label="Draft"/>
-31 |               </v-radio-group>
-32 |             </FormElementVrowVcol>
-33 | 
-34 |             <!-- Mediaplan Name -->
-35 |             <FormElementVrowVcol label="Individual Name">
-36 |               <v-text-field
-37 |                   mediaplanId="mediaplan-name"
-38 |                   v-model="formData.name"
-39 |                   placeholder="please type in an individual title"
-40 |                   :rules="[v => !!v || 'Name is required']"
-41 |               />
-42 |             </FormElementVrowVcol>
-43 | 
-44 |             <!-- PO Selection -->
-45 |             <FormElementVrowVcol label="Select existing PO" required>
-46 |               <v-row no-gutters>
-47 |                 <v-col class="mr-2">
-48 |                   <v-select
-49 |                       mediaplanId="po-select"
-50 |                       v-model="selectedPOs"
-51 |                       :items="poNumbers"
-52 |                       item-title="name"
-53 |                       item-value="_id"
-54 |                       placeholder="Select POs"
-55 |                       :rules="[v => mediaplanType !== 'po' || (v && v.length > 0) || 'At least one PO is required']"
-56 |                       multiple
-57 |                       chips
-58 |                       closable-chips
-59 |                   />
-60 |                 </v-col>
-61 |                 <v-col cols="auto">
-62 |                   <v-btn
-63 |                       color="primary"
-64 |                       size="large"
-65 |                       style="height: 48px;"
-66 |                       variant="outlined"
-67 |                       @click="openCreatePODialog"
-68 |                   >
-69 |                     Create PO
-70 |                   </v-btn>
-71 |                 </v-col>
-72 |               </v-row>
-73 |             </FormElementVrowVcol>
-74 | 
-75 |             <!-- Creator and Department -->
-76 |             <FormElementVrowVcol label="Creator" required>
-77 | 
-78 |               <v-text-field
-79 |                   mediaplanId="creator-name"
-80 |                   v-model="creatorName"
-81 |                   placeholder="Your name"
-82 |                   :rules="[v => !!v || 'Creator name is required']"
-83 |                   readonly
-84 |                   disabled
-85 |               />
-86 |             </FormElementVrowVcol>
-87 | 
-88 |             <FormElementVrowVcol label="Department">
-89 |               <v-text-field
-90 |                   mediaplanId="department"
-91 |                   v-model="department"
-92 |                   placeholder="Department name"
-93 |               />
-94 |             </FormElementVrowVcol>
-95 | 
-96 | 
-97 |             <!-- Date Range -->
-98 |             <FormElementVrowVcol label="Start date - End date" required>
-99 |               <DateRangePicker
-100 |                   mediaplanId="date-range"
-101 |                   v-model="dateRange"
-102 |                   placeholder="Select start and end dates"
-103 |                   :rules="[v => !!v || 'Date range is required']"
-104 |                   :required="true"
-105 |                   dialog-title="Choose a date range"
-106 |                   @update:model-value="handleDateRangeChange"
-107 |               />
-108 |             </FormElementVrowVcol>
-109 | 
+23 |               >
+24 |                 <template v-slot:selection="{ item }">
+25 |                   <template v-if="formData.brand">
+26 |                     <v-avatar
+27 |                         size="24"
+28 |                         class="mr-2 grey lighten-4"
+29 |                         :image="getBrandLogo({ _id: item.value, name: item.raw.name })"
+30 |                     />
+31 |                     {{ item.raw.name }}
+32 |                   </template>
+33 |                 </template>
+34 | 
+35 |                 <template v-slot:item="{ item, props }">
+36 |                   <v-list-item v-bind="props" :title="item.raw.name">
+37 |                     <template v-slot:prepend>
+38 |                       <v-avatar
+39 |                           size="32"
+40 |                           class="mr-2 grey lighten-4"
+41 |                           :image="getBrandLogo({ _id: item.value, name: item.raw.name })"
+42 |                       />
+43 |                     </template>
+44 |                   </v-list-item>
+45 |                 </template>
+46 |               </v-select>
+47 |             </FormElementVrowVcol>
+48 | 
+49 |             <!-- Mediaplan Type -->
+50 |             <FormElementVrowVcol pb="pb-3" label="Mediaplan Type" required>
+51 |               <v-radio-group v-model="mediaplanType" inline>
+52 |                 <v-radio value="po" label="PO Based"/>
+53 |                 <v-radio value="draft" label="Draft"/>
+54 |               </v-radio-group>
+55 |             </FormElementVrowVcol>
+56 | 
+57 |             <!-- Mediaplan Name -->
+58 |             <FormElementVrowVcol label="Individual Name">
+59 |               <v-text-field
+60 |                   id="mediaplan-name"
+61 |                   v-model="formData.name"
+62 |                   placeholder="please type in an individual title"
+63 |                   :rules="[v => !!v || 'Name is required']"
+64 |               />
+65 |             </FormElementVrowVcol>
+66 | 
+67 |             <!-- PO Selection -->
+68 |             <FormElementVrowVcol label="Select existing PO" required>
+69 |               <v-row no-gutters>
+70 |                 <v-col class="mr-2">
+71 |                   <v-select
+72 |                       id="po-select"
+73 |                       v-model="selectedPOs"
+74 |                       :items="poNumbers"
+75 |                       item-title="name"
+76 |                       item-value="_id"
+77 |                       placeholder="Select POs"
+78 |                       :rules="[v => mediaplanType !== 'po' || (v && v.length > 0) || 'At least one PO is required']"
+79 |                       multiple
+80 |                       chips
+81 |                       closable-chips
+82 |                   />
+83 |                 </v-col>
+84 |                 <v-col cols="auto">
+85 |                   <v-btn
+86 |                       color="primary"
+87 |                       size="large"
+88 |                       style="height: 48px;"
+89 |                       variant="outlined"
+90 |                       @click="openCreatePODialog"
+91 |                   >
+92 |                     Create PO
+93 |                   </v-btn>
+94 |                 </v-col>
+95 |               </v-row>
+96 |             </FormElementVrowVcol>
+97 | 
+98 |             <!-- Creator and Department -->
+99 |             <FormElementVrowVcol label="Creator" required>
+100 | 
+101 |               <v-text-field
+102 |                   id="creator-name"
+103 |                   v-model="creatorName"
+104 |                   placeholder="Your name"
+105 |                   :rules="[v => !!v || 'Creator name is required']"
+106 |                   readonly
+107 |                   disabled
+108 |               />
+109 |             </FormElementVrowVcol>
 110 | 
-111 |           </v-card-text>
-112 |         </WithFormDefaults>
-113 | 
-114 |         <DialogFooter
-115 |             cancel-text="Cancel"
-116 |             confirm-text="Next Step"
-117 |             :loading="isSubmitting"
-118 |             :disabled="!form?.isValid"
-119 |             :submit-button="true"
-120 |             @cancel="cancelDialog"
-121 |         />
-122 |       </v-form>
-123 |     </v-card>
-124 |   </v-dialog>
-125 | 
-126 |   <!-- Create PO Dialog -->
-127 |   <CreatePoDialog
-128 |       v-model="createPODialogVisible"
-129 |       :initial-brand-mediaplanId="formData.brand._id"
-130 |       @created="handlePoCreated"
-131 |   />
+111 |             <FormElementVrowVcol label="Department">
+112 |               <v-text-field
+113 |                   id="department"
+114 |                   v-model="department"
+115 |                   placeholder="Department name"
+116 |               />
+117 |             </FormElementVrowVcol>
+118 | 
+119 | 
+120 |             <!-- Date Range -->
+121 |             <FormElementVrowVcol label="Start date - End date" required>
+122 |               <DateRangePicker
+123 |                   id="date-range"
+124 |                   v-model="dateRange"
+125 |                   placeholder="Select start and end dates"
+126 |                   :rules="[v => !!v || 'Date range is required']"
+127 |                   :required="true"
+128 |                   dialog-title="Choose a date range"
+129 |                   @update:model-value="handleDateRangeChange"
+130 |               />
+131 |             </FormElementVrowVcol>
 132 | 
-133 |   <!-- Project Creation Dialog (shown after mediaplan creation) -->
-134 |   <CreateFirstProjectDialog
-135 |       mode="create-mediaplan"
-136 |       v-if="showProjectDialog"
-137 |       v-model="showProjectDialog"
-138 |       :mediaplan-mediaplanId="createdMediaplanId"
-139 |       :mediaplan-name="formData.name"
-140 |       :po-numbers="formData.po_numbers"
-141 |       :start-date="formData.start_date"
-142 |       :end-date="formData.end_date"
-143 |       :brand="{ _id: formData.brand._id, name: selectedBrandName }"
-144 |       @created="handleProjectCreated"
-145 |   />
-146 | </template>
-147 | 
+133 | 
+134 |           </v-card-text>
+135 |         </WithFormDefaults>
+136 | 
+137 |         <DialogFooter
+138 |             cancel-text="Cancel"
+139 |             confirm-text="Next Step"
+140 |             :loading="isSubmitting"
+141 |             :disabled="!form?.isValid"
+142 |             :submit-button="true"
+143 |             @cancel="cancelDialog"
+144 |         />
+145 |       </v-form>
+146 |     </v-card>
+147 |   </v-dialog>
 148 | 
-149 | <script setup lang="ts">
-150 | import {ref, computed, onMounted, watch, nextTick, reactive} from 'vue';
-151 | import {useAuthStore} from '@/stores/auth';
-152 | import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
-153 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
-154 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
-155 | import DateRangePicker from './DateRangePicker.vue';
-156 | import CreateFirstProjectDialog from '@/components/overview/CreateFirstProjectDialog.vue';
-157 | import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
-158 | import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
-159 | import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
-160 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
-161 | import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
-162 | 
-163 | // Props
-164 | const props = defineProps<{
-165 |   modelValue: boolean;
-166 | }>();
-167 | // Emits
-168 | const emit = defineEmits<{
-169 |   (e: 'update:modelValue', value: boolean): void;
-170 |   (e: 'created', mediaplanIdRef: string): void;
-171 |   (e: 'project-created', projectId: string): void;
-172 | }>();
-173 | 
-174 | // References
-175 | const form = ref();
-176 | const authStore = useAuthStore();
-177 | const createMediaplanStore = useCreateMediaplanStore();
-178 | 
-179 | // Reactive State
-180 | const dialog = computed({
-181 |   get: () => props.modelValue,
-182 |   set: (value) => emit('update:modelValue', value)
-183 | });
-184 | 
-185 | const mediaplanType = ref('po'); // Default to PO Based
-186 | const selectedPOs = ref<string[]>([]); // Changed to array for multi-select
-187 | const department = ref('');
-188 | const creatorName = ref('Current User');
-189 | const isSubmitting = ref(false);
-190 | const dateRange = ref<[string, string] | null>(null);
-191 | 
-192 | // Project dialog state
-193 | const showProjectDialog = ref(false);
-194 | const createdMediaplanId = ref('');
-195 | 
-196 | // Create PO Dialog
-197 | const createPODialogVisible = ref(false);
-198 | 
-199 | // Use values from the store
-200 | const brands = computed(() => createMediaplanStore.brands);
-201 | const poNumbers = computed(() => createMediaplanStore.poNumbers);
+149 |   <!-- Create PO Dialog -->
+150 |   <CreatePoDialog
+151 |       v-model="createPODialogVisible"
+152 |       :initial-brand-id="formData.brand?._id"
+153 |       @created="handlePoCreated"
+154 |   />
+155 | 
+156 |   <!-- Project Creation Dialog (shown after mediaplan creation) -->
+157 |   <CreateFirstProjectDialog
+158 |       mode="create-mediaplan"
+159 |       v-if="showProjectDialog"
+160 |       v-model="showProjectDialog"
+161 |       :mediaplan-id="createdMediaplanId"
+162 |       :mediaplan-name="formData.name"
+163 |       :po-numbers="formData.po_numbers"
+164 |       :start-date="formData.start_date"
+165 |       :end-date="formData.end_date"
+166 |       :brand="{ _id: formData.brand._id, name: selectedBrandName }"
+167 |       @created="handleProjectCreated"
+168 |   />
+169 | </template>
+170 | 
+171 | 
+172 | <script setup lang="ts">
+173 | import {ref, computed, onMounted, watch, nextTick, reactive} from 'vue';
+174 | import {useAuthStore} from '@/stores/auth';
+175 | import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
+176 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
+177 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
+178 | import DateRangePicker from './DateRangePicker.vue';
+179 | import CreateFirstProjectDialog from '@/components/overview/CreateFirstProjectDialog.vue';
+180 | import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
+181 | import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
+182 | import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
+183 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
+184 | import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
+185 | import {getBrandLogo} from "@/helpers/brandUtils.ts";
+186 | 
+187 | // Props
+188 | const props = defineProps<{
+189 |   modelValue: boolean;
+190 | }>();
+191 | // Emits
+192 | const emit = defineEmits<{
+193 |   (e: 'update:modelValue', value: boolean): void;
+194 |   (e: 'created', mediaplanId: string): void;
+195 |   (e: 'project-created', projectId: string): void;
+196 | }>();
+197 | 
+198 | // References
+199 | const form = ref();
+200 | const authStore = useAuthStore();
+201 | const createMediaplanStore = useCreateMediaplanStore();
 202 | 
-203 | const selectedBrandName = computed(() => {
-204 |   const selectedBrand = brands.value.find(brand => brand._id === formData.brand._id);
-205 |   return selectedBrand ? selectedBrand.name : '';
-206 | });
-207 | 
-208 | // Form data structure
-209 | const formData = reactive<MediaplanCreate>({
-210 |   name: '',
-211 |   status: 'Draft', // Default status
-212 |   start_date: '',
-213 |   end_date: '',
-214 |   brand: {
-215 |     _id: '',
-216 |   },
-217 |   budget: {
-218 |     total: 0,
-219 |     used: 0,
-220 |     available: 0
-221 |   },
-222 |   po_numbers: []
-223 | });
-224 | 
-225 | // Methods
-226 | const handleDateRangeChange = (range: [string, string] | null) => {
-227 |   if (range) {
-228 |     formData.start_date = range[0];
-229 |     formData.end_date = range[1];
-230 |   } else {
-231 |     formData.start_date = '';
-232 |     formData.end_date = '';
-233 |   }
-234 | };
-235 | 
-236 | // Method to handle project creation completion
-237 | const handleProjectCreated = (projectId: string) => {
-238 |   // Close the project dialog
-239 |   showProjectDialog.value = false;
-240 | 
-241 |   // Emit the project created event
-242 |   emit('project-created', projectId);
-243 | 
-244 |   // Close the main dialog as well
-245 |   dialog.value = false;
+203 | // Reactive State
+204 | const dialog = computed({
+205 |   get: () => props.modelValue,
+206 |   set: (value) => emit('update:modelValue', value)
+207 | });
+208 | 
+209 | const mediaplanType = ref('po'); // Default to PO Based
+210 | const selectedPOs = ref<string[]>([]); // Changed to array for multi-select
+211 | const department = ref('');
+212 | const creatorName = ref('Current User');
+213 | const isSubmitting = ref(false);
+214 | const dateRange = ref<[string, string] | null>(null);
+215 | 
+216 | // Project dialog state
+217 | const showProjectDialog = ref(false);
+218 | const createdMediaplanId = ref('');
+219 | 
+220 | // Create PO Dialog
+221 | const createPODialogVisible = ref(false);
+222 | 
+223 | // Use values from the store
+224 | const brands = computed(() => createMediaplanStore.brands);
+225 | const poNumbers = computed(() => createMediaplanStore.poNumbers);
+226 | 
+227 | const selectedBrandName = computed(() => {
+228 |   const selectedBrand = brands.value.find(brand => brand._id === formData.brand._id);
+229 |   return selectedBrand ? selectedBrand.name : '';
+230 | });
+231 | 
+232 | // Form data structure
+233 | const formData = reactive<MediaplanCreate>({
+234 |   name: '',
+235 |   status: 'Draft', // Default status
+236 |   start_date: '',
+237 |   end_date: '',
+238 |   brand: null,
+239 |   budget: {
+240 |     total: 0,
+241 |     used: 0,
+242 |     available: 0
+243 |   },
+244 |   po_numbers: []
+245 | });
 246 | 
-247 |   // Show success notification
-248 |   showSuccess('Project created successfully');
-249 | };
-250 | 
-251 | // Method to handle PO creation
-252 | const handlePoCreated = (po: PONumber) => {
-253 |   // Add the newly created PO to the selected POs
-254 |   selectedPOs.value = [...selectedPOs.value, po._id];
-255 | 
-256 |   // Show success message
-257 |   showSuccess(`PO "${po.name}" created successfully and added to selection`);
-258 | };
-259 | 
-260 | const loadFormData = async () => {
-261 |   try {
-262 |     // Load data from the store
-263 |     if (brands.value.length === 0) {
-264 |       await createMediaplanStore.fetchBrands();
-265 |     }
-266 | 
-267 |     if (poNumbers.value.length === 0) {
-268 |       await createMediaplanStore.fetchPONumbers();
-269 |     }
-270 |   } catch (error) {
-271 |     console.error('Error loading form data:', error);
-272 |     showError('Failed to load form data');
-273 |   }
-274 | };
-275 | 
-276 | const submitForm = async () => {
-277 |   const {valid} = await form.value.validate();
-278 | 
-279 |   if (!valid) return;
-280 | 
-281 |   isSubmitting.value = true;
-282 | 
+247 | // Methods
+248 | const handleDateRangeChange = (range: [string, string] | null) => {
+249 |   if (range) {
+250 |     formData.start_date = range[0];
+251 |     formData.end_date = range[1];
+252 |   } else {
+253 |     formData.start_date = '';
+254 |     formData.end_date = '';
+255 |   }
+256 | };
+257 | 
+258 | // Method to handle project creation completion
+259 | const handleProjectCreated = (projectId: string) => {
+260 |   // Close the project dialog
+261 |   showProjectDialog.value = false;
+262 | 
+263 |   // Emit the project created event
+264 |   emit('project-created', projectId);
+265 | 
+266 |   // Close the main dialog as well
+267 |   dialog.value = false;
+268 | 
+269 |   // Show success notification
+270 |   showSuccess('Project created successfully');
+271 | };
+272 | 
+273 | // Method to handle PO creation
+274 | const handlePoCreated = (po: PONumber) => {
+275 |   // Add the newly created PO to the selected POs
+276 |   selectedPOs.value = [...selectedPOs.value, po._id];
+277 | 
+278 |   // Show success message
+279 |   showSuccess(`PO "${po.name}" created successfully and added to selection`);
+280 | };
+281 | 
+282 | const loadFormData = async () => {
 283 |   try {
-284 |     // Add selected POs to the form data
-285 |     if (mediaplanType.value === 'po' && selectedPOs.value.length > 0) {
-286 |       const selectedPOObjects = poNumbers.value.filter(po => selectedPOs.value.includes(po._id));
-287 |       if (selectedPOObjects.length > 0) {
-288 |         formData.po_numbers = selectedPOObjects;
-289 |         // Calculate total budget from all selected POs
-290 |         formData.budget.total = selectedPOObjects.reduce((sum, po) => sum + po.value, 0);
-291 |       }
-292 |     }
-293 | 
-294 |     // Set status based on the type
-295 |     formData.status = mediaplanType.value === 'po' ? 'Draft' : 'Draft';
-296 | 
-297 |     // For demo purposes, log the payload
-298 |     console.log('Creating mediaplan with data:', formData);
-299 | 
-300 |     // In real application, send to API:
-301 |     try {
-302 |       // This would be the actual API call in production
-303 |       /*
-304 |       const response = await customFetch('/mediaplans', {
-305 |         method: 'POST',
-306 |         headers: {
-307 |           'Content-Type': 'application/json',
-308 |         },
-309 |         body: JSON.stringify(formData),
-310 |       });
-311 |       createdMediaplanId.value = response._id;
-312 |       */
-313 | 
-314 |       // For demo, simulate successful API call
-315 |       await new Promise(resolve => setTimeout(resolve, 800));
-316 | 
-317 |       // Simulate a response with a mock ID
-318 |       createdMediaplanId.value = `mediaplan-${Date.now()}`;
-319 | 
-320 |       // Notify success
-321 |       showSuccess('Mediaplan created successfully');
-322 | 
-323 |       // Emit the created event
-324 |       emit('created', createdMediaplanId.value);
-325 | 
-326 |       // Important: Here we don't cancelDoalog the dialog, but instead show the project dialog
-327 |       showProjectDialog.value = true;
-328 | 
-329 |     } catch (apiError) {
-330 |       console.error('API error creating mediaplan:', apiError);
-331 |       showError('Failed to create mediaplan: API error', {timeout: 10000});
-332 |       throw apiError;
-333 |     }
-334 | 
-335 |   } catch (error) {
-336 |     console.error('Error creating mediaplan:', error);
-337 |     showError('Failed to create mediaplan');
-338 |   } finally {
-339 |     isSubmitting.value = false;
-340 |   }
-341 | };
-342 | 
-343 | // PO Dialog methods
-344 | const openCreatePODialog = () => {
-345 |   if (!formData.brand._id) {
-346 |     showWarning('Please select a brand first');
-347 |     return;
-348 |   }
-349 |   createPODialogVisible.value = true;
-350 | };
-351 | 
-352 | const cancelDialog = () => {
-353 |   resetForm();
-354 |   dialog.value = false;
-355 | };
+284 |     // Load data from the store
+285 |     if (brands.value.length === 0) {
+286 |       await createMediaplanStore.fetchBrands();
+287 |     }
+288 | 
+289 |     if (poNumbers.value.length === 0) {
+290 |       await createMediaplanStore.fetchPONumbers();
+291 |     }
+292 |   } catch (error) {
+293 |     console.error('Error loading form data:', error);
+294 |     showError('Failed to load form data');
+295 |   }
+296 | };
+297 | 
+298 | const submitForm = async () => {
+299 |   const {valid} = await form.value.validate();
+300 | 
+301 |   if (!valid) return;
+302 | 
+303 |   isSubmitting.value = true;
+304 | 
+305 |   try {
+306 |     // Add selected POs to the form data
+307 |     if (mediaplanType.value === 'po' && selectedPOs.value.length > 0) {
+308 |       const selectedPOObjects = poNumbers.value.filter(po => selectedPOs.value.includes(po._id));
+309 |       if (selectedPOObjects.length > 0) {
+310 |         formData.po_numbers = selectedPOObjects;
+311 |         // Calculate total budget from all selected POs
+312 |         formData.budget.total = selectedPOObjects.reduce((sum, po) => sum + po.value, 0);
+313 |       }
+314 |     }
+315 | 
+316 |     // Set status based on the type
+317 |     formData.status = mediaplanType.value === 'po' ? 'Draft' : 'Draft';
+318 | 
+319 |     // For demo purposes, log the payload
+320 |     console.log('Creating mediaplan with data:', formData);
+321 | 
+322 |     // In real application, send to API:
+323 |     try {
+324 |       // This would be the actual API call in production
+325 |       /*
+326 |       const response = await customFetch('/mediaplans', {
+327 |         method: 'POST',
+328 |         headers: {
+329 |           'Content-Type': 'application/json',
+330 |         },
+331 |         body: JSON.stringify(formData),
+332 |       });
+333 |       createdMediaplanId.value = response._id;
+334 |       */
+335 | 
+336 |       // For demo, simulate successful API call
+337 |       await new Promise(resolve => setTimeout(resolve, 800));
+338 | 
+339 |       // Simulate a response with a mock ID
+340 |       createdMediaplanId.value = `mediaplan-${Date.now()}`;
+341 | 
+342 |       // Notify success
+343 |       showSuccess('Mediaplan created successfully');
+344 | 
+345 |       // Emit the created event
+346 |       emit('created', createdMediaplanId.value);
+347 | 
+348 |       // Important: Here we don't cancelDoalog the dialog, but instead show the project dialog
+349 |       showProjectDialog.value = true;
+350 | 
+351 |     } catch (apiError) {
+352 |       console.error('API error creating mediaplan:', apiError);
+353 |       showError('Failed to create mediaplan: API error', {timeout: 10000});
+354 |       throw apiError;
+355 |     }
 356 | 
-357 | const resetForm = async () => {
-358 |   if (form.value) {
-359 |     form.value.reset();
-360 |   }
-361 |   await nextTick();
-362 | 
-363 |   formData.name = '';
-364 |   formData.brand._id = '';
-365 |   formData.start_date = '';
-366 |   formData.end_date = '';
-367 |   dateRange.value = null;
-368 |   selectedPOs.value = [];
-369 |   department.value = '';
-370 |   mediaplanType.value = 'po';
-371 |   showProjectDialog.value = false;
-372 |   createdMediaplanId.value = '';
-373 | };
-374 | 
-375 | // Lifecycle
-376 | onMounted(async () => {
-377 |   await loadFormData();
-378 |   // Set creator name from auth store if available
-379 |   if (authStore.user) {
-380 |     creatorName.value = authStore.user.name || 'Current User';
-381 |   } else {
-382 |     creatorName.value = 'Current User';
-383 |   }
-384 | });
-385 | 
-386 | // Watch for dialog changes to reset form
-387 | watch(dialog, (newValue) => {
-388 |   if (newValue === false) {
-389 |     resetForm();
-390 |   }
-391 | });
-392 | </script>
+357 |   } catch (error) {
+358 |     console.error('Error creating mediaplan:', error);
+359 |     showError('Failed to create mediaplan');
+360 |   } finally {
+361 |     isSubmitting.value = false;
+362 |   }
+363 | };
+364 | 
+365 | // PO Dialog methods
+366 | const openCreatePODialog = () => {
+367 |   if (!formData.brand._id) {
+368 |     showWarning('Please select a brand first');
+369 |     return;
+370 |   }
+371 |   createPODialogVisible.value = true;
+372 | };
+373 | 
+374 | const cancelDialog = () => {
+375 |   resetForm();
+376 |   dialog.value = false;
+377 | };
+378 | 
+379 | const resetForm = async () => {
+380 |   if (form.value) {
+381 |     form.value.reset();
+382 |   }
+383 |   await nextTick();
+384 | 
+385 |   formData.name = '';
+386 |   formData.brand._id = '';
+387 |   formData.start_date = '';
+388 |   formData.end_date = '';
+389 |   dateRange.value = null;
+390 |   selectedPOs.value = [];
+391 |   department.value = '';
+392 |   mediaplanType.value = 'po';
+393 |   showProjectDialog.value = false;
+394 |   createdMediaplanId.value = '';
+395 | };
+396 | 
+397 | // Lifecycle
+398 | onMounted(async () => {
+399 |   await loadFormData();
+400 |   // Set creator name from auth store if available
+401 |   if (authStore.user) {
+402 |     creatorName.value = authStore.user.name || 'Current User';
+403 |   } else {
+404 |     creatorName.value = 'Current User';
+405 |   }
+406 | });
+407 | 
+408 | // Watch for dialog changes to reset form
+409 | watch(dialog, (newValue) => {
+410 |   if (newValue === false) {
+411 |     resetForm();
+412 |   }
+413 | });
+414 | </script>
 ```
 
 src/components/overview/CreatePoDialog.vue
@@ -6785,7 +8824,7 @@ src/components/overview/CreatePoDialog.vue
 17 |               <div class="mb-4">
 18 |                 <label for="client-department" class="text-body-2 mb-1 d-block">Client Department</label>
 19 |                 <v-text-field
-20 |                     mediaplanId="client-department"
+20 |                     id="client-department"
 21 |                     v-model="formData.clientDepartment"
 22 |                     placeholder="Enter the client's department name"
 23 |                     variant="outlined"
@@ -6796,7 +8835,7 @@ src/components/overview/CreatePoDialog.vue
 28 |               <div class="mb-4">
 29 |                 <label for="brand-select" class="text-body-2 mb-1 d-block">Brand*</label>
 30 |                 <v-select
-31 |                     mediaplanId="brand-select"
+31 |                     id="brand-select"
 32 |                     v-model="formData.brand"
 33 |                     :items="brands"
 34 |                     item-title="name"
@@ -6811,7 +8850,7 @@ src/components/overview/CreatePoDialog.vue
 43 |               <div class="mb-4">
 44 |                 <label for="client-name" class="text-body-2 mb-1 d-block">Client Name</label>
 45 |                 <v-text-field
-46 |                     mediaplanId="client-name"
+46 |                     id="client-name"
 47 |                     v-model="formData.clientName"
 48 |                     placeholder="Enter client's full name"
 49 |                     variant="outlined"
@@ -6822,7 +8861,7 @@ src/components/overview/CreatePoDialog.vue
 54 |               <div class="mb-4">
 55 |                 <label for="market-select" class="text-body-2 mb-1 d-block">Market*</label>
 56 |                 <v-select
-57 |                     mediaplanId="market-select"
+57 |                     id="market-select"
 58 |                     v-model="formData.market"
 59 |                     :items="markets"
 60 |                     item-title="name"
@@ -6837,7 +8876,7 @@ src/components/overview/CreatePoDialog.vue
 69 |               <div class="mb-4">
 70 |                 <label for="purpose-text" class="text-body-2 mb-1 d-block">Purpose</label>
 71 |                 <v-textarea
-72 |                     mediaplanId="purpose-text"
+72 |                     id="purpose-text"
 73 |                     v-model="formData.purpose"
 74 |                     placeholder="Describe the purpose of this purchase order"
 75 |                     variant="outlined"
@@ -6854,7 +8893,7 @@ src/components/overview/CreatePoDialog.vue
 86 |               <div class="mb-4">
 87 |                 <label for="po-number" class="text-body-2 mb-1 d-block">PO Number*</label>
 88 |                 <v-text-field
-89 |                     mediaplanId="po-number"
+89 |                     id="po-number"
 90 |                     v-model="formData.poNumber"
 91 |                     placeholder="Enter official purchase order number"
 92 |                     :rules="[v => !!v || 'PO Number is required']"
@@ -6867,7 +8906,7 @@ src/components/overview/CreatePoDialog.vue
 99 |                 <div class="flex-grow-1 mr-2">
 100 |                   <label for="budget" class="text-body-2 mb-1 d-block">Budget*</label>
 101 |                   <v-text-field
-102 |                       mediaplanId="budget"
+102 |                       id="budget"
 103 |                       v-model="formData.budget"
 104 |                       placeholder="Enter budget amount"
 105 |                       type="number"
@@ -6884,7 +8923,7 @@ src/components/overview/CreatePoDialog.vue
 116 |                 <div class="flex-grow-0" style="width: 100px">
 117 |                   <label for="currency" class="text-body-2 mb-1 d-block">Currency</label>
 118 |                   <v-select
-119 |                       mediaplanId="currency"
+119 |                       id="currency"
 120 |                       v-model="formData.currency"
 121 |                       :items="currencies"
 122 |                       variant="outlined"
@@ -6897,7 +8936,7 @@ src/components/overview/CreatePoDialog.vue
 129 |               <div class="mb-4">
 130 |                 <label for="validity-range" class="text-body-2 mb-1 d-block">Validity Period*</label>
 131 |                 <DateRangePicker
-132 |                     mediaplanId="validity-range"
+132 |                     id="validity-range"
 133 |                     v-model="dateRange"
 134 |                     label=""
 135 |                     placeholder="Select validity period"
@@ -6912,7 +8951,7 @@ src/components/overview/CreatePoDialog.vue
 144 |               <div class="mb-4">
 145 |                 <label for="contractor-department" class="text-body-2 mb-1 d-block">Contractor Department</label>
 146 |                 <v-text-field
-147 |                     mediaplanId="contractor-department"
+147 |                     id="contractor-department"
 148 |                     v-model="formData.contractorDepartment"
 149 |                     placeholder="Enter contractor's department name"
 150 |                     variant="outlined"
@@ -6923,7 +8962,7 @@ src/components/overview/CreatePoDialog.vue
 155 |               <div class="mb-4">
 156 |                 <label for="contractor-name" class="text-body-2 mb-1 d-block">Contractor Name</label>
 157 |                 <v-text-field
-158 |                     mediaplanId="contractor-name"
+158 |                     id="contractor-name"
 159 |                     v-model="formData.contractorName"
 160 |                     placeholder="Enter contractor's full name"
 161 |                     variant="outlined"
@@ -7341,214 +9380,216 @@ src/components/overview/MediaplanCard.vue
 ```
 1 | <template>
 2 |   <div class="position-relative card-wrapper">
-3 |     <v-card 
-4 |       class="h-100 pa-3 mediaplan-card" 
-5 |       elevation="3" 
-6 |       :data-mediaplan-mediaplanId="mediaplan._id"
-7 |       @click="handleCardClick"
+3 |     <v-card
+4 |         class="h-100 pa-3 mediaplan-card"
+5 |         elevation="3"
+6 |         :data-mediaplan-id="mediaplan._id"
+7 |         @click="handleCardClick"
 8 |     >
-9 |     <v-card-item class="pb-8">
-10 |       <div class="d-flex align-center">
-11 |         <v-tooltip
-12 |             location="top"
-13 |             open-delay="300"
-14 |         >
-15 |           <template v-slot:activator="{ props }">
-16 |             <div
-17 |                 class="text-h6 text-truncate mediaplan-title pr-1"
-18 |                 v-bind="props"
-19 |             >
-20 |               {{ mediaplan.name }}
-21 |             </div>
-22 |           </template>
-23 |           <span>{{ mediaplan.name }}</span>
-24 |         </v-tooltip>
-25 |         <v-icon size="x-small" color="primary" icon="mdi-pencil-outline" class="mr-3"/>
+9 |       <v-card-item class="pb-8">
+10 |         <div class="d-flex align-center">
+11 |           <v-tooltip
+12 |               location="top"
+13 |               open-delay="300"
+14 |           >
+15 |             <template v-slot:activator="{ props }">
+16 |               <div
+17 |                   class="text-h6 text-truncate mediaplan-title pr-1"
+18 |                   v-bind="props"
+19 |               >
+20 |                 {{ mediaplan.name }}
+21 |               </div>
+22 |             </template>
+23 |             <span>{{ mediaplan.name }}</span>
+24 |           </v-tooltip>
+25 |           <v-icon size="x-small" color="primary" icon="mdi-pencil-outline" class="mr-3"/>
 26 | 
-27 |         <!-- Brand logo -->
-28 |         <v-img
-29 |             :src="getBrandLogo(mediaplan.brand)"
-30 |             max-width="40"
-31 |             contain
-32 |             class="ml-auto"
-33 |         />
-34 |       </div>
+27 |           <!-- Brand logo -->
+28 |           <v-img
+29 |               :src="getBrandLogo(mediaplan.brand)"
+30 |               max-width="40"
+31 |               contain
+32 |               class="ml-auto"
+33 |           />
+34 |         </div>
 35 | 
-36 |       <!-- Status and date range on same row -->
-37 |       <div class="d-flex align-center justify-space-between mt-2">
-38 |         <div class="d-flex align-center">
-39 |           <v-icon
-40 |               icon="mdi-circle"
-41 |               :color="getMediaplanStatusColor(mediaplan.status)"
-42 |               size="x-small"
-43 |               class="mr-1"
-44 |           />
-45 |           <span class="status-text text-grey">{{ getMediaplanStatusLabel(mediaplan.status) }}</span>
-46 |         </div>
+36 |         <!-- Status and date range on same row -->
+37 |         <div class="d-flex align-center justify-space-between mt-2">
+38 |           <div class="d-flex align-center">
+39 |             <v-icon
+40 |                 icon="mdi-circle"
+41 |                 :color="getMediaplanStatusColor(mediaplan.status)"
+42 |                 size="x-small"
+43 |                 class="mr-1"
+44 |             />
+45 |             <span class="status-text text-grey">{{ getMediaplanStatusLabel(mediaplan.status) }}</span>
+46 |           </div>
 47 | 
-48 |         <div class="d-flex align-center">
-49 |           <v-icon size="small" icon="mdi-calendar-range" class="mr-1"/>
-50 |           <span class="date-range-text text-grey">{{ formatDateRange(mediaplan.start_date, mediaplan.end_date) }}</span>
-51 |         </div>
-52 |       </div>
-53 |     </v-card-item>
-54 | 
-55 |     <v-card-text>
-56 |       <!-- Creator row -->
-57 |       <div class="d-flex justify-space-between mb-3">
-58 |         <span class="text-subtitle-2">Creator</span>
-59 |         <span class="text-subtitle-2 font-weight-medium">{{ mediaplan.created_by?.name || 'N/A' }}</span>
-60 |       </div>
-61 | 
-62 |       <v-divider class="pt-1 pb-4"></v-divider>
-63 |       <!-- Total Budget row -->
-64 |       <div class="d-flex justify-space-between mb-3">
-65 |         <span class="text-subtitle-2">Total Budget</span>
-66 |         <div class="d-flex align-center">
-67 |           <v-icon size="x-small" icon="mdi-circle" color="green" class="mr-1"/>
-68 |           <span class="text-subtitle-2 font-weight-medium">{{ formatCurrency(mediaplan.budget?.total) }}</span>
-69 |         </div>
-70 |       </div>
-71 | 
-72 |       <v-divider class="pt-1 pb-4"></v-divider>
-73 |       <!-- Used Budget row -->
-74 |       <div class="d-flex justify-space-between mb-3">
-75 |         <span class="text-subtitle-2">Used Budget</span>
-76 |         <div class="d-flex align-center">
-77 |           <v-icon size="x-small" icon="mdi-circle" color="red" class="mr-1"/>
-78 |           <span class="text-subtitle-2 font-weight-medium">{{ formatCurrency(mediaplan.budget?.used) }}</span>
-79 |         </div>
-80 |       </div>
-81 | 
-82 |       <v-divider class="pt-1 pb-4"></v-divider>
-83 |       <!-- PO Numbers row -->
-84 |       <div class="d-flex justify-space-between" v-if="mediaplan.po_numbers && mediaplan.po_numbers.length > 0">
-85 |         <span class="text-subtitle-2">PO</span>
-86 |         <span class="text-subtitle-2 font-weight-medium text-truncate" style="max-width: 70%">
-87 |           {{ mediaplan.po_numbers.map(po => po.name).join(', ') }}
-88 |         </span>
-89 |       </div>
-90 |     </v-card-text>
-91 | 
-92 |     <v-card-actions>
-93 |       <!-- Action buttons -->
-94 |       <v-spacer/>
-95 |       
-96 |       <!-- Options menu -->
-97 |       <mediaplan-options-menu
-98 |           :mediaplan-mediaplanId="mediaplan._id"
-99 |           @action="handleMenuAction"
-100 |       />
-101 | 
-102 |       <!-- Navigation button -->
-103 |       <v-btn
-104 |           variant="flat"
-105 |           color="primary"
-106 |           :to="{ name: 'MediaplanDetail', params: { mediaplanId: mediaplan._id }}"
-107 |       >
-108 |         Show Mediaplan
-109 |       </v-btn>
-110 |       <br>
-111 | 
-112 |     </v-card-actions>
-113 |   </v-card>
-114 |   </div>
-115 | </template>
-116 | 
-117 | 
-118 | <script setup lang="ts">
-119 | import { ref } from 'vue';
-120 | import { Mediaplan } from '@/types/mediaplan';
-121 | import { getMediaplanStatusColor, getMediaplanStatusLabel } from '@/constants/mediaplanStatuses';
-122 | import MediaplanOptionsMenu from "@/components/overview/MediaplanOptionsMenu.vue";
-123 | import { useRouter } from 'vue-router';
-124 | import { formatDateRange } from '@/helpers/dateUtils';
-125 | import { formatCurrency } from '@/helpers/currencyUtils';
-126 | import { getBrandLogo } from '@/helpers/brandUtils';
-127 | 
-128 | // Store mediaplan prop in a variable to access it throughout the component
-129 | const props = defineProps<{
-130 |   mediaplan: Mediaplan;
-131 | }>();
-132 | 
-133 | const emit = defineEmits<{
-134 |   (e: 'view', mediaplanId: string): void;
-135 |   (e: 'edit', mediaplanId: string): void;
-136 |   (e: 'add-po', mediaplanId: string): void;
-137 |   (e: 'export', mediaplanId: string): void;
-138 |   (e: 'duplicate', mediaplanId: string): void;
-139 |   (e: 'archive', mediaplanId: string): void;
-140 |   (e: 'delete', mediaplanId: string): void;
-141 | }>();
-142 | 
-143 | const router = useRouter();
+48 |           <div class="d-flex align-center">
+49 |             <v-icon size="small" icon="mdi-calendar-range" class="mr-1"/>
+50 |             <span class="date-range-text text-grey">{{
+51 |                 formatDateRange(mediaplan.start_date, mediaplan.end_date)
+52 |               }}</span>
+53 |           </div>
+54 |         </div>
+55 |       </v-card-item>
+56 | 
+57 |       <v-card-text>
+58 |         <!-- Creator row -->
+59 |         <div class="d-flex justify-space-between mb-3">
+60 |           <span class="text-subtitle-2">Creator</span>
+61 |           <span class="text-subtitle-2 font-weight-medium">{{ mediaplan.created_by?.name || 'N/A' }}</span>
+62 |         </div>
+63 | 
+64 |         <v-divider class="pt-1 pb-4"></v-divider>
+65 |         <!-- Total Budget row -->
+66 |         <div class="d-flex justify-space-between mb-3">
+67 |           <span class="text-subtitle-2">Total Budget</span>
+68 |           <div class="d-flex align-center">
+69 |             <v-icon size="x-small" icon="mdi-circle" color="green" class="mr-1"/>
+70 |             <span class="text-subtitle-2 font-weight-medium">{{ formatCurrency(mediaplan.budget?.total) }}</span>
+71 |           </div>
+72 |         </div>
+73 | 
+74 |         <v-divider class="pt-1 pb-4"></v-divider>
+75 |         <!-- Used Budget row -->
+76 |         <div class="d-flex justify-space-between mb-3">
+77 |           <span class="text-subtitle-2">Used Budget</span>
+78 |           <div class="d-flex align-center">
+79 |             <v-icon size="x-small" icon="mdi-circle" color="red" class="mr-1"/>
+80 |             <span class="text-subtitle-2 font-weight-medium">{{ formatCurrency(mediaplan.budget?.used) }}</span>
+81 |           </div>
+82 |         </div>
+83 | 
+84 |         <v-divider class="pt-1 pb-4"></v-divider>
+85 |         <!-- PO Numbers row -->
+86 |         <div class="d-flex justify-space-between" v-if="mediaplan.po_numbers && mediaplan.po_numbers.length > 0">
+87 |           <span class="text-subtitle-2">PO</span>
+88 |           <span class="text-subtitle-2 font-weight-medium text-truncate" style="max-width: 70%">
+89 |           {{ mediaplan.po_numbers.map(po => po.name).join(', ') }}
+90 |         </span>
+91 |         </div>
+92 |       </v-card-text>
+93 | 
+94 |       <v-card-actions>
+95 |         <!-- Action buttons -->
+96 |         <v-spacer/>
+97 | 
+98 |         <!-- Options menu -->
+99 |         <mediaplan-options-menu
+100 |             :mediaplan-id="mediaplan._id"
+101 |             @action="handleMenuAction"
+102 |         />
+103 | 
+104 |         <!-- Navigation button -->
+105 |         <v-btn
+106 |             variant="flat"
+107 |             color="primary"
+108 |             :to="{ name: 'MediaplanDetail', params: { mediaplanId: mediaplan._id }}"
+109 |         >
+110 |           Show Mediaplan
+111 |         </v-btn>
+112 |         <br>
+113 | 
+114 |       </v-card-actions>
+115 |     </v-card>
+116 |   </div>
+117 | </template>
+118 | 
+119 | 
+120 | <script setup lang="ts">
+121 | import {ref} from 'vue';
+122 | import {Mediaplan} from '@/types/mediaplan';
+123 | import {getMediaplanStatusColor, getMediaplanStatusLabel} from '@/constants/mediaplanStatuses';
+124 | import MediaplanOptionsMenu from "@/components/overview/MediaplanOptionsMenu.vue";
+125 | import {useRouter} from 'vue-router';
+126 | import {formatDateRange} from '@/helpers/dateUtils';
+127 | import {formatCurrency} from '@/helpers/currencyUtils';
+128 | import {getBrandLogo} from '@/helpers/brandUtils';
+129 | 
+130 | // Store mediaplan prop in a variable to access it throughout the component
+131 | const props = defineProps<{
+132 |   mediaplan: Mediaplan;
+133 | }>();
+134 | 
+135 | const emit = defineEmits<{
+136 |   (e: 'view', mediaplanId: string): void;
+137 |   (e: 'edit', mediaplanId: string): void;
+138 |   (e: 'add-po', mediaplanId: string): void;
+139 |   (e: 'export', mediaplanId: string): void;
+140 |   (e: 'duplicate', mediaplanId: string): void;
+141 |   (e: 'archive', mediaplanId: string): void;
+142 |   (e: 'delete', mediaplanId: string): void;
+143 | }>();
 144 | 
-145 | // Handle card click for navigation
-146 | const handleCardClick = (event: MouseEvent) => {
-147 |   // Don't navigate if clicking on buttons or menu items
-148 |   if ((event.target as HTMLElement).closest('.v-card__actions')) {
-149 |     return;
-150 |   }
-151 |   
-152 |   // Navigate to detail page
-153 |   router.push({ name: 'MediaplanDetail', params: { mediaplanId: props.mediaplan._id }});
-154 | };
-155 |   
-156 | const handleMenuAction = (action: string, mediaplanId: string) => {
-157 |   switch (action) {
-158 |     case 'view':
-159 |       router.push({ name: 'MediaplanDetail', params: { mediaplanId }});
-160 |       break;
-161 |     case 'edit':
-162 |       router.push({ name: 'MediaplanEdit', params: { mediaplanId }});
-163 |       break;
-164 |     case 'addPo':
-165 |       emit('add-po', mediaplanId);
-166 |       break;
-167 |     case 'export':
-168 |       emit('export', mediaplanId);
-169 |       break;
-170 |     case 'duplicate':
-171 |       emit('duplicate', mediaplanId);
-172 |       break;
-173 |     case 'archive':
-174 |       emit('archive', mediaplanId);
-175 |       break;
-176 |     case 'delete':
-177 |       emit('delete', mediaplanId);
-178 |       break;
-179 |   }
-180 | };
-181 | </script>
-182 | 
-183 | <style scoped>
-184 | .mediaplan-title {
-185 |   overflow: hidden;
-186 |   text-overflow: ellipsis;
-187 |   white-space: nowrap;
-188 |   flex: 1;
-189 | }
-190 | 
-191 | .status-text, .date-range-text {
-192 |   font-size: 12px;
-193 | }
-194 | 
-195 | .mediaplan-card {
-196 |   cursor: pointer;
-197 |   transition: transform 0.2s, box-shadow 0.2s;
-198 | }
-199 | 
-200 | .mediaplan-card:hover {
-201 |   transform: translateY(-4px);
-202 |   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
-203 | }
-204 | 
-205 | /* Override cursor for buttons and menu */
-206 | .v-menu__content, 
-207 | .v-card__actions .v-btn {
-208 |   cursor: default;
-209 | }
-210 | </style>
+145 | const router = useRouter();
+146 | 
+147 | // Handle card click for navigation
+148 | const handleCardClick = (event: MouseEvent) => {
+149 |   // Don't navigate if clicking on buttons or menu items
+150 |   if ((event.target as HTMLElement).closest('.v-card__actions')) {
+151 |     return;
+152 |   }
+153 | 
+154 |   // Navigate to detail page
+155 |   router.push({name: 'MediaplanDetail', params: {mediaplanId: props.mediaplan._id}});
+156 | };
+157 | 
+158 | const handleMenuAction = (action: string, mediaplanId: string) => {
+159 |   switch (action) {
+160 |     case 'view':
+161 |       router.push({name: 'MediaplanDetail', params: {mediaplanId: id}});
+162 |       break;
+163 |     case 'edit':
+164 |       router.push({name: 'MediaplanEdit', params: {mediaplanId: id}});
+165 |       break;
+166 |     case 'addPo':
+167 |       emit('add-po', id);
+168 |       break;
+169 |     case 'export':
+170 |       emit('export', id);
+171 |       break;
+172 |     case 'duplicate':
+173 |       emit('duplicate', id);
+174 |       break;
+175 |     case 'archive':
+176 |       emit('archive', id);
+177 |       break;
+178 |     case 'delete':
+179 |       emit('delete', id);
+180 |       break;
+181 |   }
+182 | };
+183 | </script>
+184 | 
+185 | <style scoped>
+186 | .mediaplan-title {
+187 |   overflow: hidden;
+188 |   text-overflow: ellipsis;
+189 |   white-space: nowrap;
+190 |   flex: 1;
+191 | }
+192 | 
+193 | .status-text, .date-range-text {
+194 |   font-size: 12px;
+195 | }
+196 | 
+197 | .mediaplan-card {
+198 |   cursor: pointer;
+199 |   transition: transform 0.2s, box-shadow 0.2s;
+200 | }
+201 | 
+202 | .mediaplan-card:hover {
+203 |   transform: translateY(-4px);
+204 |   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+205 | }
+206 | 
+207 | /* Override cursor for buttons and menu */
+208 | .v-menu__content,
+209 | .v-card__actions .v-btn {
+210 |   cursor: default;
+211 | }
+212 | </style>
 ```
 
 src/components/overview/MediaplanFilters.vue
@@ -7869,31 +9910,27 @@ src/components/overview/MediaplanList.vue
 98 | 
 99 | 
 100 | // --- Methods ---
-101 | const viewMediaplan = (mediaplanIdRef: string) => {
-102 |   router.push({name: 'MediaplanDetail', params: {mediaplanId: mediaplanIdRef}});
+101 | const viewMediaplan = (mediaplanId: string) => {
+102 |   router.push({name: 'MediaplanDetail', params: {mediaplanId}});
 103 | };
 104 | 
-105 | // --- Interne Logik ---
-106 | // Keine eigene Datenabfrage (fetchMediaplans) mehr
-107 | // Kein eigener Ladezustand, Fehlerstatus, etc. - kommt alles über Props
-108 | 
-109 | </script>
-110 | 
-111 | 
-112 | <style scoped>
-113 | .mediaplan-col {
-114 |   min-width: 300px; /* Etwas kleiner für bessere Anpassung */
-115 |   /* max-width: 420px; */ /* Max-Breite kann oft weggelassen werden, wenn cols gesetzt sind */
+105 | </script>
+106 | 
+107 | 
+108 | <style scoped>
+109 | .mediaplan-col {
+110 |   min-width: 300px; /* Etwas kleiner für bessere Anpassung */
+111 |   /* max-width: 420px; */ /* Max-Breite kann oft weggelassen werden, wenn cols gesetzt sind */
+112 | }
+113 | 
+114 | .d-flex {
+115 |   display: flex;
 116 | }
 117 | 
-118 | .d-flex {
-119 |   display: flex;
+118 | .flex-grow-1 {
+119 |   flex-grow: 1;
 120 | }
-121 | 
-122 | .flex-grow-1 {
-123 |   flex-grow: 1;
-124 | }
-125 | </style>
+121 | </style>
 ```
 
 src/components/overview/MediaplanOptionsMenu.vue
@@ -7972,12 +10009,12 @@ src/components/overview/MediaplanOptionsMenu.vue
 72 | 
 73 | // Props
 74 | const props = defineProps<{
-75 |   mediaplanIdRef: string;
+75 |   mediaplanId: string;
 76 | }>();
 77 | 
 78 | // Emit events
 79 | const emit = defineEmits<{
-80 |   (e: 'action', action: string, mediaplanIdRef: string): void;
+80 |   (e: 'action', action: string, mediaplanId: string): void;
 81 | }>();
 82 | 
 83 | // State
@@ -7988,7 +10025,7 @@ src/components/overview/MediaplanOptionsMenu.vue
 88 |   // Prevent event propagation
 89 |   event?.stopPropagation();
 90 |   
-91 |   emit('action', action, props.mediaplanIdRef);
+91 |   emit('action', action, props.mediaplanId);
 92 |   isOpen.value = false;
 93 | };
 94 | </script>
@@ -8008,137 +10045,186 @@ src/components/overview/PaginationControls.vue
 src/components/project/CampaignListView.vue
 ```
 1 | <script setup lang="ts">
-2 | import {ref, computed} from 'vue';
-3 | import type {Campaign} from '@/types/campaign';
+2 | import {computed, ref} from 'vue';
+3 | import type {Campaign} from '@/types/campaigns'; // Corrected path
 4 | import {useRouter} from 'vue-router';
-5 | import {campaignHeaders} from "@/constants/campaign.ts";
-6 | 
-7 | // --- Props ---
-8 | interface Props {
-9 |   campaigns: Campaign[];
-10 |   totalCampaigns: number;
-11 |   isLoading: boolean;
-12 |   currentPage: number;
-13 |   itemsPerPage: number;
-14 | }
-15 | 
-16 | const props = withDefaults(defineProps<Props>(), { /* ... defaults ... */});
-17 | 
-18 | // --- Emits ---
-19 | const emit = defineEmits<{
-20 |   (e: 'addCampaign'): void;
-21 |   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
-22 | }>();
-23 | 
-24 | // --- Router ---
-25 | const router = useRouter();
-26 | 
-27 | // --- Tabelle Models & Header ---
-28 | const pageModel = computed({
-29 |   get: () => props.currentPage + 1, set: () => {
-30 |   }
-31 | });
-32 | const itemsPerPageModel = computed({
-33 |   get: () => props.itemsPerPage, set: () => {
-34 |   }
-35 | });
-36 | 
-37 | // --- Methoden ---
-38 | const onOptionsUpdate = (options: any) => {
-39 |   emit('update:options', options);
-40 | };
-41 | const triggerAddCampaign = () => {
-42 |   emit('addCampaign');
-43 | };
-44 | const editCampaign = (item: Campaign) => {
-45 |   console.log('Edit Campaign:', item._id);
-46 | };
-47 | const deleteCampaign = (item: Campaign) => {
-48 |   console.log('Delete Campaign:', item._id);
-49 | };
-50 | 
-51 | </script>
+5 | import {campaignHeaders} from "@/constants/campaign";
+6 | import {formatDate} from '@/helpers/dateUtils';
+7 | import type {VDataTableServer} from 'vuetify/components/VDataTable';
+8 | import {getBrandLogo} from "@/helpers/brandUtils.ts";
+9 | 
+10 | type ReadonlyHeaders = VDataTableServer['$props']['headers'];
+11 | type Options = VDataTableServer['$props']['options']; // Type for options
+12 | 
+13 | // --- Props (Restored original props) ---
+14 | interface Props {
+15 |   items: Campaign[];
+16 |   totalCampaigns: number;
+17 |   isLoading: boolean;
+18 |   currentPage: number; // 0-basiert
+19 |   itemsPerPage: number;
+20 |   type?: 'multi' | 'single';
+21 |   modelValue?: string[]; // For selection checkboxes
+22 |   mediaplanId: string;   // Needed for links
+23 | }
+24 | 
+25 | const props = withDefaults(defineProps<Props>(), {
+26 |   type: 'multi',
+27 |   modelValue: () => []
+28 | });
+29 | 
+30 | // --- Emits (Original emits) ---
+31 | const emit = defineEmits<{
+32 |   (e: 'addCampaign'): void;
+33 |   (e: 'update:options', options: Options): void; // Event für Parent zum Aktualisieren
+34 |   (e: 'editCampaign', campaign: Campaign): void;
+35 |   (e: 'deleteCampaign', campaign: Campaign): void;
+36 |   (e: 'update:modelValue', selectedIds: string[]): void; // For selection
+37 | }>();
+38 | 
+39 | // --- Router (unverändert) ---
+40 | const router = useRouter();
+41 | 
+42 | // --- Tabelle Models & Header ---
+43 | const pageModel = computed({
+44 |   get: () => props.currentPage + 1,
+45 |   // SET: (Nicht implementiert wie gewünscht)
+46 | });
+47 | 
+48 | const itemsPerPageModel = computed({
+49 |   get: () => props.itemsPerPage,
+50 |   // SET: (Nicht implementiert wie gewünscht)
+51 | });
 52 | 
-53 | <template>
-54 |   <div class="campaign-list-container">
-55 |     <v-card class="campaigns-table elevation-1">
-56 |       <v-data-table-server
-57 |           v-model:items-per-page="itemsPerPageModel"
-58 |           v-model:page="pageModel"
-59 |           :headers="campaignHeaders"
-60 |           :items="campaigns"
-61 |           :items-length="totalCampaigns"
-62 |           :loading="isLoading"
-63 |           :items-per-page-options="[15, 30, 50, 100]"
-64 |           item-value="_id"
-65 |           hover
-66 |           class="campaigns-data-table"
-67 |           @update:options="onOptionsUpdate"
-68 |       >
-69 |         <template v-slot:item.edit="{ item }">
-70 |           <v-btn icon density="compact" variant="text" @click.stop="editCampaign(item)">
-71 |             <v-icon>mdi-pencil-outline</v-icon>
-72 |             <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
-73 |           </v-btn>
-74 |         </template>
-75 |         <template v-slot:item.campaignname="{ item }"> {{ item.campaignname }}</template>
-76 |         <template v-slot:item.created_at="{ item }">
-77 |           {{ item.created_at ? new Date(item.created_at).toLocaleDateString('de-DE') : '-' }}
-78 |         </template>
-79 |         <template v-slot:item.campaigndetail="{ item }">
-80 |           <span class="d-inline-block text-truncate" style="max-width: 200px;"> {{ item.campaigndetail || '-' }} </span>
-81 |           <v-tooltip v-if="item.campaigndetail && item.campaigndetail.length > 30" activator="parent" location="top"
-82 |                      max-width="300px"> {{ item.campaigndetail }}
-83 |           </v-tooltip>
-84 |         </template>
-85 |         <template v-slot:item.actions="{ item }">
-86 |           <v-menu>
-87 |             <template v-slot:activator="{ props: menuProps }">
-88 |               <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
-89 |             </template>
-90 |             <v-list density="compact">
-91 |               <v-list-item @click.stop="editCampaign(item)">
-92 |                 <template v-slot:prepend>
-93 |                   <v-icon size="small">mdi-pencil-outline</v-icon>
-94 |                 </template>
-95 |                 <v-list-item-title>Edit</v-list-item-title>
-96 |               </v-list-item>
-97 |               <v-list-item @click.stop="deleteCampaign(item)" class="text-error">
-98 |                 <template v-slot:prepend>
-99 |                   <v-icon size="small">mdi-delete-outline</v-icon>
-100 |                 </template>
-101 |                 <v-list-item-title>Delete</v-list-item-title>
-102 |               </v-list-item>
-103 |             </v-list>
-104 |           </v-menu>
-105 |         </template>
-106 |         <template v-slot:loading>
-107 |           <v-skeleton-loader type="table-row@10"></v-skeleton-loader>
-108 |         </template>
-109 |         <template v-slot:no-data>
-110 |           <div class="text-center pa-4 text-grey">
-111 |             <v-icon size="large" class="mb-2">mdi-bullhorn-off-outline</v-icon>
-112 |             <p>No campaigns found for this project.</p></div>
-113 |         </template>
-114 | 
-115 |         <template v-slot:bottom>
-116 |           <v-divider></v-divider>
-117 |           <div class="d-flex align-center pa-3">
-118 |             <v-btn prepend-icon="mdi-plus" variant="text" @click="triggerAddCampaign" :disabled="isLoading">
-119 |               Add Campaign
-120 |             </v-btn>
-121 |             <v-spacer></v-spacer>
-122 |             <span class="text-caption mr-4 text-disabled" v-if="totalCampaigns > 0 && !isLoading">
-123 |                   Total: {{ totalCampaigns }} Campaigns
-124 |                </span>
-125 |           </div>
-126 |         </template>
-127 |       </v-data-table-server>
-128 |     </v-card>
-129 |   </div>
-130 | </template>
-131 | 
-132 | <style scoped> /* ... */ </style>
+53 | const selectedCampaigns = computed({
+54 |   get: () => props.modelValue,
+55 |   set: (value) => {
+56 |     emit('update:modelValue', value);
+57 |   }
+58 | });
+59 | 
+60 | // --- Methoden ---
+61 | const onOptionsUpdate = (options: Options) => {
+62 |   emit('update:options', options);
+63 | };
+64 | 
+65 | const triggerAddCampaign = () => {
+66 |   emit('addCampaign');
+67 | };
+68 | const editCampaign = (item: Campaign) => {
+69 |   emit('editCampaign', item);
+70 | };
+71 | const deleteCampaign = (item: Campaign) => {
+72 |   emit('deleteCampaign', item);
+73 | };
+74 | 
+75 | // Add missing method stubs
+76 | const editProject = (item: Campaign) => {
+77 |   console.log('Edit project:', item);
+78 |   // TODO: Implement edit project logic
+79 | };
+80 | 
+81 | // --- UI Steuerung ---
+82 | const hideFooter = computed(() => props.type === 'single');
+83 | const itemsPerPageOptions = computed(() => props.type === 'single' ? [] : [15, 30, 50, 100]);
+84 | 
+85 | // --- Funktion zum Erstellen des Detail-Links (unverändert) ---
+86 | const getCampaignDetailRoute = (campaign: Campaign) => {
+87 |   if (!props.mediaplanId || !campaign.pid || !campaign._id) {
+88 |     console.warn('Missing IDs for campaign detail route', props.mediaplanId, campaign.pid, campaign._id);
+89 |     return {};
+90 |   }
+91 |   return {
+92 |     name: 'LineitemDetail', // Assuming this is the correct route name
+93 |     params: {
+94 |       mediaplanId: props.mediaplanId,
+95 |       projectId: campaign.pid,
+96 |       campaignId: campaign._id
+97 |     }
+98 |   };
+99 | };
+100 | 
+101 | </script>
+102 | 
+103 | <template>
+104 | 
+105 |   <div class="campaign-list-container">
+106 |     <v-card class="campaigns-table elevation-1">
+107 |       <v-data-table-server
+108 |           v-model="selectedCampaigns"
+109 |           v-model:items-per-page="itemsPerPageModel"
+110 |           v-model:page="pageModel"
+111 |           :headers="campaignHeaders"
+112 |           :items="props.items"
+113 |           :items-length="props.totalCampaigns"
+114 |           :loading="props.isLoading"
+115 |           :items-per-page-options="itemsPerPageOptions"
+116 |           item-value="_id"
+117 |           hover
+118 |           class="campaigns-data-table"
+119 |           :hide-default-footer="hideFooter"
+120 |           :hide-default-header="hideFooter"
+121 |           @update:options="onOptionsUpdate"
+122 |       >
+123 |         <template v-slot:item.campaignname="{ item }">
+124 |           <router-link
+125 |               :to="getCampaignDetailRoute(item)"
+126 |               v-if="item.campaignname && type==='multi'"
+127 |               class="name-link d-flex align-center"
+128 |               @click.stop>
+129 |             {{ item.campaignname }}
+130 |           </router-link>
+131 |           <div class="d-flex align-center" v-else-if="item.campaignname">
+132 |             <span>{{ item.campaignname }}</span>
+133 |           </div>
+134 |         </template>
+135 | 
+136 | 
+137 |         <template v-slot:item.actions="{ item }">
+138 |           <v-btn icon density="compact" size="small" variant="text" @click.stop="openEditProject(item)" class="mr-2">
+139 |             <v-icon>mdi-pencil-outline</v-icon>
+140 |             <v-tooltip activator="parent" location="top">Edit Campaign</v-tooltip>
+141 |           </v-btn>
+142 |           <v-menu>
+143 |             <template v-slot:activator="{ props: menuProps }">
+144 |               <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
+145 |             </template>
+146 |             <v-list density="compact">
+147 |               <v-list-item @click.stop="() => console.log('Edit Campaign:', item._id)">
+148 |                 <v-list-item-title>Edit</v-list-item-title>
+149 |               </v-list-item>
+150 |               <v-list-item @click.stop="() => console.log('Delete Campaign:', item._id)" class="text-error">
+151 |                 <v-list-item-title>Delete</v-list-item-title>
+152 |               </v-list-item>
+153 |             </v-list>
+154 |           </v-menu>
+155 |         </template>
+156 |         <template v-slot:loading>
+157 |           <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
+158 |         </template>
+159 |         <template v-slot:no-data>
+160 |           <div class="text-center pa-4">No campaigns found.</div>
+161 |         </template>
+162 | 
+163 |         <template v-slot:bottom v-if="props.type === 'multi'">
+164 |           <div class="d-flex align-center pa-4 bg-grey-lighten-2">
+165 |             <v-btn
+166 |                 prepend-icon="mdi-plus"
+167 |                 variant="text" color="black" @click="triggerAddCampaign"
+168 |                 :disabled="props.isLoading"
+169 |                 class="black-text-button">
+170 |               Add Campaign
+171 |             </v-btn>
+172 |             <v-spacer></v-spacer>
+173 |           </div>
+174 |         </template>
+175 |       </v-data-table-server>
+176 |     </v-card>
+177 |   </div>
+178 | </template>
+179 | 
+180 | <style scoped>
+181 | </style>
 ```
 
 src/components/project/EditOrCreateProjectDialog.vue
@@ -8155,222 +10241,272 @@ src/components/project/EditOrCreateProjectDialog.vue
 10 | 
 11 |       <v-form ref="form" @submit.prevent="onSubmit" v-model="isFormValid" validate-on="input">
 12 |         <WithFormDefaults>
-13 | 
-14 |           <!-- Country & Language -->
-15 |           <CountryLanguageSelector v-model="countryLanguage"/>
-16 | 
-17 |           <!-- Date Range -->
-18 |           <FormElementVrowVcol label="Start date - End date" required>
-19 |             <DateRangePicker
-20 |                 mediaplanId="date-range"
-21 |                 v-model="dateRange"
-22 |                 placeholder="Select start and end dates"
-23 |                 :rules="[required]"
-24 |                 dialog-title="Choose a date range"
-25 |                 @update:model-value="handleDateRangeChange"
-26 |             />
-27 |           </FormElementVrowVcol>
-28 | 
-29 |           <FormElementVrowVcol label="PO Number">
-30 |             <v-text-field v-model="project.poNumber" placeholder="Optional PO Number"/>
-31 |           </FormElementVrowVcol>
-32 | 
-33 |           <FormElementVrowVcol label="Builder" required>
-34 |             <v-select
-35 |                 v-model="project.builder"
-36 |                 :items="builders"
-37 |                 item-title="name"
-38 |                 item-value="code"
-39 |                 placeholder="Select Builder"
-40 |                 :rules="[required]"
-41 |             />
-42 |           </FormElementVrowVcol>
-43 | 
-44 |           <FormElementVrowVcol label="Campaign Type" required>
-45 |             <v-select
-46 |                 v-model="project.campaignType"
-47 |                 :items="campaignTypes"
-48 |                 item-title="name"
-49 |                 item-value="code"
-50 |                 placeholder="Select Campaign Type"
-51 |                 :rules="[required]"
-52 |             />
-53 |           </FormElementVrowVcol>
-54 | 
-55 |           <FormElementVrowVcol label="Phase" required>
-56 |             <v-select
-57 |                 v-model="project.phase"
-58 |                 :items="phases"
-59 |                 item-title="name"
-60 |                 item-value="code"
-61 |                 placeholder="Select Phase"
-62 |                 :rules="[required]"
-63 |             />
-64 |           </FormElementVrowVcol>
-65 | 
-66 |           <FormElementVrowVcol label="Goal" required>
-67 |             <v-select
-68 |                 v-model="project.goal"
-69 |                 :items="goals"
-70 |                 item-title="name"
-71 |                 item-value="code"
-72 |                 placeholder="Select Goal"
-73 |                 :rules="[required]"
-74 |             />
-75 |           </FormElementVrowVcol>
-76 | 
-77 |           <FormElementVrowVcol label="Budget">
-78 |             <v-text-field v-model="project.budget" type="number" placeholder="Enter Budget (€)"/>
-79 |           </FormElementVrowVcol>
-80 | 
-81 |           <DialogFooter
-82 |               class="mt-5"
-83 |               cancel-text="Cancel"
-84 |               :confirm-text="isEdit ? 'Save' : 'Create'"
-85 |               :disabled="!isFormValid"
-86 |               @cancel="close"
-87 |               @confirm="onSubmit"
-88 |           />
-89 |         </WithFormDefaults>
-90 | 
-91 |       </v-form>
-92 |     </v-card>
-93 |   </v-dialog>
-94 | </template>
-95 | 
-96 | <script setup lang="ts">
-97 | import {ref, onMounted, computed} from 'vue';
-98 | import type {Project} from '@/types/project';
-99 | import type {ProjectCountry} from '@/types/project'; // already imported in your other dialog
-100 | 
-101 | import {useProjectStore} from '@/stores/projectStore';
-102 | import {showSuccess, showError} from '@/helpers/notificationUtils';
-103 | import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
-104 | import DateRangePicker from "@/components/overview/DateRangePicker.vue";
-105 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
-106 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
-107 | import CountryLanguageSelector from "@/components/common/dialog/CountryLanguageSelector.vue";
-108 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
-109 | 
-110 | const props = defineProps<{
-111 |   modelValue: boolean;
-112 |   isEdit?: boolean;
-113 |   initialData?: Project;
-114 | }>();
-115 | 
-116 | const emit = defineEmits<{
-117 |   (e: 'update:modelValue', value: boolean): void;
-118 |   (e: 'saved', project: Project): void;
-119 | }>();
-120 | 
-121 | const form = ref<any>(null);
-122 | const isFormValid = ref(false);
-123 | const projectStore = useProjectStore();
-124 | 
-125 | const required = (v: any) => !!v || 'Required';
-126 | 
-127 | // Separate "shallow" editable model
-128 | const project = ref<Partial<Project>>({
-129 |   startDate: '',
-130 |   endDate: '',
-131 |   poNumber: '',
-132 |   builder: null,
-133 |   campaignType: null,
-134 |   phase: null,
-135 |   goal: null,
-136 |   budget: undefined
-137 | });
+13 |           <!-- Country & Language -->
+14 |           <CountryLanguageSelector v-model="countryLanguage"/>
+15 |           <!-- Date Range -->
+16 |           <FormElementVrowVcol label="Start date - End date" required>
+17 |             <DateRangePicker
+18 |                 id="date-range"
+19 |                 v-model="dateRange"
+20 |                 placeholder="Select start and end dates"
+21 |                 :rules="[required]"
+22 |                 dialog-title="Choose a date range"
+23 |                 @update:model-value="handleDateRangeChange"
+24 |             />
+25 |           </FormElementVrowVcol>
+26 | 
+27 |           <FormElementVrowVcol label="PO Number">
+28 |             <v-select
+29 |                 id="po-select"
+30 |                 v-model="project.poNumber"
+31 |                 :items="poNumbers"
+32 |                 item-title="name"
+33 |                 item-value="_id"
+34 |                 placeholder="Select POs"
+35 |                 :rules="[(v && v.length > 0) || 'At least one PO is required']"
+36 |                 multiple
+37 |                 chips
+38 |                 closable-chips
+39 |             />
+40 |           </FormElementVrowVcol>
+41 | 
+42 |           <FormElementVrowVcol label="Builder" required>
+43 |             <v-select
+44 |                 v-model="project.builder"
+45 |                 :items="builders"
+46 |                 item-title="name"
+47 |                 item-value="code"
+48 |                 placeholder="Select Builder"
+49 |                 :rules="[required]"
+50 |             />
+51 |           </FormElementVrowVcol>
+52 | 
+53 |           <FormElementVrowVcol label="Campaign Type" required>
+54 |             <v-select
+55 |                 v-model="project.campaignType"
+56 |                 :items="campaignTypes"
+57 |                 item-title="name"
+58 |                 item-value="code"
+59 |                 placeholder="Select Campaign Type"
+60 |                 :rules="[required]"
+61 |             />
+62 |           </FormElementVrowVcol>
+63 | 
+64 |           <FormElementVrowVcol label="Phase" required>
+65 |             <v-select
+66 |                 v-model="project.phase"
+67 |                 :items="phases"
+68 |                 item-title="name"
+69 |                 item-value="code"
+70 |                 placeholder="Select Phase"
+71 |                 :rules="[required]"
+72 |             />
+73 |           </FormElementVrowVcol>
+74 | 
+75 |           <FormElementVrowVcol label="Goal" required>
+76 |             <v-select
+77 |                 v-model="project.goal"
+78 |                 :items="goals"
+79 |                 item-title="name"
+80 |                 item-value="code"
+81 |                 placeholder="Select Goal"
+82 |                 :rules="[required]"
+83 |             />
+84 |           </FormElementVrowVcol>
+85 | 
+86 |           <FormElementVrowVcol label="Budget">
+87 |             <FormattedCurrencyInput
+88 |                 v-model="project.budget"
+89 |                 suffix="€"
+90 |                 :decimal="'comma'"
+91 |                 :allowDecimals="true"
+92 |                 outlined
+93 |                 density="compact"
+94 |                 hide-details="auto"
+95 |             />
+96 |           </FormElementVrowVcol>
+97 | 
+98 |           <DialogFooter
+99 |               class="mt-5"
+100 |               cancel-text="Cancel"
+101 |               :confirm-text="isEdit ? 'Save' : 'Create'"
+102 |               :disabled="!isFormValid"
+103 |               @cancel="close"
+104 |               @confirm="onSubmit"
+105 |           />
+106 |         </WithFormDefaults>
+107 | 
+108 |       </v-form>
+109 |     </v-card>
+110 |   </v-dialog>
+111 | </template>
+112 | 
+113 | <script setup lang="ts">
+114 | import {ref, onMounted, computed} from 'vue';
+115 | import type {Project} from '@/types/project';
+116 | import type {ProjectCountry} from '@/types/project'; // already imported in your other dialog
+117 | 
+118 | import {useProjectStore} from '@/stores/projectStore';
+119 | import {showSuccess, showError} from '@/helpers/notificationUtils';
+120 | import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
+121 | import DateRangePicker from "@/components/overview/DateRangePicker.vue";
+122 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
+123 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
+124 | import CountryLanguageSelector from "@/components/common/dialog/CountryLanguageSelector.vue";
+125 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
+126 | import FormattedCurrencyInput from "@/components/common/FormattedCurrencyInput.vue";
+127 | 
+128 | const props = defineProps<{
+129 |   modelValue: boolean;
+130 |   isEdit?: boolean;
+131 |   initialData?: Project;
+132 | }>();
+133 | 
+134 | const emit = defineEmits<{
+135 |   (e: 'update:modelValue', value: boolean): void;
+136 |   (e: 'saved', project: Project): void;
+137 | }>();
 138 | 
-139 | const countryLanguage = ref<{
-140 |   country: ProjectCountry | null;
-141 |   language: string | null;
-142 | }>({
-143 |   country: null,
-144 |   language: null
-145 | });
-146 | 
-147 | const dateRange = ref<[string, string] | null>(null);
-148 | 
-149 | const handleDateRangeChange = ([start, end]: [string, string]) => {
-150 |   project.value.startDate = start;
-151 |   project.value.endDate = end;
-152 | };
-153 | 
-154 | const close = () => emit('update:modelValue', false);
-155 | 
-156 | onMounted(async () => {
-157 |   await projectStore.fetchProjectOptions();
-158 |   if (props.isEdit && props.initialData) {
-159 |     project.value = {
-160 |       ...props.initialData,
-161 |       poNumber: props.initialData.descriptive_vars?.bmwponumber || '',
-162 |       budget: props.initialData.budget,
-163 |       startDate: props.initialData.duration?.start_date || '',
-164 |       endDate: props.initialData.duration?.end_date || ''
-165 |     };
+139 | const form = ref<any>(null);
+140 | const isFormValid = ref(false);
+141 | const projectStore = useProjectStore();
+142 | 
+143 | const required = (v: any) => !!v || 'Required';
+144 | 
+145 | // Separate "shallow" editable model
+146 | const project = ref<Partial<Project>>({
+147 |   startDate: '',
+148 |   endDate: '',
+149 |   poNumber: '',
+150 |   builder: null,
+151 |   campaignType: null,
+152 |   phase: null,
+153 |   goal: null,
+154 |   budget: undefined
+155 | });
+156 | 
+157 | const countryLanguage = ref<{
+158 |   country: ProjectCountry | null;
+159 |   language: string | null;
+160 | }>({
+161 |   country: null,
+162 |   language: null
+163 | });
+164 | 
+165 | const dateRange = ref<[string, string] | null>(null);
 166 | 
-167 |     countryLanguage.value = {
-168 |       country: {
-169 |         name: props.initialData.descriptive_vars.country,
-170 |         code: props.initialData.descriptive_vars.country // fallback
-171 |       },
-172 |       language: props.initialData.default_vars.language
-173 |     };
+167 | const handleDateRangeChange = ([start, end]: [string, string]) => {
+168 |   project.value.startDate = start;
+169 |   project.value.endDate = end;
+170 | };
+171 | 
+172 | const close = () => emit('update:modelValue', false);
+173 | import { watch } from 'vue'
 174 | 
-175 |     dateRange.value = [project.value.startDate, project.value.endDate];
-176 |   }
-177 | });
-178 | 
-179 | const builders = computed(() => projectStore.builders);
-180 | const campaignTypes = computed(() => projectStore.campaignTypes);
-181 | const phases = computed(() => projectStore.phases);
-182 | const goals = computed(() => projectStore.goals);
-183 | 
-184 | const onSubmit = async () => {
-185 |   const isValid = await form.value.validate();
-186 |   if (!isValid) return;
-187 | 
-188 |   try {
-189 |     const payload: Partial<Project> = {
-190 |       ...project.value,
-191 |       duration: {
-192 |         start_date: project.value.startDate!,
-193 |         end_date: project.value.endDate!,
-194 |         formatted: '' // add formatted logic here if needed
-195 |       },
-196 |       descriptive_vars: {
-197 |         country: countryLanguage.value.country?.code || '',
-198 |         bmwponumber: project.value.poNumber || '',
-199 |         brand: '',
-200 |         adobecampaignname: '',
-201 |         campaigntype: '',
-202 |         projectname: '',
-203 |         subsegment: '',
-204 |         year: new Date().getFullYear()
-205 |       },
-206 |       default_vars: {
-207 |         language: countryLanguage.value.language || '',
-208 |         campaigntype: project.value.campaignType || '',
-209 |         subsegment: '',
-210 |         adtype: '',
-211 |         dimension: '',
-212 |         targeturls: null,
-213 |         campaigndetail: null
-214 |       }
-215 |     };
-216 | 
-217 |     const result = props.isEdit
-218 |         ? await projectStore.updateProject(payload)
-219 |         : await projectStore.createProject(payload);
-220 | 
-221 |     showSuccess(`Project ${props.isEdit ? 'updated' : 'created'} successfully`);
-222 |     emit('saved', result);
-223 |     close();
-224 |   } catch (err: any) {
-225 |     showError(err?.message || 'Operation failed');
-226 |   }
-227 | };
-228 | </script>
+175 | watch(
+176 |     () => props.initialData,
+177 |     (newData) => {
+178 |       if (props.isEdit && newData) {
+179 |         const startDate = newData.duration?.start_date ?? '';
+180 |         const endDate = newData.duration?.end_date ?? '';
+181 | 
+182 |         project.value = {
+183 |           startDate,
+184 |           endDate,
+185 |           poNumber: newData.descriptive_vars?.bmwponumber ?? '',
+186 |           builder: newData.builder ?? null,
+187 |           campaignType: newData.default_vars?.campaigntype ?? '',
+188 |           phase: newData.phase ?? '',
+189 |           goal: newData.goal ?? '',
+190 |           budget: newData.budget?.total ?? undefined,
+191 |         };
+192 | 
+193 |         dateRange.value = [startDate, endDate];
+194 | 
+195 |         countryLanguage.value = {
+196 |           country: newData.descriptive_vars?.country
+197 |               ? { name: newData.descriptive_vars.country, code: newData.descriptive_vars.country }
+198 |               : null,
+199 |           language: newData.default_vars?.language ?? ''
+200 |         };
+201 |       }
+202 |     },
+203 |     { immediate: true } // Trigger the watcher also on component mount
+204 | );
+205 | onMounted(async () => {
+206 |   await projectStore.fetchProjectOptions();
+207 | /*  console.log(props.initialData, 'props.initialData')
+208 |   if (!(props.isEdit && props.initialData)) {
+209 |     return;
+210 |   }
+211 |   project.value = {
+212 |     ...props.initialData,
+213 |     poNumber: props.initialData.descriptive_vars?.bmwponumber || '',
+214 |     budget: props.initialData.budget,
+215 |     startDate: props.initialData.duration?.start_date || '',
+216 |     endDate: props.initialData.duration?.end_date || ''
+217 |   };
+218 |   countryLanguage.value = {
+219 |     country: {
+220 |       name: props.initialData.descriptive_vars.country,
+221 |       code: props.initialData.descriptive_vars.country // fallback
+222 |     },
+223 |     language: props.initialData.default_vars.language
+224 |   };
+225 |   dateRange.value = [project.value.startDate, project.value.endDate];*/
+226 | });
+227 | 
+228 | const builders = computed(() => projectStore.builders);
+229 | const campaignTypes = computed(() => projectStore.campaignTypes);
+230 | const phases = computed(() => projectStore.phases);
+231 | const goals = computed(() => projectStore.goals);
+232 | const poNumbers = computed(() => projectStore.poNumbers);
+233 | 
+234 | const onSubmit = async () => {
+235 |   const isValid = await form.value.validate();
+236 |   if (!isValid) return;
+237 | 
+238 |   try {
+239 |     const payload: Partial<Project> = {
+240 |       ...project.value,
+241 |       duration: {
+242 |         start_date: project.value.startDate!,
+243 |         end_date: project.value.endDate!,
+244 |         formatted: '' // add formatted logic here if needed
+245 |       },
+246 |       descriptive_vars: {
+247 |         country: countryLanguage.value.country?.code || '',
+248 |         bmwponumber: project.value.poNumber || '',
+249 |         brand: '',
+250 |         adobecampaignname: '',
+251 |         campaigntype: '',
+252 |         projectname: '',
+253 |         subsegment: '',
+254 |         year: new Date().getFullYear()
+255 |       },
+256 |       default_vars: {
+257 |         language: countryLanguage.value.language || '',
+258 |         campaigntype: project.value.campaignType || '',
+259 |         subsegment: '',
+260 |         adtype: '',
+261 |         dimension: '',
+262 |         targeturls: null,
+263 |         campaigndetail: null
+264 |       }
+265 |     };
+266 | 
+267 |     const result = props.isEdit
+268 |         ? await projectStore.updateProject(payload)
+269 |         : await projectStore.createProject(payload);
+270 | 
+271 |     showSuccess(`Project ${props.isEdit ? 'updated' : 'created'} successfully`);
+272 |     emit('saved', result);
+273 |     close();
+274 |   } catch (err: any) {
+275 |     showError(err?.message || 'Operation failed');
+276 |   }
+277 | };
+278 | </script>
 ```
 
 src/components/project/ProjectDetailTable.vue
@@ -8388,7 +10524,7 @@ src/components/project/ProjectDetailTable.vue
 11 | const editProject = (project: Project) => {
 12 |   console.log('Edit project:', project._id);
 13 |   // Navigation zur Edit-Seite oder Dialog öffnen
-14 |   // router.push({ name: 'ProjectEdit', params: { mediaplanIdRef: props.mediaplanIdRef, projectId: project._id } });
+14 |   // router.push({ name: 'ProjectEdit', params: { mediaplanId: props.mediaplanId, projectId: project._id } });
 15 | };
 16 | </script>
 17 | 
@@ -8404,1444 +10540,172 @@ src/components/project/ProjectDetailTable.vue
 27 |           item-value="_id"
 28 |           density="compact"
 29 |       >
-30 |         <template v-slot:item.edit="{ item }">
-31 |           <v-btn icon density="compact" variant="text"  @click.stop="editProject(item)">
-32 |             <v-icon>mdi-pencil-outline</v-icon>
-33 |             <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
-34 |           </v-btn>
-35 |         </template>
-36 |         <template #item.abbreviation="{ item }">
-37 |           <div class="d-flex align-center">
-38 |             <v-avatar size="32" class="mr-2 grey lighten-4" :image="getBrandLogo(item.descriptive_vars?.brand)" />
-39 |             <span>{{ item.abbreviation }}</span>
-40 |           </div>
-41 |         </template>
-42 | 
-43 |         <template #item.descriptive_vars.country="{ item }">
-44 |           <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
-45 |             <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2" />
-46 |             <span>{{ item.descriptive_vars.country }}</span>
-47 |           </div>
-48 |         </template>
-49 | 
-50 |         <template #item.duration.formatted="{ item }">
-51 |           <div class="d-flex align-center" v-if="item.duration?.formatted">
-52 |             <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
-53 |             <span>{{ item.duration.formatted }}</span>
-54 |           </div>
-55 |         </template>
-56 | 
-57 |         <template #item.detail="{ item }">
-58 |           <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
-59 |           <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top">
-60 |             {{ item.detail }}
-61 |           </v-tooltip>
-62 |         </template>
-63 | 
-64 |         <template #item.default_vars.campaigntype="{ item }">
-65 |           {{ item.default_vars?.campaigntype || 'N/A' }}
-66 |         </template>
-67 | 
-68 |         <template #item.default_vars.subsegment="{ item }">
-69 |           {{ item.default_vars?.subsegment || 'N/A' }}
-70 |         </template>
-71 | 
-72 |         <template #item.is_locked="{ item }">
-73 |           <v-icon :color="item.is_locked ? 'orange' : 'grey-lighten-1'">
-74 |             {{ item.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant' }}
-75 |           </v-icon>
-76 |           <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
-77 |         </template>
-78 |         <template v-slot:item.actions="{ item }">
-79 |           <v-menu>
-80 |             <template v-slot:activator="{ props: menuProps }">
-81 |               <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
-82 |             </template>
-83 |             <v-list density="compact">
-84 |               <v-list-item @click.stop="editProject(item)">
-85 |                 <v-list-item-title>Edit</v-list-item-title>
-86 |               </v-list-item>
-87 |               <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
-88 |                 <v-list-item-title>Delete</v-list-item-title>
-89 |               </v-list-item>
-90 |             </v-list>
-91 |           </v-menu>
-92 |         </template>
-93 |       </v-data-table>
-94 |     </v-theme-provider>
-95 |   </v-card>
-96 | </template>
-97 | 
-98 | <style scoped>
-99 | /* Increase vertical spacing in the row */
-100 | ::v-deep(.project-detail-table .v-data-table__td) {
-101 |   padding-top: 6px !important;
-102 |   padding-bottom: 6px !important;
-103 | }
-104 | </style>
-```
-
-src/components/mediaplan/DeleteProjectDialog.vue
-```
-1 | <template>
-2 |   <v-dialog v-model="internalValue" max-width="500" persistent>
-3 |     <v-card>
-4 |       <v-toolbar color="error" density="comfortable" dark>
-5 |         <v-toolbar-title>Confirm Delete</v-toolbar-title>
-6 |       </v-toolbar>
-7 |       
-8 |       <v-card-text class="pa-6">
-9 |         <v-alert
-10 |           v-if="error"
-11 |           type="error"
-12 |           variant="tonal"
-13 |           class="mb-4"
-14 |           closable
-15 |         >
-16 |           {{ error }}
-17 |         </v-alert>
-18 |         
-19 |         <p class="text-body-1">
-20 |           Are you sure you want to delete the project <strong>{{ project?.name }}</strong>?
-21 |         </p>
-22 |         <p class="text-body-2 mt-2 text-red">
-23 |           This action cannot be undone.
-24 |         </p>
-25 |       </v-card-text>
-26 |       
-27 |       <v-card-actions class="pa-6 pt-0">
-28 |         <v-spacer></v-spacer>
-29 |         <v-btn 
-30 |           variant="text" 
-31 |           @click="closeDialog"
-32 |           :disabled="isLoading"
-33 |         >
-34 |           Cancel
-35 |         </v-btn>
-36 |         <v-btn 
-37 |           color="error" 
-38 |           variant="flat"
-39 |           :loading="isLoading"
-40 |           @click="confirmDeletion"
-41 |         >
-42 |           Delete Project
-43 |         </v-btn>
-44 |       </v-card-actions>
-45 |     </v-card>
-46 |   </v-dialog>
-47 | </template>
-48 | 
-49 | <script setup lang="ts">
-50 | import { computed } from 'vue';
-51 | import type { Project } from '@/types/project';
-52 | 
-53 | // Define props
-54 | interface Props {
-55 |   modelValue: boolean;
-56 |   project: Project | null;
-57 |   isLoading: boolean;
-58 |   error: string | null;
-59 | }
-60 | 
-61 | // Define emits
-62 | const emit = defineEmits<{
-63 |   (e: 'update:modelValue', value: boolean): void;
-64 |   (e: 'confirm'): void;
-65 |   (e: 'cancel'): void;
-66 | }>();
-67 | 
-68 | // Computed property for v-model binding
-69 | const internalValue = computed({
-70 |   get: () => props.modelValue,
-71 |   set: (value: boolean) => emit('update:modelValue', value)
-72 | });
-73 | 
-74 | const closeDialog = () => {
-75 |   emit('cancel');
-76 | };
-77 | 
-78 | const confirmDeletion = () => {
-79 |   emit('confirm');
-80 | };
-81 | 
-82 | // Receive props with defaults
-83 | const props = withDefaults(defineProps<Props>(), {
-84 |   project: null,
-85 |   error: null
-86 | });
-87 | </script>
-```
-
-src/components/mediaplan/MediaplanBreadcrumb.vue
-```
-1 | // src/components/mediaplan/MediaplanBreadcrumb.vue (Angepasst)
-2 | 
-3 | <script setup lang="ts">
-4 | import {computed} from 'vue';
-5 | import {useRouter} from 'vue-router';
-6 | import type {Mediaplan} from '@/types/mediaplan'; // Pfad prüfen
-7 | import type {Project} from '@/types/project';
-8 | import {getBrandLogo} from "@/helpers/brandUtils.ts";   // Pfad prüfen
-9 | const router = useRouter();
-10 | 
-11 | // --- Props ---
-12 | // Akzeptiert jetzt optional ein ganzes Project-Objekt
-13 | interface Props {
-14 |   mediaplan?: Mediaplan | null;
-15 |   project?: Project | null;     // NEU: Akzeptiert Project-Objekt statt nur Name
-16 |   campaignName?: string;        // Bleibt vorerst als String
-17 | }
-18 | 
-19 | // Define events
-20 | const emit = defineEmits(['back']);
-21 | 
-22 | // Props mit Defaults
-23 | const props = withDefaults(defineProps<Props>(), {
-24 |   mediaplan: null,
-25 |   project: null,
-26 |   campaignName: '',
-27 | });
-28 | 
-29 | // --- Computed Properties für die Anzeige ---
-30 | const breadcrumbItems = computed(() => {
-31 |   const items = [];
-32 |   // Immer Home/Übersicht als Basis? Oder dynamisch? Hier als Beispiel statisch.
-33 |   items.push({title: 'Mediaplans', to: '/', disabled: !props.mediaplan});
-34 | 
-35 |   if (props.mediaplan) {
-36 |     items.push({
-37 |       title: props.mediaplan.name || 'Mediaplan',
-38 |       // Link nur aktiv, wenn wir tiefer sind (also wenn ein Projekt übergeben wurde)
-39 |       to: props.project ? {name: 'MediaplanDetail', params: {mediaplanId: props.mediaplan._id}} : undefined,
-40 |       disabled: !props.project
-41 |     });
-42 | 
-43 |     if (props.project) {
-44 |       items.push({
-45 |         title: props.project.abbreviation || props.project.descriptive_vars?.projectname || 'Project',
-46 |         // Link nur aktiv, wenn wir tiefer sind (also wenn campaignName übergeben wurde)
-47 |         to: props.campaignName ? {
-48 |           name: 'ProjectDetail',
-49 |           params: {mediaplanIdRef: props.mediaplan._id, projectId: props.project._id}
-50 |         } : undefined,
-51 |         disabled: !props.campaignName
-52 |       });
-53 | 
-54 |       if (props.campaignName) {
-55 |         items.push({
-56 |           title: props.campaignName,
-57 |           // Kein Link für das letzte Element
-58 |           disabled: true
-59 |         });
-60 |       }
-61 |     }
-62 |   }
-63 |   return items;
-64 | });
-65 | 
-66 | 
-67 | // --- Methods ---
-68 | const handleBack = () => {
-69 |   emit('back'); // Event auslösen
-70 |   // Gehe zur Mediaplan-Übersicht (oder eine Ebene höher, falls möglich/gewünscht)
-71 |   router.push({name: 'Overview'}); // Gehe zur allgemeinen Übersicht
-72 | };
-73 | 
-74 | </script>
-75 | 
-76 | <template>
-77 |   <div class="d-flex align-center">
-78 |     <v-btn
-79 |         icon
-80 |         variant="text"
-81 |         size="small"
-82 |         class="mr-1"
-83 |         @click="handleBack"
-84 |         aria-label="Go back to overview"
-85 |     >
-86 |       <v-icon> mdi-arrow-u-left-top
-87 |       </v-icon>
-88 |       <v-tooltip activator="parent" location="bottom">Back to Overview</v-tooltip>
-89 |     </v-btn>
-90 | 
-91 |     <div class="breadcrumb-content d-flex align-center flex-wrap">
-92 |       <div class="brand-logo mr-2 flex-shrink-0" v-if="mediaplan?.brand">
-93 |         <v-img
-94 |             :src="getBrandLogo(mediaplan.brand)"
-95 |             :alt="mediaplan.brand.name || ''"
-96 |             width="50"
-97 |             height="25"
-98 |             contain
-99 |         ></v-img>
-100 |       </div>
-101 | 
-102 |       <v-breadcrumbs :items="breadcrumbItems" class="pa-0">
-103 |         <template v-slot:title="{ item }">
-104 |               <span :class="{ 'text-disabled': item.disabled }">
-105 |                   {{ item.title }}
-106 |               </span>
-107 |         </template>
-108 |       </v-breadcrumbs>
-109 | 
-110 |     </div>
-111 |   </div>
-112 | </template>
-113 | 
-114 | <style scoped>
-115 | .breadcrumb-content {
-116 |   min-height: 40px; /* Höhe beibehalten */
-117 |   overflow: hidden; /* Verhindert Umbruchprobleme bei sehr langen Namen */
-118 | }
-119 | 
-120 | .brand-logo {
-121 |   display: flex;
-122 |   align-items: center;
-123 |   justify-content: center;
-124 | }
-125 | 
-126 | /* Optional: Stelle sicher, dass Breadcrumbs nicht zu viel Platz einnehmen */
-127 | .v-breadcrumbs {
-128 |   flex-grow: 1;
-129 |   /* white-space: nowrap; */ /* Verhindert Umbruch, ggf. mit text-overflow */
-130 | }
-131 | 
-132 | .v-breadcrumbs :deep(.v-breadcrumbs-item) {
-133 |   font-size: 0.86rem; /* Etwas kleinere Schrift */
-134 | }
-135 | 
-136 | .text-disabled {
-137 |   color: #757575 !important; /* Vuetify Standard für disabled */
-138 | }
-139 | </style>
-```
-
-src/components/mediaplan/MediaplanBudgetView.vue
-```
-1 | <template>
-2 |   <div class="budget-view-container">
-3 |     <v-card class="pa-6">
-4 |       <v-card-title class="text-h5 mb-4">Budget View</v-card-title>
-5 |       <v-card-text>
-6 |         <p class="text-body-1">
-7 |           This is a placeholder for the Budget View. This section will be implemented later.
-8 |         </p>
-9 |         <v-divider class="my-4"></v-divider>
-10 |         <p class="text-body-2 text-grey">
-11 |           The Budget View will allow users to manage financial aspects of campaigns, track spending, and allocate resources.
-12 |         </p>
-13 |       </v-card-text>
-14 |     </v-card>
-15 |   </div>
-16 | </template>
-17 | 
-18 | <script setup lang="ts">
-19 | // No props or state needed for this placeholder component
-20 | </script>
-21 | 
-22 | <style scoped>
-23 | .budget-view-container {
-24 |   margin-top: 16px;
-25 | }
-26 | </style>
-```
-
-src/components/mediaplan/MediaplanHeader.vue
-```
-1 | <template>
-2 |   <v-row align="center" style="height: 57px;">
-3 |     <div class="d-flex align-center border-b border-grey-lighten-2 mr-2 h-100">
-4 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Plan Budget:</div>
-5 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">{{ formatCurrency(planBudget) }}</div>
-6 | 
-7 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Used:</div>
-8 |       <v-progress-linear
-9 |           :model-value="usedPercentage"
-10 |           color="success"
-11 |           height="8"
-12 |           class="ml-2 mr-4"
-13 |           style="width: 120px"
-14 |       ></v-progress-linear>
-15 |       <span class="text-subtitle-1 text-grey-darken-1">{{ usedPercentage }}%</span>
-16 |     </div>
-17 | 
-18 |     <v-text-field
-19 |         v-model="search"
-20 |         placeholder="Search..."
-21 |         hide-details
-22 |         class="mr-2"
-23 |         append-inner-icon="mdi-magnify"
-24 |         @update:modelValue="$emit('update:search', $event)"
-25 |         bg-color="white"
-26 |     ></v-text-field>
-27 |     <v-btn icon="mdi-dots-horizontal" variant="plain">
-28 |     </v-btn>
-29 | 
-30 |   </v-row>
-31 | </template>
-32 | 
-33 | <script setup lang="ts">
-34 | import {ref, watch} from 'vue';
-35 | 
-36 | // Define props
-37 | interface Props {
-38 |   planBudget: number;
-39 |   usedPercentage: number;
-40 |   search: string;
-41 | }
-42 | 
-43 | // Define events
-44 | defineEmits([
-45 |   'update:search'
-46 | ]);
-47 | 
-48 | // Receive props with defaults
-49 | const props = withDefaults(defineProps<Props>(), {
-50 |   planBudget: 0,
-51 |   usedPercentage: 0,
-52 |   search: ''
-53 | });
-54 | 
-55 | // Local state
-56 | const search = ref(props.search);
-57 | 
-58 | // Watch for prop changes
-59 | watch(() => props.search, (newValue) => {
-60 |   search.value = newValue;
-61 | });
-62 | 
-63 | // Format currency
-64 | const formatCurrency = (value: number): string => {
-65 |   return new Intl.NumberFormat('en-US', {
-66 |     style: 'currency',
-67 |     currency: 'EUR',
-68 |     minimumFractionDigits: 0,
-69 |     maximumFractionDigits: 0
-70 |   }).format(value);
-71 | };
-72 | </script>
-73 | 
-```
-
-src/components/mediaplan/MediaplanInfo.vue
-```
-1 | <template>
-2 |   <v-card class="mb-4">
-3 |     <v-card-title class="d-flex align-center justify-space-between py-4 px-6">
-4 |       <div class="d-flex align-center">
-5 |         <div class="text-h5">{{ mediaplan?.name || 'Mediaplan Details' }}</div>
-6 |         <v-chip
-7 |           :color="getMediaplanStatusColor(mediaplan?.status)"
-8 |           class="ml-4"
-9 |           size="small"
-10 |           variant="elevated"
-11 |         >
-12 |           {{ getMediaplanStatusLabel(mediaplan?.status) }}
-13 |         </v-chip>
-14 |       </div>
-15 |       
-16 |       <v-btn 
-17 |         color="primary" 
-18 |         variant="flat" 
-19 |         prepend-icon="mdi-pencil-outline"
-20 |         :to="`/mediaplans/${mediaplanIdRef}/edit`"
-21 |       >
-22 |         Edit
-23 |       </v-btn>
-24 |     </v-card-title>
-25 |     
-26 |     <v-divider></v-divider>
-27 |     
-28 |     <v-card-text v-if="mediaplan" class="pa-6">
-29 |       <v-row>
-30 |         <v-col cols="12" md="4">
-31 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Brand</div>
-32 |           <div class="d-flex align-center">
-33 |             <v-avatar size="32" color="grey-lighten-3" class="mr-2">
-34 |               <v-img v-if="hasBrandLogo(mediaplan.brand)" :src="getBrandLogo(mediaplan.brand)"></v-img>
-35 |               <span v-else>{{ getBrandInitials(mediaplan.brand) }}</span>
-36 |             </v-avatar>
-37 |             <span class="font-weight-medium">{{ mediaplan.brand.name }}</span>
-38 |           </div>
-39 |         </v-col>
-40 |         
-41 |         <v-col cols="12" md="4">
-42 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Campaign Period</div>
-43 |           <div class="font-weight-medium">{{ formatDateRange(mediaplan.start_date, mediaplan.end_date) }}</div>
-44 |         </v-col>
-45 |         
-46 |         <v-col cols="12" md="4">
-47 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Budget</div>
-48 |           <div class="d-flex align-center justify-space-between mb-1">
-49 |             <span class="font-weight-medium">{{ formatCurrency(mediaplan.budget.used) }} / {{ formatCurrency(mediaplan.budget.total) }}</span>
-50 |             <span class="text-body-2">{{ calculatePercentage(mediaplan.budget.used, mediaplan.budget.total) }}%</span>
-51 |           </div>
-52 |           <v-progress-linear 
-53 |             :model-value="calculatePercentage(mediaplan.budget.used, mediaplan.budget.total)" 
-54 |             height="8" 
-55 |             :color="getBudgetStatusColor(mediaplan.budget)" 
-56 |             rounded
-57 |             bg-color="grey-lighten-3"
-58 |           ></v-progress-linear>
-59 |         </v-col>
-60 |       </v-row>
-61 |       
-62 |       <v-row class="mt-6">
-63 |         <v-col cols="12" md="4">
-64 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">PO Numbers</div>
-65 |           <div v-if="mediaplan.po_numbers && mediaplan.po_numbers.length > 0">
-66 |             <v-chip
-67 |               v-for="po in mediaplan.po_numbers"
-68 |               :key="po._id"
-69 |               class="mr-2 mb-2"
-70 |               variant="outlined"
-71 |               size="small"
-72 |             >
-73 |               {{ po.name }}: {{ formatCurrency(po.value) }}
-74 |             </v-chip>
-75 |           </div>
-76 |           <div v-else class="text-body-2 text-grey">No PO numbers added</div>
-77 |         </v-col>
-78 |         
-79 |         <v-col cols="12" md="4">
-80 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Created By</div>
-81 |           <div class="font-weight-medium">{{ mediaplan.created_by?.name || 'Unknown' }}</div>
-82 |         </v-col>
-83 |         
-84 |         <v-col cols="12" md="4">
-85 |           <div class="text-subtitle-2 text-grey-darken-1 mb-1">Last Updated</div>
-86 |           <div class="font-weight-medium">{{ formatDate(mediaplan.updated_at) }}</div>
-87 |         </v-col>
-88 |       </v-row>
-89 |     </v-card-text>
-90 |     
-91 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
-92 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
-93 |     </div>
-94 |     
-95 |     <div v-if="error" class="error-container mx-6 my-4 pa-4">
-96 |       <v-alert type="error" title="Error Loading Mediaplan">
-97 |         {{ error }}
-98 |       </v-alert>
-99 |     </div>
-100 |   </v-card>
-101 | </template>
-102 | 
-103 | <script setup lang="ts">
-104 | import { formatDate, formatDateRange } from '@/helpers/dateUtils';
-105 | import { formatCurrency, calculatePercentage, getBudgetStatusColor } from '@/helpers/currencyUtils';
-106 | import { getBrandLogo, getBrandInitials, hasBrandLogo } from '@/helpers/brandUtils';
-107 | import { getMediaplanStatusColor, getMediaplanStatusLabel } from '@/constants/mediaplanStatuses';
-108 | import type { Mediaplan } from '@/types/mediaplan';
-109 | 
-110 | // Define props
-111 | interface Props {
-112 |   mediaplan: Mediaplan | null;
-113 |   mediaplanIdRef: string;
-114 |   isLoading: boolean;
-115 |   error: string | null;
-116 | }
-117 | 
-118 | // Receive props
-119 | const props = defineProps<Props>();
-120 | </script>
-121 | 
-122 | <style scoped>
-123 | .error-container {
-124 |   border-radius: 4px;
-125 |   background-color: rgba(var(--v-theme-error), 0.1);
-126 | }
-127 | </style>
-```
-
-src/components/mediaplan/MediaplanPlanningView.vue
-```
-1 | <script setup lang="ts">
-2 | import {ref, watch, computed} from 'vue';
-3 | import {useRouter} from 'vue-router'; // Router importieren für Links
-4 | import CountryFlag from '@/components/common/CountryFlag.vue'; // Pfad prüfen
-5 | import {getBrandLogo} from "@/helpers/brandUtils"; // Pfad prüfen
-6 | import type {Project} from '@/types/project';
-7 | import {projectHeaders} from "@/constants/project.ts";
-8 | import {formatPercentage, percentage} from "../../helpers/format.ts"; // Pfad prüfen
-9 | import EditOrCreateProjectDialog from "@/components/project/EditOrCreateProjectDialog.vue";
-10 | 
-11 | 
-12 | // --- Props ---
-13 | interface Props {
-14 |   projects: Project[];
-15 |   totalProjects: number;
-16 |   isLoading: boolean;
-17 |   currentPage: number;
-18 |   itemsPerPage: number;
-19 |   mediaplanIdRef: string; // *** Diese Prop ist entscheidend für den Link ***
-20 | }
-21 | 
-22 | const props = withDefaults(defineProps<Props>(), {
-23 |   projects: () => [],
-24 |   totalProjects: 0,
-25 |   isLoading: false,
-26 |   currentPage: 0,
-27 |   itemsPerPage: 10,
-28 |   mediaplanIdRef: '' // Wichtig: Muss vom Parent (MediaplanDetail) übergeben werden!
-29 | });
 30 | 
-31 | // --- Emits ---
-32 | const emit = defineEmits<{
-33 |   (e: 'addProject'): void;
-34 |   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
-35 | }>();
-36 | 
-37 | // Router Instanz
-38 | const router = useRouter();
+31 |         <template #item.abbreviation="{ item }">
+32 |           <div class="d-flex align-center">
+33 |             <v-avatar size="32" class="mr-2 grey lighten-4" :image="getBrandLogo(item.descriptive_vars?.brand)" />
+34 |             <span>{{ item.abbreviation }} </span>
+35 |           </div>
+36 |         </template>
+37 | 
+38 |         <template #item.descriptive_vars.country="{ item }">
+39 |           <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
+40 |             <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2" />
+41 |             <span>{{ item.descriptive_vars.country }}</span>
+42 |           </div>
+43 |         </template>
+44 | 
+45 |         <template #item.duration.formatted="{ item }">
+46 |           <div class="d-flex align-center" v-if="item.duration?.formatted">
+47 |             <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
+48 |             <span>{{ item.duration.formatted }}</span>
+49 |           </div>
+50 |         </template>
+51 | 
+52 |         <template #item.detail="{ item }">
+53 |           <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
+54 |           <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top">
+55 |             {{ item.detail }}
+56 |           </v-tooltip>
+57 |         </template>
+58 | 
+59 |         <template #item.default_vars.campaigntype="{ item }">
+60 |           {{ item.default_vars?.campaigntype || 'N/A' }}
+61 |         </template>
+62 | 
+63 |         <template #item.default_vars.subsegment="{ item }">
+64 |           {{ item.default_vars?.subsegment || 'N/A' }}
+65 |         </template>
+66 | 
+67 |         <template #item.is_locked="{ item }">
+68 |           <v-icon :color="item.is_locked ? 'orange' : 'grey-lighten-1'">
+69 |             {{ item.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant' }}
+70 |           </v-icon>
+71 |           <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
+72 |         </template>
+73 |         <template v-slot:item.actions="{ item }">
+74 |           <v-btn icon density="compact" size="small" variant="text" @click.stop="editProject(item)">
+75 |             <v-icon>mdi-pencil-outline</v-icon>
+76 |             <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+77 |           </v-btn>
+78 |           <v-menu>
+79 |             <template v-slot:activator="{ props: menuProps }">
+80 |               <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
+81 |             </template>
+82 |             <v-list density="compact">
+83 |               <v-list-item @click.stop="editProject(item)">
+84 |                 <v-list-item-title>Edit</v-list-item-title>
+85 |               </v-list-item>
+86 |               <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
+87 |                 <v-list-item-title>Delete</v-list-item-title>
+88 |               </v-list-item>
+89 |             </v-list>
+90 |           </v-menu>
+91 |         </template>
+92 |       </v-data-table>
+93 |     </v-theme-provider>
+94 |   </v-card>
+95 | </template>
+96 | 
+97 | <style scoped>
+98 | /* Increase vertical spacing in the row */
+99 | ::v-deep(.project-detail-table .v-data-table__td) {
+100 |   padding-top: 6px !important;
+101 |   padding-bottom: 6px !important;
+102 | }
+103 | </style>
+```
+
+src/components/common/dialog/BudgetProgress.vue
+```
+1 | <template>
+2 |   <v-row no-gutters align="center" class="budget-progress-row">
+3 |     <v-col class="budget-progress-bar-col">
+4 |       <v-progress-linear
+5 |           :model-value="progressBarValue"
+6 |           :color="progressColor"
+7 |           rounded="pill"
+8 |           :bg-color="bgColor" height="6"
+9 |           bg-opacity=".8"
+10 |           style="min-width: 42px"
+11 |       ></v-progress-linear>
+12 |     </v-col>
+13 |     <v-col cols="auto" class="budget-progress-text-col pl-2">
+14 |       {{ formattedDisplayPercentage }}
+15 |     </v-col>
+16 |   </v-row>
+17 | </template>
+18 | 
+19 | <script setup lang="ts">
+20 | import { computed } from 'vue';
+21 | import {formatPercentage, percentage} from "@/helpers/format.ts";
+22 | 
+23 | // --- Props ---
+24 | 
+25 | interface Props {
+26 |   usedBudget: number | null | undefined;
+27 |   totalBudget: number | null | undefined;
+28 |   color?: string; // Color for the active progress bar
+29 |   bgColor?: string; // New prop for the background color
+30 | }
+31 | 
+32 | // Definieren der Props mit Standardwerten
+33 | const props = withDefaults(defineProps<Props>(), {
+34 |   usedBudget: undefined,
+35 |   totalBudget: undefined,
+36 |   color: 'success',
+37 |   bgColor: 'white', // Default background color set to white
+38 | });
 39 | 
-40 | // --- Computed Properties für Tabelle ---
-41 | const pageModel = computed({
-42 |   get: () => props.currentPage + 1,
-43 |   set: (value) => {
-44 |   }
-45 | });
-46 | 
-47 | const itemsPerPageModel = computed({
-48 |   get: () => props.itemsPerPage,
-49 |   set: (value) => {
-50 |   }
+40 | // --- Computed Properties ---
+41 | 
+42 | // Value for the progress bar (0-100)
+43 | const progressBarValue = computed<number>(() => {
+44 |   const usedNum = Number(props.usedBudget ?? 0);
+45 |   const totalNum = Number(props.totalBudget ?? 0);
+46 |   const rawPercent = percentage(usedNum, totalNum);
+47 |   if (isNaN(rawPercent)) {
+48 |     return 0;
+49 |   }
+50 |   return Math.min(100, Math.max(0, rawPercent));
 51 | });
 52 | 
-53 | 
-54 | // --- Methoden ---
-55 | const onOptionsUpdate = (options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }) => {
-56 |   emit('update:options', options);
-57 | };
-58 | 
-59 | const addProject = () => {
-60 |   emit('addProject');
-61 | };
+53 | // Formatted percentage string (e.g., "75,00 %")
+54 | const formattedDisplayPercentage = computed<string>(() => {
+55 |   const usedNum = Number(props.usedBudget ?? 0);
+56 |   const totalNum = Number(props.totalBudget ?? 0);
+57 |   return formatPercentage(usedNum, totalNum);
+58 | });
+59 | 
+60 | // Color for the active part of the progress bar
+61 | const progressColor = computed<string>(() => props.color);
 62 | 
-63 | const isProjectDialogOpen = ref(false);
-64 | const selectedProject = ref<Project | null>(null);
-65 | 
-66 | const openCreateProject = () => {
-67 |   selectedProject.value = null;
-68 |   isProjectDialogOpen.value = true;
-69 | };
+63 | // Background color for the progress bar track (directly from props)
+64 | // We don't strictly need a computed prop here as we use the prop directly
+65 | // in the template, but if needed for logic, it would be:
+66 | // const backgroundColor = computed<string>(() => props.bgColor);
+67 | // However, :bg-color="bgColor" in the template is sufficient.
+68 | 
+69 | </script>
 70 | 
-71 | const openEditProject = (project: Project) => {
-72 |   selectedProject.value = project;
-73 |   isProjectDialogOpen.value = true;
-74 | };
-75 | 
-76 | const onProjectSaved = (project: Project) => {
-77 |   isProjectDialogOpen.value = false;
-78 |   console.log(project)
-79 |   // Example: refetch list here if needed
-80 |   // await fetchProjects()
-81 | };
-82 | </script>
-83 | 
-84 | <template>
-85 |   <div class="planning-view-container mt-4">
-86 |     <EditOrCreateProjectDialog
-87 |         v-model="isProjectDialogOpen"
-88 |         :is-edit="!!selectedProject"
-89 |         :initial-data="selectedProject || undefined"
-90 |         @saved="onProjectSaved"
-91 |     />
-92 |     <v-card class="projects-table elevation-0" variant="flat">
-93 |       <v-theme-provider theme="dark">
-94 |         <v-data-table-server
-95 |             v-model:items-per-page="itemsPerPageModel"
-96 |             v-model:page="pageModel"
-97 |             :headers="projectHeaders"
-98 |             :items="projects"
-99 |             :items-length="totalProjects"
-100 |             :loading="isLoading"
-101 |             item-value="_id"
-102 |             hover
-103 |             class="projects-data-table"
-104 |             @update:options="onOptionsUpdate"
-105 | 
-106 |         >
-107 |           <template v-slot:item.edit="{ item }">
-108 |             <v-btn icon density="compact" variant="text" @click.stop="openEditProject(item)">
-109 |               <v-icon>mdi-pencil-outline</v-icon>
-110 |               <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
-111 |             </v-btn>
-112 |           </template>
-113 | 
-114 |           <template v-slot:item.abbreviation="{ item }">
-115 |             <router-link
-116 |                 :to="{ name: 'ProjectDetail', params: { mediaplanIdRef: props.mediaplanIdRef, projectId: item._id } }"
-117 |                 class="project-link d-flex align-center"
-118 |                 v-if="item.abbreviation && props.mediaplanIdRef"
-119 |                 @click.stop
-120 |             >
-121 |               <v-avatar size="32" class="mr-2 grey lighten-4"
-122 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
-123 |               <span>{{ item.abbreviation }}</span>
-124 |               <v-tooltip activator="parent" location="top">Open project</v-tooltip>
-125 |             </router-link>
-126 |             <div class="d-flex align-center" v-else-if="item.abbreviation">
-127 |               <v-avatar size="32" class="mr-2 grey lighten-4"
-128 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
-129 |               <span>{{ item.abbreviation }}</span>
-130 |               <v-tooltip activator="parent" location="top">Cannot link project (missing Mediaplan ID)</v-tooltip>
-131 |             </div>
-132 |             <div v-else>N/A</div>
-133 |           </template>
-134 | 
-135 |           <template v-slot:item.descriptive_vars.country="{ item }">
-136 |             <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
-137 |               <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2"/>
-138 |               <span>{{ item.descriptive_vars.country }}</span>
-139 |             </div>
-140 |             <div v-else>N/A</div>
-141 |           </template>
-142 | 
-143 |           <template v-slot:item.duration.formatted="{ item }">
-144 |             <div class="d-flex align-center" v-if="item.duration?.formatted">
-145 |               <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
-146 |               <span>{{ item.duration.formatted }}</span>
-147 |             </div>
-148 |             <div v-else>N/A</div>
-149 |           </template>
-150 | 
-151 |           <template v-slot:item.detail="{ item }">
-152 |             <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
-153 |             <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top"
-154 |                        max-width="300px">{{ item.detail }}
-155 |             </v-tooltip>
-156 |           </template>
-157 | 
-158 |           <template v-slot:item.default_vars.campaigntype="{ item }">
-159 |             {{ item.default_vars?.campaigntype || 'N/A' }}
-160 |           </template>
-161 | 
-162 |           <template v-slot:item.default_vars.subsegment="{ item }">
-163 |             {{ item.default_vars?.subsegment || 'N/A' }}
-164 |           </template>
-165 |           <template v-slot:item.budget="{ item }">
-166 |             <v-row no-gutters>
-167 |                 <v-progress-linear
-168 |                   :model-value="percentage(item?.budget?.used , item?.budget?.total )"
-169 |                   color="success"
-170 |                   height="8"
-171 |                   class="ml-2 mr-4"
-172 |                   style="width: 120px"
-173 |               ></v-progress-linear>
-174 |               {{ formatPercentage(item?.budget?.used, item?.budget?.total) }}
-175 |             </v-row>
-176 |           </template>
-177 | 
-178 |           <template v-slot:item.is_locked="{ item }">
-179 |             <v-icon v-if="item.is_locked != null" :color="item.is_locked ? 'orange' : 'grey-lighten-1'">
-180 |               {{ item.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant' }}
-181 |             </v-icon>
-182 |             <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
-183 |           </template>
-184 | 
-185 |           <template v-slot:item.actions="{ item }">
-186 |             <v-menu>
-187 |               <template v-slot:activator="{ props: menuProps }">
-188 |                 <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
-189 |               </template>
-190 |               <v-list density="compact">
-191 |                 <v-list-item @click.stop="editProject(item)">
-192 |                   <v-list-item-title>Edit</v-list-item-title>
-193 |                 </v-list-item>
-194 |                 <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
-195 |                   <v-list-item-title>Delete</v-list-item-title>
-196 |                 </v-list-item>
-197 |               </v-list>
-198 |             </v-menu>
-199 |           </template>
-200 | 
-201 |           <template v-slot:loading>
-202 |             <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
-203 |           </template>
-204 |           <template v-slot:no-data>
-205 |             <div class="text-center pa-4 text-disabled">
-206 |               <v-icon size="large" class="mb-2">mdi-database-off-outline</v-icon>
-207 |               <p>No projects found for this mediaplan.</p>
-208 |             </div>
-209 |           </template>
-210 | 
-211 |           <template v-slot:bottom>
-212 |             <div class="d-flex align-center pa-4 bg-grey-lighten-2">
-213 |               <v-btn
-214 |                   prepend-icon="mdi-plus"
-215 |                   class="black-text-button"
-216 |                   variant="text"
-217 |                   color="black"
-218 |                   @click="addProject"
-219 |                   :disabled="isLoading"
-220 |               >
-221 |                 Add Project
-222 |               </v-btn>
-223 |             </div>
-224 |           </template>
-225 |         </v-data-table-server>
-226 |       </v-theme-provider>
-227 |     </v-card>
-228 |   </div>
-229 | 
-230 | </template>
-231 | 
-232 | <style scoped>
-233 | /* ... (Styles bleiben) ... */
-234 | .project-link {
-235 |   color: white; /* Oder eine andere passende Farbe im Dark Theme */
-236 |   text-decoration: none;
-237 |   font-weight: 500;
-238 | }
-239 | 
-240 | .project-link:hover {
-241 |   text-decoration: underline;
-242 |   color: #E0E0E0; /* Leichte Aufhellung beim Hover */
-243 | }
-244 | </style>
-```
-
-src/components/mediaplan/MediaplanProjects.vue
-```
-1 | <template>
-2 |   <v-card>
-3 |     <v-toolbar flat color="primary" density="comfortable">
-4 |       <v-toolbar-title>Projects</v-toolbar-title>
-5 |       <v-spacer></v-spacer>
-6 |       <v-btn 
-7 |         variant="outlined" 
-8 |         prepend-icon="mdi-plus" 
-9 |         @click="$emit('createProject')"
-10 |         :disabled="isLoading"
-11 |         color="white"
-12 |       >
-13 |         Add Project
-14 |       </v-btn>
-15 |     </v-toolbar>
-16 |     
-17 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
-18 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
-19 |     </div>
-20 |     
-21 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
-22 |       <v-alert type="error" title="Error Loading Projects">
-23 |         {{ error }}
-24 |       </v-alert>
-25 |     </div>
-26 |     
-27 |     <v-data-table-server
-28 |       v-else
-29 |       v-model:items-per-page="itemsPerPage"
-30 |       v-model:page="page"
-31 |       :headers="projectHeaders"
-32 |       :items="projects"
-33 |       :items-length="totalProjects"
-34 |       :loading="isLoading"
-35 |       class="elevation-0"
-36 |       @update:options="onOptionsUpdate"
-37 |     >
-38 |       <!-- Country column with flag -->
-39 |       <template v-slot:item.country="{ item }">
-40 |         <div class="d-flex align-center">
-41 |           <v-avatar size="24" class="mr-2">
-42 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
-43 |           </v-avatar>
-44 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
-45 |         </div>
-46 |       </template>
-47 |       
-48 |       <!-- Campaign Type column -->
-49 |       <template v-slot:item.campaignType="{ item }">
-50 |         <v-chip
-51 |           size="small"
-52 |           :color="getCampaignTypeColor(item.raw.campaignType)"
-53 |           class="text-capitalize"
-54 |         >
-55 |           {{ item.raw.campaignType }}
-56 |         </v-chip>
-57 |       </template>
-58 |       
-59 |       <!-- Created date column -->
-60 |       <template v-slot:item.createdAt="{ item }">
-61 |         {{ formatDate(item.raw.createdAt) }}
-62 |       </template>
-63 |       
-64 |       <!-- Actions column -->
-65 |       <template v-slot:item.actions="{ item }">
-66 |         <v-tooltip text="View Details">
-67 |           <template v-slot:activator="{ props }">
-68 |             <v-btn
-69 |               icon
-70 |               variant="text"
-71 |               density="comfortable"
-72 |               v-bind="props"
-73 |               :to="`/mediaplans/${mediaplanIdRef}/projects/${item.raw._id}`"
-74 |             >
-75 |               <v-icon>mdi-eye</v-icon>
-76 |             </v-btn>
-77 |           </template>
-78 |         </v-tooltip>
-79 |         
-80 |         <v-tooltip text="Edit Project">
-81 |           <template v-slot:activator="{ props }">
-82 |             <v-btn
-83 |               icon
-84 |               variant="text"
-85 |               density="comfortable"
-86 |               v-bind="props"
-87 |               :to="`/mediaplans/${mediaplanIdRef}/projects/${item.raw._id}/edit`"
-88 |             >
-89 |               <v-icon>mdi-pencil-outline</v-icon>
-90 |             </v-btn>
-91 |           </template>
-92 |         </v-tooltip>
-93 |         
-94 |         <v-tooltip text="Delete Project">
-95 |           <template v-slot:activator="{ props }">
-96 |             <v-btn
-97 |               icon
-98 |               variant="text"
-99 |               density="comfortable"
-100 |               color="error"
-101 |               v-bind="props"
-102 |               @click="$emit('deleteProject', item.raw)"
-103 |             >
-104 |               <v-icon>mdi-delete</v-icon>
-105 |             </v-btn>
-106 |           </template>
-107 |         </v-tooltip>
-108 |       </template>
-109 |       
-110 |       <!-- Empty state -->
-111 |       <template v-slot:no-data>
-112 |         <v-sheet class="d-flex flex-column align-center justify-center pa-6" height="300">
-113 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
-114 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
-115 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
-116 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="$emit('createProject')">
-117 |             Add First Project
-118 |           </v-btn>
-119 |         </v-sheet>
-120 |       </template>
-121 |     </v-data-table-server>
-122 |   </v-card>
-123 | </template>
-124 | 
-125 | <script setup lang="ts">
-126 | import { ref, watch } from 'vue';
-127 | import { formatDate } from '@/helpers/dateUtils';
-128 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
-129 | import type { Project } from '@/types/project';
-130 | 
-131 | // Define props
-132 | interface Props {
-133 |   projects: Project[];
-134 |   mediaplanIdRef: string;
-135 |   totalProjects: number;
-136 |   isLoading: boolean;
-137 |   error: string | null;
-138 | }
-139 | 
-140 | // Define emits
-141 | const emit = defineEmits<{
-142 |   (e: 'createProject'): void;
-143 |   (e: 'deleteProject', project: Project): void;
-144 |   (e: 'update:page', page: number): void;
-145 |   (e: 'update:itemsPerPage', itemsPerPage: number): void;
-146 | }>();
-147 | 
-148 | // Component state
-149 | const page = ref<number>(1);
-150 | const itemsPerPage = ref<number>(10);
-151 | 
-152 | // Watch for pagination changes
-153 | watch([page, itemsPerPage], () => {
-154 |   emit('update:page', page.value);
-155 |   emit('update:itemsPerPage', itemsPerPage.value);
-156 | });
-157 | 
-158 | // Project Table Headers
-159 | const projectHeaders = [
-160 |   { title: 'Name', key: 'name', sortable: true },
-161 |   { title: 'Country', key: 'country', sortable: true },
-162 |   { title: 'Language', key: 'language', sortable: true },
-163 |   { title: 'Campaign Type', key: 'campaignType', sortable: true },
-164 |   { title: 'Phase', key: 'phase', sortable: true },
-165 |   { title: 'Goal', key: 'goal', sortable: true },
-166 |   { title: 'Created At', key: 'createdAt', sortable: true },
-167 |   { title: 'Actions', key: 'actions', sortable: false, align: 'end' },
-168 | ];
-169 | 
-170 | // Method to handle datatable option updates (sorting, etc)
-171 | const onOptionsUpdate = (options: any) => {
-172 |   // You can add additional logic here for sorting if needed
-173 |   // For now, we just update pagination
-174 |   page.value = options.page;
-175 |   itemsPerPage.value = options.itemsPerPage;
-176 | };
-177 | 
-178 | // Receive props with defaults
-179 | const props = withDefaults(defineProps<Props>(), {
-180 |   projects: () => [],
-181 |   totalProjects: 0,
-182 |   error: null
-183 | });
-184 | </script>
-185 | 
-186 | <style scoped>
-187 | .error-container {
-188 |   border-radius: 4px;
-189 |   background-color: rgba(var(--v-theme-error), 0.1);
-190 | }
-191 | </style>
-```
-
-src/components/mediaplan/MediaplanViewToggle.vue
-```
-1 | <template>
-2 |   <div class="view-toggle-container">
-3 |     <v-btn-toggle
-4 |         v-model="selectedView"
-5 |         class="view-toggle"
-6 |         density="comfortable"
-7 |         @update:modelValue="$emit('update:modelValue', $event)"
-8 |     >
-9 |       <v-btn value="planning">Planning view</v-btn>
-10 |       <v-btn value="budget">Budget view</v-btn>
-11 |     </v-btn-toggle>
-12 |   </div>
-13 | </template>
-14 | 
-15 | <script setup lang="ts">
-16 | import { ref, watch } from 'vue'
-17 | 
-18 | // Define props
-19 | interface Props {
-20 |   modelValue: string
-21 | }
-22 | 
-23 | defineEmits(['update:modelValue'])
-24 | const props = defineProps<Props>()
-25 | 
-26 | const selectedView = ref(props.modelValue)
-27 | 
-28 | watch(
-29 |     () => props.modelValue,
-30 |     (newValue) => {
-31 |       selectedView.value = newValue
-32 |     },
-33 |     { immediate: true }
-34 | )
-35 | </script>
-36 | 
-37 | <style scoped>
-38 | .view-toggle .v-btn {
-39 |   background-color: white;
-40 |   color: black;
-41 |   border: 1px solid #ccc;
-42 |   border-radius: 0;
-43 |   font-weight: 500;
-44 | }
-45 | 
-46 | .view-toggle .v-btn.v-btn--active {
-47 |   background-color: black;
-48 |   color: white;
-49 |   border-color: black;
-50 | }
-51 | </style>
-```
-
-src/components/mediaplan/ProjectsList.vue
-```
-1 | <template>
-2 |   <v-card>
-3 |     <v-card-title class="d-flex justify-space-between align-center py-4 px-6">
-4 |       <div class="text-h6">Projects</div>
-5 |       <v-btn 
-6 |         color="primary" 
-7 |         prepend-icon="mdi-plus" 
-8 |         @click="emit('createProject')"
-9 |       >
-10 |         Add Project
-11 |       </v-btn>
-12 |     </v-card-title>
-13 |     
-14 |     <v-divider></v-divider>
-15 |     
-16 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
-17 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
-18 |     </div>
-19 |     
-20 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
-21 |       <v-alert type="error" title="Error Loading Projects">
-22 |         {{ error }}
-23 |       </v-alert>
-24 |     </div>
-25 |     
-26 |     <v-data-table-server
-27 |       v-else
-28 |       v-model:items-per-page="itemsPerPage"
-29 |       v-model:page="page"
-30 |       :headers="projectHeaders"
-31 |       :items="projects"
-32 |       :items-length="totalItems"
-33 |       :loading="isLoading"
-34 |       class="elevation-0"
-35 |       @update:options="onOptionsUpdate"
-36 |     >
-37 |       <!-- Country column with flag -->
-38 |       <template v-slot:item.country="{ item }">
-39 |         <div class="d-flex align-center">
-40 |           <v-avatar size="24" class="mr-2">
-41 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
-42 |           </v-avatar>
-43 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
-44 |         </div>
-45 |       </template>
-46 |       
-47 |       <!-- Campaign Type column -->
-48 |       <template v-slot:item.campaignType="{ item }">
-49 |         <v-chip
-50 |           size="small"
-51 |           :color="getCampaignTypeColor(item.raw.campaignType)"
-52 |           class="text-capitalize"
-53 |         >
-54 |           {{ item.raw.campaignType }}
-55 |         </v-chip>
-56 |       </template>
-57 |       
-58 |       <!-- Created date column -->
-59 |       <template v-slot:item.createdAt="{ item }">
-60 |         {{ formatDate(item.raw.createdAt) }}
-61 |       </template>
-62 |       
-63 |       <!-- Actions column -->
-64 |       <template v-slot:item.actions="{ item }">
-65 |         <v-btn
-66 |           icon
-67 |           variant="text"
-68 |           density="comfortable"
-69 |           :to="`/mediaplans/${mediaplanIdRef}/projects/${item.raw._id}`"
-70 |         >
-71 |           <v-icon>mdi-eye</v-icon>
-72 |         </v-btn>
-73 |         <v-btn
-74 |           icon
-75 |           variant="text"
-76 |           density="comfortable"
-77 |           :to="`/mediaplans/${mediaplanIdRef}/projects/${item.raw._id}/edit`"
-78 |         >
-79 |           <v-icon>mdi-pencil-outline</v-icon>
-80 |         </v-btn>
-81 |         <v-btn
-82 |           icon
-83 |           variant="text"
-84 |           density="comfortable"
-85 |           color="error"
-86 |           @click="emit('deleteProject', item.raw)"
-87 |         >
-88 |           <v-icon>mdi-delete</v-icon>
-89 |         </v-btn>
-90 |       </template>
-91 |       
-92 |       <!-- Empty state -->
-93 |       <template v-slot:no-data>
-94 |         <div class="d-flex flex-column align-center justify-center pa-6">
-95 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
-96 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
-97 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
-98 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="emit('createProject')">
-99 |             Add First Project
-100 |           </v-btn>
-101 |         </div>
-102 |       </template>
-103 |     </v-data-table-server>
-104 |   </v-card>
-105 | </template>
-106 | 
-107 | <script setup lang="ts">
-108 | import { ref, watch } from 'vue';
-109 | import { formatDate } from '@/helpers/dateUtils';
-110 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
-111 | import type { Project } from '@/types/project';
-112 | 
-113 | // Define props
-114 | interface Props {
-115 |   projects: Project[];
-116 |   mediaplanIdRef: string;
-117 |   totalItems: number;
-118 |   isLoading: boolean;
-119 |   error: string | null;
-120 | }
-121 | 
-122 | // Define emits
-123 | const emit = defineEmits<{
-124 |   (e: 'createProject'): void;
-125 |   (e: 'deleteProject', project: Project): void;
-126 |   (e: 'updatePage', page: number): void;
-127 |   (e: 'updateItemsPerPage', itemsPerPage: number): void;
-128 | }>();
-129 | 
-130 | //
-```
-
-src/components/common/CountryFlag.vue
-```
-1 | <template>
-2 |   <span :class="`fi fi-${country.toLowerCase()}`" :style="flagStyle"></span>
-3 | </template>
-4 | 
-5 | <script setup lang="ts">
-6 | import {computed} from 'vue';
-7 | import 'flag-icons/css/flag-icons.min.css';
-8 | 
-9 | const props = defineProps<{
-10 |   country: string;
-11 |   size?: string;
-12 | }>();
-13 | 
-14 | const flagStyle = computed(() => {
-15 |   return {
-16 |     fontSize: props.size || '1rem',
-17 |     lineHeight: 1,
-18 |     verticalAlign: 'middle',
-19 |     display: 'inline-block'
-20 |   };
-21 | });
-22 | </script>
-23 | 
-24 | <style scoped>
-25 | 
-26 | 
-27 | span[class^="fi"] {
-28 | 
-29 | }
-30 | 
-31 | </style>
-```
-
-src/components/common/MediaplanTopSection.vue
-```
-1 | <template>
-2 |   <!-- Wrapper with native tooltip showing the current level on hover -->
-3 |   <div :title="levelDisplay">
-4 |     <v-row class="mb-0">
-5 |       <v-col cols="12" md="5" class="d-flex align-center pt-0 pb-0">
-6 |         <MediaplanBreadcrumb :mediaplan="mediaplan" :project="project" />
-7 |       </v-col>
-8 |       <v-col cols="12" md="7">
-9 |         <MediaplanHeader
-10 |             :plan-budget="mediaplan?.budget?.total || 0"
-11 |             :used-percentage="calculatePercentage(mediaplan?.budget?.used, mediaplan?.budget?.total)"
-12 |             :search="search"
-13 |             @update:search="val => emit('update:search', val)"
-14 |             :is-loading="isLoading"
-15 |         />
-16 |       </v-col>
-17 |     </v-row>
-18 | 
-19 |     <v-row class="mb-4">
-20 |       <v-col cols="12" sm="auto">
-21 |         <MediaplanViewToggle v-model="internalView" />
-22 |       </v-col>
-23 |       <v-col>
-24 |         <slot name="campaign-type-select" />
-25 |       </v-col>
-26 |     </v-row>
-27 | 
-28 |   </div>
-29 | </template>
-30 | 
-31 | <script setup lang="ts">
-32 | import { toRefs, computed } from 'vue'
-33 | import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue'
-34 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue'
-35 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue'
-36 | import type { Mediaplan } from '@/types/mediaplan'
-37 | import type { Project } from '@/types/project'
-38 | import type { Campaign } from '@/types/campaign'
-39 | 
-40 | const props = defineProps<{
-41 |   mediaplan: Mediaplan | null
-42 |   project: Project | null
-43 |   campaign?: Campaign | null
-44 |   search: string
-45 |   isLoading: boolean
-46 |   currentView: 'planning' | 'budget'
-47 | }>()
-48 | 
-49 | const emit = defineEmits<{
-50 |   (e: 'update:search', value: string): void
-51 |   (e: 'update:current-view', value: 'planning' | 'budget'): void
-52 | }>()
-53 | 
-54 | const { mediaplan, project, campaign, search, isLoading, currentView } = toRefs(props)
-55 | 
-56 | // Internal binding for the view toggle
-57 | const internalView = computed<'planning' | 'budget'>({
-58 |   get: () => currentView.value,
-59 |   set: val => emit('update:current-view', val),
-60 | })
-61 | 
-62 | // Determine which level we’re in
-63 | const levelDisplay = computed(() => {
-64 |   if (campaign?.value) return 'Campaign'
-65 |   if (project.value)    return 'Project'
-66 |   return 'Mediaplan'
-67 | })
-68 | 
-69 | function calculatePercentage(used: number | undefined, total: number | undefined): number {
-70 |   if (!used || !total) return 0
-71 |   return (used / total) * 100
-72 | }
-73 | </script>
-74 | 
-75 | <style scoped>
-76 | /* Optional: eigene Styles hier hinzufügen */
-77 | </style>
-```
-
-src/components/common/NotificationSnackbar.vue
-```
-1 | <template>
-2 |   <v-snackbar
-3 |     v-model="notification.show"
-4 |     :color="notification.type"
-5 |     :timeout="notification.timeout"
-6 |     class="notification-snackbar"
-7 |   >
-8 |     <div class="d-flex align-center">
-9 |       <v-icon :icon="getIconForType(notification.type)" class="mr-3" />
-10 |       <span>{{ notification.text }}</span>
-11 |     </div>
-12 |     <template v-slot:actions v-if="notification.closable">
-13 |       <v-btn
-14 |         icon
-15 |         variant="text"
-16 |         @click="closeNotification"
-17 |         size="small"
-18 |       >
-19 |         <v-icon>mdi-close</v-icon>
-20 |       </v-btn>
-21 |     </template>
-22 |   </v-snackbar>
-23 | </template>
-24 | 
-25 | <script setup lang="ts">
-26 | import { notification, closeNotification, NotificationType } from '@/helpers/notificationUtils';
-27 | 
-28 | /**
-29 |  * Gets the appropriate icon for the notification type
-30 |  * @param type Notification type
-31 |  * @returns Material Design Icon name
-32 |  */
-33 | const getIconForType = (type: NotificationType): string => {
-34 |   switch (type) {
-35 |     case NotificationType.SUCCESS:
-36 |       return 'mdi-check-circle';
-37 |     case NotificationType.ERROR:
-38 |       return 'mdi-alert-circle';
-39 |     case NotificationType.WARNING:
-40 |       return 'mdi-alert';
-41 |     case NotificationType.INFO:
-42 |     default:
-43 |       return 'mdi-information';
-44 |   }
-45 | };
-46 | </script>
-47 | 
-48 | <style scoped>
-49 | .notification-snackbar {
-50 |   z-index: 9999;
-51 | }
-52 | </style>
-```
-
-src/components/common/PaginationControls.vue
-```
-1 | <template>
-2 |   <div class="d-flex justify-center align-center my-4">
-3 |     <v-pagination
-4 |         v-model="modelValue"
-5 |         :length="length"
-6 |         :disabled="disabled"
-7 |         :total-visible="totalVisible"
-8 |         rounded="circle"
-9 |         @update:model-value="updatePage"
-10 |     />
-11 | 
-12 |     <div v-if="showItemsPerPage" class="ml-4 d-flex align-center">
-13 |       <span class="text-caption mr-2">Items per page:</span>
-14 |       <v-select
-15 |           v-model="itemsPerPage"
-16 |           :items="itemsPerPageOptions"
-17 |           density="compact"
-18 |           variant="outlined"
-19 |           hide-details
-20 |           class="items-per-page-select"
-21 |           @update:model-value="updateItemsPerPage"
-22 |       />
-23 |     </div>
-24 |   </div>
-25 | </template>
-26 | 
-27 | <script setup lang="ts">
-28 | import { computed, ref, watch } from 'vue';
-29 | 
-30 | interface Props {
-31 |   modelValue: number;
-32 |   length: number;
-33 |   disabled?: boolean;
-34 |   totalVisible?: number;
-35 |   showItemsPerPage?: boolean;
-36 |   itemsPerPageValue?: number;
-37 |   itemsPerPageOptions?: number[];
-38 | }
-39 | 
-40 | const props = withDefaults(defineProps<Props>(), {
-41 |   disabled: false,
-42 |   totalVisible: 7,
-43 |   showItemsPerPage: true,
-44 |   itemsPerPageValue: 10,
-45 |   itemsPerPageOptions: () => [10, 25, 50, 100]
-46 | });
-47 | 
-48 | const emit = defineEmits<{
-49 |   (e: 'update:model-value', value: number): void;
-50 |   (e: 'update:items-per-page', value: number): void;
-51 | }>();
-52 | 
-53 | // Internal model value for v-pagination (needs to be 1-based)
-54 | const modelValue = computed({
-55 |   get: () => props.modelValue + 1, // Convert from 0-based to 1-based
-56 |   set: (value: number) => {
-57 |     emit('update:model-value', value - 1); // Convert from 1-based to 0-based
-58 |   }
-59 | });
-60 | 
-61 | // Items per page handling
-62 | const itemsPerPage = ref(props.itemsPerPageValue);
-63 | 
-64 | // When props change, update the local state
-65 | watch(() => props.itemsPerPageValue, (newValue) => {
-66 |   itemsPerPage.value = newValue;
-67 | });
-68 | 
-69 | const updatePage = (page: number) => {
-70 |   emit('update:model-value', page - 1); // Convert from 1-based to 0-based
-71 | };
-72 | 
-73 | const updateItemsPerPage = (value: number) => {
-74 |   itemsPerPage.value = value;
-75 |   emit('update:items-per-page', value);
-76 | };
-77 | </script>
-78 | 
-79 | <style scoped>
-80 | .items-per-page-select {
-81 |   width: 80px;
+71 | <style scoped>
+72 | /* Styles remain unchanged */
+73 | .budget-progress-row {
+74 |   flex-wrap: nowrap;
+75 |   width: 100%;
+76 | }
+77 | 
+78 | .budget-progress-bar-col {
+79 |   flex-grow: 1;
+80 |   flex-shrink: 1;
+81 |   overflow: hidden;
 82 | }
-83 | </style>
+83 | 
+84 | .budget-progress-text-col {
+85 |   flex-shrink: 0;
+86 |   white-space: nowrap;
+87 | }
+88 | </style>
 ```
 
 src/components/common/dialog/CountryLanguageSelector.vue
@@ -10204,7 +11068,10 @@ src/components/common/dialog/WithFormDefaults.vue
 23 |     hideDetails: true
 24 |   },
 25 |   VBtn: {
-26 |   }
-27 | };
-28 | </script>
+26 |   },
+27 |   VDialog: {
+28 |     maxWidth: 450
+29 |   }
+30 | };
+31 | </script>
 ```
