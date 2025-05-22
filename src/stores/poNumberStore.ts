@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import {defineStore} from 'pinia';
+import {ref, computed} from 'vue';
 import customFetch from '@/helpers/customFetch';
-import type { PONumber } from '@/types/mediaplan';
+import type {PONumber} from '@/types/mediaplan';
 
 export interface PONumberCreatePayload {
     name: string;
@@ -14,7 +14,6 @@ export interface PONumberUpdatePayload {
     value?: number;
     metadata?: Record<string, any>;
 }
-
 
 export const usePoNumberStore = defineStore('poNumber', () => {
     const poNumbers = ref<PONumber[]>([]);
@@ -32,8 +31,8 @@ export const usePoNumberStore = defineStore('poNumber', () => {
         isLoading.value = true;
         error.value = null;
         try {
-            const response = await customFetch('po') as PONumber[];
-            poNumbers.value = response;
+            const response = await customFetch('po') as any;
+            poNumbers.value = response.data;
         } catch (err) {
             error.value = err instanceof Error ? err.message : 'Failed to fetch PO Numbers';
             console.error('Error fetching PO Numbers:', err);
@@ -104,10 +103,10 @@ export const usePoNumberStore = defineStore('poNumber', () => {
 
             const index = poNumbers.value.findIndex(po => po._id === id);
             if (index !== -1) {
-                poNumbers.value[index] = { ...poNumbers.value[index], ...updatedPONumber };
+                poNumbers.value[index] = {...poNumbers.value[index], ...updatedPONumber};
             }
             if (selectedPONumber.value?._id === id) {
-                selectedPONumber.value = { ...selectedPONumber.value, ...updatedPONumber };
+                selectedPONumber.value = {...selectedPONumber.value, ...updatedPONumber};
             }
             return updatedPONumber;
         } catch (err) {

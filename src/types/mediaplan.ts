@@ -8,11 +8,11 @@ export interface Source {
 }
 
 // Brand reference
-export interface Brand {
+/*export interface Brand {
     _id: string;
     name: string;
     logo?: string;
-}
+}*/
 
 // Filter sources from API
 export interface FilterSources {
@@ -38,6 +38,14 @@ export interface PONumber {
     value: number;
 }
 
+export interface Brand {
+    _id?: string;
+    abbreviation: string;
+    value: string;
+    category?: string | null;
+    logo?: string;
+}
+
 // Entity reference (used for created_by and other references)
 export interface EntityReference {
     _id: string;
@@ -57,36 +65,22 @@ export interface MediaplanFilter {
 }
 
 // Mediaplan create request
-export interface MediaplanCreate {
-    name: string;
-    status: 'In Planning' | 'Draft' | 'For Approval';
-    start_date: string;
-    end_date: string;
-    brand: {
-        _id: string;
-        name?: string;
-    };
-    budget: {
-        total: number;
-        used?: number;
-        available?: number;
-    };
-    po_numbers?: PONumber[];
-}
+
 
 // Complete Mediaplan object
 export interface Mediaplan {
-    _id: string;
+    _id?: string;
     name: string;
     status: 'in_planning' | 'draft' | 'for_approval';
     start_date: string;
     end_date: string;
-    brand: EntityReference;
-    budget: Budget;
-    po_numbers?: PONumber[];
-    created_by: EntityReference;
-    created_at: string;
-    updated_at: string;
+    brand: Brand;
+    po_numbers: PONumber[];
+    budget?: Budget;
+    mediaplan_type: string; // Added mediaplan_type
+    created_by?: EntityReference | string;
+    created_at?: string;
+    updated_at?: string;
 }
 
 // API response for mediaplan list
@@ -95,20 +89,4 @@ export interface MediaplanListResponse {
     total_pages: number;
     current_page: number;
     items: Mediaplan[];
-}
-
-// Sources response type
-export interface SourcesResponse {
-    _id: string;
-    version: string;
-    timestamp: string;
-    message: string;
-    code: number;
-    data: {
-        subsegment?: Source[];
-        product?: Source[];
-        campaigntype?: Source[];
-        language?: Source[];
-        [key: string]: Source[] | undefined;
-    };
 }

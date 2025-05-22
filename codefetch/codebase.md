@@ -335,6 +335,29 @@ src/components/TopBar.vue
 47 | </style>
 ```
 
+src/layouts/MainLayout.vue
+```
+1 | <template>
+2 |   <TopBar/>
+3 | 
+4 |   <v-main>
+5 |     <v-container fluid class="max-width-container">
+6 |       <slot/>
+7 |     </v-container>
+8 |   </v-main>
+9 | </template>
+10 | 
+11 | <script setup>
+12 | import TopBar from "@/components/TopBar.vue";
+13 | </script>
+14 | 
+15 | <style scoped>
+16 | .max-width-container {
+17 |   max-width: 1440px;
+18 | }
+19 | </style>
+```
+
 src/constants/campaign.ts
 ```
 1 | // src/constants/campaign.ts
@@ -488,7 +511,7 @@ src/helpers/brandUtils.ts
 37 |     return brand.logo;
 38 |   }
 39 | 
-40 |   return brandLogos[brand.name] || '/img/brands/logoipsum.svg';
+40 |   return brandLogos[brand.abbreviation] || '/img/brands/logoipsum.svg';
 41 | };
 42 | /**
 43 |  * Gets brand initials for brands without logos
@@ -1073,29 +1096,6 @@ src/helpers/statusUtils.ts
 93 |   'Cancelled',
 94 |   'Completed'
 95 | ];
-```
-
-src/layouts/MainLayout.vue
-```
-1 | <template>
-2 |   <TopBar/>
-3 | 
-4 |   <v-main>
-5 |     <v-container fluid class="max-width-container">
-6 |       <slot/>
-7 |     </v-container>
-8 |   </v-main>
-9 | </template>
-10 | 
-11 | <script setup>
-12 | import TopBar from "@/components/TopBar.vue";
-13 | </script>
-14 | 
-15 | <style scoped>
-16 | .max-width-container {
-17 |   max-width: 1440px;
-18 | }
-19 | </style>
 ```
 
 src/mocks/mediaplanProjects.ts
@@ -3873,40 +3873,6 @@ src/mocks/swagger_mp.yaml
 2375 |               type: string
 2376 |               nullable: true
 2377 |               description: Dimension (can be null).
-2378 |         descriptive_vars:
-2379 |           type: object
-2380 |           description: Descriptive variables for the project.
-2381 |           properties:
-2382 |             brand:
-2383 |               type: string
-2384 |               description: Brand name.
-2385 |             country:
-2386 |               type: string
-2387 |               description: Country code.
-2388 |             bmwponumber:
-2389 |               type: string
-2390 |               description: BMW purchase order number.
-2391 |             adobecampaignname:
-2392 |               type: string
-2393 |               description: Adobe campaign name.
-2394 |             subsegment:
-2395 |               type: string
-2396 |               description: Subsegment.
-2397 |             campaigntype:
-2398 |               type: string
-2399 |               description: Campaign type.
-2400 |             projectname:
-2401 |               type: string
-2402 |               description: Project name.
-2403 |             year:
-2404 |               type: integer
-2405 |               description: Year.
-2406 |         is_locked:
-2407 |           type: boolean
-2408 |           description: Indicates if the project is locked.
-2409 |         labels:
-2410 |           type: array
-2411 |           items:
 [TRUNCATED]
 ```
 
@@ -4355,113 +4321,114 @@ src/stores/createMediaplanStore.ts
 1 | // src/stores/createMediaplanStore.ts
 2 | import { defineStore } from 'pinia';
 3 | import { ref } from 'vue';
-4 | import customFetch from '@/helpers/customFetch';
-5 | import type { Brand, PONumber } from '@/types/mediaplan';
-6 | 
-7 | export const useCreateMediaplanStore = defineStore('createMediaplan', () => {
-8 |   // State
-9 |   const brands = ref<Brand[]>([]);
-10 |   const poNumbers = ref<PONumber[]>([]);
-11 |   const isLoading = ref(false);
-12 |   const error = ref<string | null>(null);
-13 | 
-14 |   // Actions
-15 |   async function fetchBrands() {
-16 |     isLoading.value = true;
-17 |     error.value = null;
-18 | 
-19 |     try {
-20 |       // In a real application, this would be an API call to get brands
-21 |       // const response = await customFetch('/brands');
-22 |       // brands.value = response;
+4 | import type { PONumber } from '@/types/mediaplan';
+5 | // useSourcesStore is no longer needed here directly for brands
+6 | // import { useSourcesStore } from './sourcesStore';
+7 | 
+8 | export const useCreateMediaplanStore = defineStore('createMediaplan', () => {
+9 |     // const sourcesStore = useSourcesStore(); // Not needed if brands are handled in component
+10 | 
+11 |     // State
+12 |     // const brands = ref<Brand[]>([]); // Removed
+13 |     const poNumbers = ref<PONumber[]>([]);
+14 |     const isLoading = ref(false); // This can be for PO numbers fetching and mediaplan creation
+15 |     const error = ref<string | null>(null);
+16 | 
+17 |     // Actions
+18 |     // async function fetchBrands() { ... } // Removed
+19 | 
+20 |     async function fetchPONumbers() {
+21 |         isLoading.value = true;
+22 |         error.value = null;
 23 | 
-24 |       // For demo purposes, use mock data
-25 |       brands.value = [
-26 |         { _id: 'bmw', name: 'BMW' },
-27 |         { _id: 'mini', name: 'MINI' },
-28 |       ];
-29 |     } catch (err) {
-30 |       error.value = err instanceof Error ? err.message : 'Error fetching brands';
-31 |       console.error('Error fetching brands:', err);
-32 |     } finally {
-33 |       isLoading.value = false;
-34 |     }
-35 |   }
-36 | 
-37 |   async function fetchPONumbers() {
-38 |     isLoading.value = true;
-39 |     error.value = null;
-40 | 
-41 |     try {
-42 |       // In a real application, this would be an API call to get PO numbers
-43 |       // const response = await customFetch('/po-numbers');
-44 |       // poNumbers.value = response;
-45 | 
-46 |       // For demo purposes, use mock data
-47 |       poNumbers.value = [
-48 |         { _id: 'po-1', name: 'PO12345', value: 10000 },
-49 |         { _id: 'po-2', name: 'PO67890', value: 15000 },
-50 |         { _id: 'po-3', name: 'PO24680', value: 20000 },
-51 |       ];
-52 |     } catch (err) {
-53 |       error.value = err instanceof Error ? err.message : 'Error fetching PO numbers';
-54 |       console.error('Error fetching PO numbers:', err);
-55 |     } finally {
-56 |       isLoading.value = false;
-57 |     }
-58 |   }
-59 | 
-60 |   async function createPO(poData: Omit<PONumber, '_id'> & { metadata?: any }): Promise<PONumber> {
-61 |     isLoading.value = true;
-62 |     error.value = null;
-63 | 
-64 |     try {
-65 |       // In a real application, this would be an API call to create a PO
-66 |       // const response = await customFetch('/po-numbers', {
-67 |       //   method: 'POST',
-68 |       //   headers: {
-69 |       //     'Content-Type': 'application/json',
-70 |       //   },
-71 |       //   body: JSON.stringify(poData),
-72 |       // });
-73 |       // return response;
-74 | 
-75 |       // For demo purposes, simulate API call
-76 |       await new Promise(resolve => setTimeout(resolve, 500));
-77 |       
-78 |       // Create a new PO object with a generated ID
-79 |       const newPO: PONumber = {
-80 |         _id: `po-${Date.now()}`,
-81 |         name: poData.name,
-82 |         value: poData.value
-83 |       };
-84 |       
-85 |       // Add to the store
-86 |       poNumbers.value.push(newPO);
-87 |       
-88 |       return newPO;
-89 |     } catch (err) {
-90 |       error.value = err instanceof Error ? err.message : 'Error creating PO';
-91 |       console.error('Error creating PO:', err);
-92 |       throw err;
-93 |     } finally {
-94 |       isLoading.value = false;
-95 |     }
-96 |   }
-97 | 
-98 |   return {
-99 |     // State
-100 |     brands,
-101 |     poNumbers,
-102 |     isLoading,
-103 |     error,
-104 | 
-105 |     // Actions
-106 |     fetchBrands,
-107 |     fetchPONumbers,
-108 |     createPO
-109 |   };
-110 | });
+24 |         try {
+25 |             // In a real application, this would be an API call to get PO numbers
+26 |             // const response = await customFetch('/po-numbers');
+27 |             // poNumbers.value = response;
+28 | 
+29 |             // For demo purposes, use mock data
+30 |             poNumbers.value = [
+31 |                 { _id: 'po-1', name: 'PO12345', value: 10000 },
+32 |                 { _id: 'po-2', name: 'PO67890', value: 15000 },
+33 |                 { _id: 'po-3', name: 'PO24680', value: 20000 },
+34 |             ];
+35 |         } catch (err) {
+36 |             error.value = err instanceof Error ? err.message : 'Error fetching PO numbers';
+37 |             console.error('Error fetching PO numbers:', err);
+38 |         } finally {
+39 |             isLoading.value = false;
+40 |         }
+41 |     }
+42 | 
+43 |     async function createPO(poData: Omit<PONumber, '_id'> & { metadata?: any }): Promise<PONumber> {
+44 |         isLoading.value = true;
+45 |         error.value = null;
+46 | 
+47 |         try {
+48 |             // In a real application, this would be an API call to create a PO
+49 |             // const response = await customFetch('/po-numbers', {
+50 |             //   method: 'POST',
+51 |             //   headers: {
+52 |             //     'Content-Type': 'application/json',
+53 |             //   },
+54 |             //   body: JSON.stringify(poData),
+55 |             // });
+56 |             // return response;
+57 | 
+58 |             // For demo purposes, simulate API call
+59 |             await new Promise(resolve => setTimeout(resolve, 500));
+60 | 
+61 |             const newPO: PONumber = {
+62 |                 _id: `po-${Date.now()}`,
+63 |                 name: poData.name,
+64 |                 value: poData.value
+65 |             };
+66 | 
+67 |             poNumbers.value.push(newPO);
+68 | 
+69 |             return newPO;
+70 |         } catch (err) {
+71 |             error.value = err instanceof Error ? err.message : 'Error creating PO';
+72 |             console.error('Error creating PO:', err);
+73 |             throw err;
+74 |         } finally {
+75 |             isLoading.value = false;
+76 |         }
+77 |     }
+78 | 
+79 |     // Mediaplan creation logic (example, can be expanded)
+80 |     async function createMediaplan(mediaplanData: any): Promise<any> {
+81 |         isLoading.value = true;
+82 |         error.value = null;
+83 |         try {
+84 |             // Simulate API call
+85 |             console.log('Simulating mediaplan creation with data:', mediaplanData);
+86 |             await new Promise(resolve => setTimeout(resolve, 1000));
+87 |             const mockMediaplanId = `mp-${Date.now()}`;
+88 |             // In a real API call, you would return the created mediaplan object
+89 |             return { _id: mockMediaplanId, ...mediaplanData };
+90 |         } catch (err) {
+91 |             error.value = err instanceof Error ? err.message : 'Error creating mediaplan';
+92 |             console.error(error.value, err);
+93 |             throw err;
+94 |         } finally {
+95 |             isLoading.value = false;
+96 |         }
+97 |     }
+98 | 
+99 | 
+100 |     return {
+101 |         // State
+102 |         poNumbers,
+103 |         isLoading,
+104 |         error,
+105 | 
+106 |         // Actions
+107 |         fetchPONumbers,
+108 |         createPO,
+109 |         createMediaplan, // Added for completeness if store handles creation
+110 |     };
+111 | });
 ```
 
 src/stores/lineitemStore.ts
@@ -4860,6 +4827,165 @@ src/stores/mediaplanStore.ts
 172 | });
 ```
 
+src/stores/poNumberStore.ts
+```
+1 | import {defineStore} from 'pinia';
+2 | import {ref, computed} from 'vue';
+3 | import customFetch from '@/helpers/customFetch';
+4 | import type {PONumber} from '@/types/mediaplan';
+5 | 
+6 | export interface PONumberCreatePayload {
+7 |     name: string;
+8 |     value: number;
+9 |     metadata?: Record<string, any>;
+10 | }
+11 | 
+12 | export interface PONumberUpdatePayload {
+13 |     name?: string;
+14 |     value?: number;
+15 |     metadata?: Record<string, any>;
+16 | }
+17 | 
+18 | export const usePoNumberStore = defineStore('poNumber', () => {
+19 |     const poNumbers = ref<PONumber[]>([]);
+20 |     const selectedPONumber = ref<PONumber | null>(null);
+21 |     const isLoading = ref(false);
+22 |     const error = ref<string | null>(null);
+23 | 
+24 |     const getPONumberById = computed(() => {
+25 |         return (id: string) => poNumbers.value.find(po => po._id === id);
+26 |     });
+27 | 
+28 |     const allPONumbers = computed(() => poNumbers.value);
+29 | 
+30 |     async function fetchPONumbers(): Promise<void> {
+31 |         isLoading.value = true;
+32 |         error.value = null;
+33 |         try {
+34 |             const response = await customFetch('po') as any;
+35 |             poNumbers.value = response.data;
+36 |         } catch (err) {
+37 |             error.value = err instanceof Error ? err.message : 'Failed to fetch PO Numbers';
+38 |             console.error('Error fetching PO Numbers:', err);
+39 |             poNumbers.value = [];
+40 |         } finally {
+41 |             isLoading.value = false;
+42 |         }
+43 |     }
+44 | 
+45 |     async function fetchPONumber(id: string): Promise<PONumber | null> {
+46 |         isLoading.value = true;
+47 |         error.value = null;
+48 |         selectedPONumber.value = null;
+49 |         try {
+50 |             const response = await customFetch(`po/${id}`) as PONumber;
+51 |             const index = poNumbers.value.findIndex(p => p._id === id);
+52 |             if (index !== -1) {
+53 |                 poNumbers.value[index] = response;
+54 |             } else {
+55 |             }
+56 |             selectedPONumber.value = response;
+57 |             return response;
+58 |         } catch (err) {
+59 |             error.value = err instanceof Error ? err.message : `Failed to fetch PO Number with ID ${id}`;
+60 |             console.error(`Error fetching PO Number ${id}:`, err);
+61 |             return null;
+62 |         } finally {
+63 |             isLoading.value = false;
+64 |         }
+65 |     }
+66 | 
+67 |     async function createPONumber(payload: PONumberCreatePayload): Promise<PONumber | null> {
+68 |         isLoading.value = true;
+69 |         error.value = null;
+70 |         try {
+71 |             const requestBody: Record<string, any> = {
+72 |                 name: payload.name,
+73 |                 value: payload.value,
+74 |             };
+75 |             if (payload.metadata) {
+76 |                 requestBody.metadata = payload.metadata;
+77 |             }
+78 | 
+79 |             const newPONumber = await customFetch('po', {
+80 |                 method: 'POST',
+81 |                 body: JSON.stringify(requestBody),
+82 |             }) as PONumber;
+83 | 
+84 |             poNumbers.value.push(newPONumber);
+85 |             return newPONumber;
+86 |         } catch (err) {
+87 |             error.value = err instanceof Error ? err.message : 'Failed to create PO Number';
+88 |             console.error('Error creating PO Number:', err);
+89 |             return null;
+90 |         } finally {
+91 |             isLoading.value = false;
+92 |         }
+93 |     }
+94 | 
+95 |     async function updatePONumber(id: string, payload: PONumberUpdatePayload): Promise<PONumber | null> {
+96 |         isLoading.value = true;
+97 |         error.value = null;
+98 |         try {
+99 |             const updatedPONumber = await customFetch(`po/${id}`, {
+100 |                 method: 'PUT',
+101 |                 body: JSON.stringify(payload),
+102 |             }) as PONumber;
+103 | 
+104 |             const index = poNumbers.value.findIndex(po => po._id === id);
+105 |             if (index !== -1) {
+106 |                 poNumbers.value[index] = {...poNumbers.value[index], ...updatedPONumber};
+107 |             }
+108 |             if (selectedPONumber.value?._id === id) {
+109 |                 selectedPONumber.value = {...selectedPONumber.value, ...updatedPONumber};
+110 |             }
+111 |             return updatedPONumber;
+112 |         } catch (err) {
+113 |             error.value = err instanceof Error ? err.message : `Failed to update PO Number with ID ${id}`;
+114 |             console.error(`Error updating PO Number ${id}:`, err);
+115 |             return null;
+116 |         } finally {
+117 |             isLoading.value = false;
+118 |         }
+119 |     }
+120 | 
+121 |     async function deletePONumber(id: string): Promise<boolean> {
+122 |         isLoading.value = true;
+123 |         error.value = null;
+124 |         try {
+125 |             await customFetch(`po/${id}`, {
+126 |                 method: 'DELETE',
+127 |             });
+128 |             poNumbers.value = poNumbers.value.filter(po => po._id !== id);
+129 |             if (selectedPONumber.value?._id === id) {
+130 |                 selectedPONumber.value = null;
+131 |             }
+132 |             return true;
+133 |         } catch (err) {
+134 |             error.value = err instanceof Error ? err.message : `Failed to delete PO Number with ID ${id}`;
+135 |             console.error(`Error deleting PO Number ${id}:`, err);
+136 |             return false;
+137 |         } finally {
+138 |             isLoading.value = false;
+139 |         }
+140 |     }
+141 | 
+142 |     return {
+143 |         poNumbers,
+144 |         selectedPONumber,
+145 |         isLoading,
+146 |         error,
+147 |         allPONumbers,
+148 |         getPONumberById,
+149 |         fetchPONumbers,
+150 |         fetchPONumber,
+151 |         createPONumber,
+152 |         updatePONumber,
+153 |         deletePONumber,
+154 |     };
+155 | });
+```
+
 src/stores/projectStore.ts
 ```
 1 | // src/stores/projectStore.ts
@@ -5131,7 +5257,7 @@ src/stores/sourcesStore.ts
 18 | 
 19 |     const getSourceList = computed(() => {
 20 | 
-21 |         const tmp =  (dimensionKey: string): Array<Source | Brand | Record<string, any>> | undefined => {
+21 |         const tmp = (dimensionKey: string): Array<Source | Brand | Record<string, any>> | undefined => {
 22 |             return sourcesData.value[dimensionKey];
 23 |         };
 24 |         return tmp
@@ -5157,33 +5283,32 @@ src/stores/sourcesStore.ts
 44 |                     sourcesData.value[key] = data[key];
 45 |                 }
 46 |             }
-47 |             console.log(sourcesData.value)
-48 |             currentType.value = type;
-49 |             currentLevel.value = level;
-50 | 
-51 |             console.log(`Sources fetched and state updated for type: ${type}, level: ${level}`, sourcesData.value);
-52 |             return true;
-53 | 
-54 |         } catch (err) {
-55 |             const errorMessage = err instanceof Error ? err.message : `Failed to fetch sources for type '${type}' and level '${level}'`;
-56 |             error.value = errorMessage;
-57 |             console.error(`Error fetching sources (type: ${type}, level: ${level}):`, err);
-58 |             return false;
-59 |         } finally {
-60 |             isLoading.value = false;
-61 |         }
-62 |     }
-63 | 
-64 |     return {
-65 |         sourcesData,
-66 |         isLoading,
-67 |         error,
-68 |         currentType,
-69 |         currentLevel,
-70 |         getSourceList,
-71 |         fetchSources,
-72 |     };
-73 | });
+47 |             currentType.value = type;
+48 |             currentLevel.value = level;
+49 | 
+50 |             console.log(`Sources fetched and state updated for type: ${type}, level: ${level}`, sourcesData.value);
+51 |             return true;
+52 | 
+53 |         } catch (err) {
+54 |             const errorMessage = err instanceof Error ? err.message : `Failed to fetch sources for type '${type}' and level '${level}'`;
+55 |             error.value = errorMessage;
+56 |             console.error(`Error fetching sources (type: ${type}, level: ${level}):`, err);
+57 |             return false;
+58 |         } finally {
+59 |             isLoading.value = false;
+60 |         }
+61 |     }
+62 | 
+63 |     return {
+64 |         sourcesData,
+65 |         isLoading,
+66 |         error,
+67 |         currentType,
+68 |         currentLevel,
+69 |         getSourceList,
+70 |         fetchSources,
+71 |     };
+72 | });
 ```
 
 src/types/campaigns.ts
@@ -5285,11 +5410,11 @@ src/types/mediaplan.ts
 8 | }
 9 | 
 10 | // Brand reference
-11 | export interface Brand {
+11 | /*export interface Brand {
 12 |     _id: string;
 13 |     name: string;
 14 |     logo?: string;
-15 | }
+15 | }*/
 16 | 
 17 | // Filter sources from API
 18 | export interface FilterSources {
@@ -5315,80 +5440,58 @@ src/types/mediaplan.ts
 38 |     value: number;
 39 | }
 40 | 
-41 | // Entity reference (used for created_by and other references)
-42 | export interface EntityReference {
-43 |     _id: string;
-44 |     name: string;
-45 | }
-46 | 
-47 | // Mediaplan filter options
-48 | export interface MediaplanFilter {
-49 |     search?: string;
-50 |     status?: string;
-51 |     start_date_before?: string;
-52 |     start_date_after?: string;
-53 |     brand_id?: string;
-54 |     country?: string;
-55 |     created_by_me?: boolean;
-56 |     currently_running?: boolean;
-57 | }
-58 | 
-59 | // Mediaplan create request
-60 | export interface MediaplanCreate {
-61 |     name: string;
-62 |     status: 'In Planning' | 'Draft' | 'For Approval';
-63 |     start_date: string;
-64 |     end_date: string;
-65 |     brand: {
-66 |         _id: string;
-67 |         name?: string;
-68 |     };
-69 |     budget: {
-70 |         total: number;
-71 |         used?: number;
-72 |         available?: number;
-73 |     };
-74 |     po_numbers?: PONumber[];
-75 | }
-76 | 
-77 | // Complete Mediaplan object
-78 | export interface Mediaplan {
-79 |     _id: string;
-80 |     name: string;
-81 |     status: 'in_planning' | 'draft' | 'for_approval';
-82 |     start_date: string;
-83 |     end_date: string;
-84 |     brand: EntityReference;
-85 |     budget: Budget;
-86 |     po_numbers?: PONumber[];
-87 |     created_by: EntityReference;
-88 |     created_at: string;
-89 |     updated_at: string;
-90 | }
-91 | 
-92 | // API response for mediaplan list
-93 | export interface MediaplanListResponse {
-94 |     total_items: number;
-95 |     total_pages: number;
-96 |     current_page: number;
-97 |     items: Mediaplan[];
-98 | }
-99 | 
-100 | // Sources response type
-101 | export interface SourcesResponse {
-102 |     _id: string;
-103 |     version: string;
-104 |     timestamp: string;
-105 |     message: string;
-106 |     code: number;
-107 |     data: {
-108 |         subsegment?: Source[];
-109 |         product?: Source[];
-110 |         campaigntype?: Source[];
-111 |         language?: Source[];
-112 |         [key: string]: Source[] | undefined;
-113 |     };
-114 | }
+41 | export interface Brand {
+42 |     _id?: string;
+43 |     abbreviation: string;
+44 |     value: string;
+45 |     category?: string | null;
+46 |     logo?: string;
+47 | }
+48 | 
+49 | // Entity reference (used for created_by and other references)
+50 | export interface EntityReference {
+51 |     _id: string;
+52 |     name: string;
+53 | }
+54 | 
+55 | // Mediaplan filter options
+56 | export interface MediaplanFilter {
+57 |     search?: string;
+58 |     status?: string;
+59 |     start_date_before?: string;
+60 |     start_date_after?: string;
+61 |     brand_id?: string;
+62 |     country?: string;
+63 |     created_by_me?: boolean;
+64 |     currently_running?: boolean;
+65 | }
+66 | 
+67 | // Mediaplan create request
+68 | 
+69 | 
+70 | // Complete Mediaplan object
+71 | export interface Mediaplan {
+72 |     _id?: string;
+73 |     name: string;
+74 |     status: 'in_planning' | 'draft' | 'for_approval';
+75 |     start_date: string;
+76 |     end_date: string;
+77 |     brand: Brand;
+78 |     po_numbers: PONumber[];
+79 |     budget?: Budget;
+80 |     mediaplan_type: string; // Added mediaplan_type
+81 |     created_by?: EntityReference | string;
+82 |     created_at?: string;
+83 |     updated_at?: string;
+84 | }
+85 | 
+86 | // API response for mediaplan list
+87 | export interface MediaplanListResponse {
+88 |     total_items: number;
+89 |     total_pages: number;
+90 |     current_page: number;
+91 |     items: Mediaplan[];
+92 | }
 ```
 
 src/types/project.ts
@@ -7009,2089 +7112,6 @@ src/components/common/PaginationControls.vue
 83 | </style>
 ```
 
-src/components/overview/CreateFirstProjectDialog.vue
-```
-1 | <template>
-2 |   <v-dialog :model-value="modelValue" @update:model-value="handleClose" persistent max-width="450px">
-3 |     <v-card class="px-6 pa-4">
-4 |       <DialogHeader
-5 |           title="Create new Mediaplan"
-6 |           :show-back-button="true"
-7 |           :show-close-button="true"
-8 |           margin-bottom="4"
-9 |           @back="cancelDialog"
-10 |           @close="cancelDialog"
-11 |       />
-12 | 
-13 |       <v-card-text class="pa-0 mb-4">
-14 |         <v-row class="align-center mb-3 pl-2">
-15 |           <v-img :src="getBrandLogo(brand)" class="mr-2" width="40" max-width="40"></v-img>
-16 |           <span class="text-h6 font-weight-regular">{{ brandName }} </span>
-17 |         </v-row>
-18 |       </v-card-text>
-19 |       <v-card-text class="pa-0">
-20 |         <v-row no-gutters class="pb-3 align-center">
-21 |           <v-col cols="3" class="text-body-2 text-medium-emphasis">Name:</v-col>
-22 |           <v-col class="text-body-2 text-right">{{ mediaplanName || '-' }}</v-col>
-23 |         </v-row>
-24 |         <v-row no-gutters class="pb-3 align-center">
-25 |           <v-col cols="3" class="text-body-2 text-medium-emphasis">PO:</v-col>
-26 |           <v-col class="text-body-2 text-right">{{ poNumbersDisplay }}</v-col>
-27 |         </v-row>
-28 |         <v-row no-gutters class="pb-0 align-start">
-29 |           <v-col cols="3" class="text-body-2 text-medium-emphasis">Duration:</v-col>
-30 |           <v-col class="text-body-2 text-right">
-31 |             Start: {{ formatDate(startDateValue) }}<br>
-32 |             End: {{ formatDate(endDateValue) }}
-33 |           </v-col>
-34 |         </v-row>
-35 |       </v-card-text>
-36 |       <v-divider class="mt-4 mb-5"></v-divider>
-37 | 
-38 |       <v-form ref="form" @submit.prevent="submitForm" v-model="isFormValid" validate-on="input"
-39 |               :disabled="isSubmitting">
-40 |         <WithFormDefaults>
-41 |           <v-card-text class="pa-0">
-42 | 
-43 |             <v-row>
-44 |               <v-col cols="12">
-45 |                 <h6 class="text-h6 font-weight-regular mb-0">Add first project</h6>
-46 |               </v-col>
-47 |             </v-row>
-48 | 
-49 |             <v-row>
-50 |               <v-col cols="12" md="6">
-51 |                 <div class="text-caption text-medium-emphasis">Country *</div>
-52 |                 <v-select
-53 |                     v-model="selectedCountry"
-54 |                     :items="countries"
-55 |                     item-title="name"
-56 |                     item-value="code"
-57 |                     :rules="[v => !!v || 'Country is required']"
-58 |                     return-object
-59 |                     :loading="!projectStore.countries.length"
-60 |                     placeholder="Select Country"
-61 |                 >
-62 |                   <template v-slot:selection="{ item }">
-63 |                     <div class="d-flex align-center">
-64 |                       <country-flag :country="item.code" class="mr-2"/>
-65 |                       {{ item.code }} - {{ item.name }}
-66 |                     </div>
-67 |                   </template>
-68 |                   <template v-slot:item="{ item, props }">
-69 |                     <v-list-item v-bind="props" :title="`${item.code} - ${item.name}`">
-70 |                       <template v-slot:prepend>
-71 |                         <country-flag :country="item.code" class="mr-2"/>
-72 |                       </template>
-73 |                     </v-list-item>
-74 |                   </template>
-75 |                 </v-select>
-76 |               </v-col>
-77 |               <v-col cols="12" md="6">
-78 |                 <div class="text-caption text-medium-emphasis mb-0">Language *</div>
-79 |                 <v-select
-80 |                     v-model="selectedLanguage"
-81 |                     :items="availableLanguages"
-82 |                     item-title="name"
-83 |                     item-value="code"
-84 |                     :disabled="!selectedCountry || availableLanguages.length === 0"
-85 |                     :rules="[v => !!v || 'Language is required']"
-86 |                     placeholder="Select Language"
-87 |                 />
-88 |                 <div v-if="selectedCountry" class="text-caption text-medium-emphasis mt-1">* Depends on Country</div>
-89 |               </v-col>
-90 |             </v-row>
-91 | 
-92 |             <v-row>
-93 |               <v-col cols="12">
-94 |                 <div class="text-caption text-medium-emphasis">Builder *</div>
-95 |                 <v-select
-96 |                     v-model="selectedBuilder"
-97 |                     :items="builders"
-98 |                     item-title="name"
-99 |                     item-value="code"
-100 |                     :rules="[v => !!v || 'Builder is required']"
-101 |                     placeholder="Select Builder"
-102 |                     :loading="!projectStore.builders?.length"
-103 |                 />
-104 |               </v-col>
-105 |             </v-row>
-106 |             <v-row>
-107 |               <v-col cols="12">
-108 |                 <div class="text-caption text-medium-emphasis">Campaign type *</div>
-109 |                 <v-select
-110 |                     v-model="selectedCampaignType"
-111 |                     :items="campaignTypes"
-112 |                     item-title="name"
-113 |                     item-value="code"
-114 |                     :rules="[v => !!v || 'Campaign type is required']"
-115 |                     placeholder="Select Campaign Type"
-116 |                     :loading="!projectStore.campaignTypes?.length"
-117 |                 />
-118 |               </v-col>
-119 |             </v-row>
-120 |             <v-row>
-121 |               <v-col cols="12">
-122 |                 <div class="text-caption text-medium-emphasis">Phase *</div>
-123 |                 <v-select
-124 |                     v-model="selectedPhase"
-125 |                     :items="phases"
-126 |                     item-title="name"
-127 |                     item-value="code"
-128 |                     :rules="[v => !!v || 'Phase is required']"
-129 |                     placeholder="Select Phase"
-130 |                     :loading="!projectStore.phases?.length"
-131 |                 />
-132 |               </v-col>
-133 |             </v-row>
-134 |             <v-row>
-135 |               <v-col cols="12">
-136 |                 <div class="text-caption text-medium-emphasis">Goal *</div>
-137 |                 <v-select
-138 |                     v-model="selectedGoal"
-139 |                     :items="goals"
-140 |                     item-title="name"
-141 |                     item-value="code"
-142 |                     :rules="[v => !!v || 'Goal is required']"
-143 |                     placeholder="Select Goal"
-144 |                     :loading="!projectStore.goals?.length"
-145 |                 />
-146 |               </v-col>
-147 |             </v-row>
-148 | 
-149 |           </v-card-text>
-150 |         </WithFormDefaults>
-151 | 
-152 |         <DialogFooter
-153 |             class="px-4 mt-5"
-154 |             cancel-text="Cancel"
-155 |             confirm-text="Create Project"
-156 |             :loading="isSubmitting"
-157 |             :disabled="!formIsReady || isSubmitting"
-158 |             :submit-button="true"
-159 |             @cancel="cancelDialog"
-160 |             @confirm="submitForm"/>
-161 |       </v-form>
-162 |     </v-card>
-163 |   </v-dialog>
-164 | </template>
-165 | 
-166 | <script setup lang="ts">
-167 | // Script content remains the same as the previous correct version
-168 | import {ref, computed, onMounted, watch, nextTick} from 'vue';
-169 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
-170 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
-171 | import {useProjectStore} from '@/stores/projectStore';
-172 | import type {
-173 |   ProjectCountry,
-174 |   ProjectLanguage,
-175 |   ProjectCampaignType,
-176 |   ProjectPhase,
-177 |   ProjectGoal,
-178 |   ProjectBuilder
-179 | } from '@/types/project';
-180 | import CountryFlag from '@/components/common/CountryFlag.vue';
-181 | import {getBrandLogo} from '@/helpers/brandUtils';
-182 | import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
-183 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
-184 | import {formatDate} from "@/helpers/dateUtils.ts";
-185 | 
-186 | interface CreateFirstProjectDialogProps {
-187 |   modelValue: boolean
-188 |   mediaplanId: string
-189 |   mediaplanName?: string
-190 |   poNumbers?: { _id: string; name: string; value: number }[]
-191 |   startDate?: string | Date | null
-192 |   endDate?: string | Date | null
-193 |   brand?: { _id: string; name: string }
-194 | }
-195 | 
-196 | const props = defineProps<CreateFirstProjectDialogProps>()
-197 | 
-198 | const emit = defineEmits<{
-199 |   (e: 'update:modelValue', value: boolean): void;
-200 |   (e: 'created', projectId: string): void;
-201 | }>();
-202 | 
-203 | const form = ref<any>(null);
-204 | const projectStore = useProjectStore();
-205 | const isFormValid = ref(false);
-206 | const isSubmitting = ref(false);
-207 | 
-208 | const selectedCountry = ref<ProjectCountry | null>(null);
-209 | const selectedLanguage = ref<string | null>(null);
-210 | const selectedBuilder = ref<string | null>(null);
-211 | const selectedCampaignType = ref<string | null>(null);
-212 | const selectedPhase = ref<string | null>(null);
-213 | const selectedGoal = ref<string | null>(null);
-214 | 
-215 | const brandName = computed(() => props.brand?.name || 'Brand');
-216 | const poNumbersDisplay = computed(() => {
-217 |   if (!props.poNumbers || props.poNumbers.length === 0) return '-';
-218 |   return props.poNumbers.map(po => po.name).join(', ');
-219 | });
-220 | const startDateValue = computed(() => props.startDate || null);
-221 | const endDateValue = computed(() => props.endDate || null);
-222 | 
-223 | const countries = computed(() => projectStore.countries || []);
-224 | const languageOptions = computed(() => projectStore.languages || []);
-225 | const builders = computed(() => projectStore.builders?.map(b => ({code: b.id, name: b.name})) || []);
-226 | const campaignTypes = computed(() => projectStore.campaignTypes?.map(t => ({code: t.id, name: t.name})) || []);
-227 | const phases = computed(() => projectStore.phases?.map(p => ({code: p.id, name: p.name})) || []);
-228 | const goals = computed(() => projectStore.goals?.map(g => ({code: g.id, name: g.name})) || []);
-229 | 
-230 | const formIsReady = computed(() => {
-231 |   return isFormValid.value &&
-232 |       !!selectedCountry.value &&
-233 |       !!selectedLanguage.value &&
-234 |       !!selectedBuilder.value &&
-235 |       !!selectedCampaignType.value &&
-236 |       !!selectedPhase.value &&
-237 |       !!selectedGoal.value;
-238 | });
-239 | 
-240 | const availableLanguages = computed(() => {
-241 |   if (!selectedCountry.value) return [];
-242 |   return languageOptions.value.filter((lang: any) =>
-243 |       lang.country_codes?.includes(selectedCountry.value!.code)
-244 |   );
-245 | });
-246 | 
-247 | const validateForm = async (): Promise<boolean> => {
-248 |   if (!form.value) return false;
-249 |   const {valid} = await form.value.validate();
-250 |   return valid && formIsReady.value;
-251 | };
-252 | 
-253 | const resetFormFields = () => {
-254 |   selectedCountry.value = null;
-255 |   selectedLanguage.value = null;
-256 |   selectedBuilder.value = null;
-257 |   selectedCampaignType.value = null;
-258 |   selectedPhase.value = null;
-259 |   selectedGoal.value = null;
-260 |   nextTick(() => {
-261 |     form.value?.resetValidation();
-262 |   });
-263 | };
-264 | 
-265 | const submitForm = async () => {
-266 |   const isValid = await validateForm();
-267 |   if (!isValid) {
-268 |     showWarning('Please fill in all required fields correctly.');
-269 |     return;
-270 |   }
-271 | 
-272 |   // Double-check that required refs have values before proceeding
-273 |   // formIsReady should cover this, but an extra check can be helpful.
-274 |   if (!selectedCountry.value || !selectedLanguage.value || !selectedPhase.value || !selectedCampaignType.value /* Add checks for other required fields if needed */) {
-275 |     showError("Critical project information is missing. Please check selections.");
-276 |     isSubmitting.value = false; // Ensure submission stops
-277 |     return;
-278 |   }
-279 | 
-280 |   isSubmitting.value = true;
-281 |   try {
-282 |     // --- Construct the single ProjectCreate object ---
-283 |     // NOTE: Determine how the project 'name' should be generated.
-284 |     // Using a combination of country/language as placeholder.
-285 |     // You might need a dedicated input or different logic.
-286 |     const projectCreateData: ProjectCreate = {
-287 |       mediaplanId: props.mediaplanId,
-288 |       name: `Project ${selectedCountry.value.code}-${selectedLanguage.value}`, // Placeholder name
-289 |       country: selectedCountry.value, // Pass the whole country object
-290 |       language: selectedLanguage.value, // Pass language code
-291 |       phase: selectedPhase.value, // Pass phase code
-292 |       campaignType: selectedCampaignType.value, // Pass campaign type code
-293 |       // Add goal, builder etc. IF the ProjectCreate type defines them
-294 |       // and if the store action uses them. Based on the store code provided,
-295 |       // builder/goal don't seem directly mapped in the payload construction.
-296 |       // goal: selectedGoal.value,
-297 |       // builder: selectedBuilder.value,
-298 |     };
-299 | 
-300 |     console.log("DEBUG: Submitting ProjectCreate object:", projectCreateData);
-301 | 
-302 |     // --- Call store action with the single object ---
-303 |     // The store action 'createProject' now receives the correctly structured object
-304 |     const newProjectResponse = await projectStore.createProject(projectCreateData);
-305 | 
-306 |     showSuccess(`Project created successfully`);
-307 |     // Assuming createProject returns the ID or relevant data
-308 |     // If it returns a mock ID like `project-${Date.now()}` as in the store code:
-309 |     const newProjectId = typeof newProjectResponse === 'string' ? newProjectResponse : newProjectResponse?._id || `unknown-${Date.now()}`;
-310 |     emit('created', newProjectId);
-311 | 
-312 |     emit('update:modelValue', false);
-313 | 
-314 |   } catch (error: any) {
-315 |     console.error(`Error creating first project:`, error);
-316 |     // Log the specific error from the store if possible
-317 |     const message = error?.response?.data?.message || error?.message || `Failed to create project.`;
-318 |     showError(message);
-319 |   } finally {
-320 |     isSubmitting.value = false;
-321 |   }
-322 | };
-323 | const handleClose = (value: boolean) => {
-324 |   if (!value) {
-325 |     cancelDialog();
-326 |   }
-327 | }
-328 | 
-329 | const cancelDialog = () => {
-330 |   if (isSubmitting.value) {
-331 |     showWarning('Please wait, submission is in progress.');
-332 |     return;
-333 |   }
-334 |   resetFormFields();
-335 |   emit('update:modelValue', false);
-336 | };
-337 | 
-338 | watch(() => props.modelValue, (isVisible) => {
-339 |   if (isVisible) {
-340 |     resetFormFields();
-341 |   }
-342 | });
-343 | 
-344 | watch(selectedCountry, (newCountry, oldCountry) => {
-345 |   if (newCountry !== oldCountry && oldCountry !== undefined) {
-346 |     selectedLanguage.value = null;
-347 |     nextTick(() => {
-348 |       if (availableLanguages.value.length === 1) {
-349 |         selectedLanguage.value = availableLanguages.value[0].code;
-350 |       }
-351 |     });
-352 |   }
-353 | });
-354 | 
-355 | onMounted(async () => {
-356 |   try {
-357 |     await projectStore.fetchProjectOptions();
-358 |     console.log("First Project Dialog options loaded on mount.");
-359 |   } catch (error) {
-360 |     console.error('Error fetching form options on mount:', error);
-361 |     showError('Failed to load required form options.');
-362 |   }
-363 | });
-364 | 
-365 | </script>
-366 | 
-367 | <style scoped>
-368 | .country-flag {
-369 |   width: 20px;
-370 |   height: auto;
-371 |   display: inline-block;
-372 |   vertical-align: middle;
-373 | }
-374 | </style>
-```
-
-src/components/overview/CreateMediaplanButton.vue
-```
-1 | <template>
-2 |   <div>
-3 |     <v-btn
-4 |         color="black"
-5 |         class="text-white px-4"
-6 |         prepend-icon="mdi-plus"
-7 |         @click="showDialog"
-8 |     >
-9 |       Mediaplan
-10 |     </v-btn>
-11 | 
-12 |     <create-mediaplan-dialog
-13 |         v-model="dialogVisible"
-14 |         @created="handleMediaplanCreated"
-15 |         @project-created="handleProjectCreated"
-16 |     />
-17 |   </div>
-18 | </template>
-19 | 
-20 | <script setup lang="ts">
-21 | import { ref } from 'vue';
-22 | import CreateMediaplanDialog from './CreateMediaplanDialog.vue';
-23 | import { useRouter } from 'vue-router';
-24 | import { useMediaplanStore } from '@/stores/mediaplanStore';
-25 | 
-26 | const router = useRouter();
-27 | const mediaplanStore = useMediaplanStore();
-28 | const dialogVisible = ref(false);
-29 | 
-30 | const showDialog = () => {
-31 |   dialogVisible.value = true;
-32 | };
-33 | 
-34 | const handleMediaplanCreated = (mediaplanId: string) => {
-35 |   // Store the mediaplan ID but don't close the dialog yet
-36 |   // as the project creation will follow
-37 |   console.log('Mediaplan created with ID:', mediaplanId);
-38 | };
-39 | 
-40 | const handleProjectCreated = (projectId: string) => {
-41 |   console.log('Project created with ID:', projectId);
-42 | 
-43 |   // Refresh the mediaplans list
-44 |   mediaplanStore.fetchMediaplans();
-45 | 
-46 |   // Emit event to notify parent component
-47 |   emit('project-created', projectId);
-48 | };
-49 | 
-50 | const emit = defineEmits<{
-51 |   (e: 'mediaplan-created'): void;
-52 |   (e: 'project-created', projectId: string): void;
-53 | }>();
-54 | </script>
-```
-
-src/components/overview/CreateMediaplanDialog.vue
-```
-1 | <template>
-2 |   <v-dialog v-model="dialog" persistent max-width="450px">
-3 |     <v-card class="px-6 pa-4">
-4 |       <DialogHeader
-5 |           title="Create new Mediaplan"
-6 |           :show-back-button="false"
-7 |           margin-bottom="4"
-8 |           @close="cancelDialog"
-9 |       />
-10 |       <v-form ref="form" @submit.prevent="submitForm">
-11 |         <WithFormDefaults>
-12 |           <v-card-text class="pa-0">
-13 |             <!-- Brand Selection -->
-14 |             <FormElementVrowVcol label="Brand Output" required>
-15 |               <v-select
-16 |                   id="brand-select"
-17 |                   v-model="formData.brand"
-18 |                   :items="brands"
-19 |                   item-title="name"
-20 |                   item-value="_id"
-21 |                   placeholder="Please Select a brand"
-22 |                   :rules="[v => !!v || 'Brand is required']"
-23 |               >
-24 |                 <template v-slot:selection="{ item }">
-25 |                   <template v-if="formData.brand">
-26 |                     <v-avatar
-27 |                         size="24"
-28 |                         class="mr-2 grey lighten-4"
-29 |                         :image="getBrandLogo({ _id: item.value, name: item.raw.name })"
-30 |                     />
-31 |                     {{ item.raw.name }}
-32 |                   </template>
-33 |                 </template>
-34 | 
-35 |                 <template v-slot:item="{ item, props }">
-36 |                   <v-list-item v-bind="props" :title="item.raw.name">
-37 |                     <template v-slot:prepend>
-38 |                       <v-avatar
-39 |                           size="32"
-40 |                           class="mr-2 grey lighten-4"
-41 |                           :image="getBrandLogo({ _id: item.value, name: item.raw.name })"
-42 |                       />
-43 |                     </template>
-44 |                   </v-list-item>
-45 |                 </template>
-46 |               </v-select>
-47 |             </FormElementVrowVcol>
-48 | 
-49 |             <!-- Mediaplan Type -->
-50 |             <FormElementVrowVcol pb="pb-3" label="Mediaplan Type" required>
-51 |               <v-radio-group v-model="mediaplanType" inline>
-52 |                 <v-radio value="po" label="PO Based"/>
-53 |                 <v-radio value="draft" label="Draft"/>
-54 |               </v-radio-group>
-55 |             </FormElementVrowVcol>
-56 | 
-57 |             <!-- Mediaplan Name -->
-58 |             <FormElementVrowVcol label="Individual Name">
-59 |               <v-text-field
-60 |                   id="mediaplan-name"
-61 |                   v-model="formData.name"
-62 |                   placeholder="please type in an individual title"
-63 |                   :rules="[v => !!v || 'Name is required']"
-64 |               />
-65 |             </FormElementVrowVcol>
-66 | 
-67 |             <!-- PO Selection -->
-68 |             <FormElementVrowVcol label="Select existing PO" required>
-69 |               <v-row no-gutters>
-70 |                 <v-col class="mr-2">
-71 |                   <v-select
-72 |                       id="po-select"
-73 |                       v-model="selectedPOs"
-74 |                       :items="poNumbers"
-75 |                       item-title="name"
-76 |                       item-value="_id"
-77 |                       placeholder="Select POs"
-78 |                       :rules="[v => mediaplanType !== 'po' || (v && v.length > 0) || 'At least one PO is required']"
-79 |                       multiple
-80 |                       chips
-81 |                       closable-chips
-82 |                   />
-83 |                 </v-col>
-84 |                 <v-col cols="auto">
-85 |                   <v-btn
-86 |                       color="primary"
-87 |                       size="large"
-88 |                       style="height: 48px;"
-89 |                       variant="outlined"
-90 |                       @click="openCreatePODialog"
-91 |                   >
-92 |                     Create PO
-93 |                   </v-btn>
-94 |                 </v-col>
-95 |               </v-row>
-96 |             </FormElementVrowVcol>
-97 | 
-98 |             <!-- Creator and Department -->
-99 |             <FormElementVrowVcol label="Creator" required>
-100 | 
-101 |               <v-text-field
-102 |                   id="creator-name"
-103 |                   v-model="creatorName"
-104 |                   placeholder="Your name"
-105 |                   :rules="[v => !!v || 'Creator name is required']"
-106 |                   readonly
-107 |                   disabled
-108 |               />
-109 |             </FormElementVrowVcol>
-110 | 
-111 |             <FormElementVrowVcol label="Department">
-112 |               <v-text-field
-113 |                   id="department"
-114 |                   v-model="department"
-115 |                   placeholder="Department name"
-116 |               />
-117 |             </FormElementVrowVcol>
-118 | 
-119 | 
-120 |             <!-- Date Range -->
-121 |             <FormElementVrowVcol label="Start date - End date" required>
-122 |               <DateRangePicker
-123 |                   id="date-range"
-124 |                   v-model="dateRange"
-125 |                   placeholder="Select start and end dates"
-126 |                   :rules="[v => !!v || 'Date range is required']"
-127 |                   :required="true"
-128 |                   dialog-title="Choose a date range"
-129 |                   @update:model-value="handleDateRangeChange"
-130 |               />
-131 |             </FormElementVrowVcol>
-132 | 
-133 | 
-134 |           </v-card-text>
-135 |         </WithFormDefaults>
-136 | 
-137 |         <DialogFooter
-138 |             cancel-text="Cancel"
-139 |             confirm-text="Next Step"
-140 |             :loading="isSubmitting"
-141 |             :disabled="!form?.isValid"
-142 |             :submit-button="true"
-143 |             @cancel="cancelDialog"
-144 |         />
-145 |       </v-form>
-146 |     </v-card>
-147 |   </v-dialog>
-148 | 
-149 |   <!-- Create PO Dialog -->
-150 |   <CreatePoDialog
-151 |       v-model="createPODialogVisible"
-152 |       :initial-brand-id="formData.brand?._id"
-153 |       @created="handlePoCreated"
-154 |   />
-155 | 
-156 |   <!-- Project Creation Dialog (shown after mediaplan creation) -->
-157 |   <CreateFirstProjectDialog
-158 |       mode="create-mediaplan"
-159 |       v-if="showProjectDialog"
-160 |       v-model="showProjectDialog"
-161 |       :mediaplan-id="createdMediaplanId"
-162 |       :mediaplan-name="formData.name"
-163 |       :po-numbers="formData.po_numbers"
-164 |       :start-date="formData.start_date"
-165 |       :end-date="formData.end_date"
-166 |       :brand="{ _id: formData.brand._id, name: selectedBrandName }"
-167 |       @created="handleProjectCreated"
-168 |   />
-169 | </template>
-170 | 
-171 | 
-172 | <script setup lang="ts">
-173 | import {ref, computed, onMounted, watch, nextTick, reactive} from 'vue';
-174 | import {useAuthStore} from '@/stores/auth';
-175 | import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
-176 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
-177 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
-178 | import DateRangePicker from './DateRangePicker.vue';
-179 | import CreateFirstProjectDialog from '@/components/overview/CreateFirstProjectDialog.vue';
-180 | import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
-181 | import type {MediaplanCreate, Brand, PONumber} from '@/types/mediaplan';
-182 | import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
-183 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
-184 | import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
-185 | import {getBrandLogo} from "@/helpers/brandUtils.ts";
-186 | 
-187 | // Props
-188 | const props = defineProps<{
-189 |   modelValue: boolean;
-190 | }>();
-191 | // Emits
-192 | const emit = defineEmits<{
-193 |   (e: 'update:modelValue', value: boolean): void;
-194 |   (e: 'created', mediaplanId: string): void;
-195 |   (e: 'project-created', projectId: string): void;
-196 | }>();
-197 | 
-198 | // References
-199 | const form = ref();
-200 | const authStore = useAuthStore();
-201 | const createMediaplanStore = useCreateMediaplanStore();
-202 | 
-203 | // Reactive State
-204 | const dialog = computed({
-205 |   get: () => props.modelValue,
-206 |   set: (value) => emit('update:modelValue', value)
-207 | });
-208 | 
-209 | const mediaplanType = ref('po'); // Default to PO Based
-210 | const selectedPOs = ref<string[]>([]); // Changed to array for multi-select
-211 | const department = ref('');
-212 | const creatorName = ref('Current User');
-213 | const isSubmitting = ref(false);
-214 | const dateRange = ref<[string, string] | null>(null);
-215 | 
-216 | // Project dialog state
-217 | const showProjectDialog = ref(false);
-218 | const createdMediaplanId = ref('');
-219 | 
-220 | // Create PO Dialog
-221 | const createPODialogVisible = ref(false);
-222 | 
-223 | // Use values from the store
-224 | const brands = computed(() => createMediaplanStore.brands);
-225 | const poNumbers = computed(() => createMediaplanStore.poNumbers);
-226 | 
-227 | const selectedBrandName = computed(() => {
-228 |   const selectedBrand = brands.value.find(brand => brand._id === formData.brand._id);
-229 |   return selectedBrand ? selectedBrand.name : '';
-230 | });
-231 | 
-232 | // Form data structure
-233 | const formData = reactive<MediaplanCreate>({
-234 |   name: '',
-235 |   status: 'Draft', // Default status
-236 |   start_date: '',
-237 |   end_date: '',
-238 |   brand: null,
-239 |   budget: {
-240 |     total: 0,
-241 |     used: 0,
-242 |     available: 0
-243 |   },
-244 |   po_numbers: []
-245 | });
-246 | 
-247 | // Methods
-248 | const handleDateRangeChange = (range: [string, string] | null) => {
-249 |   if (range) {
-250 |     formData.start_date = range[0];
-251 |     formData.end_date = range[1];
-252 |   } else {
-253 |     formData.start_date = '';
-254 |     formData.end_date = '';
-255 |   }
-256 | };
-257 | 
-258 | // Method to handle project creation completion
-259 | const handleProjectCreated = (projectId: string) => {
-260 |   // Close the project dialog
-261 |   showProjectDialog.value = false;
-262 | 
-263 |   // Emit the project created event
-264 |   emit('project-created', projectId);
-265 | 
-266 |   // Close the main dialog as well
-267 |   dialog.value = false;
-268 | 
-269 |   // Show success notification
-270 |   showSuccess('Project created successfully');
-271 | };
-272 | 
-273 | // Method to handle PO creation
-274 | const handlePoCreated = (po: PONumber) => {
-275 |   // Add the newly created PO to the selected POs
-276 |   selectedPOs.value = [...selectedPOs.value, po._id];
-277 | 
-278 |   // Show success message
-279 |   showSuccess(`PO "${po.name}" created successfully and added to selection`);
-280 | };
-281 | 
-282 | const loadFormData = async () => {
-283 |   try {
-284 |     // Load data from the store
-285 |     if (brands.value.length === 0) {
-286 |       await createMediaplanStore.fetchBrands();
-287 |     }
-288 | 
-289 |     if (poNumbers.value.length === 0) {
-290 |       await createMediaplanStore.fetchPONumbers();
-291 |     }
-292 |   } catch (error) {
-293 |     console.error('Error loading form data:', error);
-294 |     showError('Failed to load form data');
-295 |   }
-296 | };
-297 | 
-298 | const submitForm = async () => {
-299 |   const {valid} = await form.value.validate();
-300 | 
-301 |   if (!valid) return;
-302 | 
-303 |   isSubmitting.value = true;
-304 | 
-305 |   try {
-306 |     // Add selected POs to the form data
-307 |     if (mediaplanType.value === 'po' && selectedPOs.value.length > 0) {
-308 |       const selectedPOObjects = poNumbers.value.filter(po => selectedPOs.value.includes(po._id));
-309 |       if (selectedPOObjects.length > 0) {
-310 |         formData.po_numbers = selectedPOObjects;
-311 |         // Calculate total budget from all selected POs
-312 |         formData.budget.total = selectedPOObjects.reduce((sum, po) => sum + po.value, 0);
-313 |       }
-314 |     }
-315 | 
-316 |     // Set status based on the type
-317 |     formData.status = mediaplanType.value === 'po' ? 'Draft' : 'Draft';
-318 | 
-319 |     // For demo purposes, log the payload
-320 |     console.log('Creating mediaplan with data:', formData);
-321 | 
-322 |     // In real application, send to API:
-323 |     try {
-324 |       // This would be the actual API call in production
-325 |       /*
-326 |       const response = await customFetch('/mediaplans', {
-327 |         method: 'POST',
-328 |         headers: {
-329 |           'Content-Type': 'application/json',
-330 |         },
-331 |         body: JSON.stringify(formData),
-332 |       });
-333 |       createdMediaplanId.value = response._id;
-334 |       */
-335 | 
-336 |       // For demo, simulate successful API call
-337 |       await new Promise(resolve => setTimeout(resolve, 800));
-338 | 
-339 |       // Simulate a response with a mock ID
-340 |       createdMediaplanId.value = `mediaplan-${Date.now()}`;
-341 | 
-342 |       // Notify success
-343 |       showSuccess('Mediaplan created successfully');
-344 | 
-345 |       // Emit the created event
-346 |       emit('created', createdMediaplanId.value);
-347 | 
-348 |       // Important: Here we don't cancelDoalog the dialog, but instead show the project dialog
-349 |       showProjectDialog.value = true;
-350 | 
-351 |     } catch (apiError) {
-352 |       console.error('API error creating mediaplan:', apiError);
-353 |       showError('Failed to create mediaplan: API error', {timeout: 10000});
-354 |       throw apiError;
-355 |     }
-356 | 
-357 |   } catch (error) {
-358 |     console.error('Error creating mediaplan:', error);
-359 |     showError('Failed to create mediaplan');
-360 |   } finally {
-361 |     isSubmitting.value = false;
-362 |   }
-363 | };
-364 | 
-365 | // PO Dialog methods
-366 | const openCreatePODialog = () => {
-367 |   if (!formData.brand._id) {
-368 |     showWarning('Please select a brand first');
-369 |     return;
-370 |   }
-371 |   createPODialogVisible.value = true;
-372 | };
-373 | 
-374 | const cancelDialog = () => {
-375 |   resetForm();
-376 |   dialog.value = false;
-377 | };
-378 | 
-379 | const resetForm = async () => {
-380 |   if (form.value) {
-381 |     form.value.reset();
-382 |   }
-383 |   await nextTick();
-384 | 
-385 |   formData.name = '';
-386 |   formData.brand._id = '';
-387 |   formData.start_date = '';
-388 |   formData.end_date = '';
-389 |   dateRange.value = null;
-390 |   selectedPOs.value = [];
-391 |   department.value = '';
-392 |   mediaplanType.value = 'po';
-393 |   showProjectDialog.value = false;
-394 |   createdMediaplanId.value = '';
-395 | };
-396 | 
-397 | // Lifecycle
-398 | onMounted(async () => {
-399 |   await loadFormData();
-400 |   // Set creator name from auth store if available
-401 |   if (authStore.user) {
-402 |     creatorName.value = authStore.user.name || 'Current User';
-403 |   } else {
-404 |     creatorName.value = 'Current User';
-405 |   }
-406 | });
-407 | 
-408 | // Watch for dialog changes to reset form
-409 | watch(dialog, (newValue) => {
-410 |   if (newValue === false) {
-411 |     resetForm();
-412 |   }
-413 | });
-414 | </script>
-```
-
-src/components/overview/CreatePoDialog.vue
-```
-1 | <template>
-2 |   <v-dialog v-model="dialog" max-width="800px" persistent>
-3 |     <v-card class="px-6 py-4">
-4 |       <DialogHeader
-5 |           title="Create new PO"
-6 |           :show-back-button="false"
-7 |           :show-close-button="true"
-8 |           close-icon-color="primary"
-9 |           @close="cancelDialog"
-10 |       />
-11 | 
-12 |       <v-form ref="form" @submit.prevent="submitForm" class="mt-2">
-13 |         <v-card-text class="pa-0">
-14 |           <v-row>
-15 |             <!-- Left column -->
-16 |             <v-col cols="12" md="6">
-17 |               <div class="mb-4">
-18 |                 <label for="client-department" class="text-body-2 mb-1 d-block">Client Department</label>
-19 |                 <v-text-field
-20 |                     id="client-department"
-21 |                     v-model="formData.clientDepartment"
-22 |                     placeholder="Enter the client's department name"
-23 |                     variant="outlined"
-24 |                     hide-details
-25 |                 />
-26 |               </div>
-27 | 
-28 |               <div class="mb-4">
-29 |                 <label for="brand-select" class="text-body-2 mb-1 d-block">Brand*</label>
-30 |                 <v-select
-31 |                     id="brand-select"
-32 |                     v-model="formData.brand"
-33 |                     :items="brands"
-34 |                     item-title="name"
-35 |                     item-value="_id"
-36 |                     placeholder="Select the brand for this PO"
-37 |                     :rules="[v => !!v || 'Brand is required']"
-38 |                     variant="outlined"
-39 |                     hide-details
-40 |                 />
-41 |               </div>
-42 | 
-43 |               <div class="mb-4">
-44 |                 <label for="client-name" class="text-body-2 mb-1 d-block">Client Name</label>
-45 |                 <v-text-field
-46 |                     id="client-name"
-47 |                     v-model="formData.clientName"
-48 |                     placeholder="Enter client's full name"
-49 |                     variant="outlined"
-50 |                     hide-details
-51 |                 />
-52 |               </div>
-53 | 
-54 |               <div class="mb-4">
-55 |                 <label for="market-select" class="text-body-2 mb-1 d-block">Market*</label>
-56 |                 <v-select
-57 |                     id="market-select"
-58 |                     v-model="formData.market"
-59 |                     :items="markets"
-60 |                     item-title="name"
-61 |                     item-value="_id"
-62 |                     placeholder="Select target market region"
-63 |                     :rules="[v => !!v || 'Market is required']"
-64 |                     variant="outlined"
-65 |                     hide-details
-66 |                 />
-67 |               </div>
-68 | 
-69 |               <div class="mb-4">
-70 |                 <label for="purpose-text" class="text-body-2 mb-1 d-block">Purpose</label>
-71 |                 <v-textarea
-72 |                     id="purpose-text"
-73 |                     v-model="formData.purpose"
-74 |                     placeholder="Describe the purpose of this purchase order"
-75 |                     variant="outlined"
-76 |                     rows="4"
-77 |                     counter="250"
-78 |                     :rules="[v => !v || v.length <= 250 || 'Maximum 250 characters']"
-79 |                     hide-details="auto"
-80 |                 />
-81 |               </div>
-82 |             </v-col>
-83 | 
-84 |             <!-- Right column -->
-85 |             <v-col cols="12" md="6">
-86 |               <div class="mb-4">
-87 |                 <label for="po-number" class="text-body-2 mb-1 d-block">PO Number*</label>
-88 |                 <v-text-field
-89 |                     id="po-number"
-90 |                     v-model="formData.poNumber"
-91 |                     placeholder="Enter official purchase order number"
-92 |                     :rules="[v => !!v || 'PO Number is required']"
-93 |                     variant="outlined"
-94 |                     hide-details
-95 |                 />
-96 |               </div>
-97 | 
-98 |               <div class="d-flex">
-99 |                 <div class="flex-grow-1 mr-2">
-100 |                   <label for="budget" class="text-body-2 mb-1 d-block">Budget*</label>
-101 |                   <v-text-field
-102 |                       id="budget"
-103 |                       v-model="formData.budget"
-104 |                       placeholder="Enter budget amount"
-105 |                       type="number"
-106 |                       :rules="[
-107 |                         v => !!v || 'Budget is required',
-108 |                         v => v > 0 || 'Budget must be greater than 0'
-109 |                       ]"
-110 |                       variant="outlined"
-111 |                       class="mb-4"
-112 |                       hide-details
-113 |                   />
-114 |                 </div>
-115 | 
-116 |                 <div class="flex-grow-0" style="width: 100px">
-117 |                   <label for="currency" class="text-body-2 mb-1 d-block">Currency</label>
-118 |                   <v-select
-119 |                       id="currency"
-120 |                       v-model="formData.currency"
-121 |                       :items="currencies"
-122 |                       variant="outlined"
-123 |                       class="mb-4"
-124 |                       hide-details
-125 |                   />
-126 |                 </div>
-127 |               </div>
-128 | 
-129 |               <div class="mb-4">
-130 |                 <label for="validity-range" class="text-body-2 mb-1 d-block">Validity Period*</label>
-131 |                 <DateRangePicker
-132 |                     id="validity-range"
-133 |                     v-model="dateRange"
-134 |                     label=""
-135 |                     placeholder="Select validity period"
-136 |                     required
-137 |                     :rules="[v => !!v || 'Validity period is required']"
-138 |                     variant="outlined"
-139 |                     dialog-title="Select PO Validity Period"
-140 |                     hide-details
-141 |                 />
-142 |               </div>
-143 | 
-144 |               <div class="mb-4">
-145 |                 <label for="contractor-department" class="text-body-2 mb-1 d-block">Contractor Department</label>
-146 |                 <v-text-field
-147 |                     id="contractor-department"
-148 |                     v-model="formData.contractorDepartment"
-149 |                     placeholder="Enter contractor's department name"
-150 |                     variant="outlined"
-151 |                     hide-details
-152 |                 />
-153 |               </div>
-154 | 
-155 |               <div class="mb-4">
-156 |                 <label for="contractor-name" class="text-body-2 mb-1 d-block">Contractor Name</label>
-157 |                 <v-text-field
-158 |                     id="contractor-name"
-159 |                     v-model="formData.contractorName"
-160 |                     placeholder="Enter contractor's full name"
-161 |                     variant="outlined"
-162 |                     hide-details
-163 |                 />
-164 |               </div>
-165 |             </v-col>
-166 |           </v-row>
-167 |         </v-card-text>
-168 |         <DialogFooter
-169 |             cancel-text="Cancel"
-170 |             confirm-text="Create PO"
-171 |             :loading="isSubmitting"
-172 |             :disabled="!form?.isValid"
-173 |             :submit-button="true"
-174 |             @cancel="cancelDialog"
-175 |         />
-176 |       </v-form>
-177 |     </v-card>
-178 |   </v-dialog>
-179 | </template>
-180 | 
-181 | <script setup lang="ts">
-182 | import { ref, reactive, computed, onMounted } from 'vue';
-183 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
-184 | import { useCreateMediaplanStore } from '@/stores/createMediaplanStore';
-185 | import type { Brand, PONumber } from '@/types/mediaplan';
-186 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
-187 | import DateRangePicker from "./DateRangePicker.vue";
-188 | import { showSuccess, showError, showWarning } from '@/helpers/notificationUtils';
-189 | import { formatCurrency } from '@/helpers/currencyUtils';
-190 | 
-191 | // Props
-192 | const props = defineProps<{
-193 |   modelValue: boolean;
-194 |   initialBrandId?: string;
-195 | }>();
-196 | 
-197 | // Emits
-198 | const emit = defineEmits<{
-199 |   (e: 'update:modelValue', value: boolean): void;
-200 |   (e: 'created', po: PONumber): void;
-201 | }>();
-202 | 
-203 | // References and computed values
-204 | const form = ref();
-205 | const createMediaplanStore = useCreateMediaplanStore();
-206 | const dialog = computed({
-207 |   get: () => props.modelValue,
-208 |   set: (value) => emit('update:modelValue', value)
-209 | });
-210 | 
-211 | // Date range for the DateRangePicker
-212 | const dateRange = ref<[string, string] | null>(null);
-213 | 
-214 | // Loading state
-215 | const isSubmitting = ref(false);
-216 | 
-217 | // Brands from store
-218 | const brands = computed(() => createMediaplanStore.brands);
-219 | 
-220 | const markets = ref([
-221 |   { _id: 'de', name: 'Germany' },
-222 |   { _id: 'us', name: 'United States' },
-223 |   { _id: 'uk', name: 'United Kingdom' },
-224 |   { _id: 'fr', name: 'France' },
-225 |   { _id: 'it', name: 'Italy' },
-226 |   { _id: 'es', name: 'Spain' },
-227 |   { _id: 'pl', name: 'Poland' },
-228 | ]);
-229 | 
-230 | const currencies = ref(['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'PLN']);
-231 | 
-232 | // Form data
-233 | const formData = reactive({
-234 |   clientDepartment: '',
-235 |   brand: props.initialBrandId || '',
-236 |   clientName: '',
-237 |   market: '',
-238 |   purpose: '',
-239 |   poNumber: '',
-240 |   budget: 0,
-241 |   currency: 'EUR',
-242 |   contractorDepartment: '',
-243 |   contractorName: ''
-244 | });
-245 | 
-246 | // Methods
-247 | const submitForm = async () => {
-248 |   if (!form.value) return;
-249 | 
-250 |   const { valid } = await form.value.validate();
-251 |   if (!valid) return;
-252 | 
-253 |   isSubmitting.value = true;
-254 | 
-255 |   try {
-256 |     // Create the PO through the store
-257 |     const newPO = await createMediaplanStore.createPO({
-258 |       name: formData.poNumber,
-259 |       value: Number(formData.budget),
-260 |       // Pass the dateRange values to the API
-261 |       metadata: {
-262 |         clientDepartment: formData.clientDepartment,
-263 |         brand: formData.brand,
-264 |         clientName: formData.clientName,
-265 |         market: formData.market,
-266 |         purpose: formData.purpose,
-267 |         currency: formData.currency,
-268 |         validFrom: dateRange.value ? dateRange.value[0] : '',
-269 |         validTo: dateRange.value ? dateRange.value[1] : '',
-270 |         contractorDepartment: formData.contractorDepartment,
-271 |         contractorName: formData.contractorName
-272 |       }
-273 |     });
-274 | 
-275 |     // Show success message with formatted currency
-276 |     showSuccess(
-277 |       `PO "${formData.poNumber}" created successfully with budget ${formatCurrency(Number(formData.budget), { currency: formData.currency })}`
-278 |     );
-279 | 
-280 |     // Emit the created event with the new PO
-281 |     emit('created', newPO);
-282 | 
-283 |     // Close the dialog
-284 |     setTimeout(() => {
-285 |       dialog.value = false;
-286 |     }, 500);
-287 |   } catch (error) {
-288 |     console.error('Error creating PO:', error);
-289 |     showError('Failed to create PO. Please try again.', { timeout: 8000 });
-290 |   } finally {
-291 |     isSubmitting.value = false;
-292 |   }
-293 | };
-294 | 
-295 | const cancelDialog = () => {
-296 |   if (isSubmitting.value) {
-297 |     showWarning('Please wait while the form is submitting...');
-298 |     return;
-299 |   }
-300 |   dialog.value = false;
-301 | };
-302 | 
-303 | // Lifecycle
-304 | onMounted(async () => {
-305 |   // Set default dates (today to 1 year from now)
-306 |   const today = new Date();
-307 |   const nextYear = new Date(today);
-308 |   nextYear.setFullYear(today.getFullYear() + 1);
-309 | 
-310 |   const todayStr = today.toISOString().split('T')[0];
-311 |   const nextYearStr = nextYear.toISOString().split('T')[0];
-312 | 
-313 |   // Set the default date range
-314 |   dateRange.value = [todayStr, nextYearStr];
-315 | 
-316 |   // Initialize with the brand from the prop if provided
-317 |   if (props.initialBrandId) {
-318 |     formData.brand = props.initialBrandId;
-319 |   } else if (brands.value.length > 0) {
-320 |     // Set the first brand as default if no initial brand is provided
-321 |     formData.brand = brands.value[0]._id;
-322 |   }
-323 | 
-324 |   // Make sure brands are loaded
-325 |   if (brands.value.length === 0) {
-326 |     try {
-327 |       await createMediaplanStore.fetchBrands();
-328 |       if (brands.value.length > 0 && !formData.brand) {
-329 |         formData.brand = brands.value[0]._id;
-330 |       }
-331 |     } catch (error) {
-332 |       showError('Failed to load brands. Please try again later.');
-333 |     }
-334 |   }
-335 | });
-336 | </script>
-```
-
-src/components/overview/DateRangePicker.vue
-```
-1 | <template>
-2 |   <div class="date-range-picker">
-3 |     <!-- Single input field that triggers the dialog -->
-4 |     <v-text-field
-5 |         v-model="displayValue"
-6 |         :label="label"
-7 |         :placeholder="placeholder"
-8 |         :rules="rules"
-9 |         :hint="hint"
-10 |         :disabled="disabled"
-11 |         readonly
-12 |         @click="openDialog"
-13 |         append-inner-icon="mdi-calendar-month-outline"
-14 |         v-bind="$attrs"
-15 |     >
-16 |     </v-text-field>
-17 | 
-18 |     <!-- Date Picker Dialog -->
-19 |     <v-dialog v-model="showDialog" width="auto" max-width="420px">
-20 |       <v-card class="date-picker-dialog">
-21 |         <!-- Dialog Title -->
-22 |         <v-card-title class="d-flex align-center pb-0">
-23 |           <span class="text-subtitle-1">{{ dialogTitle }}</span>
-24 |           <v-spacer></v-spacer>
-25 |           <v-btn icon variant="text" @click="closeDialog">
-26 |             <v-icon>mdi-close</v-icon>
-27 |           </v-btn>
-28 |         </v-card-title>
-29 | 
-30 |         <!-- Display Selected Dates -->
-31 |         <v-card-text class="pt-2 pb-0">
-32 |           <div v-if="selectedDates.length >= 2" class="selected-dates">
-33 |             <span class="text-subtitle-1">Selected Range:</span>
-34 |             {{ formatSelectedDatePreview(selectedDates[0]) }} -
-35 |             {{ formatSelectedDatePreview(selectedDates[selectedDates.length - 1]) }}
-36 |           </div>
-37 |           <div v-else class="selected-dates">
-38 |             <strong>No date range selected</strong>
-39 |           </div>
-40 |         </v-card-text>
-41 | 
-42 |         <!-- Date Picker Component -->
-43 |         <v-date-picker
-44 |             v-model="selectedDates"
-45 |             :min="minDate"
-46 |             :max="maxDate"
-47 |             multiple="range"
-48 |             elevation="0"
-49 |             color="primary"
-50 |             width="100%"
-51 |             hide-header
-52 |             show-adjacent-months
-53 |         >
-54 |         </v-date-picker>
-55 | 
-56 |         <!-- Dialog Actions -->
-57 |         <v-card-actions class="pt-0 pb-4 px-6">
-58 |           <v-btn
-59 |               size="large"
-60 |               variant="outlined"
-61 |               color="grey-darken-1"
-62 |               @click="clearSelection"
-63 |           >
-64 |             Clear selection
-65 |           </v-btn>
-66 |           <v-btn
-67 |               size="large"
-68 |               color="primary"
-69 |               variant="flat"
-70 |               @click="setDates"
-71 |               :disabled="!canSetDates"
-72 |           >
-73 |             Set dates
-74 |           </v-btn>
-75 |         </v-card-actions>
-76 |       </v-card>
-77 |     </v-dialog>
-78 |   </div>
-79 | </template>
-80 | 
-81 | <script setup lang="ts">
-82 | import {ref, computed, watch} from 'vue';
-83 | import {formatDate} from '@/helpers/dateUtils';
-84 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
-85 | 
-86 | // Define props with TypeScript interface
-87 | interface Props {
-88 |   modelValue: [string, string] | null; // [startDate, endDate] as a tuple or null
-89 |   label?: string;
-90 |   placeholder?: string;
-91 |   hint?: string;
-92 |   disabled?: boolean;
-93 |   required?: boolean;
-94 |   dialogTitle?: string;
-95 |   dateFormat?: string;
-96 |   minDate?: string;
-97 |   maxDate?: string;
-98 | }
-99 | 
-100 | const props = withDefaults(defineProps<Props>(), {
-101 |   label: 'Date range',
-102 |   placeholder: 'Select a date range',
-103 |   hint: '',
-104 |   disabled: false,
-105 |   required: false,
-106 |   dialogTitle: 'Choose a date range',
-107 |   dateFormat: 'DD.MM.YYYY',
-108 |   minDate: undefined,
-109 |   maxDate: undefined,
-110 |   density: 'default',
-111 |   variant: 'outlined'
-112 | });
-113 | 
-114 | // Define emits with TypeScript
-115 | const emit = defineEmits<{
-116 |   (e: 'update:modelValue', value: [string, string] | null): void;
-117 | }>();
-118 | 
-119 | // State
-120 | const showDialog = ref(false);
-121 | const selectedDates = ref<string[]>([]);
-122 | const displayValue = ref('');
-123 | 
-124 | // Computed properties
-125 | const canSetDates = computed(() => {
-126 |   return selectedDates.value.length >= 2;
-127 | });
-128 | 
-129 | // Rules for validation
-130 | const rules = computed(() => {
-131 |   const rules = [];
-132 |   if (props.required) {
-133 |     rules.push((v: string) => !!v || `${props.label} is required`);
-134 |   }
-135 |   return rules;
-136 | });
-137 | 
-138 | // Format date for the dialog preview
-139 | const formatSelectedDatePreview = (dateStr: string): string => {
-140 |   return formatDate(dateStr, props.dateFormat);
-141 | };
-142 | 
-143 | // Methods
-144 | const openDialog = () => {
-145 |   if (props.disabled) return;
-146 | 
-147 |   // Initialize selected dates based on current values
-148 |   selectedDates.value = [];
-149 |   if (props.modelValue) {
-150 |     selectedDates.value = [...props.modelValue];
-151 |   }
-152 | 
-153 |   showDialog.value = true;
-154 | };
-155 | 
-156 | const closeDialog = () => {
-157 |   showDialog.value = false;
-158 | };
-159 | 
-160 | const clearSelection = () => {
-161 |   selectedDates.value = [];
-162 |   displayValue.value = '';
-163 |   emit('update:modelValue', null);
-164 |   closeDialog();
-165 | };
-166 | 
-167 | const setDates = () => {
-168 |   if (selectedDates.value.length >= 2) {
-169 |     // Sort the dates to ensure start is before end
-170 |     const sortedDates = [...selectedDates.value].sort();
-171 |     const startDate = sortedDates[0];
-172 |     const endDate = sortedDates[sortedDates.length - 1];
-173 | 
-174 |     emit('update:modelValue', [startDate, endDate]);
-175 |     closeDialog();
-176 |   }
-177 | };
-178 | 
-179 | // Update display value when model value changes
-180 | const updateDisplayValue = () => {
-181 |   if (!props.modelValue || props.modelValue.length !== 2) {
-182 |     displayValue.value = '';
-183 |     return;
-184 |   }
-185 | 
-186 |   const [start, end] = props.modelValue;
-187 | 
-188 |   if (start && end) {
-189 |     const startFormatted = formatDate(start, props.dateFormat);
-190 |     const endFormatted = formatDate(end, props.dateFormat);
-191 |     displayValue.value = `${startFormatted} - ${endFormatted}`;
-192 |   } else {
-193 |     displayValue.value = '';
-194 |   }
-195 | };
-196 | 
-197 | // Watch for model value changes
-198 | watch(() => props.modelValue, () => {
-199 |   updateDisplayValue();
-200 | }, {immediate: true});
-201 | 
-202 | // Watch for selected dates changes
-203 | watch(() => selectedDates.value, (newVal) => {
-204 |   if (newVal.length >= 2) {
-205 |     // Update the preview in the input field even before confirming
-206 |     const sortedDates = [...newVal].sort();
-207 |     const startPreview = formatDate(sortedDates[0], props.dateFormat);
-208 |     const endPreview = formatDate(sortedDates[sortedDates.length - 1], props.dateFormat);
-209 |     displayValue.value = `${startPreview} - ${endPreview}`;
-210 |   }
-211 | });
-212 | </script>
-213 | 
-214 | <style scoped>
-215 | .date-picker-dialog {
-216 |   overflow: hidden;
-217 | }
-218 | 
-219 | .weekday-header {
-220 |   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-221 |   position: relative;
-222 |   z-index: 1;
-223 |   background-color: white;
-224 | }
-225 | </style>
-```
-
-src/components/overview/MediaplanActionMenu.vue
-```
-```
-
-src/components/overview/MediaplanCard.vue
-```
-1 | <template>
-2 |   <div class="position-relative card-wrapper">
-3 |     <v-card
-4 |         class="h-100 pa-3 mediaplan-card"
-5 |         elevation="3"
-6 |         :data-mediaplan-id="mediaplan._id"
-7 |         @click="handleCardClick"
-8 |     >
-9 |       <v-card-item class="pb-8">
-10 |         <div class="d-flex align-center">
-11 |           <v-tooltip
-12 |               location="top"
-13 |               open-delay="300"
-14 |           >
-15 |             <template v-slot:activator="{ props }">
-16 |               <div
-17 |                   class="text-h6 text-truncate mediaplan-title pr-1"
-18 |                   v-bind="props"
-19 |               >
-20 |                 {{ mediaplan.name }}
-21 |               </div>
-22 |             </template>
-23 |             <span>{{ mediaplan.name }}</span>
-24 |           </v-tooltip>
-25 |           <v-icon size="x-small" color="primary" icon="mdi-pencil-outline" class="mr-3"/>
-26 | 
-27 |           <!-- Brand logo -->
-28 |           <v-img
-29 |               :src="getBrandLogo(mediaplan.brand)"
-30 |               max-width="40"
-31 |               contain
-32 |               class="ml-auto"
-33 |           />
-34 |         </div>
-35 | 
-36 |         <!-- Status and date range on same row -->
-37 |         <div class="d-flex align-center justify-space-between mt-2">
-38 |           <div class="d-flex align-center">
-39 |             <v-icon
-40 |                 icon="mdi-circle"
-41 |                 :color="getMediaplanStatusColor(mediaplan.status)"
-42 |                 size="x-small"
-43 |                 class="mr-1"
-44 |             />
-45 |             <span class="status-text text-grey">{{ getMediaplanStatusLabel(mediaplan.status) }}</span>
-46 |           </div>
-47 | 
-48 |           <div class="d-flex align-center">
-49 |             <v-icon size="small" icon="mdi-calendar-range" class="mr-1"/>
-50 |             <span class="date-range-text text-grey">{{
-51 |                 formatDateRange(mediaplan.start_date, mediaplan.end_date)
-52 |               }}</span>
-53 |           </div>
-54 |         </div>
-55 |       </v-card-item>
-56 | 
-57 |       <v-card-text>
-58 |         <!-- Creator row -->
-59 |         <div class="d-flex justify-space-between mb-3">
-60 |           <span class="text-subtitle-2">Creator</span>
-61 |           <span class="text-subtitle-2 font-weight-medium">{{ mediaplan.created_by?.name || 'N/A' }}</span>
-62 |         </div>
-63 | 
-64 |         <v-divider class="pt-1 pb-4"></v-divider>
-65 |         <!-- Total Budget row -->
-66 |         <div class="d-flex justify-space-between mb-3">
-67 |           <span class="text-subtitle-2">Total Budget</span>
-68 |           <div class="d-flex align-center">
-69 |             <v-icon size="x-small" icon="mdi-circle" color="green" class="mr-1"/>
-70 |             <span class="text-subtitle-2 font-weight-medium">{{ formatCurrency(mediaplan.budget?.total) }}</span>
-71 |           </div>
-72 |         </div>
-73 | 
-74 |         <v-divider class="pt-1 pb-4"></v-divider>
-75 |         <!-- Used Budget row -->
-76 |         <div class="d-flex justify-space-between mb-3">
-77 |           <span class="text-subtitle-2">Used Budget</span>
-78 |           <div class="d-flex align-center">
-79 |             <v-icon size="x-small" icon="mdi-circle" color="red" class="mr-1"/>
-80 |             <span class="text-subtitle-2 font-weight-medium">{{ formatCurrency(mediaplan.budget?.used) }}</span>
-81 |           </div>
-82 |         </div>
-83 | 
-84 |         <v-divider class="pt-1 pb-4"></v-divider>
-85 |         <!-- PO Numbers row -->
-86 |         <div class="d-flex justify-space-between" v-if="mediaplan.po_numbers && mediaplan.po_numbers.length > 0">
-87 |           <span class="text-subtitle-2">PO</span>
-88 |           <span class="text-subtitle-2 font-weight-medium text-truncate" style="max-width: 70%">
-89 |           {{ mediaplan.po_numbers.map(po => po.name).join(', ') }}
-90 |         </span>
-91 |         </div>
-92 |       </v-card-text>
-93 | 
-94 |       <v-card-actions>
-95 |         <!-- Action buttons -->
-96 |         <v-spacer/>
-97 | 
-98 |         <!-- Options menu -->
-99 |         <mediaplan-options-menu
-100 |             :mediaplan-id="mediaplan._id"
-101 |             @action="handleMenuAction"
-102 |         />
-103 | 
-104 |         <!-- Navigation button -->
-105 |         <v-btn
-106 |             variant="flat"
-107 |             color="primary"
-108 |             :to="{ name: 'MediaplanDetail', params: { mediaplanId: mediaplan._id }}"
-109 |         >
-110 |           Show Mediaplan
-111 |         </v-btn>
-112 |         <br>
-113 | 
-114 |       </v-card-actions>
-115 |     </v-card>
-116 |   </div>
-117 | </template>
-118 | 
-119 | 
-120 | <script setup lang="ts">
-121 | import {ref} from 'vue';
-122 | import {Mediaplan} from '@/types/mediaplan';
-123 | import {getMediaplanStatusColor, getMediaplanStatusLabel} from '@/constants/mediaplanStatuses';
-124 | import MediaplanOptionsMenu from "@/components/overview/MediaplanOptionsMenu.vue";
-125 | import {useRouter} from 'vue-router';
-126 | import {formatDateRange} from '@/helpers/dateUtils';
-127 | import {formatCurrency} from '@/helpers/currencyUtils';
-128 | import {getBrandLogo} from '@/helpers/brandUtils';
-129 | 
-130 | // Store mediaplan prop in a variable to access it throughout the component
-131 | const props = defineProps<{
-132 |   mediaplan: Mediaplan;
-133 | }>();
-134 | 
-135 | const emit = defineEmits<{
-136 |   (e: 'view', mediaplanId: string): void;
-137 |   (e: 'edit', mediaplanId: string): void;
-138 |   (e: 'add-po', mediaplanId: string): void;
-139 |   (e: 'export', mediaplanId: string): void;
-140 |   (e: 'duplicate', mediaplanId: string): void;
-141 |   (e: 'archive', mediaplanId: string): void;
-142 |   (e: 'delete', mediaplanId: string): void;
-143 | }>();
-144 | 
-145 | const router = useRouter();
-146 | 
-147 | // Handle card click for navigation
-148 | const handleCardClick = (event: MouseEvent) => {
-149 |   // Don't navigate if clicking on buttons or menu items
-150 |   if ((event.target as HTMLElement).closest('.v-card__actions')) {
-151 |     return;
-152 |   }
-153 | 
-154 |   // Navigate to detail page
-155 |   router.push({name: 'MediaplanDetail', params: {mediaplanId: props.mediaplan._id}});
-156 | };
-157 | 
-158 | const handleMenuAction = (action: string, mediaplanId: string) => {
-159 |   switch (action) {
-160 |     case 'view':
-161 |       router.push({name: 'MediaplanDetail', params: {mediaplanId: id}});
-162 |       break;
-163 |     case 'edit':
-164 |       router.push({name: 'MediaplanEdit', params: {mediaplanId: id}});
-165 |       break;
-166 |     case 'addPo':
-167 |       emit('add-po', id);
-168 |       break;
-169 |     case 'export':
-170 |       emit('export', id);
-171 |       break;
-172 |     case 'duplicate':
-173 |       emit('duplicate', id);
-174 |       break;
-175 |     case 'archive':
-176 |       emit('archive', id);
-177 |       break;
-178 |     case 'delete':
-179 |       emit('delete', id);
-180 |       break;
-181 |   }
-182 | };
-183 | </script>
-184 | 
-185 | <style scoped>
-186 | .mediaplan-title {
-187 |   overflow: hidden;
-188 |   text-overflow: ellipsis;
-189 |   white-space: nowrap;
-190 |   flex: 1;
-191 | }
-192 | 
-193 | .status-text, .date-range-text {
-194 |   font-size: 12px;
-195 | }
-196 | 
-197 | .mediaplan-card {
-198 |   cursor: pointer;
-199 |   transition: transform 0.2s, box-shadow 0.2s;
-200 | }
-201 | 
-202 | .mediaplan-card:hover {
-203 |   transform: translateY(-4px);
-204 |   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
-205 | }
-206 | 
-207 | /* Override cursor for buttons and menu */
-208 | .v-menu__content,
-209 | .v-card__actions .v-btn {
-210 |   cursor: default;
-211 | }
-212 | </style>
-```
-
-src/components/overview/MediaplanFilters.vue
-```
-1 | <template>
-2 |   <div class="filter-container">
-3 |     <div class="filter-item">
-4 |       <v-select
-5 |           v-model="localBrandId"
-6 |           :items="brandsFromStore"
-7 |           item-title="value"
-8 |           item-value="abbreviation"
-9 |           label="Brand"
-10 |           variant="underlined"
-11 |           return-object
-12 |           hide-details
-13 |           prepend-inner-icon="mdi-filter"
-14 |           :disabled="props.loading || sourcesStore.isLoading"
-15 |           :loading="sourcesStore.isLoading && !brandsFromStore.length"/>
-16 |     </div>
-17 |     <div class="filter-item">
-18 |       <v-select
-19 |           v-model="localSort"
-20 |           :items="sortOptions"
-21 |           item-title="text"
-22 |           item-value="value"
-23 |           label="Sort by"
-24 |           variant="underlined"
-25 |           hide-details
-26 |           prepend-inner-icon="mdi-sort"
-27 |           :disabled="props.loading"
-28 |       />
-29 |     </div>
-30 | 
-31 |     <div class="filter-item">
-32 |       <v-autocomplete
-33 |           v-model="localCountries"
-34 |           :items="countriesFromStore" item-title="value" item-value="abbreviation" label="Country Selection"
-35 |           variant="underlined"
-36 |           hide-details
-37 |           multiple
-38 |           chips
-39 |           closable-chips
-40 |           prepend-inner-icon="mdi-filter"
-41 |           :disabled="props.loading || sourcesStore.isLoading"
-42 |           :loading="sourcesStore.isLoading && !countriesFromStore.length"/>
-43 |     </div>
-44 | 
-45 |     <div class="filter-item">
-46 |       <v-select
-47 |           v-model="localStatus"
-48 |           :items="filterOptions"
-49 |           item-title="text"
-50 |           item-value="value"
-51 |           label="Filter by"
-52 |           variant="underlined"
-53 |           hide-details
-54 |           prepend-inner-icon="mdi-filter"
-55 |           :disabled="props.loading"
-56 |       />
-57 |     </div>
-58 | 
-59 |     <div class="filter-item search-field">
-60 |       <v-text-field
-61 |           v-model="localSearch"
-62 |           placeholder="Search..."
-63 |           prepend-inner-icon="mdi-magnify"
-64 |           variant="underlined"
-65 |           hide-details
-66 |           flat
-67 |           single-line
-68 |           clearable
-69 |           :disabled="props.loading"
-70 |       />
-71 |     </div>
-72 | 
-73 |     <div class="filter-item create-button">
-74 |       <create-mediaplan-button :disabled="props.loading"/>
-75 |     </div>
-76 |   </div>
-77 | </template>
-78 | 
-79 | <script setup lang="ts">
-80 | import {computed} from 'vue';
-81 | import type {MediaplanFilter, Brand, Source} from '@/types';
-82 | import CreateMediaplanButton from "@/components/overview/CreateMediaplanButton.vue";
-83 | import {useSourcesStore} from '@/stores/sourcesStore';
-84 | 
-85 | const sourcesStore = useSourcesStore();
-86 | 
-87 | const props = defineProps<{
-88 |   filters: MediaplanFilter;
-89 |   loading: boolean;
-90 |   sortBy: string;
-91 |   sortOrder: 'asc' | 'desc';
-92 | }>();
-93 | 
-94 | const emit = defineEmits<{
-95 |   (e: 'update:filter', payload: { key: keyof MediaplanFilter; value: unknown }): void;
-96 |   (e: 'update:sort', payload: { sortBy: string; sortOrder: 'asc' | 'desc' }): void;
-97 | }>();
-98 | 
-99 | const sortOptions = [
-100 |   {text: 'Last updated first', value: 'updated_at:desc'},
-101 |   {text: 'Earliest Start Date first', value: 'start_date:asc'},
-102 |   {text: 'Budget Lowest First', value: 'budget.total:asc'}
-103 | ];
-104 | const filterOptions = [
-105 |   {text: 'All', value: ''},
-106 |   {text: 'Created by me', value: 'created_by_me'},
-107 |   {text: 'For Approval', value: 'for_approval'}
-108 | ];
-109 | 
-110 | const localSearch = computed({
-111 |   get: () => props.filters.search || '',
-112 |   set: v => emit('update:filter', {key: 'search', value: v})
-113 | });
-114 | const localBrandId = computed({
-115 |   get: () => props.filters.brand_id || null,
-116 |   set: v => emit('update:filter', {key: 'brand_id', value: v})
-117 | });
-118 | const localStatus = computed({
-119 |   get: () => props.filters.status || '',
-120 |   set: v => emit('update:filter', {key: 'status', value: v})
-121 | });
-122 | const localCountries = computed<string[]>({
-123 |   get: () => props.filters.country ? (props.filters.country as string).split(',') : [],
-124 |   set: arr => emit('update:filter', {key: 'country', value: arr.join(',')})
-125 | });
-126 | const localSort = computed({
-127 |   get: () => `${props.sortBy}:${props.sortOrder}`,
-128 |   set: v => {
-129 |     const [by, order] = v.split(':') as [string, 'asc' | 'desc'];
-130 |     emit('update:sort', {sortBy: by, sortOrder: order});
-131 |   }
-132 | });
-133 | 
-134 | const brandsFromStore = computed((): Brand[] => {
-135 |   return (sourcesStore.getSourceList('brand') as Brand[] | undefined) || [];
-136 | });
-137 | 
-138 | const countriesFromStore = computed((): Source[] => {
-139 |   return (sourcesStore.getSourceList('country') as Source[] | undefined) || [];
-140 | });
-141 | 
-142 | </script>
-143 | 
-144 | <style scoped>
-145 | .filter-container {
-146 |   display: flex;
-147 |   flex-wrap: wrap;
-148 |   gap: 16px;
-149 |   align-items: center;
-150 |   width: 100%;
-151 | }
-152 | 
-153 | .filter-item {
-154 |   min-width: 180px;
-155 | }
-156 | 
-157 | .search-field {
-158 |   flex-grow: 1;
-159 |   min-width: 200px;
-160 |   max-width: 280px;
-161 | }
-162 | 
-163 | .create-button {
-164 |   margin-left: auto;
-165 |   min-width: auto;
-166 | }
-167 | 
-168 | @media (max-width: 1200px) {
-169 |   .filter-item {
-170 |     min-width: 160px;
-171 |   }
-172 | }
-173 | 
-174 | @media (max-width: 960px) {
-175 |   .filter-container {
-176 |     grid-template-columns: 1fr 1fr;
-177 |   }
-178 | 
-179 |   .filter-item {
-180 |     min-width: 140px;
-181 |   }
-182 | 
-183 |   .search-field {
-184 |     flex-basis: 100%;
-185 |     order: 5;
-186 |   }
-187 | 
-188 |   .create-button {
-189 |     margin-left: 0;
-190 |     flex-basis: 100%;
-191 |     order: 6;
-192 |     display: flex;
-193 |     justify-content: flex-end;
-194 |   }
-195 | }
-196 | 
-197 | @media (max-width: 600px) {
-198 |   .filter-item {
-199 |     flex-basis: 100%;
-200 |   }
-201 | }
-202 | </style>
-```
-
-src/components/overview/MediaplanList.vue
-```
-1 | <template>
-2 |   <div v-if="isLoading && mediaplans.length === 0" class="d-flex justify-center align-center my-10">
-3 |     <v-progress-circular indeterminate color="primary" size="64"/>
-4 |   </div>
-5 |   <div v-else>
-6 |     <v-row v-if="mediaplans.length > 0" class="justify-center">
-7 |       <v-col
-8 |           v-for="mediaplan in mediaplans"
-9 |           :key="mediaplan._id"
-10 |           cols="12" sm="6" md="4" lg="3"
-11 |           class="mb-4 mediaplan-col d-flex"
-12 |       >
-13 |         <mediaplan-card
-14 |             :mediaplan="mediaplan"
-15 |             class="flex-grow-1"
-16 |             @view="viewMediaplan"
-17 |         />
-18 |       </v-col>
-19 |     </v-row>
-20 | 
-21 |     <div v-if="!isLoading && mediaplans.length === 0" class="text-center my-10 text-disabled">
-22 |       <v-icon size="x-large" class="mb-2">mdi-database-off-outline</v-icon>
-23 |       <p>No mediaplans found</p>
-24 |       <p class="text-caption">Try adjusting your filters.</p>
-25 |     </div>
-26 | 
-27 |     <pagination-controls
-28 |         v-if="!isLoading && totalPages > 1"
-29 |         v-model="paginationModel"
-30 |         :length="totalPages"
-31 |         :disabled="isLoading"
-32 |         :items-per-page-value="itemsPerPageModel"
-33 |         @update:items-per-page="itemsPerPageModel = $event"
-34 |     />
-35 | 
-36 |     <div v-if="!isLoading && totalItems > 0" class="text-center text-caption text-medium-emphasis mt-2">
-37 |       {{ paginationInfo }}
-38 |     </div>
-39 |   </div>
-40 | </template>
-41 | 
-42 | <script setup lang="ts">
-43 | import {ref, computed, watch} from 'vue';
-44 | import {useRouter} from 'vue-router';
-45 | import type {Mediaplan} from '@/types/mediaplan'; // Pfad prüfen
-46 | import MediaplanCard from '@/components/overview/MediaplanCard.vue'; // Pfad prüfen
-47 | import PaginationControls from '@/components/common/PaginationControls.vue'; // Pfad prüfen
-48 | 
-49 | // --- Props ---
-50 | // Empfängt jetzt Daten und Zustand direkt von Overview.vue (aus dem Store)
-51 | interface Props {
-52 |   mediaplans: Mediaplan[];
-53 |   isLoading: boolean;
-54 |   totalPages: number;
-55 |   totalItems: number;
-56 |   currentPage: number; // 0-basiert
-57 |   itemsPerPage: number;
-58 | }
-59 | 
-60 | const props = defineProps<Props>();
-61 | 
-62 | // --- Emits ---
-63 | // Meldet nur noch Benutzerinteraktionen nach oben, die eine Änderung im Store erfordern
-64 | const emit = defineEmits<{
-65 |   (e: 'update:page', page: number): void; // Meldet gewünschte Seitenänderung (1-basiert von PaginationControls)
-66 |   (e: 'update:items-per-page', perPage: number): void; // Meldet gewünschte Items pro Seite Änderung
-67 | }>();
-68 | 
-69 | // --- Router ---
-70 | const router = useRouter();
-71 | 
-72 | // --- Computed Properties ---
-73 | 
-74 | // Aktuelle Seite für PaginationControls (oft 1-basiert)
-75 | const paginationModel = computed({
-76 |   get: () => props.currentPage + 1, // Konvertiere 0-basierte Prop zu 1-basierter Anzeige
-77 |   set: (value: number) => {
-78 |     // Wenn das v-model von PaginationControls sich ändert, wird das Event nach oben emittiert
-79 |     emit('update:page', value);
-80 |   }
-81 | });
-82 | 
-83 | // Aktuelle Items pro Seite für PaginationControls
-84 | const itemsPerPageModel = computed({
-85 |   get: () => props.itemsPerPage,
-86 |   set: (value: number) => {
-87 |     emit('update:items-per-page', value);
-88 |   }
-89 | });
-90 | 
-91 | // Info-Text für Paginierung
-92 | const paginationInfo = computed(() => {
-93 |   if (props.totalItems === 0) return '';
-94 |   const startItem = (props.currentPage * props.itemsPerPage) + 1;
-95 |   const endItem = Math.min(startItem + props.itemsPerPage - 1, props.totalItems);
-96 |   return `${startItem}-${endItem} of ${props.totalItems} mediaplans`;
-97 | });
-98 | 
-99 | 
-100 | // --- Methods ---
-101 | const viewMediaplan = (mediaplanId: string) => {
-102 |   router.push({name: 'MediaplanDetail', params: {mediaplanId}});
-103 | };
-104 | 
-105 | </script>
-106 | 
-107 | 
-108 | <style scoped>
-109 | .mediaplan-col {
-110 |   min-width: 300px; /* Etwas kleiner für bessere Anpassung */
-111 |   /* max-width: 420px; */ /* Max-Breite kann oft weggelassen werden, wenn cols gesetzt sind */
-112 | }
-113 | 
-114 | .d-flex {
-115 |   display: flex;
-116 | }
-117 | 
-118 | .flex-grow-1 {
-119 |   flex-grow: 1;
-120 | }
-121 | </style>
-```
-
-src/components/overview/MediaplanOptionsMenu.vue
-```
-1 | <template>
-2 |   <v-menu v-model="isOpen" :close-on-content-click="false">
-3 |     <template v-slot:activator="{ props }">
-4 |       <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props" @click.stop></v-btn>
-5 |     </template>
-6 | 
-7 |     <v-card min-width="280">
-8 |       <v-toolbar density="compact" color="white">
-9 |         <v-toolbar-title class="text-body-1 font-weight-medium">Options</v-toolbar-title>
-10 |         <v-spacer></v-spacer>
-11 |         <v-btn icon variant="text" color="primary" size="small" @click.stop="isOpen = false">
-12 |           <v-icon>mdi-close</v-icon>
-13 |         </v-btn>
-14 |       </v-toolbar>
-15 | 
-16 |       <v-list class="menu-list">
-17 |         <v-list-item @click.stop="handleAction('view')" class="menu-item">
-18 |           <template v-slot:prepend>
-19 |             <v-icon icon="mdi-eye" size="small"></v-icon>
-20 |           </template>
-21 |           <v-list-item-title>View Mediaplan</v-list-item-title>
-22 |         </v-list-item>
-23 | 
-24 |         <v-list-item @click.stop="handleAction('edit')" class="menu-item">
-25 |           <template v-slot:prepend>
-26 |             <v-icon icon="mdi-pencil-outline" size="small"></v-icon>
-27 |           </template>
-28 |           <v-list-item-title>Edit base data</v-list-item-title>
-29 |         </v-list-item>
-30 | 
-31 |         <v-list-item @click.stop="handleAction('addPo')" class="menu-item">
-32 |           <template v-slot:prepend>
-33 |             <v-icon icon="mdi-plus" size="small"></v-icon>
-34 |           </template>
-35 |           <v-list-item-title>Add PO Number</v-list-item-title>
-36 |         </v-list-item>
-37 | 
-38 |         <v-list-item @click.stop="handleAction('export')" class="menu-item">
-39 |           <template v-slot:prepend>
-40 |             <v-icon icon="mdi-download" size="small"></v-icon>
-41 |           </template>
-42 |           <v-list-item-title>Export Mediaplan</v-list-item-title>
-43 |         </v-list-item>
-44 | 
-45 |         <v-list-item @click.stop="handleAction('duplicate')" class="menu-item">
-46 |           <template v-slot:prepend>
-47 |             <v-icon icon="mdi-content-copy" size="small"></v-icon>
-48 |           </template>
-49 |           <v-list-item-title>Duplicate MediaPlan</v-list-item-title>
-50 |         </v-list-item>
-51 | 
-52 |         <v-list-item @click.stop="handleAction('archive')" class="menu-item">
-53 |           <template v-slot:prepend>
-54 |             <v-icon icon="mdi-archive-outline" size="small"></v-icon>
-55 |           </template>
-56 |           <v-list-item-title>Archive Mediaplan</v-list-item-title>
-57 |         </v-list-item>
-58 | 
-59 |         <v-list-item @click.stop="handleAction('delete')" class="menu-item">
-60 |           <template v-slot:prepend>
-61 |             <v-icon icon="mdi-delete-outline" size="small"></v-icon>
-62 |           </template>
-63 |           <v-list-item-title>Delete MediaPlan</v-list-item-title>
-64 |         </v-list-item>
-65 |       </v-list>
-66 |     </v-card>
-67 |   </v-menu>
-68 | </template>
-69 | 
-70 | <script setup lang="ts">
-71 | import {ref} from 'vue';
-72 | 
-73 | // Props
-74 | const props = defineProps<{
-75 |   mediaplanId: string;
-76 | }>();
-77 | 
-78 | // Emit events
-79 | const emit = defineEmits<{
-80 |   (e: 'action', action: string, mediaplanId: string): void;
-81 | }>();
-82 | 
-83 | // State
-84 | const isOpen = ref(false);
-85 | 
-86 | // Methods
-87 | const handleAction = (action: string) => {
-88 |   // Prevent event propagation
-89 |   event?.stopPropagation();
-90 |   
-91 |   emit('action', action, props.mediaplanId);
-92 |   isOpen.value = false;
-93 | };
-94 | </script>
-95 | 
-96 | <style scoped>
-97 | .menu-list .v-list-item {
-98 |   border-top: 1px solid #e0e0e0;
-99 | }
-100 | 
-101 | </style>
-```
-
-src/components/overview/PaginationControls.vue
-```
-```
-
 src/components/mediaplan/DeleteProjectDialog.vue
 ```
 1 | <template>
@@ -10060,6 +8080,2001 @@ src/components/mediaplan/ProjectsList.vue
 128 | }>();
 129 | 
 130 | //
+```
+
+src/components/overview/CreateFirstProjectDialog.vue
+```
+1 | <template>
+2 |   <v-dialog :model-value="modelValue" @update:model-value="handleClose" persistent max-width="450px">
+3 |     <v-card class="px-6 pa-4">
+4 |       <DialogHeader
+5 |           title="Create new Mediaplan"
+6 |           :show-back-button="true"
+7 |           :show-close-button="true"
+8 |           margin-bottom="4"
+9 |           @back="cancelDialog"
+10 |           @close="cancelDialog"
+11 |       />
+12 | 
+13 |       <v-card-text class="pa-0 mb-4">
+14 |         <v-row class="align-center mb-3 pl-2">
+15 |           <v-img :src="getBrandLogo(brand)" class="mr-2" width="40" max-width="40"></v-img>
+16 |           <span class="text-h6 font-weight-regular">{{ brandName }} </span>
+17 |         </v-row>
+18 |       </v-card-text>
+19 |       <v-card-text class="pa-0">
+20 |         <v-row no-gutters class="pb-3 align-center">
+21 |           <v-col cols="3" class="text-body-2 text-medium-emphasis">Name:</v-col>
+22 |           <v-col class="text-body-2 text-right">{{ mediaplanName || '-' }}</v-col>
+23 |         </v-row>
+24 |         <v-row no-gutters class="pb-3 align-center">
+25 |           <v-col cols="3" class="text-body-2 text-medium-emphasis">PO:</v-col>
+26 |           <v-col class="text-body-2 text-right">{{ poNumbersDisplay }}</v-col>
+27 |         </v-row>
+28 |         <v-row no-gutters class="pb-0 align-start">
+29 |           <v-col cols="3" class="text-body-2 text-medium-emphasis">Duration:</v-col>
+30 |           <v-col class="text-body-2 text-right">
+31 |             Start: {{ formatDate(startDateValue) }}<br>
+32 |             End: {{ formatDate(endDateValue) }}
+33 |           </v-col>
+34 |         </v-row>
+35 |       </v-card-text>
+36 |       <v-divider class="mt-4 mb-5"></v-divider>
+37 | 
+38 |       <v-form ref="form" @submit.prevent="submitForm" v-model="isFormValid" validate-on="input"
+39 |               :disabled="isSubmitting">
+40 |         <WithFormDefaults>
+41 |           <v-card-text class="pa-0">
+42 | 
+43 |             <v-row>
+44 |               <v-col cols="12">
+45 |                 <h6 class="text-h6 font-weight-regular mb-0">Add first project</h6>
+46 |               </v-col>
+47 |             </v-row>
+48 | 
+49 |             <v-row>
+50 |               <v-col cols="12" md="6">
+51 |                 <div class="text-caption text-medium-emphasis">Country *</div>
+52 |                 <v-select
+53 |                     v-model="selectedCountry"
+54 |                     :items="countries"
+55 |                     item-title="name"
+56 |                     item-value="code"
+57 |                     :rules="[v => !!v || 'Country is required']"
+58 |                     return-object
+59 |                     :loading="!projectStore.countries.length"
+60 |                     placeholder="Select Country"
+61 |                 >
+62 |                   <template v-slot:selection="{ item }">
+63 |                     <div class="d-flex align-center">
+64 |                       <country-flag :country="item.code" class="mr-2"/>
+65 |                       {{ item.code }} - {{ item.name }}
+66 |                     </div>
+67 |                   </template>
+68 |                   <template v-slot:item="{ item, props }">
+69 |                     <v-list-item v-bind="props" :title="`${item.code} - ${item.name}`">
+70 |                       <template v-slot:prepend>
+71 |                         <country-flag :country="item.code" class="mr-2"/>
+72 |                       </template>
+73 |                     </v-list-item>
+74 |                   </template>
+75 |                 </v-select>
+76 |               </v-col>
+77 |               <v-col cols="12" md="6">
+78 |                 <div class="text-caption text-medium-emphasis mb-0">Language *</div>
+79 |                 <v-select
+80 |                     v-model="selectedLanguage"
+81 |                     :items="availableLanguages"
+82 |                     item-title="name"
+83 |                     item-value="code"
+84 |                     :disabled="!selectedCountry || availableLanguages.length === 0"
+85 |                     :rules="[v => !!v || 'Language is required']"
+86 |                     placeholder="Select Language"
+87 |                 />
+88 |                 <div v-if="selectedCountry" class="text-caption text-medium-emphasis mt-1">* Depends on Country</div>
+89 |               </v-col>
+90 |             </v-row>
+91 | 
+92 |             <v-row>
+93 |               <v-col cols="12">
+94 |                 <div class="text-caption text-medium-emphasis">Builder *</div>
+95 |                 <v-select
+96 |                     v-model="selectedBuilder"
+97 |                     :items="builders"
+98 |                     item-title="name"
+99 |                     item-value="code"
+100 |                     :rules="[v => !!v || 'Builder is required']"
+101 |                     placeholder="Select Builder"
+102 |                     :loading="!projectStore.builders?.length"
+103 |                 />
+104 |               </v-col>
+105 |             </v-row>
+106 |             <v-row>
+107 |               <v-col cols="12">
+108 |                 <div class="text-caption text-medium-emphasis">Campaign type *</div>
+109 |                 <v-select
+110 |                     v-model="selectedCampaignType"
+111 |                     :items="campaignTypes"
+112 |                     item-title="name"
+113 |                     item-value="code"
+114 |                     :rules="[v => !!v || 'Campaign type is required']"
+115 |                     placeholder="Select Campaign Type"
+116 |                     :loading="!projectStore.campaignTypes?.length"
+117 |                 />
+118 |               </v-col>
+119 |             </v-row>
+120 |             <v-row>
+121 |               <v-col cols="12">
+122 |                 <div class="text-caption text-medium-emphasis">Phase *</div>
+123 |                 <v-select
+124 |                     v-model="selectedPhase"
+125 |                     :items="phases"
+126 |                     item-title="name"
+127 |                     item-value="code"
+128 |                     :rules="[v => !!v || 'Phase is required']"
+129 |                     placeholder="Select Phase"
+130 |                     :loading="!projectStore.phases?.length"
+131 |                 />
+132 |               </v-col>
+133 |             </v-row>
+134 |             <v-row>
+135 |               <v-col cols="12">
+136 |                 <div class="text-caption text-medium-emphasis">Goal *</div>
+137 |                 <v-select
+138 |                     v-model="selectedGoal"
+139 |                     :items="goals"
+140 |                     item-title="name"
+141 |                     item-value="code"
+142 |                     :rules="[v => !!v || 'Goal is required']"
+143 |                     placeholder="Select Goal"
+144 |                     :loading="!projectStore.goals?.length"
+145 |                 />
+146 |               </v-col>
+147 |             </v-row>
+148 | 
+149 |           </v-card-text>
+150 |         </WithFormDefaults>
+151 | 
+152 |         <DialogFooter
+153 |             class="px-4 mt-5"
+154 |             cancel-text="Cancel"
+155 |             confirm-text="Create Project"
+156 |             :loading="isSubmitting"
+157 |             :disabled="!formIsReady || isSubmitting"
+158 |             :submit-button="true"
+159 |             @cancel="cancelDialog"
+160 |             @confirm="submitForm"/>
+161 |       </v-form>
+162 |     </v-card>
+163 |   </v-dialog>
+164 | </template>
+165 | 
+166 | <script setup lang="ts">
+167 | // Script content remains the same as the previous correct version
+168 | import {ref, computed, onMounted, watch, nextTick} from 'vue';
+169 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
+170 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
+171 | import {useProjectStore} from '@/stores/projectStore';
+172 | import type {
+173 |   ProjectCountry,
+174 |   ProjectLanguage,
+175 |   ProjectCampaignType,
+176 |   ProjectPhase,
+177 |   ProjectGoal,
+178 |   ProjectBuilder
+179 | } from '@/types/project';
+180 | import CountryFlag from '@/components/common/CountryFlag.vue';
+181 | import {getBrandLogo} from '@/helpers/brandUtils';
+182 | import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
+183 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
+184 | import {formatDate} from "@/helpers/dateUtils.ts";
+185 | 
+186 | interface CreateFirstProjectDialogProps {
+187 |   modelValue: boolean
+188 |   mediaplanId: string
+189 |   mediaplanName?: string
+190 |   poNumbers?: { _id: string; name: string; value: number }[]
+191 |   startDate?: string | Date | null
+192 |   endDate?: string | Date | null
+193 |   brand?: { _id: string; name: string }
+194 | }
+195 | 
+196 | const props = defineProps<CreateFirstProjectDialogProps>()
+197 | 
+198 | const emit = defineEmits<{
+199 |   (e: 'update:modelValue', value: boolean): void;
+200 |   (e: 'created', projectId: string): void;
+201 | }>();
+202 | 
+203 | const form = ref<any>(null);
+204 | const projectStore = useProjectStore();
+205 | const isFormValid = ref(false);
+206 | const isSubmitting = ref(false);
+207 | 
+208 | const selectedCountry = ref<ProjectCountry | null>(null);
+209 | const selectedLanguage = ref<string | null>(null);
+210 | const selectedBuilder = ref<string | null>(null);
+211 | const selectedCampaignType = ref<string | null>(null);
+212 | const selectedPhase = ref<string | null>(null);
+213 | const selectedGoal = ref<string | null>(null);
+214 | 
+215 | const brandName = computed(() => props.brand?.name || 'Brand');
+216 | const poNumbersDisplay = computed(() => {
+217 |   if (!props.poNumbers || props.poNumbers.length === 0) return '-';
+218 |   return props.poNumbers.map(po => po.name).join(', ');
+219 | });
+220 | const startDateValue = computed(() => props.startDate || null);
+221 | const endDateValue = computed(() => props.endDate || null);
+222 | 
+223 | const countries = computed(() => projectStore.countries || []);
+224 | const languageOptions = computed(() => projectStore.languages || []);
+225 | const builders = computed(() => projectStore.builders?.map(b => ({code: b.id, name: b.name})) || []);
+226 | const campaignTypes = computed(() => projectStore.campaignTypes?.map(t => ({code: t.id, name: t.name})) || []);
+227 | const phases = computed(() => projectStore.phases?.map(p => ({code: p.id, name: p.name})) || []);
+228 | const goals = computed(() => projectStore.goals?.map(g => ({code: g.id, name: g.name})) || []);
+229 | 
+230 | const formIsReady = computed(() => {
+231 |   return isFormValid.value &&
+232 |       !!selectedCountry.value &&
+233 |       !!selectedLanguage.value &&
+234 |       !!selectedBuilder.value &&
+235 |       !!selectedCampaignType.value &&
+236 |       !!selectedPhase.value &&
+237 |       !!selectedGoal.value;
+238 | });
+239 | 
+240 | const availableLanguages = computed(() => {
+241 |   if (!selectedCountry.value) return [];
+242 |   return languageOptions.value.filter((lang: any) =>
+243 |       lang.country_codes?.includes(selectedCountry.value!.code)
+244 |   );
+245 | });
+246 | 
+247 | const validateForm = async (): Promise<boolean> => {
+248 |   if (!form.value) return false;
+249 |   const {valid} = await form.value.validate();
+250 |   return valid && formIsReady.value;
+251 | };
+252 | 
+253 | const resetFormFields = () => {
+254 |   selectedCountry.value = null;
+255 |   selectedLanguage.value = null;
+256 |   selectedBuilder.value = null;
+257 |   selectedCampaignType.value = null;
+258 |   selectedPhase.value = null;
+259 |   selectedGoal.value = null;
+260 |   nextTick(() => {
+261 |     form.value?.resetValidation();
+262 |   });
+263 | };
+264 | 
+265 | const submitForm = async () => {
+266 |   const isValid = await validateForm();
+267 |   if (!isValid) {
+268 |     showWarning('Please fill in all required fields correctly.');
+269 |     return;
+270 |   }
+271 | 
+272 |   // Double-check that required refs have values before proceeding
+273 |   // formIsReady should cover this, but an extra check can be helpful.
+274 |   if (!selectedCountry.value || !selectedLanguage.value || !selectedPhase.value || !selectedCampaignType.value /* Add checks for other required fields if needed */) {
+275 |     showError("Critical project information is missing. Please check selections.");
+276 |     isSubmitting.value = false; // Ensure submission stops
+277 |     return;
+278 |   }
+279 | 
+280 |   isSubmitting.value = true;
+281 |   try {
+282 |     // --- Construct the single ProjectCreate object ---
+283 |     // NOTE: Determine how the project 'name' should be generated.
+284 |     // Using a combination of country/language as placeholder.
+285 |     // You might need a dedicated input or different logic.
+286 |     const projectCreateData: ProjectCreate = {
+287 |       mediaplanId: props.mediaplanId,
+288 |       name: `Project ${selectedCountry.value.code}-${selectedLanguage.value}`, // Placeholder name
+289 |       country: selectedCountry.value, // Pass the whole country object
+290 |       language: selectedLanguage.value, // Pass language code
+291 |       phase: selectedPhase.value, // Pass phase code
+292 |       campaignType: selectedCampaignType.value, // Pass campaign type code
+293 |       // Add goal, builder etc. IF the ProjectCreate type defines them
+294 |       // and if the store action uses them. Based on the store code provided,
+295 |       // builder/goal don't seem directly mapped in the payload construction.
+296 |       // goal: selectedGoal.value,
+297 |       // builder: selectedBuilder.value,
+298 |     };
+299 | 
+300 |     console.log("DEBUG: Submitting ProjectCreate object:", projectCreateData);
+301 | 
+302 |     // --- Call store action with the single object ---
+303 |     // The store action 'createProject' now receives the correctly structured object
+304 |     const newProjectResponse = await projectStore.createProject(projectCreateData);
+305 | 
+306 |     showSuccess(`Project created successfully`);
+307 |     // Assuming createProject returns the ID or relevant data
+308 |     // If it returns a mock ID like `project-${Date.now()}` as in the store code:
+309 |     const newProjectId = typeof newProjectResponse === 'string' ? newProjectResponse : newProjectResponse?._id || `unknown-${Date.now()}`;
+310 |     emit('created', newProjectId);
+311 | 
+312 |     emit('update:modelValue', false);
+313 | 
+314 |   } catch (error: any) {
+315 |     console.error(`Error creating first project:`, error);
+316 |     // Log the specific error from the store if possible
+317 |     const message = error?.response?.data?.message || error?.message || `Failed to create project.`;
+318 |     showError(message);
+319 |   } finally {
+320 |     isSubmitting.value = false;
+321 |   }
+322 | };
+323 | const handleClose = (value: boolean) => {
+324 |   if (!value) {
+325 |     cancelDialog();
+326 |   }
+327 | }
+328 | 
+329 | const cancelDialog = () => {
+330 |   if (isSubmitting.value) {
+331 |     showWarning('Please wait, submission is in progress.');
+332 |     return;
+333 |   }
+334 |   resetFormFields();
+335 |   emit('update:modelValue', false);
+336 | };
+337 | 
+338 | watch(() => props.modelValue, (isVisible) => {
+339 |   if (isVisible) {
+340 |     resetFormFields();
+341 |   }
+342 | });
+343 | 
+344 | watch(selectedCountry, (newCountry, oldCountry) => {
+345 |   if (newCountry !== oldCountry && oldCountry !== undefined) {
+346 |     selectedLanguage.value = null;
+347 |     nextTick(() => {
+348 |       if (availableLanguages.value.length === 1) {
+349 |         selectedLanguage.value = availableLanguages.value[0].code;
+350 |       }
+351 |     });
+352 |   }
+353 | });
+354 | 
+355 | onMounted(async () => {
+356 |   try {
+357 |     await projectStore.fetchProjectOptions();
+358 |     console.log("First Project Dialog options loaded on mount.");
+359 |   } catch (error) {
+360 |     console.error('Error fetching form options on mount:', error);
+361 |     showError('Failed to load required form options.');
+362 |   }
+363 | });
+364 | 
+365 | </script>
+366 | 
+367 | <style scoped>
+368 | .country-flag {
+369 |   width: 20px;
+370 |   height: auto;
+371 |   display: inline-block;
+372 |   vertical-align: middle;
+373 | }
+374 | </style>
+```
+
+src/components/overview/CreateMediaplanButton.vue
+```
+1 | <template>
+2 |   <div>
+3 |     <v-btn
+4 |         color="black"
+5 |         class="text-white px-4"
+6 |         prepend-icon="mdi-plus"
+7 |         @click="showDialog"
+8 |     >
+9 |       Mediaplan
+10 |     </v-btn>
+11 | 
+12 |     <create-mediaplan-dialog
+13 |         v-model="dialogVisible"
+14 |         @created="handleMediaplanCreated"
+15 |         @project-created="handleProjectCreated"
+16 |     />
+17 |   </div>
+18 | </template>
+19 | 
+20 | <script setup lang="ts">
+21 | import { ref } from 'vue';
+22 | import CreateMediaplanDialog from './CreateMediaplanDialog.vue';
+23 | import { useRouter } from 'vue-router';
+24 | import { useMediaplanStore } from '@/stores/mediaplanStore';
+25 | 
+26 | const router = useRouter();
+27 | const mediaplanStore = useMediaplanStore();
+28 | const dialogVisible = ref(false);
+29 | 
+30 | const showDialog = () => {
+31 |   dialogVisible.value = true;
+32 | };
+33 | 
+34 | const handleMediaplanCreated = (mediaplanId: string) => {
+35 |   // Store the mediaplan ID but don't close the dialog yet
+36 |   // as the project creation will follow
+37 |   console.log('Mediaplan created with ID:', mediaplanId);
+38 | };
+39 | 
+40 | const handleProjectCreated = (projectId: string) => {
+41 |   console.log('Project created with ID:', projectId);
+42 | 
+43 |   // Refresh the mediaplans list
+44 |   mediaplanStore.fetchMediaplans();
+45 | 
+46 |   // Emit event to notify parent component
+47 |   emit('project-created', projectId);
+48 | };
+49 | 
+50 | const emit = defineEmits<{
+51 |   (e: 'mediaplan-created'): void;
+52 |   (e: 'project-created', projectId: string): void;
+53 | }>();
+54 | </script>
+```
+
+src/components/overview/CreateMediaplanDialog.vue
+```
+1 | <template>
+2 |   <v-dialog v-model="dialog" persistent max-width="450px">
+3 |     <v-card class="px-6 pa-4">
+4 |       <DialogHeader
+5 |           title="Create new Mediaplan"
+6 |           :show-back-button="false"
+7 |           margin-bottom="4"
+8 |           @close="cancelDialog"
+9 |       />
+10 |       <v-form ref="form" @submit.prevent="submitForm">
+11 |         <WithFormDefaults>
+12 |           <pre>{{ formData }}</pre>
+13 |           <v-card-text class="pa-0">
+14 |             <FormElementVrowVcol label="Brand Output" required>
+15 |               <v-select
+16 |                   id="brand-select"
+17 |                   v-model="formData.brand"
+18 |                   :items="brands"
+19 |                   item-title="value"
+20 |                   item-value="abbreviation"
+21 |                   placeholder="Please Select a brand"
+22 |                   :rules="[v => !!v || 'Brand is required']"
+23 |                   return-object
+24 |                   :loading="isLoadingSources"
+25 |               >
+26 |                 <template v-slot:selection="{ item }">
+27 |                   <template v-if="formData.brand">
+28 |                     <v-avatar
+29 |                         size="24"
+30 |                         class="mr-2 grey lighten-4"
+31 |                         :image="getBrandLogo(item.raw)"/>
+32 |                     {{ item.raw.value }}
+33 |                   </template>
+34 |                 </template>
+35 | 
+36 |                 <template v-slot:item="{ item, props }">
+37 |                   <v-list-item v-bind="props" :title="item.raw.value">
+38 |                     <template v-slot:prepend>
+39 |                       <v-avatar
+40 |                           size="32"
+41 |                           class="mr-2 grey lighten-4"
+42 |                           :image="getBrandLogo(item.raw)"
+43 |                       />
+44 |                     </template>
+45 |                   </v-list-item>
+46 |                 </template>
+47 |               </v-select>
+48 |             </FormElementVrowVcol>
+49 | 
+50 |             <FormElementVrowVcol pb="pb-3" label="Mediaplan Type" required>
+51 |               <v-radio-group v-model="formData.mediaplan_type" inline>
+52 |                 <v-radio value="po" label="PO Based"/>
+53 |                 <v-radio value="draft" label="Draft"/>
+54 |               </v-radio-group>
+55 |             </FormElementVrowVcol>
+56 | 
+57 |             <FormElementVrowVcol label="Individual Name">
+58 |               <v-text-field
+59 |                   id="mediaplan-name"
+60 |                   v-model="formData.name"
+61 |                   placeholder="please type in an individual title"
+62 |                   :rules="[v => !!v || 'Name is required']"
+63 |               />
+64 |             </FormElementVrowVcol>
+65 | 
+66 |             <FormElementVrowVcol label="Select existing PO" required>
+67 |               <v-row no-gutters>
+68 |                 <v-col class="mr-2">
+69 |                   <v-select
+70 |                       id="po-select"
+71 |                       v-model="formData.po_numbers"
+72 |                       :items="poNumbersFromStore"
+73 |                       item-title="name"
+74 |                       item-value="_id"
+75 |                       placeholder="Select POs"
+76 |                       return-object
+77 |                       :rules="[v => (v && v.length > 0) || 'At least one PO is required']"
+78 |                       multiple
+79 |                       chips
+80 |                       closable-chips
+81 |                       :loading="poStore.isLoading"/>
+82 |                 </v-col>
+83 |                 <v-col cols="auto">
+84 |                   <v-btn
+85 |                       color="primary"
+86 |                       size="large"
+87 |                       style="height: 48px;"
+88 |                       variant="outlined"
+89 |                       @click="openCreatePODialog"
+90 |                       :disabled="poStore.isLoading">
+91 |                     Create PO
+92 |                   </v-btn>
+93 |                 </v-col>
+94 |               </v-row>
+95 |             </FormElementVrowVcol>
+96 | 
+97 |             <FormElementVrowVcol label="Creator" required>
+98 |               <v-text-field
+99 |                   id="creator-name"
+100 |                   :value="authStore.user?.name"
+101 |                   placeholder="Your name"
+102 |                   :rules="[v => !!v || 'Creator name is required']"
+103 |                   readonly
+104 |                   disabled
+105 |               />
+106 |             </FormElementVrowVcol>
+107 | 
+108 |             <FormElementVrowVcol label="Department">
+109 |               <v-text-field
+110 |                   id="department"
+111 |                   v-model="department"
+112 |                   placeholder="Department name"
+113 |               />
+114 |             </FormElementVrowVcol>
+115 | 
+116 |             <FormElementVrowVcol label="Start date - End date" required>
+117 |               <DateRangePicker
+118 |                   id="date-range"
+119 |                   v-model="dateRange"
+120 |                   placeholder="Select start and end dates"
+121 |                   :rules="[v => !!v || 'Date range is required']"
+122 |                   :required="true"
+123 |                   dialog-title="Choose a date range"
+124 |                   @update:model-value="handleDateRangeChange"
+125 |               />
+126 |             </FormElementVrowVcol>
+127 |           </v-card-text>
+128 |         </WithFormDefaults>
+129 | 
+130 |         <DialogFooter
+131 |             cancel-text="Cancel"
+132 |             confirm-text="Next Step"
+133 |             :loading="isSubmitting"
+134 |             :disabled="!form?.isValid || isLoadingSources || poStore.isLoading"
+135 |             :submit-button="true"
+136 |             @cancel="cancelDialog"
+137 |         />
+138 |       </v-form>
+139 |     </v-card>
+140 |   </v-dialog>
+141 | 
+142 |   <CreatePoDialog
+143 |       v-model="createPODialogVisible"
+144 |       :initial-brand-id="formData.brand?.abbreviation" @created="handlePoCreated"
+145 |   />
+146 | 
+147 |   <CreateFirstProjectDialog
+148 |       mode="create-mediaplan"
+149 |       v-if="showProjectDialog"
+150 |       v-model="showProjectDialog"
+151 |       :mediaplan-id="createdMediaplanId"
+152 |       :mediaplan-name="formData.name"
+153 |       :po-numbers="formData.po_numbers"
+154 |       :start-date="formData.start_date"
+155 |       :end-date="formData.end_date"
+156 |       :brand="formData.brand ? { _id: formData.brand.abbreviation, name: formData.brand.value } : undefined"
+157 |       @created="handleProjectCreated"
+158 |   />
+159 | </template>
+160 | 
+161 | <script setup lang="ts">
+162 | import {ref, computed, onMounted, watch, nextTick, reactive} from 'vue';
+163 | import {useAuthStore} from '@/stores/auth';
+164 | import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
+165 | import {useSourcesStore} from '@/stores/sourcesStore';
+166 | import {usePoNumberStore} from '@/stores/poNumberStore';
+167 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
+168 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
+169 | import DateRangePicker from './DateRangePicker.vue';
+170 | import CreateFirstProjectDialog from '@/components/overview/CreateFirstProjectDialog.vue';
+171 | import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
+172 | import type {MediaplanCreate, Brand as MediaplanBrandType, PONumber, Source, Mediaplan} from '@/types/mediaplan';
+173 | import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
+174 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
+175 | import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
+176 | import {getBrandLogo} from "@/helpers/brandUtils.ts";
+177 | 
+178 | type ComponentBrandType = Source;
+179 | 
+180 | const props = defineProps<{
+181 |   modelValue: boolean;
+182 | }>();
+183 | 
+184 | const emit = defineEmits<{
+185 |   (e: 'update:modelValue', value: boolean): void;
+186 |   (e: 'created', mediaplanId: string): void;
+187 |   (e: 'project-created', projectId: string): void;
+188 | }>();
+189 | 
+190 | const form = ref<any>();
+191 | const authStore = useAuthStore();
+192 | const createMediaplanStore = useCreateMediaplanStore();
+193 | const sourcesStore = useSourcesStore();
+194 | const poStore = usePoNumberStore();
+195 | 
+196 | const dialog = computed({
+197 |   get: () => props.modelValue,
+198 |   set: (value) => emit('update:modelValue', value)
+199 | });
+200 | 
+201 | const department = ref('');
+202 | 
+203 | const isSubmitting = ref(false);
+204 | const dateRange = ref<[string, string] | null>(null);
+205 | const showProjectDialog = ref(false);
+206 | const createdMediaplanId = ref('');
+207 | const createPODialogVisible = ref(false);
+208 | 
+209 | const brands = ref<ComponentBrandType[]>([]);
+210 | const isLoadingSources = ref(false);
+211 | 
+212 | const poNumbersFromStore = computed(() => poStore.allPONumbers);
+213 | 
+214 | const formData = reactive<Mediaplan>({
+215 |   name: '',
+216 |   status: 'Draft', // Default status
+217 |   start_date: '',
+218 |   end_date: '',
+219 |   brand: null,     // Initialized to null
+220 |   po_numbers: [],
+221 |   mediaplan_type: '',
+222 |   created_by: authStore.user?.name || '',
+223 | });
+224 | 
+225 | const handleDateRangeChange = (range: [string, string] | null) => {
+226 |   if (range) {
+227 |     formData.start_date = range[0];
+228 |     formData.end_date = range[1];
+229 |   } else {
+230 |     formData.start_date = '';
+231 |     formData.end_date = '';
+232 |   }
+233 | };
+234 | 
+235 | const handleProjectCreated = (projectId: string) => {
+236 |   showProjectDialog.value = false;
+237 |   emit('project-created', projectId);
+238 |   dialog.value = false;
+239 |   showSuccess('Project created successfully');
+240 | };
+241 | 
+242 | const handlePoCreated = async (po: PONumber) => {
+243 |   selectedPOs.value = [...selectedPOs.value, po._id];
+244 |   showSuccess(`PO "${po.name}" created successfully and added to selection`);
+245 | };
+246 | 
+247 | const loadInitialData = async () => {
+248 |   isLoadingSources.value = true;
+249 | 
+250 |   try {
+251 |     let brandList = sourcesStore.getSourceList('brand') as ComponentBrandType[] | undefined;
+252 |     if (!brandList || brandList.length === 0) {
+253 |       const fetchSuccess = await sourcesStore.fetchSources('creation', 'mediaplan');
+254 |       if (fetchSuccess) {
+255 |         brandList = sourcesStore.getSourceList('brand') as ComponentBrandType[] | undefined;
+256 |       } else {
+257 |         showError(sourcesStore.error || 'Failed to fetch brand sources.');
+258 |       }
+259 |     }
+260 |     brands.value = brandList || [];
+261 |     isLoadingSources.value = false;
+262 | 
+263 |     if (poStore.allPONumbers.length === 0) {
+264 |       await poStore.fetchPONumbers();
+265 |     }
+266 | 
+267 |   } catch (error) {
+268 |     console.error('Error loading initial form data:', error);
+269 |     showError('Failed to load initial form data.');
+270 |     isLoadingSources.value = false;
+271 |   }
+272 | };
+273 | 
+274 | const submitForm = async () => {
+275 |   if (!form.value) return;
+276 |   const {valid} = await form.value.validate();
+277 |   if (!valid) return;
+278 | 
+279 |   isSubmitting.value = true;
+280 |   try {
+281 | 
+282 |     const finalPayloadForMediaplan: Mediaplan = {
+283 |       ...formData,
+284 |     };
+285 |     const createdMediaplan = await createMediaplanStore.createMediaplan(finalPayloadForMediaplan);
+286 |     createdMediaplanId.value = createdMediaplan._id;
+287 | 
+288 |     showSuccess('Mediaplan created successfully');
+289 |     emit('created', createdMediaplanId.value);
+290 |     showProjectDialog.value = true;
+291 | 
+292 |   } catch (error) {
+293 |     console.error('Error creating mediaplan:', error);
+294 |     showError('Failed to create mediaplan: ' + (error instanceof Error ? error.message : 'Unknown API error'));
+295 |   } finally {
+296 |     isSubmitting.value = false;
+297 |   }
+298 | };
+299 | 
+300 | const openCreatePODialog = () => {
+301 |   if (!formData.brand?.abbreviation) {
+302 |     showWarning('Please select a brand first');
+303 |     return;
+304 |   }
+305 |   createPODialogVisible.value = true;
+306 | };
+307 | 
+308 | const cancelDialog = () => {
+309 |   resetForm();
+310 |   dialog.value = false;
+311 | };
+312 | 
+313 | const resetForm = async () => {
+314 |   if (form.value) {
+315 |     form.value.resetValidation();
+316 |     form.value.reset();
+317 |   }
+318 |   await nextTick();
+319 |   formData.name = '';
+320 |   formData.brand = null;
+321 |   formData.start_date = '';
+322 |   formData.end_date = '';
+323 |   formData.budget = {total: 0, used: 0, available: 0};
+324 |   formData.po_numbers = [];
+325 |   formData.mediaplan_type = 'po';
+326 |   formData.created_by = authStore.user?.name || '';
+327 |   dateRange.value = null;
+328 |   department.value = '';
+329 |   showProjectDialog.value = false;
+330 |   createdMediaplanId.value = '';
+331 | };
+332 | 
+333 | onMounted(async () => {
+334 |   await loadInitialData();
+335 | 
+336 |   if (!authStore.user) {
+337 |     await authStore.fetchProfile();
+338 | 
+339 |   }
+340 | 
+341 | });
+342 | 
+343 | watch(dialog, (newValue) => {
+344 |   if (newValue) {
+345 |     if (brands.value.length === 0 || poStore.allPONumbers.length === 0) {
+346 |       loadInitialData();
+347 |     }
+348 |   } else {
+349 |     resetForm();
+350 |   }
+351 | });
+352 | </script>
+```
+
+src/components/overview/CreatePoDialog.vue
+```
+1 | <template>
+2 |   <v-dialog v-model="dialog" max-width="800px" persistent>
+3 |     <v-card class="px-6 py-4">
+4 |       <DialogHeader
+5 |           title="Create new PO"
+6 |           :show-back-button="false"
+7 |           :show-close-button="true"
+8 |           close-icon-color="primary"
+9 |           @close="cancelDialog"
+10 |       />
+11 | 
+12 |       <v-form ref="form" @submit.prevent="submitForm" class="mt-2">
+13 |         <v-card-text class="pa-0">
+14 |           <v-row>
+15 |             <v-col cols="12" md="6">
+16 |               <div class="mb-4">
+17 |                 <label for="client-department" class="text-body-2 mb-1 d-block">Client Department</label>
+18 |                 <v-text-field
+19 |                     id="client-department"
+20 |                     v-model="formData.clientDepartment"
+21 |                     placeholder="Enter the client's department name"
+22 |                     variant="outlined"
+23 |                     hide-details
+24 |                 />
+25 |               </div>
+26 | 
+27 |               <div class="mb-4">
+28 |                 <label for="brand-select" class="text-body-2 mb-1 d-block">Brand*</label>
+29 |                 <v-select
+30 |                     id="brand-select"
+31 |                     v-model="formData.brand"
+32 |                     :items="componentBrands" item-title="name"
+33 |                     item-value="_id"
+34 |                     placeholder="Select the brand for this PO"
+35 |                     :rules="[v => !!v || 'Brand is required']"
+36 |                     variant="outlined"
+37 |                     hide-details
+38 |                     :loading="isLoadingBrands"/>
+39 |               </div>
+40 | 
+41 |               <div class="mb-4">
+42 |                 <label for="client-name" class="text-body-2 mb-1 d-block">Client Name</label>
+43 |                 <v-text-field
+44 |                     id="client-name"
+45 |                     v-model="formData.clientName"
+46 |                     placeholder="Enter client's full name"
+47 |                     variant="outlined"
+48 |                     hide-details
+49 |                 />
+50 |               </div>
+51 | 
+52 |               <div class="mb-4">
+53 |                 <label for="market-select" class="text-body-2 mb-1 d-block">Market*</label>
+54 |                 <v-select
+55 |                     id="market-select"
+56 |                     v-model="formData.market"
+57 |                     :items="markets"
+58 |                     item-title="name"
+59 |                     item-value="_id"
+60 |                     placeholder="Select target market region"
+61 |                     :rules="[v => !!v || 'Market is required']"
+62 |                     variant="outlined"
+63 |                     hide-details
+64 |                 />
+65 |               </div>
+66 | 
+67 |               <div class="mb-4">
+68 |                 <label for="purpose-text" class="text-body-2 mb-1 d-block">Purpose</label>
+69 |                 <v-textarea
+70 |                     id="purpose-text"
+71 |                     v-model="formData.purpose"
+72 |                     placeholder="Describe the purpose of this purchase order"
+73 |                     variant="outlined"
+74 |                     rows="4"
+75 |                     counter="250"
+76 |                     :rules="[v => !v || v.length <= 250 || 'Maximum 250 characters']"
+77 |                     hide-details="auto"
+78 |                 />
+79 |               </div>
+80 |             </v-col>
+81 | 
+82 |             <v-col cols="12" md="6">
+83 |               <div class="mb-4">
+84 |                 <label for="po-number" class="text-body-2 mb-1 d-block">PO Number*</label>
+85 |                 <v-text-field
+86 |                     id="po-number"
+87 |                     v-model="formData.poNumber"
+88 |                     placeholder="Enter official purchase order number"
+89 |                     :rules="[v => !!v || 'PO Number is required']"
+90 |                     variant="outlined"
+91 |                     hide-details
+92 |                 />
+93 |               </div>
+94 | 
+95 |               <div class="d-flex">
+96 |                 <div class="flex-grow-1 mr-2">
+97 |                   <label for="budget" class="text-body-2 mb-1 d-block">Budget*</label>
+98 |                   <v-text-field
+99 |                       id="budget"
+100 |                       v-model="formData.budget"
+101 |                       placeholder="Enter budget amount"
+102 |                       type="number"
+103 |                       :rules="[
+104 |                         v => !!v || 'Budget is required',
+105 |                         v => parseFloat(v) > 0 || 'Budget must be greater than 0'
+106 |                       ]"
+107 |                       variant="outlined"
+108 |                       class="mb-4"
+109 |                       hide-details
+110 |                   />
+111 |                 </div>
+112 | 
+113 |                 <div class="flex-grow-0" style="width: 100px">
+114 |                   <label for="currency" class="text-body-2 mb-1 d-block">Currency</label>
+115 |                   <v-select
+116 |                       id="currency"
+117 |                       v-model="formData.currency"
+118 |                       :items="currencies"
+119 |                       variant="outlined"
+120 |                       class="mb-4"
+121 |                       hide-details
+122 |                   />
+123 |                 </div>
+124 |               </div>
+125 | 
+126 |               <div class="mb-4">
+127 |                 <label for="validity-range" class="text-body-2 mb-1 d-block">Validity Period*</label>
+128 |                 <DateRangePicker
+129 |                     id="validity-range"
+130 |                     v-model="dateRange"
+131 |                     label=""
+132 |                     placeholder="Select validity period"
+133 |                     required
+134 |                     :rules="[v => !!v || 'Validity period is required']"
+135 |                     variant="outlined"
+136 |                     dialog-title="Select PO Validity Period"
+137 |                     hide-details
+138 |                 />
+139 |               </div>
+140 | 
+141 |               <div class="mb-4">
+142 |                 <label for="contractor-department" class="text-body-2 mb-1 d-block">Contractor Department</label>
+143 |                 <v-text-field
+144 |                     id="contractor-department"
+145 |                     v-model="formData.contractorDepartment"
+146 |                     placeholder="Enter contractor's department name"
+147 |                     variant="outlined"
+148 |                     hide-details
+149 |                 />
+150 |               </div>
+151 | 
+152 |               <div class="mb-4">
+153 |                 <label for="contractor-name" class="text-body-2 mb-1 d-block">Contractor Name</label>
+154 |                 <v-text-field
+155 |                     id="contractor-name"
+156 |                     v-model="formData.contractorName"
+157 |                     placeholder="Enter contractor's full name"
+158 |                     variant="outlined"
+159 |                     hide-details
+160 |                 />
+161 |               </div>
+162 |             </v-col>
+163 |           </v-row>
+164 |         </v-card-text>
+165 |         <DialogFooter
+166 |             cancel-text="Cancel"
+167 |             confirm-text="Create PO"
+168 |             :loading="isSubmitting"
+169 |             :disabled="!form?.isValid || isLoadingBrands"
+170 |             :submit-button="true"
+171 |             @cancel="cancelDialog"
+172 |         />
+173 |       </v-form>
+174 |     </v-card>
+175 |   </v-dialog>
+176 | </template>
+177 | 
+178 | <script setup lang="ts">
+179 | import {ref, reactive, computed, onMounted} from 'vue';
+180 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
+181 | import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
+182 | import {useSourcesStore} from '@/stores/sourcesStore';
+183 | import type {Brand, PONumber} from '@/types/mediaplan';
+184 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
+185 | import DateRangePicker from "./DateRangePicker.vue";
+186 | import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
+187 | import {formatCurrency} from '@/helpers/currencyUtils';
+188 | 
+189 | const props = defineProps<{
+190 |   modelValue: boolean;
+191 |   initialBrandId?: string;
+192 | }>();
+193 | 
+194 | const emit = defineEmits<{
+195 |   (e: 'update:modelValue', value: boolean): void;
+196 |   (e: 'created', po: PONumber): void;
+197 | }>();
+198 | 
+199 | const form = ref<any>();
+200 | const createMediaplanStore = useCreateMediaplanStore();
+201 | const sourcesStore = useSourcesStore();
+202 | 
+203 | const dialog = computed({
+204 |   get: () => props.modelValue,
+205 |   set: (value) => emit('update:modelValue', value)
+206 | });
+207 | 
+208 | const dateRange = ref<[string, string] | null>(null);
+209 | const isSubmitting = ref(false);
+210 | 
+211 | const componentBrands = ref<Brand[]>([]);
+212 | const isLoadingBrands = ref(false);
+213 | 
+214 | const markets = ref([
+215 |   {_id: 'de', name: 'Germany'},
+216 |   {_id: 'us', name: 'United States'},
+217 |   {_id: 'uk', name: 'United Kingdom'},
+218 | ]);
+219 | 
+220 | const currencies = ref(['EUR', 'USD', 'GBP', 'PLN']);
+221 | 
+222 | const formData = reactive({
+223 |   clientDepartment: '',
+224 |   brand: '',
+225 |   clientName: '',
+226 |   market: '',
+227 |   purpose: '',
+228 |   poNumber: '',
+229 |   budget: null as number | null,
+230 |   currency: 'EUR',
+231 |   contractorDepartment: '',
+232 |   contractorName: ''
+233 | });
+234 | 
+235 | const submitForm = async () => {
+236 |   if (!form.value) return;
+237 |   const {valid} = await form.value.validate();
+238 |   if (!valid) return;
+239 | 
+240 |   isSubmitting.value = true;
+241 |   try {
+242 |     const newPO = await createMediaplanStore.createPO({
+243 |       name: formData.poNumber,
+244 |       value: Number(formData.budget),
+245 |       metadata: {
+246 |         clientDepartment: formData.clientDepartment,
+247 |         brand: formData.brand,
+248 |         clientName: formData.clientName,
+249 |         market: formData.market,
+250 |         purpose: formData.purpose,
+251 |         currency: formData.currency,
+252 |         validFrom: dateRange.value ? dateRange.value[0] : undefined,
+253 |         validTo: dateRange.value ? dateRange.value[1] : undefined,
+254 |         contractorDepartment: formData.contractorDepartment,
+255 |         contractorName: formData.contractorName
+256 |       }
+257 |     });
+258 | 
+259 |     showSuccess(
+260 |         `PO "${formData.poNumber}" created successfully with budget ${formatCurrency(Number(formData.budget))}`
+261 |     );
+262 |     emit('created', newPO);
+263 |     dialog.value = false;
+264 |   } catch (error) {
+265 |     console.error('Error creating PO:', error);
+266 |     showError('Failed to create PO. Please try again.');
+267 |   } finally {
+268 |     isSubmitting.value = false;
+269 |   }
+270 | };
+271 | 
+272 | const cancelDialog = () => {
+273 |   dialog.value = false;
+274 | };
+275 | 
+276 | onMounted(async () => {
+277 |   const today = new Date();
+278 |   const nextYear = new Date(today);
+279 |   nextYear.setFullYear(today.getFullYear() + 1);
+280 |   dateRange.value = [today.toISOString().split('T')[0], nextYear.toISOString().split('T')[0]];
+281 | 
+282 |   isLoadingBrands.value = true;
+283 |   try {
+284 |     let brandList = sourcesStore.getSourceList('brand') as Brand[] | undefined;
+285 |     if (!brandList || brandList.length === 0) {
+286 |       const fetchSuccess = await sourcesStore.fetchSources('creation', 'mediaplan');
+287 |       if (fetchSuccess) {
+288 |         brandList = sourcesStore.getSourceList('brand') as Brand[] | undefined;
+289 |       } else {
+290 |         showError(sourcesStore.error || 'Failed to fetch brand sources.');
+291 |       }
+292 |     }
+293 |     componentBrands.value = brandList || [];
+294 | 
+295 |     if (props.initialBrandId && componentBrands.value.some(b => b._id === props.initialBrandId)) {
+296 |       formData.brand = props.initialBrandId;
+297 |     } else if (componentBrands.value.length > 0) {
+298 |       formData.brand = componentBrands.value[0]._id;
+299 |     } else {
+300 |       formData.brand = '';
+301 |     }
+302 | 
+303 |   } catch (error) {
+304 |     showError('Failed to load brands. Please try again later.');
+305 |     console.error("Error loading brands in CreatePoDialog:", error);
+306 |   } finally {
+307 |     isLoadingBrands.value = false;
+308 |   }
+309 | });
+310 | </script>
+```
+
+src/components/overview/DateRangePicker.vue
+```
+1 | <template>
+2 |   <div class="date-range-picker">
+3 |     <!-- Single input field that triggers the dialog -->
+4 |     <v-text-field
+5 |         v-model="displayValue"
+6 |         :label="label"
+7 |         :placeholder="placeholder"
+8 |         :rules="rules"
+9 |         :hint="hint"
+10 |         :disabled="disabled"
+11 |         readonly
+12 |         @click="openDialog"
+13 |         append-inner-icon="mdi-calendar-month-outline"
+14 |         v-bind="$attrs"
+15 |     >
+16 |     </v-text-field>
+17 | 
+18 |     <!-- Date Picker Dialog -->
+19 |     <v-dialog v-model="showDialog" width="auto" max-width="420px">
+20 |       <v-card class="date-picker-dialog">
+21 |         <!-- Dialog Title -->
+22 |         <v-card-title class="d-flex align-center pb-0">
+23 |           <span class="text-subtitle-1">{{ dialogTitle }}</span>
+24 |           <v-spacer></v-spacer>
+25 |           <v-btn icon variant="text" @click="closeDialog">
+26 |             <v-icon>mdi-close</v-icon>
+27 |           </v-btn>
+28 |         </v-card-title>
+29 | 
+30 |         <!-- Display Selected Dates -->
+31 |         <v-card-text class="pt-2 pb-0">
+32 |           <div v-if="selectedDates.length >= 2" class="selected-dates">
+33 |             <span class="text-subtitle-1">Selected Range:</span>
+34 |             {{ formatSelectedDatePreview(selectedDates[0]) }} -
+35 |             {{ formatSelectedDatePreview(selectedDates[selectedDates.length - 1]) }}
+36 |           </div>
+37 |           <div v-else class="selected-dates">
+38 |             <strong>No date range selected</strong>
+39 |           </div>
+40 |         </v-card-text>
+41 | 
+42 |         <!-- Date Picker Component -->
+43 |         <v-date-picker
+44 |             v-model="selectedDates"
+45 |             :min="minDate"
+46 |             :max="maxDate"
+47 |             multiple="range"
+48 |             elevation="0"
+49 |             color="primary"
+50 |             width="100%"
+51 |             hide-header
+52 |             show-adjacent-months
+53 |         >
+54 |         </v-date-picker>
+55 | 
+56 |         <!-- Dialog Actions -->
+57 |         <v-card-actions class="pt-0 pb-4 px-6">
+58 |           <v-btn
+59 |               size="large"
+60 |               variant="outlined"
+61 |               color="grey-darken-1"
+62 |               @click="clearSelection"
+63 |           >
+64 |             Clear selection
+65 |           </v-btn>
+66 |           <v-btn
+67 |               size="large"
+68 |               color="primary"
+69 |               variant="flat"
+70 |               @click="setDates"
+71 |               :disabled="!canSetDates"
+72 |           >
+73 |             Set dates
+74 |           </v-btn>
+75 |         </v-card-actions>
+76 |       </v-card>
+77 |     </v-dialog>
+78 |   </div>
+79 | </template>
+80 | 
+81 | <script setup lang="ts">
+82 | import {ref, computed, watch} from 'vue';
+83 | import {formatDate} from '@/helpers/dateUtils';
+84 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
+85 | 
+86 | // Define props with TypeScript interface
+87 | interface Props {
+88 |   modelValue: [string, string] | null; // [startDate, endDate] as a tuple or null
+89 |   label?: string;
+90 |   placeholder?: string;
+91 |   hint?: string;
+92 |   disabled?: boolean;
+93 |   required?: boolean;
+94 |   dialogTitle?: string;
+95 |   dateFormat?: string;
+96 |   minDate?: string;
+97 |   maxDate?: string;
+98 | }
+99 | 
+100 | const props = withDefaults(defineProps<Props>(), {
+101 |   label: 'Date range',
+102 |   placeholder: 'Select a date range',
+103 |   hint: '',
+104 |   disabled: false,
+105 |   required: false,
+106 |   dialogTitle: 'Choose a date range',
+107 |   dateFormat: 'DD.MM.YYYY',
+108 |   minDate: undefined,
+109 |   maxDate: undefined,
+110 |   density: 'default',
+111 |   variant: 'outlined'
+112 | });
+113 | 
+114 | // Define emits with TypeScript
+115 | const emit = defineEmits<{
+116 |   (e: 'update:modelValue', value: [string, string] | null): void;
+117 | }>();
+118 | 
+119 | // State
+120 | const showDialog = ref(false);
+121 | const selectedDates = ref<string[]>([]);
+122 | const displayValue = ref('');
+123 | 
+124 | // Computed properties
+125 | const canSetDates = computed(() => {
+126 |   return selectedDates.value.length >= 2;
+127 | });
+128 | 
+129 | // Rules for validation
+130 | const rules = computed(() => {
+131 |   const rules = [];
+132 |   if (props.required) {
+133 |     rules.push((v: string) => !!v || `${props.label} is required`);
+134 |   }
+135 |   return rules;
+136 | });
+137 | 
+138 | // Format date for the dialog preview
+139 | const formatSelectedDatePreview = (dateStr: string): string => {
+140 |   return formatDate(dateStr, props.dateFormat);
+141 | };
+142 | 
+143 | // Methods
+144 | const openDialog = () => {
+145 |   if (props.disabled) return;
+146 | 
+147 |   // Initialize selected dates based on current values
+148 |   selectedDates.value = [];
+149 |   if (props.modelValue) {
+150 |     selectedDates.value = [...props.modelValue];
+151 |   }
+152 | 
+153 |   showDialog.value = true;
+154 | };
+155 | 
+156 | const closeDialog = () => {
+157 |   showDialog.value = false;
+158 | };
+159 | 
+160 | const clearSelection = () => {
+161 |   selectedDates.value = [];
+162 |   displayValue.value = '';
+163 |   emit('update:modelValue', null);
+164 |   closeDialog();
+165 | };
+166 | 
+167 | const setDates = () => {
+168 |   if (selectedDates.value.length >= 2) {
+169 |     // Sort the dates to ensure start is before end
+170 |     const sortedDates = [...selectedDates.value].sort();
+171 |     const startDate = sortedDates[0];
+172 |     const endDate = sortedDates[sortedDates.length - 1];
+173 | 
+174 |     emit('update:modelValue', [startDate, endDate]);
+175 |     closeDialog();
+176 |   }
+177 | };
+178 | 
+179 | // Update display value when model value changes
+180 | const updateDisplayValue = () => {
+181 |   if (!props.modelValue || props.modelValue.length !== 2) {
+182 |     displayValue.value = '';
+183 |     return;
+184 |   }
+185 | 
+186 |   const [start, end] = props.modelValue;
+187 | 
+188 |   if (start && end) {
+189 |     const startFormatted = formatDate(start, props.dateFormat);
+190 |     const endFormatted = formatDate(end, props.dateFormat);
+191 |     displayValue.value = `${startFormatted} - ${endFormatted}`;
+192 |   } else {
+193 |     displayValue.value = '';
+194 |   }
+195 | };
+196 | 
+197 | // Watch for model value changes
+198 | watch(() => props.modelValue, () => {
+199 |   updateDisplayValue();
+200 | }, {immediate: true});
+201 | 
+202 | // Watch for selected dates changes
+203 | watch(() => selectedDates.value, (newVal) => {
+204 |   if (newVal.length >= 2) {
+205 |     // Update the preview in the input field even before confirming
+206 |     const sortedDates = [...newVal].sort();
+207 |     const startPreview = formatDate(sortedDates[0], props.dateFormat);
+208 |     const endPreview = formatDate(sortedDates[sortedDates.length - 1], props.dateFormat);
+209 |     displayValue.value = `${startPreview} - ${endPreview}`;
+210 |   }
+211 | });
+212 | </script>
+213 | 
+214 | <style scoped>
+215 | .date-picker-dialog {
+216 |   overflow: hidden;
+217 | }
+218 | 
+219 | .weekday-header {
+220 |   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+221 |   position: relative;
+222 |   z-index: 1;
+223 |   background-color: white;
+224 | }
+225 | </style>
+```
+
+src/components/overview/MediaplanActionMenu.vue
+```
+```
+
+src/components/overview/MediaplanCard.vue
+```
+1 | <template>
+2 |   <div class="position-relative card-wrapper">
+3 |     <v-card
+4 |         class="h-100 pa-3 mediaplan-card"
+5 |         elevation="3"
+6 |         :data-mediaplan-id="mediaplan._id"
+7 |         @click="handleCardClick"
+8 |     >
+9 |       <v-card-item class="pb-8">
+10 |         <div class="d-flex align-center">
+11 |           <v-tooltip
+12 |               location="top"
+13 |               open-delay="300"
+14 |           >
+15 |             <template v-slot:activator="{ props }">
+16 |               <div
+17 |                   class="text-h6 text-truncate mediaplan-title pr-1"
+18 |                   v-bind="props"
+19 |               >
+20 |                 {{ mediaplan.name }}
+21 |               </div>
+22 |             </template>
+23 |             <span>{{ mediaplan.name }}</span>
+24 |           </v-tooltip>
+25 |           <v-icon size="x-small" color="primary" icon="mdi-pencil-outline" class="mr-3"/>
+26 | 
+27 |           <!-- Brand logo -->
+28 |           <v-img
+29 |               :src="getBrandLogo(mediaplan.brand)"
+30 |               max-width="40"
+31 |               contain
+32 |               class="ml-auto"
+33 |           />
+34 |         </div>
+35 | 
+36 |         <!-- Status and date range on same row -->
+37 |         <div class="d-flex align-center justify-space-between mt-2">
+38 |           <div class="d-flex align-center">
+39 |             <v-icon
+40 |                 icon="mdi-circle"
+41 |                 :color="getMediaplanStatusColor(mediaplan.status)"
+42 |                 size="x-small"
+43 |                 class="mr-1"
+44 |             />
+45 |             <span class="status-text text-grey">{{ getMediaplanStatusLabel(mediaplan.status) }}</span>
+46 |           </div>
+47 | 
+48 |           <div class="d-flex align-center">
+49 |             <v-icon size="small" icon="mdi-calendar-range" class="mr-1"/>
+50 |             <span class="date-range-text text-grey">{{
+51 |                 formatDateRange(mediaplan.start_date, mediaplan.end_date)
+52 |               }}</span>
+53 |           </div>
+54 |         </div>
+55 |       </v-card-item>
+56 | 
+57 |       <v-card-text>
+58 |         <!-- Creator row -->
+59 |         <div class="d-flex justify-space-between mb-3">
+60 |           <span class="text-subtitle-2">Creator</span>
+61 |           <span class="text-subtitle-2 font-weight-medium">{{ mediaplan.created_by?.name || 'N/A' }}</span>
+62 |         </div>
+63 | 
+64 |         <v-divider class="pt-1 pb-4"></v-divider>
+65 |         <!-- Total Budget row -->
+66 |         <div class="d-flex justify-space-between mb-3">
+67 |           <span class="text-subtitle-2">Total Budget</span>
+68 |           <div class="d-flex align-center">
+69 |             <v-icon size="x-small" icon="mdi-circle" color="green" class="mr-1"/>
+70 |             <span class="text-subtitle-2 font-weight-medium">{{ formatCurrency(mediaplan.budget?.total) }}</span>
+71 |           </div>
+72 |         </div>
+73 | 
+74 |         <v-divider class="pt-1 pb-4"></v-divider>
+75 |         <!-- Used Budget row -->
+76 |         <div class="d-flex justify-space-between mb-3">
+77 |           <span class="text-subtitle-2">Used Budget</span>
+78 |           <div class="d-flex align-center">
+79 |             <v-icon size="x-small" icon="mdi-circle" color="red" class="mr-1"/>
+80 |             <span class="text-subtitle-2 font-weight-medium">{{ formatCurrency(mediaplan.budget?.used) }}</span>
+81 |           </div>
+82 |         </div>
+83 | 
+84 |         <v-divider class="pt-1 pb-4"></v-divider>
+85 |         <!-- PO Numbers row -->
+86 |         <div class="d-flex justify-space-between" v-if="mediaplan.po_numbers && mediaplan.po_numbers.length > 0">
+87 |           <span class="text-subtitle-2">PO</span>
+88 |           <span class="text-subtitle-2 font-weight-medium text-truncate" style="max-width: 70%">
+89 |           {{ mediaplan.po_numbers.map(po => po.name).join(', ') }}
+90 |         </span>
+91 |         </div>
+92 |       </v-card-text>
+93 | 
+94 |       <v-card-actions>
+95 |         <!-- Action buttons -->
+96 |         <v-spacer/>
+97 | 
+98 |         <!-- Options menu -->
+99 |         <mediaplan-options-menu
+100 |             :mediaplan-id="mediaplan._id"
+101 |             @action="handleMenuAction"
+102 |         />
+103 | 
+104 |         <!-- Navigation button -->
+105 |         <v-btn
+106 |             variant="flat"
+107 |             color="primary"
+108 |             :to="{ name: 'MediaplanDetail', params: { mediaplanId: mediaplan._id }}"
+109 |         >
+110 |           Show Mediaplan
+111 |         </v-btn>
+112 |         <br>
+113 | 
+114 |       </v-card-actions>
+115 |     </v-card>
+116 |   </div>
+117 | </template>
+118 | 
+119 | 
+120 | <script setup lang="ts">
+121 | import {ref} from 'vue';
+122 | import {Mediaplan} from '@/types/mediaplan';
+123 | import {getMediaplanStatusColor, getMediaplanStatusLabel} from '@/constants/mediaplanStatuses';
+124 | import MediaplanOptionsMenu from "@/components/overview/MediaplanOptionsMenu.vue";
+125 | import {useRouter} from 'vue-router';
+126 | import {formatDateRange} from '@/helpers/dateUtils';
+127 | import {formatCurrency} from '@/helpers/currencyUtils';
+128 | import {getBrandLogo} from '@/helpers/brandUtils';
+129 | 
+130 | // Store mediaplan prop in a variable to access it throughout the component
+131 | const props = defineProps<{
+132 |   mediaplan: Mediaplan;
+133 | }>();
+134 | 
+135 | const emit = defineEmits<{
+136 |   (e: 'view', mediaplanId: string): void;
+137 |   (e: 'edit', mediaplanId: string): void;
+138 |   (e: 'add-po', mediaplanId: string): void;
+139 |   (e: 'export', mediaplanId: string): void;
+140 |   (e: 'duplicate', mediaplanId: string): void;
+141 |   (e: 'archive', mediaplanId: string): void;
+142 |   (e: 'delete', mediaplanId: string): void;
+143 | }>();
+144 | 
+145 | const router = useRouter();
+146 | 
+147 | // Handle card click for navigation
+148 | const handleCardClick = (event: MouseEvent) => {
+149 |   // Don't navigate if clicking on buttons or menu items
+150 |   if ((event.target as HTMLElement).closest('.v-card__actions')) {
+151 |     return;
+152 |   }
+153 | 
+154 |   // Navigate to detail page
+155 |   router.push({name: 'MediaplanDetail', params: {mediaplanId: props.mediaplan._id}});
+156 | };
+157 | 
+158 | const handleMenuAction = (action: string, mediaplanId: string) => {
+159 |   switch (action) {
+160 |     case 'view':
+161 |       router.push({name: 'MediaplanDetail', params: {mediaplanId: id}});
+162 |       break;
+163 |     case 'edit':
+164 |       router.push({name: 'MediaplanEdit', params: {mediaplanId: id}});
+165 |       break;
+166 |     case 'addPo':
+167 |       emit('add-po', id);
+168 |       break;
+169 |     case 'export':
+170 |       emit('export', id);
+171 |       break;
+172 |     case 'duplicate':
+173 |       emit('duplicate', id);
+174 |       break;
+175 |     case 'archive':
+176 |       emit('archive', id);
+177 |       break;
+178 |     case 'delete':
+179 |       emit('delete', id);
+180 |       break;
+181 |   }
+182 | };
+183 | </script>
+184 | 
+185 | <style scoped>
+186 | .mediaplan-title {
+187 |   overflow: hidden;
+188 |   text-overflow: ellipsis;
+189 |   white-space: nowrap;
+190 |   flex: 1;
+191 | }
+192 | 
+193 | .status-text, .date-range-text {
+194 |   font-size: 12px;
+195 | }
+196 | 
+197 | .mediaplan-card {
+198 |   cursor: pointer;
+199 |   transition: transform 0.2s, box-shadow 0.2s;
+200 | }
+201 | 
+202 | .mediaplan-card:hover {
+203 |   transform: translateY(-4px);
+204 |   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15) !important;
+205 | }
+206 | 
+207 | /* Override cursor for buttons and menu */
+208 | .v-menu__content,
+209 | .v-card__actions .v-btn {
+210 |   cursor: default;
+211 | }
+212 | </style>
+```
+
+src/components/overview/MediaplanFilters.vue
+```
+1 | <template>
+2 |   <div class="filter-container">
+3 |     <div class="filter-item">
+4 |       <v-select
+5 |           v-model="localBrandId"
+6 |           :items="brandsFromStore"
+7 |           item-title="value"
+8 |           item-value="abbreviation"
+9 |           label="Brand"
+10 |           variant="underlined"
+11 |           return-object
+12 |           hide-details
+13 |           prepend-inner-icon="mdi-filter"
+14 |           :disabled="props.loading || sourcesStore.isLoading"
+15 |           :loading="sourcesStore.isLoading && !brandsFromStore.length"/>
+16 |     </div>
+17 |     <div class="filter-item">
+18 |       <v-select
+19 |           v-model="localSort"
+20 |           :items="sortOptions"
+21 |           item-title="text"
+22 |           item-value="value"
+23 |           label="Sort by"
+24 |           variant="underlined"
+25 |           hide-details
+26 |           prepend-inner-icon="mdi-sort"
+27 |           :disabled="props.loading"
+28 |       />
+29 |     </div>
+30 | 
+31 |     <div class="filter-item">
+32 |       <v-autocomplete
+33 |           v-model="localCountries"
+34 |           :items="countriesFromStore" item-title="value" item-value="abbreviation" label="Country Selection"
+35 |           variant="underlined"
+36 |           hide-details
+37 |           multiple
+38 |           chips
+39 |           closable-chips
+40 |           prepend-inner-icon="mdi-filter"
+41 |           :disabled="props.loading || sourcesStore.isLoading"
+42 |           :loading="sourcesStore.isLoading && !countriesFromStore.length"/>
+43 |     </div>
+44 | 
+45 |     <div class="filter-item">
+46 |       <v-select
+47 |           v-model="localStatus"
+48 |           :items="filterOptions"
+49 |           item-title="text"
+50 |           item-value="value"
+51 |           label="Filter by"
+52 |           variant="underlined"
+53 |           hide-details
+54 |           prepend-inner-icon="mdi-filter"
+55 |           :disabled="props.loading"
+56 |       />
+57 |     </div>
+58 | 
+59 |     <div class="filter-item search-field">
+60 |       <v-text-field
+61 |           v-model="localSearch"
+62 |           placeholder="Search..."
+63 |           prepend-inner-icon="mdi-magnify"
+64 |           variant="underlined"
+65 |           hide-details
+66 |           flat
+67 |           single-line
+68 |           clearable
+69 |           :disabled="props.loading"
+70 |       />
+71 |     </div>
+72 | 
+73 |     <div class="filter-item create-button">
+74 |       <create-mediaplan-button :disabled="props.loading"/>
+75 |     </div>
+76 |   </div>
+77 | </template>
+78 | 
+79 | <script setup lang="ts">
+80 | import {computed} from 'vue';
+81 | import type {MediaplanFilter, Brand, Source} from '@/types';
+82 | import CreateMediaplanButton from "@/components/overview/CreateMediaplanButton.vue";
+83 | import {useSourcesStore} from '@/stores/sourcesStore';
+84 | 
+85 | const sourcesStore = useSourcesStore();
+86 | 
+87 | const props = defineProps<{
+88 |   filters: MediaplanFilter;
+89 |   loading: boolean;
+90 |   sortBy: string;
+91 |   sortOrder: 'asc' | 'desc';
+92 | }>();
+93 | 
+94 | const emit = defineEmits<{
+95 |   (e: 'update:filter', payload: { key: keyof MediaplanFilter; value: unknown }): void;
+96 |   (e: 'update:sort', payload: { sortBy: string; sortOrder: 'asc' | 'desc' }): void;
+97 | }>();
+98 | 
+99 | const sortOptions = [
+100 |   {text: 'Last updated first', value: 'updated_at:desc'},
+101 |   {text: 'Earliest Start Date first', value: 'start_date:asc'},
+102 |   {text: 'Budget Lowest First', value: 'budget.total:asc'}
+103 | ];
+104 | const filterOptions = [
+105 |   {text: 'All', value: ''},
+106 |   {text: 'Created by me', value: 'created_by_me'},
+107 |   {text: 'For Approval', value: 'for_approval'}
+108 | ];
+109 | 
+110 | const localSearch = computed({
+111 |   get: () => props.filters.search || '',
+112 |   set: v => emit('update:filter', {key: 'search', value: v})
+113 | });
+114 | const localBrandId = computed({
+115 |   get: () => props.filters.brand_id || null,
+116 |   set: v => emit('update:filter', {key: 'brand_id', value: v})
+117 | });
+118 | const localStatus = computed({
+119 |   get: () => props.filters.status || '',
+120 |   set: v => emit('update:filter', {key: 'status', value: v})
+121 | });
+122 | const localCountries = computed<string[]>({
+123 |   get: () => props.filters.country ? (props.filters.country as string).split(',') : [],
+124 |   set: arr => emit('update:filter', {key: 'country', value: arr.join(',')})
+125 | });
+126 | const localSort = computed({
+127 |   get: () => `${props.sortBy}:${props.sortOrder}`,
+128 |   set: v => {
+129 |     const [by, order] = v.split(':') as [string, 'asc' | 'desc'];
+130 |     emit('update:sort', {sortBy: by, sortOrder: order});
+131 |   }
+132 | });
+133 | 
+134 | const brandsFromStore = computed((): Brand[] => {
+135 |   return (sourcesStore.getSourceList('brand') as Brand[] | undefined) || [];
+136 | });
+137 | 
+138 | const countriesFromStore = computed((): Source[] => {
+139 |   return (sourcesStore.getSourceList('country') as Source[] | undefined) || [];
+140 | });
+141 | 
+142 | </script>
+143 | 
+144 | <style scoped>
+145 | .filter-container {
+146 |   display: flex;
+147 |   flex-wrap: wrap;
+148 |   gap: 16px;
+149 |   align-items: center;
+150 |   width: 100%;
+151 | }
+152 | 
+153 | .filter-item {
+154 |   min-width: 180px;
+155 | }
+156 | 
+157 | .search-field {
+158 |   flex-grow: 1;
+159 |   min-width: 200px;
+160 |   max-width: 280px;
+161 | }
+162 | 
+163 | .create-button {
+164 |   margin-left: auto;
+165 |   min-width: auto;
+166 | }
+167 | 
+168 | @media (max-width: 1200px) {
+169 |   .filter-item {
+170 |     min-width: 160px;
+171 |   }
+172 | }
+173 | 
+174 | @media (max-width: 960px) {
+175 |   .filter-container {
+176 |     grid-template-columns: 1fr 1fr;
+177 |   }
+178 | 
+179 |   .filter-item {
+180 |     min-width: 140px;
+181 |   }
+182 | 
+183 |   .search-field {
+184 |     flex-basis: 100%;
+185 |     order: 5;
+186 |   }
+187 | 
+188 |   .create-button {
+189 |     margin-left: 0;
+190 |     flex-basis: 100%;
+191 |     order: 6;
+192 |     display: flex;
+193 |     justify-content: flex-end;
+194 |   }
+195 | }
+196 | 
+197 | @media (max-width: 600px) {
+198 |   .filter-item {
+199 |     flex-basis: 100%;
+200 |   }
+201 | }
+202 | </style>
+```
+
+src/components/overview/MediaplanList.vue
+```
+1 | <template>
+2 |   <div v-if="isLoading && mediaplans.length === 0" class="d-flex justify-center align-center my-10">
+3 |     <v-progress-circular indeterminate color="primary" size="64"/>
+4 |   </div>
+5 |   <div v-else>
+6 |     <v-row v-if="mediaplans.length > 0" class="justify-center">
+7 |       <v-col
+8 |           v-for="mediaplan in mediaplans"
+9 |           :key="mediaplan._id"
+10 |           cols="12" sm="6" md="4" lg="3"
+11 |           class="mb-4 mediaplan-col d-flex"
+12 |       >
+13 |         <mediaplan-card
+14 |             :mediaplan="mediaplan"
+15 |             class="flex-grow-1"
+16 |             @view="viewMediaplan"
+17 |         />
+18 |       </v-col>
+19 |     </v-row>
+20 | 
+21 |     <div v-if="!isLoading && mediaplans.length === 0" class="text-center my-10 text-disabled">
+22 |       <v-icon size="x-large" class="mb-2">mdi-database-off-outline</v-icon>
+23 |       <p>No mediaplans found</p>
+24 |       <p class="text-caption">Try adjusting your filters.</p>
+25 |     </div>
+26 | 
+27 |     <pagination-controls
+28 |         v-if="!isLoading && totalPages > 1"
+29 |         v-model="paginationModel"
+30 |         :length="totalPages"
+31 |         :disabled="isLoading"
+32 |         :items-per-page-value="itemsPerPageModel"
+33 |         @update:items-per-page="itemsPerPageModel = $event"
+34 |     />
+35 | 
+36 |     <div v-if="!isLoading && totalItems > 0" class="text-center text-caption text-medium-emphasis mt-2">
+37 |       {{ paginationInfo }}
+38 |     </div>
+39 |   </div>
+40 | </template>
+41 | 
+42 | <script setup lang="ts">
+43 | import {ref, computed, watch} from 'vue';
+44 | import {useRouter} from 'vue-router';
+45 | import type {Mediaplan} from '@/types/mediaplan'; // Pfad prüfen
+46 | import MediaplanCard from '@/components/overview/MediaplanCard.vue'; // Pfad prüfen
+47 | import PaginationControls from '@/components/common/PaginationControls.vue'; // Pfad prüfen
+48 | 
+49 | // --- Props ---
+50 | // Empfängt jetzt Daten und Zustand direkt von Overview.vue (aus dem Store)
+51 | interface Props {
+52 |   mediaplans: Mediaplan[];
+53 |   isLoading: boolean;
+54 |   totalPages: number;
+55 |   totalItems: number;
+56 |   currentPage: number; // 0-basiert
+57 |   itemsPerPage: number;
+58 | }
+59 | 
+60 | const props = defineProps<Props>();
+61 | 
+62 | // --- Emits ---
+63 | // Meldet nur noch Benutzerinteraktionen nach oben, die eine Änderung im Store erfordern
+64 | const emit = defineEmits<{
+65 |   (e: 'update:page', page: number): void; // Meldet gewünschte Seitenänderung (1-basiert von PaginationControls)
+66 |   (e: 'update:items-per-page', perPage: number): void; // Meldet gewünschte Items pro Seite Änderung
+67 | }>();
+68 | 
+69 | // --- Router ---
+70 | const router = useRouter();
+71 | 
+72 | // --- Computed Properties ---
+73 | 
+74 | // Aktuelle Seite für PaginationControls (oft 1-basiert)
+75 | const paginationModel = computed({
+76 |   get: () => props.currentPage + 1, // Konvertiere 0-basierte Prop zu 1-basierter Anzeige
+77 |   set: (value: number) => {
+78 |     // Wenn das v-model von PaginationControls sich ändert, wird das Event nach oben emittiert
+79 |     emit('update:page', value);
+80 |   }
+81 | });
+82 | 
+83 | // Aktuelle Items pro Seite für PaginationControls
+84 | const itemsPerPageModel = computed({
+85 |   get: () => props.itemsPerPage,
+86 |   set: (value: number) => {
+87 |     emit('update:items-per-page', value);
+88 |   }
+89 | });
+90 | 
+91 | // Info-Text für Paginierung
+92 | const paginationInfo = computed(() => {
+93 |   if (props.totalItems === 0) return '';
+94 |   const startItem = (props.currentPage * props.itemsPerPage) + 1;
+95 |   const endItem = Math.min(startItem + props.itemsPerPage - 1, props.totalItems);
+96 |   return `${startItem}-${endItem} of ${props.totalItems} mediaplans`;
+97 | });
+98 | 
+99 | 
+100 | // --- Methods ---
+101 | const viewMediaplan = (mediaplanId: string) => {
+102 |   router.push({name: 'MediaplanDetail', params: {mediaplanId}});
+103 | };
+104 | 
+105 | </script>
+106 | 
+107 | 
+108 | <style scoped>
+109 | .mediaplan-col {
+110 |   min-width: 300px; /* Etwas kleiner für bessere Anpassung */
+111 |   /* max-width: 420px; */ /* Max-Breite kann oft weggelassen werden, wenn cols gesetzt sind */
+112 | }
+113 | 
+114 | .d-flex {
+115 |   display: flex;
+116 | }
+117 | 
+118 | .flex-grow-1 {
+119 |   flex-grow: 1;
+120 | }
+121 | </style>
+```
+
+src/components/overview/MediaplanOptionsMenu.vue
+```
+1 | <template>
+2 |   <v-menu v-model="isOpen" :close-on-content-click="false">
+3 |     <template v-slot:activator="{ props }">
+4 |       <v-btn icon="mdi-dots-vertical" variant="text" v-bind="props" @click.stop></v-btn>
+5 |     </template>
+6 | 
+7 |     <v-card min-width="280">
+8 |       <v-toolbar density="compact" color="white">
+9 |         <v-toolbar-title class="text-body-1 font-weight-medium">Options</v-toolbar-title>
+10 |         <v-spacer></v-spacer>
+11 |         <v-btn icon variant="text" color="primary" size="small" @click.stop="isOpen = false">
+12 |           <v-icon>mdi-close</v-icon>
+13 |         </v-btn>
+14 |       </v-toolbar>
+15 | 
+16 |       <v-list class="menu-list">
+17 |         <v-list-item @click.stop="handleAction('view')" class="menu-item">
+18 |           <template v-slot:prepend>
+19 |             <v-icon icon="mdi-eye" size="small"></v-icon>
+20 |           </template>
+21 |           <v-list-item-title>View Mediaplan</v-list-item-title>
+22 |         </v-list-item>
+23 | 
+24 |         <v-list-item @click.stop="handleAction('edit')" class="menu-item">
+25 |           <template v-slot:prepend>
+26 |             <v-icon icon="mdi-pencil-outline" size="small"></v-icon>
+27 |           </template>
+28 |           <v-list-item-title>Edit base data</v-list-item-title>
+29 |         </v-list-item>
+30 | 
+31 |         <v-list-item @click.stop="handleAction('addPo')" class="menu-item">
+32 |           <template v-slot:prepend>
+33 |             <v-icon icon="mdi-plus" size="small"></v-icon>
+34 |           </template>
+35 |           <v-list-item-title>Add PO Number</v-list-item-title>
+36 |         </v-list-item>
+37 | 
+38 |         <v-list-item @click.stop="handleAction('export')" class="menu-item">
+39 |           <template v-slot:prepend>
+40 |             <v-icon icon="mdi-download" size="small"></v-icon>
+41 |           </template>
+42 |           <v-list-item-title>Export Mediaplan</v-list-item-title>
+43 |         </v-list-item>
+44 | 
+45 |         <v-list-item @click.stop="handleAction('duplicate')" class="menu-item">
+46 |           <template v-slot:prepend>
+47 |             <v-icon icon="mdi-content-copy" size="small"></v-icon>
+48 |           </template>
+49 |           <v-list-item-title>Duplicate MediaPlan</v-list-item-title>
+50 |         </v-list-item>
+51 | 
+52 |         <v-list-item @click.stop="handleAction('archive')" class="menu-item">
+53 |           <template v-slot:prepend>
+54 |             <v-icon icon="mdi-archive-outline" size="small"></v-icon>
+55 |           </template>
+56 |           <v-list-item-title>Archive Mediaplan</v-list-item-title>
+57 |         </v-list-item>
+58 | 
+59 |         <v-list-item @click.stop="handleAction('delete')" class="menu-item">
+60 |           <template v-slot:prepend>
+61 |             <v-icon icon="mdi-delete-outline" size="small"></v-icon>
+62 |           </template>
+63 |           <v-list-item-title>Delete MediaPlan</v-list-item-title>
+64 |         </v-list-item>
+65 |       </v-list>
+66 |     </v-card>
+67 |   </v-menu>
+68 | </template>
+69 | 
+70 | <script setup lang="ts">
+71 | import {ref} from 'vue';
+72 | 
+73 | // Props
+74 | const props = defineProps<{
+75 |   mediaplanId: string;
+76 | }>();
+77 | 
+78 | // Emit events
+79 | const emit = defineEmits<{
+80 |   (e: 'action', action: string, mediaplanId: string): void;
+81 | }>();
+82 | 
+83 | // State
+84 | const isOpen = ref(false);
+85 | 
+86 | // Methods
+87 | const handleAction = (action: string) => {
+88 |   // Prevent event propagation
+89 |   event?.stopPropagation();
+90 |   
+91 |   emit('action', action, props.mediaplanId);
+92 |   isOpen.value = false;
+93 | };
+94 | </script>
+95 | 
+96 | <style scoped>
+97 | .menu-list .v-list-item {
+98 |   border-top: 1px solid #e0e0e0;
+99 | }
+100 | 
+101 | </style>
+```
+
+src/components/overview/PaginationControls.vue
+```
 ```
 
 src/components/project/CampaignListView.vue

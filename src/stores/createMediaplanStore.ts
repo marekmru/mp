@@ -2,6 +2,8 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type { PONumber } from '@/types/mediaplan';
+import customFetch from "../helpers/customFetch.ts";
+import type {Mediaplan} from "../types";
 // useSourcesStore is no longer needed here directly for brands
 // import { useSourcesStore } from './sourcesStore';
 
@@ -77,20 +79,22 @@ export const useCreateMediaplanStore = defineStore('createMediaplan', () => {
     }
 
     // Mediaplan creation logic (example, can be expanded)
-    async function createMediaplan(mediaplanData: any): Promise<any> {
+    async function createMediaplan(mediaplanData: Mediaplan): Promise<Mediaplan | null> {
         isLoading.value = true;
         error.value = null;
         try {
-            // Simulate API call
-            console.log('Simulating mediaplan creation with data:', mediaplanData);
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            const mockMediaplanId = `mp-${Date.now()}`;
-            // In a real API call, you would return the created mediaplan object
-            return { _id: mockMediaplanId, ...mediaplanData };
+            // Actual API call to POST /mediaplans
+            const newMediaplan = await customFetch('mediaplans', {
+                method: 'POST',
+                body: JSON.stringify(mediaplanData),
+            }) as Mediaplan; // Assuming the response is the created Mediaplan object
+            return newMediaplan;
         } catch (err) {
             error.value = err instanceof Error ? err.message : 'Error creating mediaplan';
-            console.error(error.value, err);
-            throw err;
+            console.error('Error creating mediaplan:', err);
+            // Optionally, you might want to emit an error event or rethrow
+            // depending on how you want to handle errors globally vs. locally
+            return null; // Or throw err;
         } finally {
             isLoading.value = false;
         }
