@@ -12,7 +12,6 @@
       <v-form ref="form" @submit.prevent="submitForm" class="mt-2">
         <v-card-text class="pa-0">
           <v-row>
-            <!-- Left column -->
             <v-col cols="12" md="6">
               <div class="mb-4">
                 <label for="client-department" class="text-body-2 mb-1 d-block">Client Department</label>
@@ -30,14 +29,13 @@
                 <v-select
                     id="brand-select"
                     v-model="formData.brand"
-                    :items="brands"
-                    item-title="name"
+                    :items="componentBrands" item-title="name"
                     item-value="_id"
                     placeholder="Select the brand for this PO"
                     :rules="[v => !!v || 'Brand is required']"
                     variant="outlined"
                     hide-details
-                />
+                    :loading="isLoadingBrands"/>
               </div>
 
               <div class="mb-4">
@@ -81,7 +79,6 @@
               </div>
             </v-col>
 
-            <!-- Right column -->
             <v-col cols="12" md="6">
               <div class="mb-4">
                 <label for="po-number" class="text-body-2 mb-1 d-block">PO Number*</label>
@@ -105,7 +102,7 @@
                       type="number"
                       :rules="[
                         v => !!v || 'Budget is required',
-                        v => v > 0 || 'Budget must be greater than 0'
+                        v => parseFloat(v) > 0 || 'Budget must be greater than 0'
                       ]"
                       variant="outlined"
                       class="mb-4"
@@ -169,7 +166,7 @@
             cancel-text="Cancel"
             confirm-text="Create PO"
             :loading="isSubmitting"
-            :disabled="!form?.isValid"
+            :disabled="!form?.isValid || isLoadingBrands"
             :submit-button="true"
             @cancel="cancelDialog"
         />
@@ -179,85 +176,72 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue';
+import {ref, reactive, computed, onMounted} from 'vue';
 import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
-import { useCreateMediaplanStore } from '@/stores/createMediaplanStore';
-import type { Brand, PONumber } from '@/types/mediaplan';
+import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
+import {useSourcesStore} from '@/stores/sourcesStore';
+import type {Brand, PONumber} from '@/types/mediaplan';
 import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
 import DateRangePicker from "./DateRangePicker.vue";
-import { showSuccess, showError, showWarning } from '@/helpers/notificationUtils';
-import { formatCurrency } from '@/helpers/currencyUtils';
+import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
+import {formatCurrency} from '@/helpers/currencyUtils';
 
-// Props
 const props = defineProps<{
   modelValue: boolean;
   initialBrandId?: string;
 }>();
 
-// Emits
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;
   (e: 'created', po: PONumber): void;
 }>();
 
-// References and computed values
-const form = ref();
+const form = ref<any>();
 const createMediaplanStore = useCreateMediaplanStore();
+const sourcesStore = useSourcesStore();
+
 const dialog = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
 });
 
-// Date range for the DateRangePicker
 const dateRange = ref<[string, string] | null>(null);
-
-// Loading state
 const isSubmitting = ref(false);
 
-// Brands from store
-const brands = computed(() => createMediaplanStore.brands);
+const componentBrands = ref<Brand[]>([]);
+const isLoadingBrands = ref(false);
 
 const markets = ref([
-  { _id: 'de', name: 'Germany' },
-  { _id: 'us', name: 'United States' },
-  { _id: 'uk', name: 'United Kingdom' },
-  { _id: 'fr', name: 'France' },
-  { _id: 'it', name: 'Italy' },
-  { _id: 'es', name: 'Spain' },
-  { _id: 'pl', name: 'Poland' },
+  {_id: 'de', name: 'Germany'},
+  {_id: 'us', name: 'United States'},
+  {_id: 'uk', name: 'United Kingdom'},
 ]);
 
-const currencies = ref(['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'PLN']);
+const currencies = ref(['EUR', 'USD', 'GBP', 'PLN']);
 
-// Form data
 const formData = reactive({
   clientDepartment: '',
-  brand: props.initialBrandId || '',
+  brand: '',
   clientName: '',
   market: '',
   purpose: '',
   poNumber: '',
-  budget: 0,
+  budget: null as number | null,
   currency: 'EUR',
   contractorDepartment: '',
   contractorName: ''
 });
 
-// Methods
 const submitForm = async () => {
   if (!form.value) return;
-
-  const { valid } = await form.value.validate();
+  const {valid} = await form.value.validate();
   if (!valid) return;
 
   isSubmitting.value = true;
-
   try {
-    // Create the PO through the store
     const newPO = await createMediaplanStore.createPO({
       name: formData.poNumber,
       value: Number(formData.budget),
-      // Pass the dateRange values to the API
       metadata: {
         clientDepartment: formData.clientDepartment,
         brand: formData.brand,
@@ -265,72 +249,62 @@ const submitForm = async () => {
         market: formData.market,
         purpose: formData.purpose,
         currency: formData.currency,
-        validFrom: dateRange.value ? dateRange.value[0] : '',
-        validTo: dateRange.value ? dateRange.value[1] : '',
+        validFrom: dateRange.value ? dateRange.value[0] : undefined,
+        validTo: dateRange.value ? dateRange.value[1] : undefined,
         contractorDepartment: formData.contractorDepartment,
         contractorName: formData.contractorName
       }
     });
 
-    // Show success message with formatted currency
     showSuccess(
-      `PO "${formData.poNumber}" created successfully with budget ${formatCurrency(Number(formData.budget), { currency: formData.currency })}`
+        `PO "${formData.poNumber}" created successfully with budget ${formatCurrency(Number(formData.budget))}`
     );
-
-    // Emit the created event with the new PO
     emit('created', newPO);
-
-    // Close the dialog
-    setTimeout(() => {
-      dialog.value = false;
-    }, 500);
+    dialog.value = false;
   } catch (error) {
     console.error('Error creating PO:', error);
-    showError('Failed to create PO. Please try again.', { timeout: 8000 });
+    showError('Failed to create PO. Please try again.');
   } finally {
     isSubmitting.value = false;
   }
 };
 
 const cancelDialog = () => {
-  if (isSubmitting.value) {
-    showWarning('Please wait while the form is submitting...');
-    return;
-  }
   dialog.value = false;
 };
 
-// Lifecycle
 onMounted(async () => {
-  // Set default dates (today to 1 year from now)
   const today = new Date();
   const nextYear = new Date(today);
   nextYear.setFullYear(today.getFullYear() + 1);
+  dateRange.value = [today.toISOString().split('T')[0], nextYear.toISOString().split('T')[0]];
 
-  const todayStr = today.toISOString().split('T')[0];
-  const nextYearStr = nextYear.toISOString().split('T')[0];
-
-  // Set the default date range
-  dateRange.value = [todayStr, nextYearStr];
-
-  // Initialize with the brand from the prop if provided
-  if (props.initialBrandId) {
-    formData.brand = props.initialBrandId;
-  } else if (brands.value.length > 0) {
-    // Set the first brand as default if no initial brand is provided
-    formData.brand = brands.value[0]._id;
-  }
-
-  // Make sure brands are loaded
-  if (brands.value.length === 0) {
-    try {
-      await createMediaplanStore.fetchBrands();
-      if (brands.value.length > 0 && !formData.brand) {
-        formData.brand = brands.value[0]._id;
+  isLoadingBrands.value = true;
+  try {
+    let brandList = sourcesStore.getSourceList('brand') as Brand[] | undefined;
+    if (!brandList || brandList.length === 0) {
+      const fetchSuccess = await sourcesStore.fetchSources('creation', 'mediaplan');
+      if (fetchSuccess) {
+        brandList = sourcesStore.getSourceList('brand') as Brand[] | undefined;
+      } else {
+        showError(sourcesStore.error || 'Failed to fetch brand sources.');
       }
-    } catch (error) {
-      showError('Failed to load brands. Please try again later.');
     }
+    componentBrands.value = brandList || [];
+
+    if (props.initialBrandId && componentBrands.value.some(b => b._id === props.initialBrandId)) {
+      formData.brand = props.initialBrandId;
+    } else if (componentBrands.value.length > 0) {
+      formData.brand = componentBrands.value[0]._id;
+    } else {
+      formData.brand = '';
+    }
+
+  } catch (error) {
+    showError('Failed to load brands. Please try again later.');
+    console.error("Error loading brands in CreatePoDialog:", error);
+  } finally {
+    isLoadingBrands.value = false;
   }
 });
 </script>

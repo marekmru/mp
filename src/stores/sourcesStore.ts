@@ -18,7 +18,7 @@ export const useSourcesStore = defineStore('sources', () => {
 
     const getSourceList = computed(() => {
 
-        const tmp =  (dimensionKey: string): Array<Source | Brand | Record<string, any>> | undefined => {
+        const tmp = (dimensionKey: string): Array<Source | Brand | Record<string, any>> | undefined => {
             return sourcesData.value[dimensionKey];
         };
         return tmp
@@ -44,7 +44,6 @@ export const useSourcesStore = defineStore('sources', () => {
                     sourcesData.value[key] = data[key];
                 }
             }
-            console.log(sourcesData.value)
             currentType.value = type;
             currentLevel.value = level;
 

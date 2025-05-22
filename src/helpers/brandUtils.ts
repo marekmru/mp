@@ -37,7 +37,7 @@ export const getBrandLogo = (brand?: Brand | EntityReference | string): string =
     return brand.logo;
   }
 
-  return brandLogos[brand.name] || '/img/brands/logoipsum.svg';
+  return brandLogos[brand.abbreviation] || '/img/brands/logoipsum.svg';
 };
 /**
  * Gets brand initials for brands without logos
