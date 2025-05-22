@@ -5,7 +5,6 @@
       <v-col>
         <MediaplanFilters
             :filters="filters"
-            :sources="sources"
             :loading="isLoading"
             :sort-by="sortBy"
             :sort-order="sortOrder"
@@ -60,7 +59,6 @@ const totalPages  = computed(() => store.totalPages);
 const totalItems  = computed(() => store.totalItems);
 const mediaplans  = computed(() => store.mediaplans);
 const isLoading   = computed(() => store.isLoading);
-const sources     = computed(() => store.sources);
 
 // --- Dialog control ---
 const showCreateMediaplanDialog = ref(false);

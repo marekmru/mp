@@ -52,7 +52,7 @@ export const useProjectStore = defineStore('project', () => {
             queryParams.append('page', currentPage.value.toString());
             queryParams.append('per_page', perPage.value.toString());
 
-            const url = `/mediaplans/${mediaplanId}/projects?${queryParams.toString()}`;
+            const url = `mediaplans/${mediaplanId}/projects?${queryParams.toString()}`;
             const response = await customFetch(url) as ProjectListResponse;
 
             projects.value = response.items;
@@ -73,7 +73,7 @@ export const useProjectStore = defineStore('project', () => {
         error.value = null;
 
         try {
-            const url = `/mediaplans/${mediaplanId}/projects/${projectId}`;
+            const url = `mediaplans/${mediaplanId}/projects/${projectId}`;
             const response = await customFetch(url) as Project;
             selectedProject.value = response;
             return response;
@@ -91,7 +91,7 @@ export const useProjectStore = defineStore('project', () => {
         error.value = null;
 
         try {
-            const url = `/mediaplans/${projectData.mediaplanId}/projects`;
+            const url = `mediaplans/${projectData.mediaplanId}/projects`;
 
             // For our implementation, we need to adjust the data structure to match the API expectations
             const payload = {

@@ -59,7 +59,7 @@ export const useLineitemStore = defineStore('lineItem', () => {
         error.value = null;
         try {
             // Construct the API URL
-            const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems`;
+            const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems`;
 
             // Make the API call
             // Expecting LineitemListResponse which is currently typed as Lineitem[]
@@ -120,7 +120,7 @@ export const useLineitemStore = defineStore('lineItem', () => {
         error.value = null;
         selectedLineitem.value = null; // Reset before fetching
         try {
-            const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems/${lineItemId}`;
+            const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems/${lineItemId}`;
             const response = (await customFetch(url)) as Lineitem;
             selectedLineitem.value = {
                 ...response,
@@ -163,7 +163,7 @@ export const useLineitemStore = defineStore('lineItem', () => {
         isLoading.value = true; // Consider a separate loading state
         error.value = null;
         try {
-            const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems`;
+            const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems`;
             const newLinteItem = (await customFetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

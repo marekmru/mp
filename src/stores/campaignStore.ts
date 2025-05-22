@@ -55,7 +55,7 @@ export const useCampaignStore = defineStore('campaign', () => {
             // queryParams.append('sort', sortBy.value);
             // queryParams.append('order', sortOrder.value);
 
-            const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns?${queryParams.toString()}`;
+            const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns?${queryParams.toString()}`;
 
             // Annahme: API liefert paginierte Antwort
             const response = await customFetch(url) as CampaignListResponse;
@@ -108,7 +108,7 @@ export const useCampaignStore = defineStore('campaign', () => {
         error.value = null;
         selectedCampaign.value = null; // Reset
         try {
-            const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}`;
+            const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}`;
             selectedCampaign.value = await customFetch(url) as Campaign;
         } catch (err) {
             error.value = err instanceof Error ? err.message : 'Failed to load campaign details';
@@ -160,7 +160,7 @@ export const useCampaignStore = defineStore('campaign', () => {
         isLoading.value = true;
         error.value = null;
         try {
-            const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns`;
+            const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns`;
             const newCampaign = await customFetch(url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},

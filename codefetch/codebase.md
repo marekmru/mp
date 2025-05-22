@@ -63,20 +63,18 @@ package.json
 17 |     "path": "^0.12.7",
 18 |     "pinia": "^3.0.1",
 19 |     "sass": "^1.85.1",
-20 |     "vee-validate": "^4.15.0",
-21 |     "vue": "^3.5.13",
-22 |     "vue-router": "4",
-23 |     "vuetify": "^3.7.16",
-24 |     "yup": "^1.6.1"
-25 |   },
-26 |   "devDependencies": {
-27 |     "@vitejs/plugin-vue": "^5.2.1",
-28 |     "@vue/tsconfig": "^0.7.0",
-29 |     "typescript": "~5.7.2",
-30 |     "vite": "^6.2.0",
-31 |     "vue-tsc": "^2.2.4"
-32 |   }
-33 | }
+20 |     "vue": "^3.5.13",
+21 |     "vue-router": "4",
+22 |     "vuetify": "^3.7.16"
+23 |   },
+24 |   "devDependencies": {
+25 |     "@vitejs/plugin-vue": "^5.2.1",
+26 |     "@vue/tsconfig": "^0.7.0",
+27 |     "typescript": "~5.7.2",
+28 |     "vite": "^6.2.0",
+29 |     "vue-tsc": "^2.2.4"
+30 |   }
+31 | }
 ```
 
 tsconfig.app.json
@@ -599,128 +597,123 @@ src/helpers/currencyUtils.ts
 
 src/helpers/customFetch.ts
 ```
-1 | // customFetch.ts
-2 | 
-3 | import emitter from '@/helpers/emitter'
-4 | 
-5 | const baseURL = `${import.meta.env.VITE_API_BASE_MEDIAPLAN}`
-6 | const baseURLCore4 = `${import.meta.env.VITE_API_BASE_CORE4}`
-7 | let ti = null
-8 | const customFetch = async (url: string, options: RequestInit = {}) => {
-9 |     // Request interceptor
-10 |     clearTimeout(ti)
-11 |     try {
-12 |         const userLS = localStorage.getItem('user')
-13 |         if (userLS != null) {
-14 |             const user = JSON.parse(userLS)
-15 |             options.headers = {
-16 |                 ...options.headers,
-17 |                 Authorization: `Bearer ${user.token}`,
-18 |             }
-19 |         } else {
-20 |             // throw new Error('User not found in localStorage')
-21 |         }
-22 | 
-23 |         // const token = JSON.parse(user).token
-24 |         // const response = await fetch(`${baseURL}${url}?token=${token}`, options)
-25 |         const response = await fetch(`${baseURL}${url}`, options)
-26 |         // Response interceptor
-27 |         if (response.status === 401) {
-28 |             localStorage.removeItem('user')
-29 | 
-30 |             if (window.location.hostname === 'localhost') {
-31 |                 await navigateTo('/login')
-32 |             } else {
-33 |                 window.location.href = `${baseURLCore4}login?next=${baseURL}#/`
-34 |             }
-35 |             throw new Error('Unauthorized')
-36 |             /* } else if (response.status >= 412) { */
-37 |         } else if (response.status >= 400 && response.status < 500) {
-38 |             // Client-side error (400-499)
-39 |             const errorData = await response.json() // If your API returns error details in JSON format
-40 |             emitter.emit('error', errorData)
-41 | 
-42 |             throw new Error(`Client error! status: ${response.status}, message: ${errorData.message || errorData.data}`)
-43 |         } else if (response.status >= 500) {
-44 |             const errorData = await response.json() // If your API returns error details in JSON format
-45 | 
-46 |             // Server-side error (500-599)
-47 |             emitter.emit('error', errorData)
-48 |             throw new Error(`Server error! status: ${response.status}`)
-49 |         }
-50 | 
-51 |         if (!response.ok) {
-52 |             throw new Error(`HTTP error! status: ${response.status}`)
-53 |         }
-54 | 
-55 |         // Dispatch 'cud-event' for PUT, POST, DELETE methods
-56 | 
-57 |         // Unpack the data from the response
-58 |         const responseText = await response.text()
-59 |         // Replace "NaN" string with null
-60 |         // Parse the sanitized response text as JSON
-61 |         const data = JSON.parse(responseText)
-62 | 
-63 |         // const data = await response.json()
-64 |         return data
-65 |     } catch (error) {
-66 |         console.error('Fetch error: ', error)
-67 |         throw error
-68 |     }
-69 | }
-70 | 
-71 | export const customFetchCore4 = async (url: string, options: RequestInit = {}) => {
-72 |     // Request interceptor
-73 |     try {
-74 |         if (!url.includes('login')) {
-75 |             const userLS = localStorage.getItem('user')
-76 |             if (userLS != null) {
-77 |                 const user = JSON.parse(userLS)
-78 |                 options.headers = {
-79 |                     ...options.headers,
-80 |                     Authorization: `Bearer ${user.token}`,
-81 |                 }
-82 |             } else {
-83 |                 throw new Error('User not found in localStorage')
-84 |             }
-85 |         }
-86 | 
-87 |         const response = await fetch(`${baseURLCore4}${url}`, options);
-88 | 
-89 |         if (!response.ok) { // This is the KEY CHANGE: Handle errors *before* trying to parse JSON
-90 |             let errorData;
-91 |             try {
-92 |                 errorData = await response.json(); // Attempt to get JSON error details
-93 |             } catch (jsonError) {
-94 |                 // If parsing JSON fails (e.g., the response is plain text), use a generic message
-95 |                 errorData = { message: 'An error occurred', status: response.status };
+1 | import emitter from '@/helpers/emitter';
+2 | import router from '@/router';
+3 | 
+4 | const baseURL = `${import.meta.env.VITE_API_BASE_MEDIAPLAN}`;
+5 | const baseURLCore4 = `${import.meta.env.VITE_API_BASE_CORE4}`;
+6 | 
+7 | let isRedirecting = false;
+8 | 
+9 | const customFetch = async (url: string, options: RequestInit = {}) => {
+10 |     try {
+11 |         const userLS = localStorage.getItem('user');
+12 |         if (userLS != null) {
+13 |             const user = JSON.parse(userLS);
+14 |             options.headers = {
+15 |                 ...options.headers,
+16 |                 Authorization: `Bearer ${user.token}`,
+17 |             };
+18 |         }
+19 | 
+20 |         const response = await fetch(`${baseURL}${url}`, options);
+21 | 
+22 |         if (response.status === 401) {
+23 |             localStorage.removeItem('user');
+24 |             emitter.emit('unauthorized');
+25 | 
+26 |             if (!isRedirecting && router.currentRoute.value.name !== 'Login') {
+27 |                 isRedirecting = true;
+28 |                 router.push({ name: 'Login' }).finally(() => {
+29 |                     isRedirecting = false;
+30 |                 });
+31 |             }
+32 |             throw new Error('Unauthorized');
+33 |         } else if (response.status >= 400 && response.status < 500) {
+34 |             const errorData = await response.json();
+35 |             emitter.emit('error', errorData);
+36 |             throw new Error(`Client error! status: ${response.status}, message: ${errorData.message || errorData.data}`);
+37 |         } else if (response.status >= 500) {
+38 |             const errorData = await response.json();
+39 |             emitter.emit('error', errorData);
+40 |             throw new Error(`Server error! status: ${response.status}`);
+41 |         }
+42 | 
+43 |         if (!response.ok) {
+44 |             throw new Error(`HTTP error! status: ${response.status}`);
+45 |         }
+46 | 
+47 |         const responseText = await response.text();
+48 |         const data = JSON.parse(responseText);
+49 | 
+50 |         return data;
+51 |     } catch (error) {
+52 |         console.error('Fetch error in customFetch: ', error);
+53 |         throw error;
+54 |     }
+55 | 
+56 | };
+57 | 
+58 | export const customFetchCore4 = async (url:string, options: RequestInit = {}) => {
+59 |     try {
+60 |         if (!url.includes('login') && !url.includes('profile')) {
+61 |             const userLS = localStorage.getItem('user')
+62 |             if (userLS != null) {
+63 |                 const user = JSON.parse(userLS)
+64 |                 if (user.token) {
+65 |                     options.headers = {
+66 |                         ...options.headers,
+67 |                         Authorization: `Bearer ${user.token}`,
+68 |                     }
+69 |                 } else if (!url.endsWith('login')) {
+70 |                     throw new Error('User token not found in localStorage for Core4 fetch');
+71 |                 }
+72 |             } else if (!url.endsWith('login')) {
+73 |                 throw new Error('User not found in localStorage for Core4 fetch');
+74 |             }
+75 |         } else if (url.includes('profile')) {
+76 |             const userLS = localStorage.getItem('user')
+77 |             if (userLS != null) {
+78 |                 const user = JSON.parse(userLS)
+79 |                 if (user.token) {
+80 |                     options.headers = {
+81 |                         ...options.headers,
+82 |                         Authorization: `Bearer ${user.token}`,
+83 |                     }
+84 |                 }
+85 |             }
+86 |         }
+87 | 
+88 |         const response = await fetch(`${baseURLCore4}${url}`, options);
+89 | 
+90 |         if (!response.ok) {
+91 |             let errorData;
+92 |             try {
+93 |                 errorData = await response.json();
+94 |             } catch (jsonError) {
+95 |                 errorData = { message: `An error occurred (${response.status})`, status: response.status };
 96 |             }
 97 | 
-98 |             // Construct an error object that mimics the structure expected by your component
-99 |             const error = new Error(errorData.message || 'An error occurred');
-100 |             (error as any).response = { // Add the .response property
-101 |                 status: response.status,
-102 |                 data: errorData,
-103 |             };
-104 |             throw error; // Reject the promise with the structured error
-105 |         }
-106 | 
-107 |         // If the response *is* OK, proceed as before
-108 |         let data;
-109 |         try {
-110 |             data = await response.json();
-111 |         } catch (err) {
-112 |             data = response; //  Handle cases where response might not be JSON
-113 |         }
-114 |         return data;
-115 | 
-116 |     } catch (error) {
-117 |         console.error('Fetch error: ', error);
-118 |         throw error; // Re-throw the (possibly modified) error
-119 |     }
-120 | };
-121 | 
-122 | export default customFetch
+98 |             const error = new Error(errorData.message || `An error occurred (${response.status})`);
+99 |             (error as any).response = {
+100 |                 status: response.status,
+101 |                 data: errorData,
+102 |             };
+103 |             throw error;
+104 |         }
+105 |         const contentType = response.headers.get("content-type");
+106 |         if (contentType && contentType.includes("application/json")) {
+107 |             return await response.json();
+108 |         }
+109 |         return await response.text();
+110 | 
+111 |     } catch (error) {
+112 |         console.error('Fetch error in customFetchCore4: ', error);
+113 |         throw error;
+114 |     }
+115 | };
+116 | 
+117 | export default customFetch;
 ```
 
 src/helpers/dateUtils.ts
@@ -3914,37 +3907,6 @@ src/mocks/swagger_mp.yaml
 2409 |         labels:
 2410 |           type: array
 2411 |           items:
-2412 |             type: string
-2413 |           description: Labels associated with project
-2414 |         lock_state:
-2415 |           type: integer
-2416 |           description: Lock state of the project.
-2417 |         owner:
-2418 |           type: string
-2419 |           description: Owner of the project.
-2420 |         updated_at:
-2421 |           type: string
-2422 |           format: date-time
-2423 |           nullable: true
-2424 |           description: Project last update timestamp.
-2425 |         uploaded_at:
-2426 |           type: string
-2427 |           format: date-time
-2428 |           description: Project upload timestamp.
-2429 |         # Optional fields based on mock data (add here if part of schema)
-2430 |         duration:
-2431 |           type: object
-2432 |           properties:
-2433 |             start_date:
-2434 |               type: string
-2435 |               format: date-time
-2436 |             end_date:
-2437 |               type: string
-2438 |               format: date-time
-2439 |             formatted:
-2440 |               type: string
-2441 |         detail:
-2442 |           type: string
 [TRUNCATED]
 ```
 
@@ -4238,7 +4200,7 @@ src/stores/campaignStore.ts
 55 |             // queryParams.append('sort', sortBy.value);
 56 |             // queryParams.append('order', sortOrder.value);
 57 | 
-58 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns?${queryParams.toString()}`;
+58 |             const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns?${queryParams.toString()}`;
 59 | 
 60 |             // Annahme: API liefert paginierte Antwort
 61 |             const response = await customFetch(url) as CampaignListResponse;
@@ -4291,7 +4253,7 @@ src/stores/campaignStore.ts
 108 |         error.value = null;
 109 |         selectedCampaign.value = null; // Reset
 110 |         try {
-111 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}`;
+111 |             const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}`;
 112 |             selectedCampaign.value = await customFetch(url) as Campaign;
 113 |         } catch (err) {
 114 |             error.value = err instanceof Error ? err.message : 'Failed to load campaign details';
@@ -4343,7 +4305,7 @@ src/stores/campaignStore.ts
 160 |         isLoading.value = true;
 161 |         error.value = null;
 162 |         try {
-163 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns`;
+163 |             const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns`;
 164 |             const newCampaign = await customFetch(url, {
 165 |                 method: 'POST',
 166 |                 headers: {'Content-Type': 'application/json'},
@@ -4565,7 +4527,7 @@ src/stores/lineitemStore.ts
 59 |         error.value = null;
 60 |         try {
 61 |             // Construct the API URL
-62 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems`;
+62 |             const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems`;
 63 | 
 64 |             // Make the API call
 65 |             // Expecting LineitemListResponse which is currently typed as Lineitem[]
@@ -4626,7 +4588,7 @@ src/stores/lineitemStore.ts
 120 |         error.value = null;
 121 |         selectedLineitem.value = null; // Reset before fetching
 122 |         try {
-123 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems/${lineItemId}`;
+123 |             const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems/${lineItemId}`;
 124 |             const response = (await customFetch(url)) as Lineitem;
 125 |             selectedLineitem.value = {
 126 |                 ...response,
@@ -4669,7 +4631,7 @@ src/stores/lineitemStore.ts
 163 |         isLoading.value = true; // Consider a separate loading state
 164 |         error.value = null;
 165 |         try {
-166 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems`;
+166 |             const url = `mediaplans/${mediaplanId}/projects/${projectId}/campaigns/${campaignId}/lineitems`;
 167 |             const newLinteItem = (await customFetch(url, {
 168 |                 method: 'POST',
 169 |                 headers: { 'Content-Type': 'application/json' },
@@ -4724,201 +4686,178 @@ src/stores/lineitemStore.ts
 
 src/stores/mediaplanStore.ts
 ```
-1 | // File: src/stores/mediaplanStore.ts
-2 | import {defineStore} from 'pinia';
-3 | import {ref, computed} from 'vue';
-4 | import  customFetch from '@/helpers/customFetch';
-5 | import type {
-6 |     FilterSources,
-7 |     Mediaplan,
-8 |     MediaplanFilter,
-9 |     MediaplanListResponse,
-10 |     SourcesResponse
-11 | } from '@/types';
-12 | 
-13 | export const useMediaplanStore = defineStore('mediaplan', () => {
-14 |     // --- State ---
-15 |     const sources = ref<FilterSources>({
-16 |         brands: [
-17 |             {_id: 'bmw', name: 'BMW'},
-18 |             {_id: 'mini', name: 'MINI'}
-19 |         ],
-20 |         countries: [
-21 |             {abbreviation: 'DE', value: 'Germany', category: null},
-22 |             {abbreviation: 'AT', value: 'Austria', category: null},
-23 |             // …other mock countries…
-24 |         ],
-25 |         subsegments: [],
-26 |         products: [],
-27 |         campaigntypes: [],
-28 |         languages: []
-29 |     });
-30 |     const mediaplans = ref<Mediaplan[]>([]);
-31 |     const isLoading = ref(false);
-32 |     const error = ref<string | null>(null);
-33 |     const selectedMediaplan = ref<Mediaplan | null>(null)
+1 | import {defineStore} from 'pinia';
+2 | import {ref, computed} from 'vue';
+3 | import customFetch from '@/helpers/customFetch';
+4 | import type {
+5 |     Mediaplan,
+6 |     MediaplanFilter,
+7 |     Brand,
+8 |     Source
+9 | } from '@/types';
+10 | import {useSourcesStore} from './sourcesStore';
+11 | 
+12 | interface ActualMediaplanListResponse {
+13 |     _id?: string;
+14 |     version?: string;
+15 |     timestamp?: string;
+16 |     code?: number;
+17 |     message?: string;
+18 |     data: Mediaplan[];
+19 |     count?: number;
+20 |     page?: number;
+21 |     page_count?: number;
+22 |     per_page?: number;
+23 |     total_count?: number;
+24 | 
+25 |     items?: Mediaplan[];
+26 |     total_items?: number;
+27 |     total_pages?: number;
+28 |     current_page?: number;
+29 | }
+30 | 
+31 | 
+32 | export const useMediaplanStore = defineStore('mediaplan', () => {
+33 |     const sourcesStore = useSourcesStore();
 34 | 
-35 | 
-36 |     // Pagination
-37 |     const totalItems = ref(0);
-38 |     const totalPages = ref(0);
-39 |     const currentPage = ref(0);
-40 |     const perPage = ref(10);
-41 | 
-42 |     // Filters & Sorting
-43 |     const filters = ref<MediaplanFilter>({search: '', status: ''});
-44 |     const sortBy = ref('updated_at');
-45 |     const sortOrder = ref<'asc' | 'desc'>('desc');
-46 | 
-47 |     const hasFilters = computed(() =>
-48 |         !!(
-49 |             filters.value.search ||
-50 |             filters.value.status ||
-51 |             filters.value.brand_id ||
-52 |             filters.value.country
-53 |         )
-54 |     );
-55 | 
-56 |     // --- Actions ---
-57 |     /** Load real source‐lists (when API is available) */
-58 |     async function fetchSources() {
-59 |         isLoading.value = true;
-60 |         try {
-61 |             const res = await customFetch('/mediaplans/sources?type=overview') as SourcesResponse;
-62 |             sources.value = {
-63 |                 brands: res.data.brand ?? [],
-64 |                 countries: res.data.country ?? [],
-65 |                 subsegments: res.data.subsegment ?? [],
-66 |                 products: res.data.product ?? [],
-67 |                 campaigntypes: res.data.campaigntype ?? [],
-68 |                 languages: res.data.language ?? []
-69 |             };
-70 |         } catch {
-71 |             // keep the mock data
-72 |         } finally {
-73 |             isLoading.value = false;
-74 |         }
-75 |     }
-76 | 
-77 | // Inside defineStore in mediaplanStore.ts
-78 | 
-79 | 
-80 |     /**
-81 |      * Fetch a single Mediaplan by ID
-82 |      */
-83 |     async function fetchMediaplan(id: string) {
-84 |         isLoading.value = true
-85 |         error.value = null
-86 |         try {
-87 |             const res = await customFetch(`/mediaplans/${id}`) as Mediaplan
-88 |             selectedMediaplan.value = res
-89 |         } catch (err) {
-90 |             selectedMediaplan.value = null
-91 |             error.value = err instanceof Error ? err.message : 'Error fetching mediaplan'
-92 |         } finally {
-93 |             isLoading.value = false
-94 |         }
-95 |     }
-96 | 
-97 |     /** Fetch paginated & filtered list */
-98 |     async function fetchMediaplans() {
-99 |         isLoading.value = true;
-100 |         error.value = null;
-101 |         try {
-102 |             const params = new URLSearchParams({
-103 |                 page: currentPage.value.toString(),
-104 |                 per_page: perPage.value.toString(),
-105 |                 sort: sortBy.value,
-106 |                 order: sortOrder.value,
-107 |             });
-108 | 
-109 |             // apply filters
-110 |             const active: Record<string, any> = {};
-111 |             Object.entries(filters.value).forEach(([k, v]) => {
-112 |                 if (v !== '' && v != null) {
-113 |                     active[k] = v;
-114 |                 }
-115 |             });
-116 |             if (Object.keys(active).length) {
-117 |                 params.append('filter', JSON.stringify(active));
-118 |             }
-119 | 
-120 |             const url = `/mediaplans`
-121 |             // ?${params.toString()}`;
-122 |             const resp = await customFetch(url) as MediaplanListResponse;
-123 | 
-124 |             mediaplans.value = resp.items;
-125 |             totalItems.value = resp.total_items;
-126 |             totalPages.value = resp.total_pages;
-127 |             currentPage.value = resp.current_page;
-128 |         } catch (err) {
-129 |             error.value = err instanceof Error ? err.message : 'Error fetching mediaplans';
-130 |             mediaplans.value = [];
-131 |             totalItems.value = totalPages.value = 0;
-132 |         } finally {
-133 |             isLoading.value = false;
-134 |         }
-135 |     }
-136 | 
-137 |     /** Update a single filter and reload */
-138 |     function setFilter(key: keyof MediaplanFilter, value: unknown) {
-139 |         filters.value = {...filters.value, [key]: value};
-140 |         currentPage.value = 0;
-141 |         fetchMediaplans();
-142 |     }
-143 | 
-144 |     /** Clear all filters back to defaults */
-145 |     function clearFilters() {
-146 |         filters.value = {search: '', status: ''};
-147 |         currentPage.value = 0;
-148 |         fetchMediaplans();
-149 |     }
-150 | 
-151 |     /** Change sorting and reload */
-152 |     function setSorting(field: string, order: 'asc' | 'desc') {
-153 |         sortBy.value = field;
-154 |         sortOrder.value = order;
-155 |         fetchMediaplans();
-156 |     }
-157 | 
-158 |     /** Change page and reload */
-159 |     function setPage(page: number) {
-160 |         currentPage.value = page;
-161 |         fetchMediaplans();
-162 |     }
-163 | 
-164 |     /** Initialize both sources and list */
-165 |     function init() {
-166 |        //  fetchSources();
-167 |         fetchMediaplans();
-168 |     }
-169 | 
-170 |     return {
-171 |         // state
-172 |         sources,
-173 |         mediaplans,
-174 |         selectedMediaplan,
-175 |         isLoading,
-176 |         error,
-177 |         totalItems,
-178 |         totalPages,
-179 |         currentPage,
-180 |         perPage,
-181 |         filters,
-182 |         sortBy,
-183 |         sortOrder,
-184 |         hasFilters,
-185 |         // actions
-186 |         fetchSources,
-187 |         fetchMediaplans,
-188 |         fetchMediaplan,
-189 |         setFilter,
-190 |         clearFilters,
-191 |         setSorting,
-192 |         setPage,
-193 |         init
-194 |     }
-195 | });
+35 |     const mediaplans = ref<Mediaplan[]>([]);
+36 |     const isLoading = ref(false);
+37 |     const error = ref<string | null>(null);
+38 |     const selectedMediaplan = ref<Mediaplan | null>(null);
+39 | 
+40 |     const totalItems = ref(0);
+41 |     const totalPages = ref(0);
+42 |     const currentPage = ref(0);
+43 |     const perPage = ref(10);
+44 | 
+45 |     const filters = ref<MediaplanFilter>({search: '', status: ''});
+46 |     const sortBy = ref('updated_at');
+47 |     const sortOrder = ref<'asc' | 'desc'>('desc');
+48 | 
+49 |     const hasFilters = computed(() =>
+50 |         !!(
+51 |             filters.value.search ||
+52 |             filters.value.status ||
+53 |             filters.value.brand_id ||
+54 |             filters.value.country
+55 |         )
+56 |     );
+57 | 
+58 |     const overviewFilterSources = computed(() => ({
+59 |         brands: (sourcesStore.getSourceList('brand') as Brand[] | undefined) || [],
+60 |         countries: (sourcesStore.getSourceList('country') as Source[] | undefined) || [],
+61 |         subsegments: (sourcesStore.getSourceList('subsegment') as Source[] | undefined) || [],
+62 |         products: (sourcesStore.getSourceList('product') as Source[] | undefined) || [],
+63 |         campaigntypes: (sourcesStore.getSourceList('campaigntype') as Source[] | undefined) || [],
+64 |         languages: (sourcesStore.getSourceList('language') as Source[] | undefined) || [],
+65 |     }));
+66 | 
+67 |     async function fetchMediaplan(id: string) {
+68 |         isLoading.value = true;
+69 |         error.value = null;
+70 |         try {
+71 |             const res = await customFetch(`mediaplans/${id}`) as Mediaplan;
+72 |             selectedMediaplan.value = (res as any).data || res;
+73 |         } catch (err) {
+74 |             selectedMediaplan.value = null;
+75 |             error.value = err instanceof Error ? err.message : 'Error fetching mediaplan';
+76 |         } finally {
+77 |             isLoading.value = false;
+78 |         }
+79 |     }
+80 | 
+81 |     async function fetchMediaplans() {
+82 |         isLoading.value = true;
+83 |         error.value = null;
+84 |         try {
+85 |             const params = new URLSearchParams({
+86 |                 page: currentPage.value.toString(),
+87 |                 per_page: perPage.value.toString(),
+88 |                 sort: sortBy.value,
+89 |                 order: sortOrder.value,
+90 |             });
+91 | 
+92 |             const active: Record<string, any> = {};
+93 |             Object.entries(filters.value).forEach(([k, v]) => {
+94 |                 if (v !== '' && v != null) {
+95 |                     active[k] = v;
+96 |                 }
+97 |             });
+98 |             if (Object.keys(active).length) {
+99 |                 params.append('filter', JSON.stringify(active));
+100 |             }
+101 | 
+102 |             const url = `mediaplans?${params.toString()}`;
+103 |             const resp = await customFetch(url) as ActualMediaplanListResponse;
+104 | 
+105 |             mediaplans.value = resp.data || resp.items || [];
+106 |             totalItems.value = resp.total_count ?? resp.total_items ?? mediaplans.value.length;
+107 |             totalPages.value = resp.page_count ?? resp.total_pages ?? 1;
+108 |             currentPage.value = resp.page ?? resp.current_page ?? 0;
+109 |             if (resp.per_page) {
+110 |                 perPage.value = resp.per_page;
+111 |             }
+112 | 
+113 |         } catch (err) {
+114 |             error.value = err instanceof Error ? err.message : 'Error fetching mediaplans';
+115 |             mediaplans.value = [];
+116 |             totalItems.value = totalPages.value = 0;
+117 |         } finally {
+118 |             isLoading.value = false;
+119 |         }
+120 |     }
+121 | 
+122 |     function setFilter(key: keyof MediaplanFilter, value: unknown) {
+123 |         filters.value = {...filters.value, [key]: value};
+124 |         currentPage.value = 0;
+125 |         fetchMediaplans();
+126 |     }
+127 | 
+128 |     function clearFilters() {
+129 |         filters.value = {search: '', status: ''};
+130 |         currentPage.value = 0;
+131 |         fetchMediaplans();
+132 |     }
+133 | 
+134 |     function setSorting(field: string, order: 'asc' | 'desc') {
+135 |         sortBy.value = field;
+136 |         sortOrder.value = order;
+137 |         fetchMediaplans();
+138 |     }
+139 | 
+140 |     function setPage(page: number) {
+141 |         currentPage.value = page;
+142 |         fetchMediaplans();
+143 |     }
+144 | 
+145 |     async function init() {
+146 |         await sourcesStore.fetchSources('creation', 'mediaplan');
+147 |         await fetchMediaplans();
+148 |     }
+149 | 
+150 |     return {
+151 |         overviewFilterSources,
+152 |         mediaplans,
+153 |         selectedMediaplan,
+154 |         isLoading,
+155 |         error,
+156 |         totalItems,
+157 |         totalPages,
+158 |         currentPage,
+159 |         perPage,
+160 |         filters,
+161 |         sortBy,
+162 |         sortOrder,
+163 |         hasFilters,
+164 |         fetchMediaplans,
+165 |         fetchMediaplan,
+166 |         setFilter,
+167 |         clearFilters,
+168 |         setSorting,
+169 |         setPage,
+170 |         init
+171 |     };
+172 | });
 ```
 
 src/stores/projectStore.ts
@@ -4977,7 +4916,7 @@ src/stores/projectStore.ts
 52 |             queryParams.append('page', currentPage.value.toString());
 53 |             queryParams.append('per_page', perPage.value.toString());
 54 | 
-55 |             const url = `/mediaplans/${mediaplanId}/projects?${queryParams.toString()}`;
+55 |             const url = `mediaplans/${mediaplanId}/projects?${queryParams.toString()}`;
 56 |             const response = await customFetch(url) as ProjectListResponse;
 57 | 
 58 |             projects.value = response.items;
@@ -4998,7 +4937,7 @@ src/stores/projectStore.ts
 73 |         error.value = null;
 74 | 
 75 |         try {
-76 |             const url = `/mediaplans/${mediaplanId}/projects/${projectId}`;
+76 |             const url = `mediaplans/${mediaplanId}/projects/${projectId}`;
 77 |             const response = await customFetch(url) as Project;
 78 |             selectedProject.value = response;
 79 |             return response;
@@ -5016,7 +4955,7 @@ src/stores/projectStore.ts
 91 |         error.value = null;
 92 | 
 93 |         try {
-94 |             const url = `/mediaplans/${projectData.mediaplanId}/projects`;
+94 |             const url = `mediaplans/${projectData.mediaplanId}/projects`;
 95 | 
 96 |             // For our implementation, we need to adjust the data structure to match the API expectations
 97 |             const payload = {
@@ -5170,941 +5109,81 @@ src/stores/projectStore.ts
 245 | });
 ```
 
-src/validations/validations.ts
+src/stores/sourcesStore.ts
 ```
-1 | // src/validations/validations.ts
-2 | import * as yup from 'yup';
-3 | 
-4 | export const loginValidationSchema = yup.object({
-5 |     username: yup.string().required('Username is required').max(100, 'Username must be less than 100 characters'),
-6 |     password: yup.string().required('Password is required').min(2, 'Password must be at least 2 characters'),
-7 | });
-8 | 
-9 | 
-10 | 
-11 | // Füge hier weitere Validierungsschemata hinzu
-```
-
-src/views/CampaignDetail.vue
-```
-1 | <template>
-2 |   <MainLayout>
-3 |     <div class="campaign-detail">
-4 |       <v-alert v-if="error" type="error" density="compact" class="mb-4" closable>
-5 |         {{ error }}
-6 |       </v-alert>
+1 | import {defineStore} from 'pinia';
+2 | import {ref, computed} from 'vue';
+3 | import customFetch from '@/helpers/customFetch';
+4 | import type {Source, Brand} from '@/types/mediaplan';
+5 | 
+6 | export type GlossaryHandlerResponse = Record<string, Array<Record<string, any>>>;
 7 | 
-8 |       <div v-if="isLoading && !campaign" class="text-center my-10">
-9 |         <v-progress-circular indeterminate color="primary" size="40"/>
-10 |         <p class="mt-2 text-disabled">Loading Campaign Data...</p>
-11 |       </div>
-12 | 
-13 |       <template v-if="campaign">
-14 |         <MediaplanTopSection
-15 |             :mediaplan="parentMediaplan"
-16 |             :project="parentProject"
-17 |             :campaign="campaign"
-18 |             :search="searchTerm" :is-loading="isLoading"
-19 |             :current-view="'planning'"
-20 |             :builder-type="'display'"
-21 |             @update:search="updateSearchTerm"
-22 |         />
-23 |         <CampaignListView
-24 |             :mediaplan-id="mediaplanIdRef"
-25 |             :items="campaigns"
-26 |             :total-campaigns="1"
-27 |             :is-loading="isLoading"
-28 |             :current-page="0"
-29 |             :items-per-page="1"
-30 |             type="single"
-31 |             class="pb-3"
-32 |         />
-33 | 
-34 | 
-35 |         <LineitemTable
-36 |           class="mt-5"
-37 |           :items="lineitems"
-38 |           :is-loading="isLoadingLineitems"
-39 |           :total-items="totalLineitems"
-40 |           :current-page="currentPage"
-41 |           :items-per-page="perPage"
-42 |           :sort-by-server="sortBy"
-43 |           :search="searchTerm"
-44 |           :model-value="selectedLineitemIds"
-45 |           @add-lineitem="openAddLineitemDialog"
-46 |           @view-lineitem="handleViewLineitem"
-47 |           @update:model-value="val => selectedLineitemIds.value = val"
-48 |           @update:options="({ page, itemsPerPage, sortBy }) => {
-49 |             lineitemStore.currentPage = page;
-50 |             lineitemStore.perPage = itemsPerPage;
-51 |             lineitemStore.sortBy = sortBy;
-52 |           }"
-53 |         />
-54 | 
-55 |       </template>
-56 | 
-57 |       <template v-else-if="!isLoading && !campaign && error">
-58 |         <div class="text-center my-10 text-disabled">
-59 |           <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
-60 |           <p>Could not load Campaign data.</p>
-61 |           <p class="text-caption">{{ error }}</p>
-62 |           <v-btn color="primary" @click="goBack">Go Back</v-btn>
-63 |         </div>
-64 |       </template>
-65 | 
-66 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-67 |         {{ snackbar.text }}
-68 |         <template v-slot:actions>
-69 |           <v-btn icon @click="snackbar.show = false"><v-icon>mdi-close</v-icon></v-btn>
-70 |         </template>
-71 |       </v-snackbar>
-72 | 
-73 |     </div>
-74 |   </MainLayout>
-75 | </template>
-76 | 
-77 | <script setup lang="ts">
-78 | import { ref, computed, onMounted, reactive, watch } from 'vue';
-79 | import { useRoute, useRouter } from 'vue-router';
-80 | 
-81 | // Komponenten
-82 | import MainLayout from '@/layouts/MainLayout.vue';
-83 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
-84 | import LineitemTable from '@/components/campaign/LineitemTable.vue'; // Spezifische Tabelle
-85 | // Stores
-86 | import { useCampaignStore } from '@/stores/campaignStore';
-87 | import { useProjectStore } from '@/stores/projectStore';
-88 | import { useMediaplanStore } from '@/stores/mediaplanStore';
-89 | // Types
-90 | import type { Campaign } from '@/types/campaign';
-91 | import type { Lineitem } from '@/types/lineitem';
-92 | import type { Project } from '@/types/project';
-93 | import type { Mediaplan } from '@/types/mediaplan';
-94 | import {useLineitemStore} from "@/stores/lineitemStore.ts";
-95 | import MediaplanPlanningViewDatatable from "@/components/mediaplan/MediaplanPlanningViewDatatable.vue";
-96 | import CampaignListView from "@/components/project/CampaignListView.vue";
-97 | 
-98 | // Props & Route
-99 | const props = defineProps<{
-100 |   mediaplanId?: string;
-101 |   projectId?: string;
-102 |   campaignId?: string;
-103 | }>()
-104 | const route = useRoute();
-105 | const router = useRouter();
-106 | 
-107 | // IDs
-108 | const mediaplanIdRef = ref(props.mediaplanId || (route.params.mediaplanId as string));
-109 | const projectIdRef = ref(props.projectId || (route.params.projectId as string));
-110 | const campaignIdRef = ref(props.campaignId || (route.params.campaignId as string));
-111 | 
-112 | // Stores
-113 | const campaignStore = useCampaignStore();
-114 | const lineitemStore = useLineitemStore();
-115 | const projectStore = useProjectStore();
-116 | const mediaplanStore = useMediaplanStore();
-117 | 
-118 | // State
-119 | const isLoading = ref(false);
-120 | const error = ref<string | null>(null);
-121 | const searchTerm = ref(''); // Wird von TopSection gesetzt, aber hier nicht direkt zum Filtern verwendet
-122 | // const canAddLineitems = ref(false); // Noch nicht implementiert
-123 | 
-124 | // Computed Properties
-125 | const campaign = computed<Campaign | null>(() => campaignStore.selectedCampaign);
-126 | const campaigns = computed(() => {
-127 |   return campaignStore.selectedCampaign ? [campaignStore.selectedCampaign] : []
-128 | });
-129 | 
-130 | 
-131 | const parentProject = computed<Project | null>(() => projectStore.selectedProject);
-132 | const parentMediaplan = computed<Mediaplan | null>(() => mediaplanStore.selectedMediaplan);
-133 | const lineitems = computed<Lineitem[]>(() => lineitemStore.lineitems);
-134 | const isLoadingLineitems = computed(() => lineitemStore.isLoading);
-135 | // Kein Zugriff auf Line Item Paginierung/Sortierung hier, da v-data-table dies clientseitig macht
-136 | 
-137 | const totalLineitems = computed(() => lineitemStore.totalItems);
-138 | const currentPage = computed(() => lineitemStore.currentPage);
-139 | const perPage = computed(() => lineitemStore.perPage);
-140 | const sortBy = computed(() => lineitemStore.sortBy);
-141 | const selectedLineitemIds = ref<string[]>([]);
-142 | 
-143 | // Snackbar
-144 | const snackbar = reactive({ show: false, text: '', color: 'success' });
-145 | 
-146 | // --- Methoden ---
-147 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => {
-148 |   snackbar.text = text;
-149 |   snackbar.color = color;
-150 |   snackbar.show = true;
-151 | };
-152 | 
-153 | const loadData = async () => {
-154 |   if (!mediaplanIdRef.value || !projectIdRef.value || !campaignIdRef.value) {
-155 |     error.value = "Missing ID for loading campaign details.";
-156 |     showSnackbar(error.value, "error");
-157 |     return;
-158 |   }
-159 |   isLoading.value = true;
-160 |   error.value = null;
-161 |   try {
-162 |     await Promise.all([
-163 |       campaignStore.fetchCampaign(mediaplanIdRef.value, projectIdRef.value, campaignIdRef.value),
-164 |       projectStore.fetchProject(mediaplanIdRef.value, projectIdRef.value), // Kontext
-165 |       mediaplanStore.fetchMediaplan(mediaplanIdRef.value), // Kontext
-166 |       lineitemStore.fetchLineitems(mediaplanIdRef.value, projectIdRef.value, campaignIdRef.value) // Kinder
-167 |     ]);
-168 |     // canAddLineitems.value = checkApi(); // Wenn API für Add existiert
-169 | 
-170 |   } catch (err: any) {
-171 |     error.value = `Failed to load campaign data: ${err.message || err}`;
-172 |     showSnackbar(error.value, 'error');
-173 |     campaignStore.selectedCampaign = null;
-174 |     projectStore.selectedProject = null;
-175 |     mediaplanStore.selectedMediaplan = null;
-176 |   } finally {
-177 |     isLoading.value = false;
-178 |   }
-179 | };
-180 | 
-181 | const updateSearchTerm = (newSearchTerm: string) => {
-182 |   searchTerm.value = newSearchTerm;
-183 |   // Hier keine Aktion nötig, da die Tabelle clientseitig filtert (oder Suche ignoriert)
-184 | };
-185 | 
-186 | const openAddLineitemDialog = () => {
-187 |   console.log('Add Lineitem for Campaign:', campaignIdRef.value);
-188 |   showSnackbar("Adding line items is not supported by the API yet.", "info");
-189 |   // Logik zum Öffnen des Dialogs
-190 | };
-191 | 
-192 | const handleViewLineitem = (item: Lineitem) => {
-193 |   console.log('View Lineitem (Event received):', item._id);
-194 |   showSnackbar("Viewing line item details is not supported by the API yet.", "info");
-195 |   // Logik zum Anzeigen der Details (z.B. in einem Dialog)
-196 | }
-197 | 
-198 | const goBack = () => {
-199 |   router.back();
-200 | }
-201 | 
-202 | // Lifecycle & Watchers
-203 | onMounted(() => {
-204 |   loadData();
-205 | });
-206 | 
-207 | watch(() => [route.params.mediaplanId, route.params.projectId, route.params.campaignId],
-208 |     ([newMpId, newPId, newCId], [oldMpId, oldPId, oldCId]) => {
-209 |       let needsReload = false;
-210 |       if (typeof newMpId === 'string' && newMpId !== oldMpId) { mediaplanIdRef.value = newMpId; needsReload = true; }
-211 |       if (typeof newPId === 'string' && newPId !== oldPId) { projectIdRef.value = newPId; needsReload = true; }
-212 |       if (typeof newCId === 'string' && newCId !== oldCId) { campaignIdRef.value = newCId; needsReload = true; }
-213 |       if (needsReload) { loadData(); }
-214 |     },
-215 |     { immediate: false }
-216 | );
-217 | 
-218 | watch(error, (err) => { if (err && !snackbar.show) { /* Fehler in loadData behandelt */ } });
-219 | 
-220 | </script>
-221 | 
-222 | <style scoped>
-223 | .campaign-detail {
-224 |   min-height: calc(100vh - 64px);
-225 | }
-226 | </style>
-```
-
-src/views/Login.vue
-```
-1 | <template>
-2 |   <v-container fluid style="max-width: 1600px" class="d-flex justify-center">
-3 |     <v-sheet class="pa-6" rounded elevation="4" max-width="480" width="100%" style="margin-top: 100px;">
-4 |       <v-form @submit.prevent="onSubmit" class="form-container">
-5 |         <h4 class="text-h4 font-weight-medium mb-3">
-6 |           Welcome to the BMW Group Mediaplan.
-7 |         </h4>
-8 |         <v-text-field
-9 |             v-model="name.value.value"
-10 |             :error-messages="name.errorMessage.value"
-11 |             label="Name"
-12 |             variant="outlined"
-13 |             clearable
-14 |             class="mb-3"
-15 |         />
-16 | 
-17 |         <v-text-field
-18 |             v-model="password.value.value"
-19 |             :error-messages="password.errorMessage.value"
-20 |             label="Password"
-21 |             type="password"
-22 |             variant="outlined"
-23 |             clearable
-24 |             class="mb-6"
-25 |         />
-26 | 
-27 |         <v-alert
-28 |             v-if="authStore.error"
-29 |             class="mb-4"
-30 |             type="error"
-31 |             variant="tonal"
-32 |             border="start"
-33 |             closable
-34 |             @close="authStore.error = null"
-35 |             icon="mdi-alert-circle-outline"
-36 |         >
-37 |           {{ authStore.error }}
-38 |         </v-alert>
-39 | 
-40 |         <v-row justify="end">
-41 |           <v-col cols="auto">
-42 |             <v-btn :disabled="authStore.isLoading" type="submit" color="primary">
-43 |               Login
-44 |             </v-btn>
-45 |           </v-col>
-46 |         </v-row>
-47 |       </v-form>
-48 |     </v-sheet>
-49 |   </v-container>
-50 | </template>
-51 | 
-52 | <script setup lang="ts">
-53 | import {reactive} from 'vue'; // No need to import ref if not used independently
-54 | import {useAuthStore} from '../stores/auth';
-55 | import {useRouter} from 'vue-router';
-56 | import {useField, useForm} from 'vee-validate';
-57 | import {VAlert} from 'vuetify/components'; // Correct import for VAlert
-58 | 
-59 | const router = useRouter();
-60 | const authStore = useAuthStore();
-61 | const validationSchema = {
-62 |   name(value: string) { // Type annotation for value
-63 |     if (value?.length >= 2) {
-64 |       return true;
-65 |     }
-66 |     return 'Name needs to be at least 2 characters.';
-67 |   },
-68 |   password(value: string) { // Type annotation for value
-69 |     if (value?.length >= 6) {
-70 |       return true;
-71 |     }
-72 |     return 'Password needs to be at least 6 characters.';
-73 |   },
-74 | }
-75 | 
-76 | 
-77 | const {handleSubmit, handleReset} = useForm({ //Removed the Reset, not used
-78 |   validationSchema
-79 | });
-80 | 
-81 | const name = useField('name', validationSchema,
-82 |     {
-83 |       initialValue: 'onebuilderPlanner'
-84 |     }
-85 | );
-86 | const password = useField('password', validationSchema,
-87 |     {
-88 |       initialValue: 'OnebuilderPlanner1'
-89 |     });
-90 | 
-91 | const onSubmit = handleSubmit(async (values) => {
-92 |   // No need for local errorMessage, use authStore.error
-93 |   // No need for local form.pending, use authStore.isLoading
-94 | 
-95 |   try {
-96 |     await authStore.login(values.name, values.password);
-97 |     // Redirect *after* successful login (handled in the store)
-98 |     if (authStore.isAuthenticated) {
-99 |       router.push('/');
-100 |     }
-101 | 
-102 |   } catch (error: any) {
-103 |     //  Error handling is now done in the store, so we don't need this here.
-104 |     //  The store will set authStore.error appropriately.
-105 |     console.error("Login Error in Component:", error); // Good for debugging
-106 |   }
-107 |   // No finally block needed, authStore.isLoading is handled in the store.
-108 | });
-109 | </script>
-110 | 
-111 | <style scoped>
-112 | .form-container {
-113 |   max-width: 430px;
-114 |   margin: 0 auto;
-115 | }
-116 | </style>
-```
-
-src/views/MediaplanDetail.vue
-```
-1 | <template>
-2 |   <MainLayout>
-3 |     <div class="mediaplan-detail">
-4 |       <v-alert v-if="errorMediaplan" type="error" density="compact" class="mb-4" closable>
-5 |         {{ errorMediaplan }}
-6 |       </v-alert>
-7 | 
-8 |       <div v-if="isLoadingMediaplan && !mediaplan" class="text-center my-10">
-9 |         <v-progress-circular indeterminate color="primary" size="40"/>
-10 |         <p class="mt-2 text-disabled">Loading Mediaplan...</p>
-11 |       </div>
-12 | 
-13 |       <template v-if="!isLoadingMediaplan && mediaplan">
-14 |         <MediaplanTopSection
-15 |             :mediaplan="mediaplan"
-16 |             :project="null"
-17 |             :search="search"
-18 |             :is-loading="isLoadingMediaplan"
-19 |             :current-view="currentView"
-20 |             :builder-type="'display'"
-21 |             @update:search="updateSearch"
-22 |             @update:current-view="val => currentView = val"
-23 |         />
-24 | 
-25 |         <div class="main-content">
-26 |           <MediaplanPlanningView
-27 |               v-if="currentView === 'planning'"
-28 |               type="multi"
-29 |               :projects="projects"
-30 |               :total-projects="totalProjects"
-31 |               :is-loading="isLoadingProjects"
-32 |               :current-page="projectCurrentPage"
-33 |               :items-per-page="projectItemsPerPage"
-34 |               :mediaplan-id="mediaplanIdRef"
-35 |               @update:options="handleProjectOptionsUpdate"
-36 |               @add-project="openCreateProjectDialog"
-37 |           />
-38 | 
-39 |           <MediaplanBudgetView v-else :mediaplan="mediaplan"/>
-40 | 
-41 |           <v-alert
-42 |               v-if="projectError && currentView === 'planning'"
-43 |               type="error"
-44 |               density="compact"
-45 |               class="mt-4"
-46 |               closable
-47 |           >
-48 |             Failed to load projects: {{ projectError }}
-49 |           </v-alert>
-50 |         </div>
-51 |       </template>
-52 | 
-53 |       <template v-else-if="!isLoadingMediaplan && !mediaplan && errorMediaplan">
-54 |         <div class="text-center my-10 text-disabled">
-55 |           <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
-56 |           <p>Could not load Mediaplan data.</p>
-57 |         </div>
-58 |       </template>
-59 | 
-60 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-61 |         {{ snackbar.text }}
-62 |         <template v-slot:actions>
-63 |           <v-btn icon @click="snackbar.show = false">
-64 |             <v-icon>mdi-close</v-icon>
-65 |           </v-btn>
-66 |         </template>
-67 |       </v-snackbar>
-68 |     </div>
-69 |   </MainLayout>
-70 | </template>
-71 | 
-72 | <script setup lang="ts">
-73 | import {ref, computed, onMounted, reactive, watch} from 'vue'
-74 | import {useRoute} from 'vue-router'
-75 | 
-76 | import MainLayout from '@/layouts/MainLayout.vue'
-77 | import MediaplanPlanningView from '@/components/mediaplan/MediaplanPlanningViewDatatable.vue'
-78 | import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue'
-79 | import {useMediaplanStore} from '@/stores/mediaplanStore'
-80 | import {useProjectStore} from '@/stores/projectStore'
-81 | import type {Mediaplan} from '@/types/mediaplan'
-82 | import type {Project} from '@/types/project'
-83 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
-84 | 
-85 | // --- Props & Route ---
-86 | const props = defineProps<{ mediaplanId?: string }>()
-87 | const route = useRoute()
-88 | const mediaplanIdRef = ref(props.mediaplanId || (route.params.id as string))
-89 | 
-90 | // --- Stores ---
-91 | const mediaplanStore = useMediaplanStore()
-92 | const projectStore = useProjectStore()
-93 | 
-94 | // --- Computed Properties ---
-95 | const mediaplan = computed<Mediaplan | null>(() => mediaplanStore.selectedMediaplan)
-96 | const isLoadingMediaplan = computed(() => mediaplanStore.isLoading)
-97 | const errorMediaplan = computed(() => mediaplanStore.error)
-98 | 
-99 | const projects = computed<Project[]>(() => projectStore.projects)
-100 | const totalProjects = computed(() => projectStore.totalItems)
-101 | const isLoadingProjects = computed(() => projectStore.isLoading)
-102 | const projectError = computed(() => projectStore.error)
-103 | const projectCurrentPage = computed(() => projectStore.currentPage)
-104 | const projectItemsPerPage = computed(() => projectStore.perPage)
-105 | 
-106 | // --- UI State ---
-107 | const currentView = ref<'planning' | 'budget'>('planning')
-108 | const search = ref('')
-109 | 
-110 | // --- Snackbar ---
-111 | const snackbar = reactive({show: false, text: '', color: 'success'})
-112 | 
-113 | // --- Methods ---
-114 | const handleProjectOptionsUpdate = (options: {
-115 |   page: number
-116 |   itemsPerPage: number
-117 |   sortBy?: any[]
-118 |   sortDesc?: boolean[]
-119 | }) => {
-120 |   const newPage = options.page - 1
-121 |   if (newPage !== projectCurrentPage.value) {
-122 |     projectStore.currentPage = newPage
-123 |     projectStore.fetchProjects(mediaplanIdRef.value)
-124 |   }
-125 |   if (options.itemsPerPage !== projectItemsPerPage.value) {
-126 |     projectStore.perPage = options.itemsPerPage
-127 |     projectStore.currentPage = 0
-128 |     projectStore.fetchProjects(mediaplanIdRef.value)
-129 |   }
-130 | }
-131 | 
-132 | const openCreateProjectDialog = () => {
-133 |   console.log('Trigger create project for Mediaplan ID:', mediaplanIdRef.value)
-134 |   // router.push or dialog logic here
-135 | }
-136 | 
-137 | const updateSearch = (val: string) => {
-138 |   search.value = val
-139 |   // ggf. Filter-Logik hier
-140 | }
-141 | 
-142 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => {
-143 |   snackbar.text = text
-144 |   snackbar.color = color
-145 |   snackbar.show = true
-146 | }
-147 | 
-148 | // --- Lifecycle ---
-149 | onMounted(() => {
-150 |   if (!mediaplanIdRef.value) {
-151 |     mediaplanStore.error = 'No mediaplan ID provided'
-152 |     return
-153 |   }
-154 |   mediaplanStore.fetchMediaplan(mediaplanIdRef.value)
-155 |   projectStore.fetchProjects(mediaplanIdRef.value)
-156 | })
-157 | 
-158 | // --- Watchers ---
-159 | watch(() => route.params.id, (newId) => {
-160 |   if (typeof newId === 'string' && newId !== mediaplanIdRef.value) {
-161 |     mediaplanIdRef.value = newId
-162 |     mediaplanStore.fetchMediaplan(newId)
-163 |     projectStore.fetchProjects(newId)
-164 |   }
-165 | })
-166 | 
-167 | watch(errorMediaplan, (err) => err && showSnackbar(`Error loading mediaplan: ${err}`, 'error'))
-168 | watch(projectError, (err) => err && showSnackbar(`Error loading projects: ${err}`, 'error'))
-169 | </script>
-170 | 
-171 | <style scoped>
-172 | .mediaplan-detail {
-173 |   min-height: calc(100vh - 64px);
-174 | }
-175 | 
-176 | .main-content {
-177 |   min-height: 60vh;
-178 | }
-179 | </style>
-```
-
-src/views/MediaplanEdit.vue
-```
-1 | <template>
-2 |   <v-container>
-3 |     <v-row>
-4 |       <v-col cols="12">
-5 |         <v-card>
-6 |           <v-card-title class="text-h4">
-7 |             Edit Mediaplan
-8 |           </v-card-title>
-9 |           <v-card-text>
-10 |             <p>Mediaplan ID: {{ mediaplanId }}</p>
-11 |             <p>This page would allow editing of the mediaplan details.</p>
-12 |           </v-card-text>
-13 |           <v-card-actions>
-14 |             <v-btn color="primary" @click="goBack">
-15 |               Back to Overview
-16 |             </v-btn>
-17 |           </v-card-actions>
-18 |         </v-card>
-19 |       </v-col>
-20 |     </v-row>
-21 |   </v-container>
-22 | </template>
-23 | 
-24 | <script setup lang="ts">
-25 | import { useRouter } from 'vue-router';
-26 | 
-27 | // Props
-28 | const props = defineProps<{
-29 |   mediaplanId: string;
-30 | }>();
-31 | 
-32 | // Router
-33 | const router = useRouter();
-34 | 
-35 | // Methods
-36 | const goBack = () => {
-37 |   router.push('/');
-38 | };
-39 | </script>
-```
-
-src/views/Overview.vue
-```
-1 | <!-- File: src/views/Overview.vue -->
-2 | <template>
-3 |   <MainLayout>
-4 |     <v-row class="pb-6 pt-1">
-5 |       <v-col>
-6 |         <MediaplanFilters
-7 |             :filters="filters"
-8 |             :sources="sources"
-9 |             :loading="isLoading"
-10 |             :sort-by="sortBy"
-11 |             :sort-order="sortOrder"
-12 |             @update:filter="handleFilterUpdate"
-13 |             @update:sort="handleSortUpdate"
-14 |         />
-15 |       </v-col>
-16 |     </v-row>
-17 | 
-18 |     <MediaplanList
-19 |         :mediaplans="mediaplans"
-20 |         :is-loading="isLoading"
-21 |         :total-pages="totalPages"
-22 |         :total-items="totalItems"
-23 |         :current-page="currentPage"
-24 |         :items-per-page="perPage"
-25 |         @update:page="handlePageUpdate"
-26 |         @update:items-per-page="handleItemsPerPageUpdate"
-27 |     />
-28 | 
-29 |     <CreateMediaplanDialog
-30 |         v-model="showCreateMediaplanDialog"
-31 |         @created="handleMediaplanCreated"
-32 |         @project-created="handleProjectCreated"
-33 |     />
-34 | 
-35 |     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-36 |       {{ snackbar.text }}
-37 |     </v-snackbar>
-38 |   </MainLayout>
-39 | </template>
-40 | 
-41 | <script setup lang="ts">
-42 | import { onMounted, computed, ref, reactive } from 'vue';
-43 | import MainLayout from '@/layouts/MainLayout.vue';
-44 | import MediaplanFilters from '@/components/overview/MediaplanFilters.vue';
-45 | import MediaplanList from '@/components/overview/MediaplanList.vue';
-46 | import CreateMediaplanDialog from '@/components/overview/CreateMediaplanDialog.vue';
-47 | import { useMediaplanStore } from '@/stores/mediaplanStore';
-48 | import type { MediaplanFilter } from '@/types';
-49 | 
-50 | // --- Store ---
-51 | const store = useMediaplanStore();
-52 | 
-53 | // --- Computed from store ---
-54 | const filters     = computed(() => store.filters);
-55 | const sortBy      = computed(() => store.sortBy);
-56 | const sortOrder   = computed(() => store.sortOrder);
-57 | const currentPage = computed(() => store.currentPage);
-58 | const perPage     = computed(() => store.perPage);
-59 | const totalPages  = computed(() => store.totalPages);
-60 | const totalItems  = computed(() => store.totalItems);
-61 | const mediaplans  = computed(() => store.mediaplans);
-62 | const isLoading   = computed(() => store.isLoading);
-63 | const sources     = computed(() => store.sources);
-64 | 
-65 | // --- Dialog control ---
-66 | const showCreateMediaplanDialog = ref(false);
-67 | 
-68 | // --- Snackbar ---
-69 | const snackbar = reactive({
-70 |   show: false,
-71 |   text: '',
-72 |   color: 'success'
-73 | });
-74 | 
-75 | // --- Event Handlers ---
-76 | function handleFilterUpdate(key: keyof MediaplanFilter, value: any) {
-77 |   store.setFilter(key, value);
-78 | }
-79 | 
-80 | function handleSortUpdate(payload: { sortBy: string; sortOrder: 'asc' | 'desc' }) {
-81 |   if (payload.sortBy !== sortBy.value || payload.sortOrder !== sortOrder.value) {
-82 |     store.setSorting(payload.sortBy, payload.sortOrder);
-83 |   }
-84 | }
-85 | 
-86 | function handlePageUpdate(newPage: number) {
-87 |   // v-pagination is 1-based; our store is 0-based
-88 |   const zeroPage = newPage - 1;
-89 |   if (zeroPage !== currentPage.value) {
-90 |     store.setPage(zeroPage);
-91 |   }
-92 | }
-93 | 
-94 | function handleItemsPerPageUpdate(newPerPage: number) {
-95 |   if (newPerPage !== perPage.value) {
-96 |     store.perPage = newPerPage;
-97 |     store.setPage(0);
-98 |   }
-99 | }
-100 | 
-101 | function handleMediaplanCreated(id: string) {
-102 |   console.log('Mediaplan created:', id);
-103 | }
-104 | 
-105 | function handleProjectCreated(id: string) {
-106 |   snackbar.color = 'success';
-107 |   snackbar.text = 'Project created successfully';
-108 |   snackbar.show = true;
-109 |   showCreateMediaplanDialog.value = false;
-110 | }
-111 | 
-112 | // --- Init ---
-113 | onMounted(() => {
-114 |   store.init();
-115 | });
-116 | </script>
-```
-
-src/views/ProjectDetail.vue
-```
-1 | <script setup lang="ts">
-2 | import {ref, computed, onMounted, reactive, watch} from 'vue';
-3 | import {useRouter, useRoute} from 'vue-router';
-4 | import MainLayout from '@/layouts/MainLayout.vue';
-5 | import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue';
-6 | // import ProjectToolbar from '@/components/project/ProjectToolbar.vue';
-7 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue';
-8 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue';
-9 | import CampaignListView from '@/components/project/CampaignListView.vue';
-10 | import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue';
-11 | import {useMediaplanStore} from '@/stores/mediaplanStore';
-12 | import {useProjectStore} from '@/stores/projectStore';
-13 | import {useCampaignStore} from '@/stores/campaignStore';
-14 | import type {Project} from '@/types/project';
-15 | import {formatDateRange} from '@/helpers/dateUtils';
-16 | import {calculatePercentage} from '@/helpers/currencyUtils';
-17 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
-18 | import ProjectDetailTable from "@/components/project/ProjectDetailTable.vue";
-19 | import MediaplanPlanningViewDatatable from "@/components/mediaplan/MediaplanPlanningViewDatatable.vue"; // Pfad prüfen
+8 | export interface SourcesStateValues {
+9 |     [key: string]: Array<Source | Brand | Record<string, any>>;
+10 | }
+11 | 
+12 | export const useSourcesStore = defineStore('sources', () => {
+13 |     const sourcesData = ref<SourcesStateValues>({});
+14 |     const isLoading = ref(false);
+15 |     const error = ref<string | null>(null);
+16 |     const currentType = ref<string | null>(null);
+17 |     const currentLevel = ref<string | null>(null);
+18 | 
+19 |     const getSourceList = computed(() => {
 20 | 
-21 | // --- Props & Route ---
-22 | const props = defineProps<{ mediaplanId?: string; projectId?: string; }>();
-23 | const route = useRoute();
-24 | const router = useRouter();
-25 | const currentMediaplanId = ref(props.mediaplanId || route.params.mediaplanId as string);
-26 | const currentProjectId = ref(props.projectId || route.params.projectId as string);
-27 | 
-28 | // --- Stores ---
-29 | const mediaplanStore = useMediaplanStore();
-30 | const projectStore = useProjectStore();
-31 | const campaignStore = useCampaignStore();
-32 | 
-33 | // --- Computed Properties ---
-34 | const parentMediaplan = computed(() => mediaplanStore.selectedMediaplan);
-35 | const project = computed(() => {
-36 |   return projectStore.selectedProject ? [projectStore.selectedProject] : []
-37 | });
-38 | const isLoadingProject = computed(() => projectStore.isLoading);
-39 | const errorProject = computed(() => projectStore.error);
-40 | const campaigns = computed(() => campaignStore.campaigns);
-41 | const totalCampaigns = computed(() => campaignStore.totalItems);
-42 | const isLoadingCampaigns = computed(() => campaignStore.isLoading);
-43 | const errorCampaigns = computed(() => campaignStore.error);
-44 | const campaignCurrentPage = computed(() => campaignStore.currentPage);
-45 | const campaignItemsPerPage = computed(() => campaignStore.perPage);
-46 | 
-47 | // --- UI State ---
-48 | // currentView wird jetzt für den MediaplanViewToggle benötigt
-49 | const currentView = ref<string>('planning'); // 'planning' or 'budget'
-50 | const search = ref<string>('');
-51 | 
-52 | // --- Snackbar ---
-53 | const snackbar = reactive({show: false, text: '', color: 'success'});
-54 | 
-55 | // --- Methods ---
-56 | const handleCampaignOptionsUpdate = (options: { /* ... */ page: number; itemsPerPage: number; }) => {
-57 |   const newZeroBasedPage = options.page - 1;
-58 |   let needsReload = false;
-59 |   if (newZeroBasedPage !== campaignCurrentPage.value) {
-60 |     campaignStore.currentPage = newZeroBasedPage;
-61 |     needsReload = true;
-62 |   }
-63 |   if (options.itemsPerPage !== campaignItemsPerPage.value) {
-64 |     campaignStore.perPage = options.itemsPerPage;
-65 |     if (campaignStore.currentPage !== 0) campaignStore.currentPage = 0;
-66 |     needsReload = true;
-67 |   }
-68 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
-69 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
-70 |   }
-71 | };
-72 | 
-73 | const openCreateCampaignDialog = () => { /* ... */
-74 |   console.log('Trigger create campaign');
-75 | };
-76 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => { /* ... */
-77 |   snackbar.text = text;
-78 |   snackbar.color = color;
-79 |   snackbar.show = true;
-80 | };
-81 | 
-82 | // Handler für das @update:search Event von MediaplanHeader
-83 | const updateSearchHandler = (value: string | null) => {
-84 |   search.value = value || '';
-85 |   // Hier Logik zum Filtern der Kampagnen basierend auf 'search.value' hinzufügen, falls gewünscht
-86 |   // z.B. campaignStore.setFilter('search', search.value); campaignStore.fetchCampaigns(...)
-87 | };
-88 | 
-89 | 
-90 | // --- Lifecycle Hooks ---
-91 | onMounted(() => {
-92 |   if (!currentMediaplanId.value || !currentProjectId.value) {
-93 |     console.error('Missing ID(s) for Project Detail view');
-94 |     errorProject.value = 'Missing Mediaplan or Project ID.'; // Set error directly or via store
-95 |     return;
-96 |   }
-97 |   projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
-98 |   campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
-99 |   // Lade den Parent-Mediaplan nur, wenn er noch nicht geladen ist oder ein anderer ist
-100 |   if (!parentMediaplan.value || parentMediaplan.value._id !== currentMediaplanId.value) {
-101 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
-102 |   }
-103 | });
-104 | 
-105 | // --- Watchers ---
-106 | // Beobachte Routenänderungen, um Daten neu zu laden
-107 | watch(() => [route.params.mediaplanId, route.params.projectId], ([newMpId, newPId]) => {
-108 |   let needsReload = false;
-109 |   if (newMpId && typeof newMpId === 'string' && newMpId !== currentMediaplanId.value) {
-110 |     currentMediaplanId.value = newMpId;
-111 |     needsReload = true;
-112 |   }
-113 |   if (newPId && typeof newPId === 'string' && newPId !== currentProjectId.value) {
-114 |     currentProjectId.value = newPId;
-115 |     needsReload = true;
-116 |   }
-117 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
-118 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
-119 |     projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
-120 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
-121 |   }
-122 | }, {deep: true});
-123 | 
-124 | watch(errorProject, (newError) => {
-125 |   if (newError) showSnackbar(`Error loading project: ${newError}`, 'error');
-126 | });
-127 | watch(errorCampaigns, (newError) => {
-128 |   if (newError) showSnackbar(`Error loading campaigns: ${newError}`, 'error');
-129 | });
-130 | 
-131 | // Optional: Watch search changes for immediate filtering
-132 | // watch(search, (newValue) => { ... });
-133 | </script>
-134 | 
-135 | <template>
-136 |   <MainLayout>
-137 |     <div class="project-detail">
-138 |       <v-alert v-if="errorProject && !isLoadingProject" type="error" density="compact" class="mb-4" closable>
-139 |         Error loading project details: {{ errorProject }}
-140 |       </v-alert>
-141 |       <div v-if="isLoadingProject && !project" class="text-center my-10">
-142 |         <v-progress-circular indeterminate color="primary" size="40"></v-progress-circular>
-143 |         <p class="mt-2 text-disabled">Loading Project...</p>
-144 |       </div>
-145 | 
-146 |       <template v-if="!isLoadingProject && project">
-147 |         <MediaplanTopSection
-148 |             :mediaplan="parentMediaplan"
-149 |             :project="project"
-150 |             :search="search"
-151 |             :is-loading="isLoadingProject || mediaplanStore.isLoading"
-152 |             :current-view="currentView"
-153 |             :builder-type="'display'"
-154 |             @update:search="updateSearchHandler"
-155 |             @update:current-view="val => currentView = val"
-156 |         />
-157 | 
-158 |         <MediaplanPlanningViewDatatable
-159 |             :projects="project"
-160 |             :is-loading="isLoadingProject"
-161 |             :mediaplan-id="route.params.mediaplanId"
-162 |             :current-page="0"
-163 |             :total-projects="1"
-164 |             :items-per-page="1"
-165 |             type="single"
-166 |             class="pb-3"
-167 |         />
-168 | 
-169 |         <template v-if="project">
-170 |           <div class="main-content">
-171 |             <CampaignListView
-172 |                 v-if="currentView === 'planning'"
-173 |                 :mediaplan-id="currentMediaplanId"
-174 |                 :items="campaigns"
-175 |                 :total-campaigns="totalCampaigns"
-176 |                 :is-loading="isLoadingCampaigns"
-177 |                 :current-page="campaignCurrentPage"
-178 |                 :items-per-page="campaignItemsPerPage"
-179 |                 @update:options="handleCampaignOptionsUpdate"
-180 |                 @add-campaign="openCreateCampaignDialog"
-181 |             />
-182 |             <MediaplanBudgetView
-183 |                 v-else-if="currentView === 'budget' && parentMediaplan"
-184 |                 :mediaplan="parentMediaplan"
-185 |             />
-186 |             <div v-else-if="currentView === 'budget' && !parentMediaplan">
-187 |               Loading budget data...
-188 |             </div>
-189 | 
-190 |             <v-alert v-if="errorCampaigns && currentView === 'planning'" type="error" density="compact" class="mt-4"
-191 |                      closable>
-192 |               Failed to load campaigns: {{ errorCampaigns }}
-193 |             </v-alert>
-194 |           </div>
-195 |         </template>
-196 |         <template v-else-if="!isLoadingProject && errorProject">
-197 |           <div class="text-center my-10 text-disabled">
-198 |             <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
-199 |             <p>Could not load Project data.</p>
-200 |           </div>
-201 |         </template>
-202 |       </template>
-203 | 
-204 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
-205 |         {{ snackbar.text }}
-206 |         <template v-slot:actions>
-207 |           <v-btn icon="mdi-close" @click="snackbar.show = false"></v-btn>
-208 |         </template>
-209 |       </v-snackbar>
-210 |     </div>
-211 |   </MainLayout>
-212 | </template>
-213 | 
-214 | <style scoped>
-215 | .project-detail {
-216 |   padding-bottom: 20px;
-217 | }
-218 | 
-219 | .main-content {
-220 |   min-height: 60vh;
-221 | }
-222 | </style>
+21 |         const tmp =  (dimensionKey: string): Array<Source | Brand | Record<string, any>> | undefined => {
+22 |             return sourcesData.value[dimensionKey];
+23 |         };
+24 |         return tmp
+25 |     });
+26 | 
+27 |     async function fetchSources(type: string, level: string): Promise<boolean> {
+28 |         if (!type || !level) {
+29 |             error.value = 'Type and level are required to fetch sources.';
+30 |             console.error(error.value);
+31 |             currentType.value = null;
+32 |             currentLevel.value = null;
+33 |             return false;
+34 |         }
+35 | 
+36 |         isLoading.value = true;
+37 |         error.value = null;
+38 |         try {
+39 |             const endpoint = `settings?type=${encodeURIComponent(type)}&level=${encodeURIComponent(level)}`;
+40 |             const response = await customFetch(endpoint) as GlossaryHandlerResponse;
+41 |             const data = response.data
+42 |             for (const key in data) {
+43 |                 if (Object.prototype.hasOwnProperty.call(data, key)) {
+44 |                     sourcesData.value[key] = data[key];
+45 |                 }
+46 |             }
+47 |             console.log(sourcesData.value)
+48 |             currentType.value = type;
+49 |             currentLevel.value = level;
+50 | 
+51 |             console.log(`Sources fetched and state updated for type: ${type}, level: ${level}`, sourcesData.value);
+52 |             return true;
+53 | 
+54 |         } catch (err) {
+55 |             const errorMessage = err instanceof Error ? err.message : `Failed to fetch sources for type '${type}' and level '${level}'`;
+56 |             error.value = errorMessage;
+57 |             console.error(`Error fetching sources (type: ${type}, level: ${level}):`, err);
+58 |             return false;
+59 |         } finally {
+60 |             isLoading.value = false;
+61 |         }
+62 |     }
+63 | 
+64 |     return {
+65 |         sourcesData,
+66 |         isLoading,
+67 |         error,
+68 |         currentType,
+69 |         currentLevel,
+70 |         getSourceList,
+71 |         fetchSources,
+72 |     };
+73 | });
 ```
 
 src/types/campaigns.ts
@@ -6391,6 +5470,957 @@ src/types/project.ts
 75 |   current_page: number;
 76 |   items: Project[];
 77 | }
+```
+
+src/validations/validations.ts
+```
+1 | // src/validations/validations.ts
+2 | import * as yup from 'yup';
+3 | 
+4 | export const loginValidationSchema = yup.object({
+5 |     username: yup.string().required('Username is required').max(100, 'Username must be less than 100 characters'),
+6 |     password: yup.string().required('Password is required').min(2, 'Password must be at least 2 characters'),
+7 | });
+8 | 
+9 | 
+10 | 
+11 | // Füge hier weitere Validierungsschemata hinzu
+```
+
+src/views/CampaignDetail.vue
+```
+1 | <template>
+2 |   <MainLayout>
+3 |     <div class="campaign-detail">
+4 |       <v-alert v-if="error" type="error" density="compact" class="mb-4" closable>
+5 |         {{ error }}
+6 |       </v-alert>
+7 | 
+8 |       <div v-if="isLoading && !campaign" class="text-center my-10">
+9 |         <v-progress-circular indeterminate color="primary" size="40"/>
+10 |         <p class="mt-2 text-disabled">Loading Campaign Data...</p>
+11 |       </div>
+12 | 
+13 |       <template v-if="campaign">
+14 |         <MediaplanTopSection
+15 |             :mediaplan="parentMediaplan"
+16 |             :project="parentProject"
+17 |             :campaign="campaign"
+18 |             :search="searchTerm" :is-loading="isLoading"
+19 |             :current-view="'planning'"
+20 |             :builder-type="'display'"
+21 |             @update:search="updateSearchTerm"
+22 |         />
+23 |         <CampaignListView
+24 |             :mediaplan-id="mediaplanIdRef"
+25 |             :items="campaigns"
+26 |             :total-campaigns="1"
+27 |             :is-loading="isLoading"
+28 |             :current-page="0"
+29 |             :items-per-page="1"
+30 |             type="single"
+31 |             class="pb-3"
+32 |         />
+33 | 
+34 | 
+35 |         <LineitemTable
+36 |           class="mt-5"
+37 |           :items="lineitems"
+38 |           :is-loading="isLoadingLineitems"
+39 |           :total-items="totalLineitems"
+40 |           :current-page="currentPage"
+41 |           :items-per-page="perPage"
+42 |           :sort-by-server="sortBy"
+43 |           :search="searchTerm"
+44 |           :model-value="selectedLineitemIds"
+45 |           @add-lineitem="openAddLineitemDialog"
+46 |           @view-lineitem="handleViewLineitem"
+47 |           @update:model-value="val => selectedLineitemIds.value = val"
+48 |           @update:options="({ page, itemsPerPage, sortBy }) => {
+49 |             lineitemStore.currentPage = page;
+50 |             lineitemStore.perPage = itemsPerPage;
+51 |             lineitemStore.sortBy = sortBy;
+52 |           }"
+53 |         />
+54 | 
+55 |       </template>
+56 | 
+57 |       <template v-else-if="!isLoading && !campaign && error">
+58 |         <div class="text-center my-10 text-disabled">
+59 |           <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
+60 |           <p>Could not load Campaign data.</p>
+61 |           <p class="text-caption">{{ error }}</p>
+62 |           <v-btn color="primary" @click="goBack">Go Back</v-btn>
+63 |         </div>
+64 |       </template>
+65 | 
+66 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+67 |         {{ snackbar.text }}
+68 |         <template v-slot:actions>
+69 |           <v-btn icon @click="snackbar.show = false"><v-icon>mdi-close</v-icon></v-btn>
+70 |         </template>
+71 |       </v-snackbar>
+72 | 
+73 |     </div>
+74 |   </MainLayout>
+75 | </template>
+76 | 
+77 | <script setup lang="ts">
+78 | import { ref, computed, onMounted, reactive, watch } from 'vue';
+79 | import { useRoute, useRouter } from 'vue-router';
+80 | 
+81 | // Komponenten
+82 | import MainLayout from '@/layouts/MainLayout.vue';
+83 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
+84 | import LineitemTable from '@/components/campaign/LineitemTable.vue'; // Spezifische Tabelle
+85 | // Stores
+86 | import { useCampaignStore } from '@/stores/campaignStore';
+87 | import { useProjectStore } from '@/stores/projectStore';
+88 | import { useMediaplanStore } from '@/stores/mediaplanStore';
+89 | // Types
+90 | import type { Campaign } from '@/types/campaign';
+91 | import type { Lineitem } from '@/types/lineitem';
+92 | import type { Project } from '@/types/project';
+93 | import type { Mediaplan } from '@/types/mediaplan';
+94 | import {useLineitemStore} from "@/stores/lineitemStore.ts";
+95 | import MediaplanPlanningViewDatatable from "@/components/mediaplan/MediaplanPlanningViewDatatable.vue";
+96 | import CampaignListView from "@/components/project/CampaignListView.vue";
+97 | 
+98 | // Props & Route
+99 | const props = defineProps<{
+100 |   mediaplanId?: string;
+101 |   projectId?: string;
+102 |   campaignId?: string;
+103 | }>()
+104 | const route = useRoute();
+105 | const router = useRouter();
+106 | 
+107 | // IDs
+108 | const mediaplanIdRef = ref(props.mediaplanId || (route.params.mediaplanId as string));
+109 | const projectIdRef = ref(props.projectId || (route.params.projectId as string));
+110 | const campaignIdRef = ref(props.campaignId || (route.params.campaignId as string));
+111 | 
+112 | // Stores
+113 | const campaignStore = useCampaignStore();
+114 | const lineitemStore = useLineitemStore();
+115 | const projectStore = useProjectStore();
+116 | const mediaplanStore = useMediaplanStore();
+117 | 
+118 | // State
+119 | const isLoading = ref(false);
+120 | const error = ref<string | null>(null);
+121 | const searchTerm = ref(''); // Wird von TopSection gesetzt, aber hier nicht direkt zum Filtern verwendet
+122 | // const canAddLineitems = ref(false); // Noch nicht implementiert
+123 | 
+124 | // Computed Properties
+125 | const campaign = computed<Campaign | null>(() => campaignStore.selectedCampaign);
+126 | const campaigns = computed(() => {
+127 |   return campaignStore.selectedCampaign ? [campaignStore.selectedCampaign] : []
+128 | });
+129 | 
+130 | 
+131 | const parentProject = computed<Project | null>(() => projectStore.selectedProject);
+132 | const parentMediaplan = computed<Mediaplan | null>(() => mediaplanStore.selectedMediaplan);
+133 | const lineitems = computed<Lineitem[]>(() => lineitemStore.lineitems);
+134 | const isLoadingLineitems = computed(() => lineitemStore.isLoading);
+135 | // Kein Zugriff auf Line Item Paginierung/Sortierung hier, da v-data-table dies clientseitig macht
+136 | 
+137 | const totalLineitems = computed(() => lineitemStore.totalItems);
+138 | const currentPage = computed(() => lineitemStore.currentPage);
+139 | const perPage = computed(() => lineitemStore.perPage);
+140 | const sortBy = computed(() => lineitemStore.sortBy);
+141 | const selectedLineitemIds = ref<string[]>([]);
+142 | 
+143 | // Snackbar
+144 | const snackbar = reactive({ show: false, text: '', color: 'success' });
+145 | 
+146 | // --- Methoden ---
+147 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => {
+148 |   snackbar.text = text;
+149 |   snackbar.color = color;
+150 |   snackbar.show = true;
+151 | };
+152 | 
+153 | const loadData = async () => {
+154 |   if (!mediaplanIdRef.value || !projectIdRef.value || !campaignIdRef.value) {
+155 |     error.value = "Missing ID for loading campaign details.";
+156 |     showSnackbar(error.value, "error");
+157 |     return;
+158 |   }
+159 |   isLoading.value = true;
+160 |   error.value = null;
+161 |   try {
+162 |     await Promise.all([
+163 |       campaignStore.fetchCampaign(mediaplanIdRef.value, projectIdRef.value, campaignIdRef.value),
+164 |       projectStore.fetchProject(mediaplanIdRef.value, projectIdRef.value), // Kontext
+165 |       mediaplanStore.fetchMediaplan(mediaplanIdRef.value), // Kontext
+166 |       lineitemStore.fetchLineitems(mediaplanIdRef.value, projectIdRef.value, campaignIdRef.value) // Kinder
+167 |     ]);
+168 |     // canAddLineitems.value = checkApi(); // Wenn API für Add existiert
+169 | 
+170 |   } catch (err: any) {
+171 |     error.value = `Failed to load campaign data: ${err.message || err}`;
+172 |     showSnackbar(error.value, 'error');
+173 |     campaignStore.selectedCampaign = null;
+174 |     projectStore.selectedProject = null;
+175 |     mediaplanStore.selectedMediaplan = null;
+176 |   } finally {
+177 |     isLoading.value = false;
+178 |   }
+179 | };
+180 | 
+181 | const updateSearchTerm = (newSearchTerm: string) => {
+182 |   searchTerm.value = newSearchTerm;
+183 |   // Hier keine Aktion nötig, da die Tabelle clientseitig filtert (oder Suche ignoriert)
+184 | };
+185 | 
+186 | const openAddLineitemDialog = () => {
+187 |   console.log('Add Lineitem for Campaign:', campaignIdRef.value);
+188 |   showSnackbar("Adding line items is not supported by the API yet.", "info");
+189 |   // Logik zum Öffnen des Dialogs
+190 | };
+191 | 
+192 | const handleViewLineitem = (item: Lineitem) => {
+193 |   console.log('View Lineitem (Event received):', item._id);
+194 |   showSnackbar("Viewing line item details is not supported by the API yet.", "info");
+195 |   // Logik zum Anzeigen der Details (z.B. in einem Dialog)
+196 | }
+197 | 
+198 | const goBack = () => {
+199 |   router.back();
+200 | }
+201 | 
+202 | // Lifecycle & Watchers
+203 | onMounted(() => {
+204 |   loadData();
+205 | });
+206 | 
+207 | watch(() => [route.params.mediaplanId, route.params.projectId, route.params.campaignId],
+208 |     ([newMpId, newPId, newCId], [oldMpId, oldPId, oldCId]) => {
+209 |       let needsReload = false;
+210 |       if (typeof newMpId === 'string' && newMpId !== oldMpId) { mediaplanIdRef.value = newMpId; needsReload = true; }
+211 |       if (typeof newPId === 'string' && newPId !== oldPId) { projectIdRef.value = newPId; needsReload = true; }
+212 |       if (typeof newCId === 'string' && newCId !== oldCId) { campaignIdRef.value = newCId; needsReload = true; }
+213 |       if (needsReload) { loadData(); }
+214 |     },
+215 |     { immediate: false }
+216 | );
+217 | 
+218 | watch(error, (err) => { if (err && !snackbar.show) { /* Fehler in loadData behandelt */ } });
+219 | 
+220 | </script>
+221 | 
+222 | <style scoped>
+223 | .campaign-detail {
+224 |   min-height: calc(100vh - 64px);
+225 | }
+226 | </style>
+```
+
+src/views/Login.vue
+```
+1 | <template>
+2 |   <v-container fluid class="fill-height pa-0">
+3 |     <v-row align="center" justify="center" class="fill-height ma-0">
+4 |       <v-col cols="12" md="7" lg="8" class="d-none d-md-flex bg-img fill-height pa-0">
+5 |       </v-col>
+6 | 
+7 |       <v-col cols="12" md="5" lg="4" class="d-flex align-center justify-center pa-6 fill-height">
+8 |         <v-sheet class="pa-sm-10 pa-6" rounded elevation="4" max-width="480" width="100%">
+9 |           <div class="text-center mb-6">
+10 |             <img src="/img/the-marcom-engine.png" alt="The Marcom Engine" width="280"/>
+11 |             <h4 class="text-h5 font-weight-medium mt-6">
+12 |               BMW Group Mediaplan
+13 |             </h4>
+14 |           </div>
+15 | 
+16 |           <v-form ref="loginFormRef" @submit.prevent="onSubmit">
+17 |             <v-alert
+18 |                 v-if="authStore.error"
+19 |                 class="mb-4"
+20 |                 type="error"
+21 |                 variant="tonal"
+22 |                 border="start"
+23 |                 closable
+24 |                 @click:close="clearAuthError"
+25 |                 icon="mdi-alert-circle-outline"
+26 |                 density="compact"
+27 |             >
+28 |               {{ authStore.error }}
+29 |             </v-alert>
+30 | 
+31 |             <v-text-field
+32 |                 v-model="username"
+33 |                 :rules="usernameRules"
+34 |                 label="Username"
+35 |                 variant="outlined"
+36 |                 prepend-inner-icon="mdi-account-outline"
+37 |                 class="mb-4"
+38 |                 density="comfortable"
+39 |                 autofocus
+40 |                 required
+41 |             />
+42 | 
+43 |             <v-text-field
+44 |                 v-model="password"
+45 |                 :rules="passwordRules"
+46 |                 label="Password"
+47 |                 type="password"
+48 |                 variant="outlined"
+49 |                 prepend-inner-icon="mdi-lock-outline"
+50 |                 class="mb-6"
+51 |                 density="comfortable"
+52 |                 required
+53 |             />
+54 | 
+55 |             <v-btn
+56 |                 :loading="authStore.isLoading"
+57 |                 :disabled="authStore.isLoading"
+58 |                 type="submit"
+59 |                 color="primary"
+60 |                 block
+61 |                 size="large"
+62 |             >
+63 |               Login
+64 |             </v-btn>
+65 |           </v-form>
+66 |         </v-sheet>
+67 |       </v-col>
+68 |     </v-row>
+69 |   </v-container>
+70 | </template>
+71 | 
+72 | <script setup lang="ts">
+73 | import {ref, onMounted} from 'vue';
+74 | import {useAuthStore} from '@/stores/auth';
+75 | import {useRouter} from 'vue-router';
+76 | import type {VForm} from 'vuetify/components';
+77 | 
+78 | const router = useRouter();
+79 | const authStore = useAuthStore();
+80 | const loginFormRef = ref<InstanceType<typeof VForm> | null>(null);
+81 | 
+82 | const username = ref('admin');
+83 | const password = ref('hans');
+84 | 
+85 | const usernameRules = [
+86 |   (value: string) => !!value || 'Username is required.',
+87 |   (value: string) => (value && value.length >= 2) || 'Username needs to be at least 2 characters.',
+88 |   (value: string) => (value && value.length <= 100) || 'Username must be less than 100 characters.',
+89 | ];
+90 | 
+91 | const passwordRules = [
+92 |   (value: string) => !!value || 'Password is required.',
+93 |   (value: string) => (value && value.length >= 3) || 'Password must be at least 3 characters.',
+94 | ];
+95 | 
+96 | const clearAuthError = () => {
+97 |   authStore.error = null;
+98 | };
+99 | 
+100 | const onSubmit = async () => {
+101 |   if (authStore.isLoading) return;
+102 | 
+103 |   const {valid} = await loginFormRef.value?.validate() || {valid: false};
+104 | 
+105 |   if (valid) {
+106 |     await authStore.login(username.value, password.value);
+107 |     if (authStore.isAuthenticated) {
+108 |       router.push('/');
+109 |     }
+110 |   }
+111 | };
+112 | 
+113 | onMounted(() => {
+114 |   if (authStore.isAuthenticated) {
+115 |     router.push('/');
+116 |   }
+117 | });
+118 | 
+119 | </script>
+120 | 
+121 | <style scoped>
+122 | .fill-height {
+123 |   min-height: 100vh;
+124 | }
+125 | 
+126 | .bg-img {
+127 |   background-image: url('/img/login-bg.jpg');
+128 |   background-position: center center;
+129 |   background-size: cover;
+130 |   background-color: #e0e0e0;
+131 | }
+132 | </style>
+```
+
+src/views/MediaplanDetail.vue
+```
+1 | <template>
+2 |   <MainLayout>
+3 |     <div class="mediaplan-detail">
+4 |       <v-alert v-if="errorMediaplan" type="error" density="compact" class="mb-4" closable>
+5 |         {{ errorMediaplan }}
+6 |       </v-alert>
+7 | 
+8 |       <div v-if="isLoadingMediaplan && !mediaplan" class="text-center my-10">
+9 |         <v-progress-circular indeterminate color="primary" size="40"/>
+10 |         <p class="mt-2 text-disabled">Loading Mediaplan...</p>
+11 |       </div>
+12 | 
+13 |       <template v-if="!isLoadingMediaplan && mediaplan">
+14 |         <MediaplanTopSection
+15 |             :mediaplan="mediaplan"
+16 |             :project="null"
+17 |             :search="search"
+18 |             :is-loading="isLoadingMediaplan"
+19 |             :current-view="currentView"
+20 |             :builder-type="'display'"
+21 |             @update:search="updateSearch"
+22 |             @update:current-view="val => currentView = val"
+23 |         />
+24 | 
+25 |         <div class="main-content">
+26 |           <MediaplanPlanningView
+27 |               v-if="currentView === 'planning'"
+28 |               type="multi"
+29 |               :projects="projects"
+30 |               :total-projects="totalProjects"
+31 |               :is-loading="isLoadingProjects"
+32 |               :current-page="projectCurrentPage"
+33 |               :items-per-page="projectItemsPerPage"
+34 |               :mediaplan-id="mediaplanIdRef"
+35 |               @update:options="handleProjectOptionsUpdate"
+36 |               @add-project="openCreateProjectDialog"
+37 |           />
+38 | 
+39 |           <MediaplanBudgetView v-else :mediaplan="mediaplan"/>
+40 | 
+41 |           <v-alert
+42 |               v-if="projectError && currentView === 'planning'"
+43 |               type="error"
+44 |               density="compact"
+45 |               class="mt-4"
+46 |               closable
+47 |           >
+48 |             Failed to load projects: {{ projectError }}
+49 |           </v-alert>
+50 |         </div>
+51 |       </template>
+52 | 
+53 |       <template v-else-if="!isLoadingMediaplan && !mediaplan && errorMediaplan">
+54 |         <div class="text-center my-10 text-disabled">
+55 |           <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
+56 |           <p>Could not load Mediaplan data.</p>
+57 |         </div>
+58 |       </template>
+59 | 
+60 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+61 |         {{ snackbar.text }}
+62 |         <template v-slot:actions>
+63 |           <v-btn icon @click="snackbar.show = false">
+64 |             <v-icon>mdi-close</v-icon>
+65 |           </v-btn>
+66 |         </template>
+67 |       </v-snackbar>
+68 |     </div>
+69 |   </MainLayout>
+70 | </template>
+71 | 
+72 | <script setup lang="ts">
+73 | import {ref, computed, onMounted, reactive, watch} from 'vue'
+74 | import {useRoute} from 'vue-router'
+75 | 
+76 | import MainLayout from '@/layouts/MainLayout.vue'
+77 | import MediaplanPlanningView from '@/components/mediaplan/MediaplanPlanningViewDatatable.vue'
+78 | import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue'
+79 | import {useMediaplanStore} from '@/stores/mediaplanStore'
+80 | import {useProjectStore} from '@/stores/projectStore'
+81 | import type {Mediaplan} from '@/types/mediaplan'
+82 | import type {Project} from '@/types/project'
+83 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
+84 | 
+85 | // --- Props & Route ---
+86 | const props = defineProps<{ mediaplanId?: string }>()
+87 | const route = useRoute()
+88 | const mediaplanIdRef = ref(props.mediaplanId || (route.params.id as string))
+89 | 
+90 | // --- Stores ---
+91 | const mediaplanStore = useMediaplanStore()
+92 | const projectStore = useProjectStore()
+93 | 
+94 | // --- Computed Properties ---
+95 | const mediaplan = computed<Mediaplan | null>(() => mediaplanStore.selectedMediaplan)
+96 | const isLoadingMediaplan = computed(() => mediaplanStore.isLoading)
+97 | const errorMediaplan = computed(() => mediaplanStore.error)
+98 | 
+99 | const projects = computed<Project[]>(() => projectStore.projects)
+100 | const totalProjects = computed(() => projectStore.totalItems)
+101 | const isLoadingProjects = computed(() => projectStore.isLoading)
+102 | const projectError = computed(() => projectStore.error)
+103 | const projectCurrentPage = computed(() => projectStore.currentPage)
+104 | const projectItemsPerPage = computed(() => projectStore.perPage)
+105 | 
+106 | // --- UI State ---
+107 | const currentView = ref<'planning' | 'budget'>('planning')
+108 | const search = ref('')
+109 | 
+110 | // --- Snackbar ---
+111 | const snackbar = reactive({show: false, text: '', color: 'success'})
+112 | 
+113 | // --- Methods ---
+114 | const handleProjectOptionsUpdate = (options: {
+115 |   page: number
+116 |   itemsPerPage: number
+117 |   sortBy?: any[]
+118 |   sortDesc?: boolean[]
+119 | }) => {
+120 |   const newPage = options.page - 1
+121 |   if (newPage !== projectCurrentPage.value) {
+122 |     projectStore.currentPage = newPage
+123 |     projectStore.fetchProjects(mediaplanIdRef.value)
+124 |   }
+125 |   if (options.itemsPerPage !== projectItemsPerPage.value) {
+126 |     projectStore.perPage = options.itemsPerPage
+127 |     projectStore.currentPage = 0
+128 |     projectStore.fetchProjects(mediaplanIdRef.value)
+129 |   }
+130 | }
+131 | 
+132 | const openCreateProjectDialog = () => {
+133 |   console.log('Trigger create project for Mediaplan ID:', mediaplanIdRef.value)
+134 |   // router.push or dialog logic here
+135 | }
+136 | 
+137 | const updateSearch = (val: string) => {
+138 |   search.value = val
+139 |   // ggf. Filter-Logik hier
+140 | }
+141 | 
+142 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => {
+143 |   snackbar.text = text
+144 |   snackbar.color = color
+145 |   snackbar.show = true
+146 | }
+147 | 
+148 | // --- Lifecycle ---
+149 | onMounted(() => {
+150 |   if (!mediaplanIdRef.value) {
+151 |     mediaplanStore.error = 'No mediaplan ID provided'
+152 |     return
+153 |   }
+154 |   mediaplanStore.fetchMediaplan(mediaplanIdRef.value)
+155 |   projectStore.fetchProjects(mediaplanIdRef.value)
+156 | })
+157 | 
+158 | // --- Watchers ---
+159 | watch(() => route.params.id, (newId) => {
+160 |   if (typeof newId === 'string' && newId !== mediaplanIdRef.value) {
+161 |     mediaplanIdRef.value = newId
+162 |     mediaplanStore.fetchMediaplan(newId)
+163 |     projectStore.fetchProjects(newId)
+164 |   }
+165 | })
+166 | 
+167 | watch(errorMediaplan, (err) => err && showSnackbar(`Error loading mediaplan: ${err}`, 'error'))
+168 | watch(projectError, (err) => err && showSnackbar(`Error loading projects: ${err}`, 'error'))
+169 | </script>
+170 | 
+171 | <style scoped>
+172 | .mediaplan-detail {
+173 |   min-height: calc(100vh - 64px);
+174 | }
+175 | 
+176 | .main-content {
+177 |   min-height: 60vh;
+178 | }
+179 | </style>
+```
+
+src/views/MediaplanEdit.vue
+```
+1 | <template>
+2 |   <v-container>
+3 |     <v-row>
+4 |       <v-col cols="12">
+5 |         <v-card>
+6 |           <v-card-title class="text-h4">
+7 |             Edit Mediaplan
+8 |           </v-card-title>
+9 |           <v-card-text>
+10 |             <p>Mediaplan ID: {{ mediaplanId }}</p>
+11 |             <p>This page would allow editing of the mediaplan details.</p>
+12 |           </v-card-text>
+13 |           <v-card-actions>
+14 |             <v-btn color="primary" @click="goBack">
+15 |               Back to Overview
+16 |             </v-btn>
+17 |           </v-card-actions>
+18 |         </v-card>
+19 |       </v-col>
+20 |     </v-row>
+21 |   </v-container>
+22 | </template>
+23 | 
+24 | <script setup lang="ts">
+25 | import { useRouter } from 'vue-router';
+26 | 
+27 | // Props
+28 | const props = defineProps<{
+29 |   mediaplanId: string;
+30 | }>();
+31 | 
+32 | // Router
+33 | const router = useRouter();
+34 | 
+35 | // Methods
+36 | const goBack = () => {
+37 |   router.push('/');
+38 | };
+39 | </script>
+```
+
+src/views/Overview.vue
+```
+1 | <!-- File: src/views/Overview.vue -->
+2 | <template>
+3 |   <MainLayout>
+4 |     <v-row class="pb-6 pt-1">
+5 |       <v-col>
+6 |         <MediaplanFilters
+7 |             :filters="filters"
+8 |             :loading="isLoading"
+9 |             :sort-by="sortBy"
+10 |             :sort-order="sortOrder"
+11 |             @update:filter="handleFilterUpdate"
+12 |             @update:sort="handleSortUpdate"
+13 |         />
+14 |       </v-col>
+15 |     </v-row>
+16 | 
+17 |     <MediaplanList
+18 |         :mediaplans="mediaplans"
+19 |         :is-loading="isLoading"
+20 |         :total-pages="totalPages"
+21 |         :total-items="totalItems"
+22 |         :current-page="currentPage"
+23 |         :items-per-page="perPage"
+24 |         @update:page="handlePageUpdate"
+25 |         @update:items-per-page="handleItemsPerPageUpdate"
+26 |     />
+27 | 
+28 |     <CreateMediaplanDialog
+29 |         v-model="showCreateMediaplanDialog"
+30 |         @created="handleMediaplanCreated"
+31 |         @project-created="handleProjectCreated"
+32 |     />
+33 | 
+34 |     <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+35 |       {{ snackbar.text }}
+36 |     </v-snackbar>
+37 |   </MainLayout>
+38 | </template>
+39 | 
+40 | <script setup lang="ts">
+41 | import { onMounted, computed, ref, reactive } from 'vue';
+42 | import MainLayout from '@/layouts/MainLayout.vue';
+43 | import MediaplanFilters from '@/components/overview/MediaplanFilters.vue';
+44 | import MediaplanList from '@/components/overview/MediaplanList.vue';
+45 | import CreateMediaplanDialog from '@/components/overview/CreateMediaplanDialog.vue';
+46 | import { useMediaplanStore } from '@/stores/mediaplanStore';
+47 | import type { MediaplanFilter } from '@/types';
+48 | 
+49 | // --- Store ---
+50 | const store = useMediaplanStore();
+51 | 
+52 | // --- Computed from store ---
+53 | const filters     = computed(() => store.filters);
+54 | const sortBy      = computed(() => store.sortBy);
+55 | const sortOrder   = computed(() => store.sortOrder);
+56 | const currentPage = computed(() => store.currentPage);
+57 | const perPage     = computed(() => store.perPage);
+58 | const totalPages  = computed(() => store.totalPages);
+59 | const totalItems  = computed(() => store.totalItems);
+60 | const mediaplans  = computed(() => store.mediaplans);
+61 | const isLoading   = computed(() => store.isLoading);
+62 | 
+63 | // --- Dialog control ---
+64 | const showCreateMediaplanDialog = ref(false);
+65 | 
+66 | // --- Snackbar ---
+67 | const snackbar = reactive({
+68 |   show: false,
+69 |   text: '',
+70 |   color: 'success'
+71 | });
+72 | 
+73 | // --- Event Handlers ---
+74 | function handleFilterUpdate(key: keyof MediaplanFilter, value: any) {
+75 |   store.setFilter(key, value);
+76 | }
+77 | 
+78 | function handleSortUpdate(payload: { sortBy: string; sortOrder: 'asc' | 'desc' }) {
+79 |   if (payload.sortBy !== sortBy.value || payload.sortOrder !== sortOrder.value) {
+80 |     store.setSorting(payload.sortBy, payload.sortOrder);
+81 |   }
+82 | }
+83 | 
+84 | function handlePageUpdate(newPage: number) {
+85 |   // v-pagination is 1-based; our store is 0-based
+86 |   const zeroPage = newPage - 1;
+87 |   if (zeroPage !== currentPage.value) {
+88 |     store.setPage(zeroPage);
+89 |   }
+90 | }
+91 | 
+92 | function handleItemsPerPageUpdate(newPerPage: number) {
+93 |   if (newPerPage !== perPage.value) {
+94 |     store.perPage = newPerPage;
+95 |     store.setPage(0);
+96 |   }
+97 | }
+98 | 
+99 | function handleMediaplanCreated(id: string) {
+100 |   console.log('Mediaplan created:', id);
+101 | }
+102 | 
+103 | function handleProjectCreated(id: string) {
+104 |   snackbar.color = 'success';
+105 |   snackbar.text = 'Project created successfully';
+106 |   snackbar.show = true;
+107 |   showCreateMediaplanDialog.value = false;
+108 | }
+109 | 
+110 | // --- Init ---
+111 | onMounted(() => {
+112 |   store.init();
+113 | });
+114 | </script>
+```
+
+src/views/ProjectDetail.vue
+```
+1 | <script setup lang="ts">
+2 | import {ref, computed, onMounted, reactive, watch} from 'vue';
+3 | import {useRouter, useRoute} from 'vue-router';
+4 | import MainLayout from '@/layouts/MainLayout.vue';
+5 | import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue';
+6 | // import ProjectToolbar from '@/components/project/ProjectToolbar.vue';
+7 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue';
+8 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue';
+9 | import CampaignListView from '@/components/project/CampaignListView.vue';
+10 | import MediaplanBudgetView from '@/components/mediaplan/MediaplanBudgetView.vue';
+11 | import {useMediaplanStore} from '@/stores/mediaplanStore';
+12 | import {useProjectStore} from '@/stores/projectStore';
+13 | import {useCampaignStore} from '@/stores/campaignStore';
+14 | import type {Project} from '@/types/project';
+15 | import {formatDateRange} from '@/helpers/dateUtils';
+16 | import {calculatePercentage} from '@/helpers/currencyUtils';
+17 | import MediaplanTopSection from "@/components/common/MediaplanTopSection.vue";
+18 | import ProjectDetailTable from "@/components/project/ProjectDetailTable.vue";
+19 | import MediaplanPlanningViewDatatable from "@/components/mediaplan/MediaplanPlanningViewDatatable.vue"; // Pfad prüfen
+20 | 
+21 | // --- Props & Route ---
+22 | const props = defineProps<{ mediaplanId?: string; projectId?: string; }>();
+23 | const route = useRoute();
+24 | const router = useRouter();
+25 | const currentMediaplanId = ref(props.mediaplanId || route.params.mediaplanId as string);
+26 | const currentProjectId = ref(props.projectId || route.params.projectId as string);
+27 | 
+28 | // --- Stores ---
+29 | const mediaplanStore = useMediaplanStore();
+30 | const projectStore = useProjectStore();
+31 | const campaignStore = useCampaignStore();
+32 | 
+33 | // --- Computed Properties ---
+34 | const parentMediaplan = computed(() => mediaplanStore.selectedMediaplan);
+35 | const project = computed(() => {
+36 |   return projectStore.selectedProject ? [projectStore.selectedProject] : []
+37 | });
+38 | const isLoadingProject = computed(() => projectStore.isLoading);
+39 | const errorProject = computed(() => projectStore.error);
+40 | const campaigns = computed(() => campaignStore.campaigns);
+41 | const totalCampaigns = computed(() => campaignStore.totalItems);
+42 | const isLoadingCampaigns = computed(() => campaignStore.isLoading);
+43 | const errorCampaigns = computed(() => campaignStore.error);
+44 | const campaignCurrentPage = computed(() => campaignStore.currentPage);
+45 | const campaignItemsPerPage = computed(() => campaignStore.perPage);
+46 | 
+47 | // --- UI State ---
+48 | // currentView wird jetzt für den MediaplanViewToggle benötigt
+49 | const currentView = ref<string>('planning'); // 'planning' or 'budget'
+50 | const search = ref<string>('');
+51 | 
+52 | // --- Snackbar ---
+53 | const snackbar = reactive({show: false, text: '', color: 'success'});
+54 | 
+55 | // --- Methods ---
+56 | const handleCampaignOptionsUpdate = (options: { /* ... */ page: number; itemsPerPage: number; }) => {
+57 |   const newZeroBasedPage = options.page - 1;
+58 |   let needsReload = false;
+59 |   if (newZeroBasedPage !== campaignCurrentPage.value) {
+60 |     campaignStore.currentPage = newZeroBasedPage;
+61 |     needsReload = true;
+62 |   }
+63 |   if (options.itemsPerPage !== campaignItemsPerPage.value) {
+64 |     campaignStore.perPage = options.itemsPerPage;
+65 |     if (campaignStore.currentPage !== 0) campaignStore.currentPage = 0;
+66 |     needsReload = true;
+67 |   }
+68 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
+69 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
+70 |   }
+71 | };
+72 | 
+73 | const openCreateCampaignDialog = () => { /* ... */
+74 |   console.log('Trigger create campaign');
+75 | };
+76 | const showSnackbar = (text: string, color: 'success' | 'error' | 'info' = 'success') => { /* ... */
+77 |   snackbar.text = text;
+78 |   snackbar.color = color;
+79 |   snackbar.show = true;
+80 | };
+81 | 
+82 | // Handler für das @update:search Event von MediaplanHeader
+83 | const updateSearchHandler = (value: string | null) => {
+84 |   search.value = value || '';
+85 |   // Hier Logik zum Filtern der Kampagnen basierend auf 'search.value' hinzufügen, falls gewünscht
+86 |   // z.B. campaignStore.setFilter('search', search.value); campaignStore.fetchCampaigns(...)
+87 | };
+88 | 
+89 | 
+90 | // --- Lifecycle Hooks ---
+91 | onMounted(() => {
+92 |   if (!currentMediaplanId.value || !currentProjectId.value) {
+93 |     console.error('Missing ID(s) for Project Detail view');
+94 |     errorProject.value = 'Missing Mediaplan or Project ID.'; // Set error directly or via store
+95 |     return;
+96 |   }
+97 |   projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
+98 |   campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
+99 |   // Lade den Parent-Mediaplan nur, wenn er noch nicht geladen ist oder ein anderer ist
+100 |   if (!parentMediaplan.value || parentMediaplan.value._id !== currentMediaplanId.value) {
+101 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
+102 |   }
+103 | });
+104 | 
+105 | // --- Watchers ---
+106 | // Beobachte Routenänderungen, um Daten neu zu laden
+107 | watch(() => [route.params.mediaplanId, route.params.projectId], ([newMpId, newPId]) => {
+108 |   let needsReload = false;
+109 |   if (newMpId && typeof newMpId === 'string' && newMpId !== currentMediaplanId.value) {
+110 |     currentMediaplanId.value = newMpId;
+111 |     needsReload = true;
+112 |   }
+113 |   if (newPId && typeof newPId === 'string' && newPId !== currentProjectId.value) {
+114 |     currentProjectId.value = newPId;
+115 |     needsReload = true;
+116 |   }
+117 |   if (needsReload && currentMediaplanId.value && currentProjectId.value) {
+118 |     mediaplanStore.fetchMediaplan(currentMediaplanId.value);
+119 |     projectStore.fetchProject(currentMediaplanId.value, currentProjectId.value);
+120 |     campaignStore.fetchCampaigns(currentMediaplanId.value, currentProjectId.value);
+121 |   }
+122 | }, {deep: true});
+123 | 
+124 | watch(errorProject, (newError) => {
+125 |   if (newError) showSnackbar(`Error loading project: ${newError}`, 'error');
+126 | });
+127 | watch(errorCampaigns, (newError) => {
+128 |   if (newError) showSnackbar(`Error loading campaigns: ${newError}`, 'error');
+129 | });
+130 | 
+131 | // Optional: Watch search changes for immediate filtering
+132 | // watch(search, (newValue) => { ... });
+133 | </script>
+134 | 
+135 | <template>
+136 |   <MainLayout>
+137 |     <div class="project-detail">
+138 |       <v-alert v-if="errorProject && !isLoadingProject" type="error" density="compact" class="mb-4" closable>
+139 |         Error loading project details: {{ errorProject }}
+140 |       </v-alert>
+141 |       <div v-if="isLoadingProject && !project" class="text-center my-10">
+142 |         <v-progress-circular indeterminate color="primary" size="40"></v-progress-circular>
+143 |         <p class="mt-2 text-disabled">Loading Project...</p>
+144 |       </div>
+145 | 
+146 |       <template v-if="!isLoadingProject && project">
+147 |         <MediaplanTopSection
+148 |             :mediaplan="parentMediaplan"
+149 |             :project="project"
+150 |             :search="search"
+151 |             :is-loading="isLoadingProject || mediaplanStore.isLoading"
+152 |             :current-view="currentView"
+153 |             :builder-type="'display'"
+154 |             @update:search="updateSearchHandler"
+155 |             @update:current-view="val => currentView = val"
+156 |         />
+157 | 
+158 |         <MediaplanPlanningViewDatatable
+159 |             :projects="project"
+160 |             :is-loading="isLoadingProject"
+161 |             :mediaplan-id="route.params.mediaplanId"
+162 |             :current-page="0"
+163 |             :total-projects="1"
+164 |             :items-per-page="1"
+165 |             type="single"
+166 |             class="pb-3"
+167 |         />
+168 | 
+169 |         <template v-if="project">
+170 |           <div class="main-content">
+171 |             <CampaignListView
+172 |                 v-if="currentView === 'planning'"
+173 |                 :mediaplan-id="currentMediaplanId"
+174 |                 :items="campaigns"
+175 |                 :total-campaigns="totalCampaigns"
+176 |                 :is-loading="isLoadingCampaigns"
+177 |                 :current-page="campaignCurrentPage"
+178 |                 :items-per-page="campaignItemsPerPage"
+179 |                 @update:options="handleCampaignOptionsUpdate"
+180 |                 @add-campaign="openCreateCampaignDialog"
+181 |             />
+182 |             <MediaplanBudgetView
+183 |                 v-else-if="currentView === 'budget' && parentMediaplan"
+184 |                 :mediaplan="parentMediaplan"
+185 |             />
+186 |             <div v-else-if="currentView === 'budget' && !parentMediaplan">
+187 |               Loading budget data...
+188 |             </div>
+189 | 
+190 |             <v-alert v-if="errorCampaigns && currentView === 'planning'" type="error" density="compact" class="mt-4"
+191 |                      closable>
+192 |               Failed to load campaigns: {{ errorCampaigns }}
+193 |             </v-alert>
+194 |           </div>
+195 |         </template>
+196 |         <template v-else-if="!isLoadingProject && errorProject">
+197 |           <div class="text-center my-10 text-disabled">
+198 |             <v-icon size="x-large" class="mb-2">mdi-alert-circle-outline</v-icon>
+199 |             <p>Could not load Project data.</p>
+200 |           </div>
+201 |         </template>
+202 |       </template>
+203 | 
+204 |       <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000">
+205 |         {{ snackbar.text }}
+206 |         <template v-slot:actions>
+207 |           <v-btn icon="mdi-close" @click="snackbar.show = false"></v-btn>
+208 |         </template>
+209 |       </v-snackbar>
+210 |     </div>
+211 |   </MainLayout>
+212 | </template>
+213 | 
+214 | <style scoped>
+215 | .project-detail {
+216 |   padding-bottom: 20px;
+217 | }
+218 | 
+219 | .main-content {
+220 |   min-height: 60vh;
+221 | }
+222 | </style>
 ```
 
 src/components/campaign/LineItemTable.vue
@@ -6977,976 +7007,6 @@ src/components/common/PaginationControls.vue
 81 |   width: 80px;
 82 | }
 83 | </style>
-```
-
-src/components/mediaplan/DeleteProjectDialog.vue
-```
-1 | <template>
-2 |   <v-dialog v-model="internalValue" max-width="500" persistent>
-3 |     <v-card>
-4 |       <v-toolbar color="error" density="comfortable" dark>
-5 |         <v-toolbar-title>Confirm Delete</v-toolbar-title>
-6 |       </v-toolbar>
-7 |       
-8 |       <v-card-text class="pa-6">
-9 |         <v-alert
-10 |           v-if="error"
-11 |           type="error"
-12 |           variant="tonal"
-13 |           class="mb-4"
-14 |           closable
-15 |         >
-16 |           {{ error }}
-17 |         </v-alert>
-18 |         
-19 |         <p class="text-body-1">
-20 |           Are you sure you want to delete the project <strong>{{ project?.name }}</strong>?
-21 |         </p>
-22 |         <p class="text-body-2 mt-2 text-red">
-23 |           This action cannot be undone.
-24 |         </p>
-25 |       </v-card-text>
-26 |       
-27 |       <v-card-actions class="pa-6 pt-0">
-28 |         <v-spacer></v-spacer>
-29 |         <v-btn 
-30 |           variant="text" 
-31 |           @click="closeDialog"
-32 |           :disabled="isLoading"
-33 |         >
-34 |           Cancel
-35 |         </v-btn>
-36 |         <v-btn 
-37 |           color="error" 
-38 |           variant="flat"
-39 |           :loading="isLoading"
-40 |           @click="confirmDeletion"
-41 |         >
-42 |           Delete Project
-43 |         </v-btn>
-44 |       </v-card-actions>
-45 |     </v-card>
-46 |   </v-dialog>
-47 | </template>
-48 | 
-49 | <script setup lang="ts">
-50 | import { computed } from 'vue';
-51 | import type { Project } from '@/types/project';
-52 | 
-53 | // Define props
-54 | interface Props {
-55 |   modelValue: boolean;
-56 |   project: Project | null;
-57 |   isLoading: boolean;
-58 |   error: string | null;
-59 | }
-60 | 
-61 | // Define emits
-62 | const emit = defineEmits<{
-63 |   (e: 'update:modelValue', value: boolean): void;
-64 |   (e: 'confirm'): void;
-65 |   (e: 'cancel'): void;
-66 | }>();
-67 | 
-68 | // Computed property for v-model binding
-69 | const internalValue = computed({
-70 |   get: () => props.modelValue,
-71 |   set: (value: boolean) => emit('update:modelValue', value)
-72 | });
-73 | 
-74 | const closeDialog = () => {
-75 |   emit('cancel');
-76 | };
-77 | 
-78 | const confirmDeletion = () => {
-79 |   emit('confirm');
-80 | };
-81 | 
-82 | // Receive props with defaults
-83 | const props = withDefaults(defineProps<Props>(), {
-84 |   project: null,
-85 |   error: null
-86 | });
-87 | </script>
-```
-
-src/components/mediaplan/MediaplanBreadcrumb.vue
-```
-1 | // src/components/mediaplan/MediaplanBreadcrumb.vue (Angepasst)
-2 | 
-3 | <script setup lang="ts">
-4 | import {computed} from 'vue';
-5 | import {useRouter} from 'vue-router';
-6 | import type {Mediaplan} from '@/types/mediaplan'; // Pfad prüfen
-7 | import type {Project} from '@/types/project';
-8 | import {getBrandLogo} from "@/helpers/brandUtils.ts";   // Pfad prüfen
-9 | const router = useRouter();
-10 | 
-11 | // --- Props ---
-12 | // Akzeptiert jetzt optional ein ganzes Project-Objekt
-13 | interface Props {
-14 |   mediaplan?: Mediaplan | null;
-15 |   project?: Project | null;     // NEU: Akzeptiert Project-Objekt statt nur Name
-16 |   campaignName?: string;        // Bleibt vorerst als String
-17 | }
-18 | 
-19 | // Define events
-20 | const emit = defineEmits(['back']);
-21 | 
-22 | // Props mit Defaults
-23 | const props = withDefaults(defineProps<Props>(), {
-24 |   mediaplan: null,
-25 |   project: null,
-26 |   campaignName: '',
-27 | });
-28 | 
-29 | // --- Computed Properties für die Anzeige ---
-30 | const breadcrumbItems = computed(() => {
-31 |   const items = [];
-32 |   // Immer Home/Übersicht als Basis? Oder dynamisch? Hier als Beispiel statisch.
-33 |   items.push({title: 'Mediaplans', to: '/', disabled: !props.mediaplan});
-34 | 
-35 |   if (props.mediaplan) {
-36 |     items.push({
-37 |       title: props.mediaplan.name || 'Mediaplan',
-38 |       // Link nur aktiv, wenn wir tiefer sind (also wenn ein Projekt übergeben wurde)
-39 |       to: props.project ? {name: 'MediaplanDetail', params: {mediaplanId: props.mediaplan._id}} : undefined,
-40 |       disabled: !props.project
-41 |     });
-42 | 
-43 |     if (props.project) {
-44 |       items.push({
-45 |         title: props.project.abbreviation || props.project.descriptive_vars?.projectname || 'Project',
-46 |         // Link nur aktiv, wenn wir tiefer sind (also wenn campaignName übergeben wurde)
-47 |         to: props.campaignName ? {
-48 |           name: 'ProjectDetail',
-49 |           params: {mediaplanId: props.mediaplan._id, projectId: props.project._id}
-50 |         } : undefined,
-51 |         disabled: !props.campaignName
-52 |       });
-53 | 
-54 |       if (props.campaignName) {
-55 |         items.push({
-56 |           title: props.campaignName,
-57 |           // Kein Link für das letzte Element
-58 |           disabled: true
-59 |         });
-60 |       }
-61 |     }
-62 |   }
-63 |   return items;
-64 | });
-65 | 
-66 | 
-67 | // --- Methods ---
-68 | const handleBack = () => {
-69 |   emit('back'); // Event auslösen
-70 |   // Gehe zur Mediaplan-Übersicht (oder eine Ebene höher, falls möglich/gewünscht)
-71 |   router.push({name: 'Overview'}); // Gehe zur allgemeinen Übersicht
-72 | };
-73 | 
-74 | </script>
-75 | 
-76 | <template>
-77 |   <div class="d-flex align-center">
-78 |     <v-btn
-79 |         icon
-80 |         variant="text"
-81 |         size="small"
-82 |         class="mr-1"
-83 |         @click="handleBack"
-84 |         aria-label="Go back to overview"
-85 |     >
-86 |       <v-icon> mdi-arrow-u-left-top
-87 |       </v-icon>
-88 |       <v-tooltip activator="parent" location="bottom">Back to Overview</v-tooltip>
-89 |     </v-btn>
-90 | 
-91 |     <div class="breadcrumb-content d-flex align-center flex-wrap">
-92 |       <div class="brand-logo mr-2 flex-shrink-0" v-if="mediaplan?.brand">
-93 |         <v-img
-94 |             :src="getBrandLogo(mediaplan.brand)"
-95 |             :alt="mediaplan.brand.name || ''"
-96 |             width="50"
-97 |             height="25"
-98 |             contain
-99 |         ></v-img>
-100 |       </div>
-101 | 
-102 |       <v-breadcrumbs :items="breadcrumbItems" class="pa-0">
-103 |         <template v-slot:title="{ item }">
-104 |               <span :class="{ 'text-disabled': item.disabled }">
-105 |                   {{ item.title }}
-106 |               </span>
-107 |         </template>
-108 |       </v-breadcrumbs>
-109 | 
-110 |     </div>
-111 |   </div>
-112 | </template>
-113 | 
-114 | <style scoped>
-115 | .breadcrumb-content {
-116 |   min-height: 40px; /* Höhe beibehalten */
-117 |   overflow: hidden; /* Verhindert Umbruchprobleme bei sehr langen Namen */
-118 | }
-119 | 
-120 | .brand-logo {
-121 |   display: flex;
-122 |   align-items: center;
-123 |   justify-content: center;
-124 | }
-125 | 
-126 | /* Optional: Stelle sicher, dass Breadcrumbs nicht zu viel Platz einnehmen */
-127 | .v-breadcrumbs {
-128 |   flex-grow: 1;
-129 |   /* white-space: nowrap; */ /* Verhindert Umbruch, ggf. mit text-overflow */
-130 | }
-131 | 
-132 | .v-breadcrumbs :deep(.v-breadcrumbs-item) {
-133 |   font-size: 0.86rem; /* Etwas kleinere Schrift */
-134 | }
-135 | 
-136 | .text-disabled {
-137 |   color: #757575 !important; /* Vuetify Standard für disabled */
-138 | }
-139 | </style>
-```
-
-src/components/mediaplan/MediaplanBudgetView.vue
-```
-1 | <template>
-2 |   <div class="budget-view-container">
-3 |     <v-card class="pa-6">
-4 |       <v-card-title class="text-h5 mb-4">Budget View</v-card-title>
-5 |       <v-card-text>
-6 |         <p class="text-body-1">
-7 |           This is a placeholder for the Budget View. This section will be implemented later.
-8 |         </p>
-9 |         <v-divider class="my-4"></v-divider>
-10 |         <p class="text-body-2 text-grey">
-11 |           The Budget View will allow users to manage financial aspects of campaigns, track spending, and allocate resources.
-12 |         </p>
-13 |       </v-card-text>
-14 |     </v-card>
-15 |   </div>
-16 | </template>
-17 | 
-18 | <script setup lang="ts">
-19 | // No props or state needed for this placeholder component
-20 | </script>
-21 | 
-22 | <style scoped>
-23 | .budget-view-container {
-24 |   margin-top: 16px;
-25 | }
-26 | </style>
-```
-
-src/components/mediaplan/MediaplanHeader.vue
-```
-1 | <template>
-2 |   <v-row align="center" justify="end" style="height: 57px;" class="mr-0">
-3 |     <div class="d-flex align-center border-b border-grey-lighten-2 mr-2 h-100">
-4 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Plan Budget:</div>
-5 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">{{ formatCurrency(planBudget) }}</div>
-6 | 
-7 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Used:</div>
-8 |       <v-progress-linear
-9 |           :model-value="usedPercentage"
-10 |           color="success"
-11 |           height="8"
-12 |           class="ml-2 mr-4"
-13 |           style="width: 100px"
-14 |       ></v-progress-linear>
-15 |       <span class="text-subtitle-1 text-grey-darken-1">{{ usedPercentage }}%</span>
-16 |     </div>
-17 | 
-18 |     <v-text-field
-19 |         max-width="120px"
-20 |         min-width="100px"
-21 |         v-model="search"
-22 |         placeholder="Search..."
-23 |         hide-details
-24 |         class="mr-2" append-inner-icon="mdi-magnify"
-25 |         @update:modelValue="$emit('update:search', $event)"
-26 |         bg-color="white"
-27 |     ></v-text-field>
-28 | 
-29 |     <v-btn icon="mdi-dots-horizontal" variant="plain">
-30 |     </v-btn>
-31 |   </v-row>
-32 | </template>
-33 | 
-34 | <script setup lang="ts">
-35 | import {ref, watch} from 'vue';
-36 | 
-37 | // Define props
-38 | interface Props {
-39 |   planBudget: number;
-40 |   usedPercentage: number;
-41 |   search: string;
-42 | }
-43 | 
-44 | // Define events
-45 | defineEmits([
-46 |   'update:search'
-47 | ]);
-48 | 
-49 | // Receive props with defaults
-50 | const props = withDefaults(defineProps<Props>(), {
-51 |   planBudget: 0,
-52 |   usedPercentage: 0,
-53 |   search: ''
-54 | });
-55 | 
-56 | // Local state
-57 | const search = ref(props.search);
-58 | 
-59 | // Watch for prop changes
-60 | watch(() => props.search, (newValue) => {
-61 |   search.value = newValue;
-62 | });
-63 | 
-64 | // Format currency
-65 | const formatCurrency = (value: number): string => {
-66 |   // Empfehlung: 'de-DE' für korrekte Euro-Formatierung in Deutschland
-67 |   return new Intl.NumberFormat('de-DE', {
-68 |     style: 'currency',
-69 |     currency: 'EUR',
-70 |     minimumFractionDigits: 0,
-71 |     maximumFractionDigits: 0
-72 |   }).format(value);
-73 | };
-74 | </script>
-```
-
-src/components/mediaplan/MediaplanPlanningViewDatatable.vue
-```
-1 | <template>
-2 |   <div class="planning-view-container mt-4">
-3 |     <EditOrCreateProjectDialog
-4 |         v-model="isProjectDialogOpen"
-5 |         :is-edit="!!selectedProject"
-6 |         :initial-data="selectedProject || undefined"
-7 |         @saved="onProjectSaved"
-8 |     />
-9 |     <v-card class="projects-table elevation-0" variant="flat">
-10 |       <v-theme-provider theme="dark">
-11 |         <v-data-table-server
-12 |             v-model:items-per-page="itemsPerPageModel"
-13 |             v-model:page="pageModel"
-14 |             :headers="projectHeaders"
-15 |             :hide-default-header="type === 'single'"
-16 |             :hide-default-footer="type==='single'"
-17 |             :items="projects"
-18 |             :items-length="totalProjects"
-19 |             :loading="isLoading"
-20 |             item-value="_id"
-21 |             hover
-22 |             class="projects-data-table"
-23 |             @update:options="onOptionsUpdate"
-24 | 
-25 |         >
-26 | <!--          <template v-slot:item.edit="{ item }">
-27 | 
-28 |           </template>-->
-29 | 
-30 |           <template v-slot:item.abbreviation="{ item }">
-31 |             <router-link
-32 |                 :to="{ name: 'ProjectDetail', params: { mediaplanId: props.mediaplanId, projectId: item._id } }"
-33 |                 class="name-link d-flex align-center"
-34 |                 v-if="item.abbreviation && props.mediaplanId && type==='multi'"
-35 |                 @click.stop
-36 |             >
-37 |               <v-avatar size="32" class="mr-2 grey lighten-4"
-38 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
-39 |               <span>{{ item.abbreviation }}</span>
-40 |               <v-tooltip activator="parent" location="top">Open project</v-tooltip>
-41 |             </router-link>
-42 |             <div class="d-flex align-center" v-else-if="item.abbreviation">
-43 |               <v-avatar size="32" class="mr-2 grey lighten-4"
-44 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
-45 |               <span>{{ item.abbreviation }}</span>
-46 |             </div>
-47 |             <div v-else>N/A</div>
-48 |           </template>
-49 | 
-50 |           <template v-slot:item.descriptive_vars.country="{ item }">
-51 |             <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
-52 |               <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2"/>
-53 |               <span>{{ item.descriptive_vars.country }}</span>
-54 |             </div>
-55 |             <div v-else>N/A</div>
-56 |           </template>
-57 | 
-58 |           <template v-slot:item.duration.formatted="{ item }">
-59 |             <div class="d-flex align-center" v-if="item.duration?.formatted">
-60 |               <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
-61 |               <span>{{ item.duration.formatted }}</span>
-62 |             </div>
-63 |             <div v-else>N/A</div>
-64 |           </template>
-65 | 
-66 |           <template v-slot:item.detail="{ item }">
-67 |             <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
-68 |             <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top"
-69 |                        max-width="300px">{{ item.detail }}
-70 |             </v-tooltip>
-71 |           </template>
-72 | 
-73 |           <template v-slot:item.default_vars.campaigntype="{ item }">
-74 |             {{ item.default_vars?.campaigntype || 'N/A' }}
-75 |           </template>
-76 | 
-77 |           <template v-slot:item.default_vars.subsegment="{ item }">
-78 |             {{ item.default_vars?.subsegment || 'N/A' }}
-79 |           </template>
-80 |           <template v-slot:item.budget="{ item }">
-81 |             <BudgetProgress
-82 |                 :used-budget="item?.budget?.used"
-83 |                 :total-budget="item?.budget?.total"
-84 |                 color="success"
-85 |                 bg-color="#ffffff"
-86 |             />
-87 |           </template>
-88 | 
-89 |           <template v-slot:item.is_locked="{ item }">
-90 |             <v-icon v-if="item.is_locked != null" :color="item.is_locked ? 'warning' : 'white'">
-91 |               {{ item.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant' }}
-92 |             </v-icon>
-93 |             <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
-94 |           </template>
-95 | 
-96 |           <template v-slot:item.actions="{ item }">
-97 |             <v-btn icon density="compact" size="small" variant="text" @click.stop="openEditProject(item)" class="mr-2">
-98 |               <v-icon>mdi-pencil-outline</v-icon>
-99 |               <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
-100 |             </v-btn>
-101 |             <v-menu>
-102 |               <template v-slot:activator="{ props: menuProps }">
-103 |                 <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
-104 |               </template>
-105 |               <v-list density="compact">
-106 |                 <v-list-item @click.stop="openEditProject(item)">
-107 |                   <v-list-item-title>Edit</v-list-item-title>
-108 |                 </v-list-item>
-109 |                 <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
-110 |                   <v-list-item-title>Delete</v-list-item-title>
-111 |                 </v-list-item>
-112 |               </v-list>
-113 |             </v-menu>
-114 |           </template>
-115 | 
-116 |           <template v-slot:loading>
-117 |             <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
-118 |           </template>
-119 |           <template v-slot:no-data v-if="type === 'multi'">
-120 | 
-121 |             <div class="text-center pa-4 text-disabled">
-122 |               <v-icon size="large" class="mb-2">mdi-database-off-outline</v-icon>
-123 |               <p>No projects found for this mediaplan.</p>
-124 |             </div>
-125 |           </template>
-126 | 
-127 |           <template v-slot:bottom v-if="type === 'multi'">
-128 |             <div class="d-flex align-center pa-4 bg-grey-lighten-2">
-129 |               <v-btn
-130 |                   prepend-icon="mdi-plus"
-131 |                   class="black-text-button"
-132 |                   variant="text"
-133 |                   color="black"
-134 |                   @click="addProject"
-135 |                   :disabled="isLoading"
-136 |               >
-137 |                 Add Project
-138 |               </v-btn>
-139 |             </div>
-140 |           </template>
-141 |         </v-data-table-server>
-142 |       </v-theme-provider>
-143 |     </v-card>
-144 |   </div>
-145 | 
-146 | </template>
-147 | 
-148 | <script setup lang="ts">
-149 | import {ref, watch, computed} from 'vue';
-150 | import {useRouter} from 'vue-router';
-151 | import CountryFlag from '@/components/common/CountryFlag.vue';
-152 | import {getBrandLogo} from "@/helpers/brandUtils";
-153 | import type {Project} from '@/types/project';
-154 | import {projectHeaders} from "@/constants/project.ts";
-155 | import EditOrCreateProjectDialog from "@/components/project/EditOrCreateProjectDialog.vue";
-156 | import BudgetProgress from "@/components/common/dialog/BudgetProgress.vue";
-157 | 
-158 | /* Single for Display on Overviewpage, multi for complete datatable*/
-159 | type ComponentType = 'single' | 'multi';
-160 | 
-161 | // --- Props ---
-162 | interface Props {
-163 |   type: ComponentType | null | undefined;
-164 |   projects: Project[];
-165 |   totalProjects: number;
-166 |   isLoading: boolean;
-167 |   currentPage: number | null;
-168 |   itemsPerPage: number;
-169 |   mediaplanId: string;
-170 | }
-171 | 
-172 | const props = withDefaults(defineProps<Props>(), {
-173 |   type: 'multi',
-174 |   projects: () => [],
-175 |   totalProjects: 0,
-176 |   isLoading: false,
-177 |   currentPage: 0,
-178 |   itemsPerPage: 10,
-179 |   mediaplanId: null // Wichtig: Muss vom Parent (MediaplanDetail) übergeben werden!
-180 | 
-181 | });
-182 | 
-183 | // --- Emits ---
-184 | const emit = defineEmits<{
-185 |   (e: 'addProject'): void;
-186 |   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
-187 | }>();
-188 | 
-189 | // Router Instanz
-190 | const router = useRouter();
-191 | 
-192 | // --- Computed Properties für Tabelle ---
-193 | const pageModel = computed({
-194 |   get: () => props.currentPage + 1,
-195 |   set: (value) => {
-196 |   }
-197 | });
-198 | 
-199 | const itemsPerPageModel = computed({
-200 |   get: () => props.itemsPerPage,
-201 |   set: (value) => {
-202 |   }
-203 | });
-204 | 
-205 | 
-206 | // --- Methoden ---
-207 | const onOptionsUpdate = (options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }) => {
-208 |   emit('update:options', options);
-209 | };
-210 | 
-211 | const addProject = () => {
-212 |   emit('addProject');
-213 | };
-214 | 
-215 | const isProjectDialogOpen = ref(false);
-216 | const selectedProject = ref<Project | null>(null);
-217 | 
-218 | const openCreateProject = () => {
-219 |   selectedProject.value = null;
-220 |   isProjectDialogOpen.value = true;
-221 | };
-222 | 
-223 | const openEditProject = (project: Project) => {
-224 |   selectedProject.value = project;
-225 |   isProjectDialogOpen.value = true;
-226 | };
-227 | 
-228 | const onProjectSaved = (project: Project) => {
-229 |   isProjectDialogOpen.value = false;
-230 |   console.log(project)
-231 |   // Example: refetch list here if needed
-232 |   // await fetchProjects()
-233 | };
-234 | </script>
-235 | 
-236 | 
-237 | <style scoped>
-238 | /* ... (Styles bleiben) ... */
-239 | 
-240 | </style>
-```
-
-src/components/mediaplan/MediaplanProjects.vue
-```
-1 | <template>
-2 |   <v-card>
-3 |     <v-toolbar flat color="primary" density="comfortable">
-4 |       <v-toolbar-title>Projects</v-toolbar-title>
-5 |       <v-spacer></v-spacer>
-6 |       <v-btn 
-7 |         variant="outlined" 
-8 |         prepend-icon="mdi-plus" 
-9 |         @click="$emit('createProject')"
-10 |         :disabled="isLoading"
-11 |         color="white"
-12 |       >
-13 |         Add Project
-14 |       </v-btn>
-15 |     </v-toolbar>
-16 |     
-17 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
-18 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
-19 |     </div>
-20 |     
-21 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
-22 |       <v-alert type="error" title="Error Loading Projects">
-23 |         {{ error }}
-24 |       </v-alert>
-25 |     </div>
-26 |     
-27 |     <v-data-table-server
-28 |       v-else
-29 |       v-model:items-per-page="itemsPerPage"
-30 |       v-model:page="page"
-31 |       :headers="projectHeaders"
-32 |       :items="projects"
-33 |       :items-length="totalProjects"
-34 |       :loading="isLoading"
-35 |       class="elevation-0"
-36 |       @update:options="onOptionsUpdate"
-37 |     >
-38 |       <!-- Country column with flag -->
-39 |       <template v-slot:item.country="{ item }">
-40 |         <div class="d-flex align-center">
-41 |           <v-avatar size="24" class="mr-2">
-42 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
-43 |           </v-avatar>
-44 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
-45 |         </div>
-46 |       </template>
-47 |       
-48 |       <!-- Campaign Type column -->
-49 |       <template v-slot:item.campaignType="{ item }">
-50 |         <v-chip
-51 |           size="small"
-52 |           :color="getCampaignTypeColor(item.raw.campaignType)"
-53 |           class="text-capitalize"
-54 |         >
-55 |           {{ item.raw.campaignType }}
-56 |         </v-chip>
-57 |       </template>
-58 |       
-59 |       <!-- Created date column -->
-60 |       <template v-slot:item.createdAt="{ item }">
-61 |         {{ formatDate(item.raw.createdAt) }}
-62 |       </template>
-63 |       
-64 |       <!-- Actions column -->
-65 |       <template v-slot:item.actions="{ item }">
-66 |         <v-tooltip text="View Details">
-67 |           <template v-slot:activator="{ props }">
-68 |             <v-btn
-69 |               icon
-70 |               variant="text"
-71 |               density="comfortable"
-72 |               v-bind="props"
-73 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
-74 |             >
-75 |               <v-icon>mdi-eye</v-icon>
-76 |             </v-btn>
-77 |           </template>
-78 |         </v-tooltip>
-79 |         
-80 |         <v-tooltip text="Edit Project">
-81 |           <template v-slot:activator="{ props }">
-82 |             <v-btn
-83 |               icon
-84 |               variant="text"
-85 |               density="comfortable"
-86 |               v-bind="props"
-87 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
-88 |             >
-89 |               <v-icon>mdi-pencil-outline</v-icon>
-90 |             </v-btn>
-91 |           </template>
-92 |         </v-tooltip>
-93 |         
-94 |         <v-tooltip text="Delete Project">
-95 |           <template v-slot:activator="{ props }">
-96 |             <v-btn
-97 |               icon
-98 |               variant="text"
-99 |               density="comfortable"
-100 |               color="error"
-101 |               v-bind="props"
-102 |               @click="$emit('deleteProject', item.raw)"
-103 |             >
-104 |               <v-icon>mdi-delete</v-icon>
-105 |             </v-btn>
-106 |           </template>
-107 |         </v-tooltip>
-108 |       </template>
-109 |       
-110 |       <!-- Empty state -->
-111 |       <template v-slot:no-data>
-112 |         <v-sheet class="d-flex flex-column align-center justify-center pa-6" height="300">
-113 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
-114 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
-115 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
-116 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="$emit('createProject')">
-117 |             Add First Project
-118 |           </v-btn>
-119 |         </v-sheet>
-120 |       </template>
-121 |     </v-data-table-server>
-122 |   </v-card>
-123 | </template>
-124 | 
-125 | <script setup lang="ts">
-126 | import { ref, watch } from 'vue';
-127 | import { formatDate } from '@/helpers/dateUtils';
-128 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
-129 | import type { Project } from '@/types/project';
-130 | 
-131 | // Define props
-132 | interface Props {
-133 |   projects: Project[];
-134 |   mediaplanId: string;
-135 |   totalProjects: number;
-136 |   isLoading: boolean;
-137 |   error: string | null;
-138 | }
-139 | 
-140 | // Define emits
-141 | const emit = defineEmits<{
-142 |   (e: 'createProject'): void;
-143 |   (e: 'deleteProject', project: Project): void;
-144 |   (e: 'update:page', page: number): void;
-145 |   (e: 'update:itemsPerPage', itemsPerPage: number): void;
-146 | }>();
-147 | 
-148 | // Component state
-149 | const page = ref<number>(1);
-150 | const itemsPerPage = ref<number>(10);
-151 | 
-152 | // Watch for pagination changes
-153 | watch([page, itemsPerPage], () => {
-154 |   emit('update:page', page.value);
-155 |   emit('update:itemsPerPage', itemsPerPage.value);
-156 | });
-157 | 
-158 | // Project Table Headers
-159 | const projectHeaders = [
-160 |   { title: 'Name', key: 'name', sortable: true },
-161 |   { title: 'Country', key: 'country', sortable: true },
-162 |   { title: 'Language', key: 'language', sortable: true },
-163 |   { title: 'Campaign Type', key: 'campaignType', sortable: true },
-164 |   { title: 'Phase', key: 'phase', sortable: true },
-165 |   { title: 'Goal', key: 'goal', sortable: true },
-166 |   { title: 'Created At', key: 'createdAt', sortable: true },
-167 |   { title: 'Actions', key: 'actions', sortable: false, align: 'end' },
-168 | ];
-169 | 
-170 | // Method to handle datatable option updates (sorting, etc)
-171 | const onOptionsUpdate = (options: any) => {
-172 |   // You can add additional logic here for sorting if needed
-173 |   // For now, we just update pagination
-174 |   page.value = options.page;
-175 |   itemsPerPage.value = options.itemsPerPage;
-176 | };
-177 | 
-178 | // Receive props with defaults
-179 | const props = withDefaults(defineProps<Props>(), {
-180 |   projects: () => [],
-181 |   totalProjects: 0,
-182 |   error: null
-183 | });
-184 | </script>
-185 | 
-186 | <style scoped>
-187 | .error-container {
-188 |   border-radius: 4px;
-189 |   background-color: rgba(var(--v-theme-error), 0.1);
-190 | }
-191 | </style>
-```
-
-src/components/mediaplan/MediaplanViewToggle.vue
-```
-1 | <template>
-2 |   <div class="view-toggle-container">
-3 |     <v-btn-toggle
-4 |         v-model="selectedView"
-5 |         class="view-toggle"
-6 |         density="comfortable"
-7 |         @update:modelValue="$emit('update:modelValue', $event)"
-8 |     >
-9 |       <v-btn value="planning">Planning view</v-btn>
-10 |       <v-btn value="budget">Budget view</v-btn>
-11 |     </v-btn-toggle>
-12 |   </div>
-13 | </template>
-14 | 
-15 | <script setup lang="ts">
-16 | import { ref, watch } from 'vue'
-17 | 
-18 | // Define props
-19 | interface Props {
-20 |   modelValue: string
-21 | }
-22 | 
-23 | defineEmits(['update:modelValue'])
-24 | const props = defineProps<Props>()
-25 | 
-26 | const selectedView = ref(props.modelValue)
-27 | 
-28 | watch(
-29 |     () => props.modelValue,
-30 |     (newValue) => {
-31 |       selectedView.value = newValue
-32 |     },
-33 |     { immediate: true }
-34 | )
-35 | </script>
-36 | 
-37 | <style scoped>
-38 | .view-toggle .v-btn {
-39 |   background-color: white;
-40 |   color: black;
-41 |   border: 1px solid #ccc;
-42 |   border-radius: 0;
-43 |   font-weight: 500;
-44 | }
-45 | 
-46 | .view-toggle .v-btn.v-btn--active {
-47 |   background-color: black;
-48 |   color: white;
-49 |   border-color: black;
-50 | }
-51 | </style>
-```
-
-src/components/mediaplan/ProjectsList.vue
-```
-1 | <template>
-2 |   <v-card>
-3 |     <v-card-title class="d-flex justify-space-between align-center py-4 px-6">
-4 |       <div class="text-h6">Projects</div>
-5 |       <v-btn 
-6 |         color="primary" 
-7 |         prepend-icon="mdi-plus" 
-8 |         @click="emit('createProject')"
-9 |       >
-10 |         Add Project
-11 |       </v-btn>
-12 |     </v-card-title>
-13 |     
-14 |     <v-divider></v-divider>
-15 |     
-16 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
-17 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
-18 |     </div>
-19 |     
-20 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
-21 |       <v-alert type="error" title="Error Loading Projects">
-22 |         {{ error }}
-23 |       </v-alert>
-24 |     </div>
-25 |     
-26 |     <v-data-table-server
-27 |       v-else
-28 |       v-model:items-per-page="itemsPerPage"
-29 |       v-model:page="page"
-30 |       :headers="projectHeaders"
-31 |       :items="projects"
-32 |       :items-length="totalItems"
-33 |       :loading="isLoading"
-34 |       class="elevation-0"
-35 |       @update:options="onOptionsUpdate"
-36 |     >
-37 |       <!-- Country column with flag -->
-38 |       <template v-slot:item.country="{ item }">
-39 |         <div class="d-flex align-center">
-40 |           <v-avatar size="24" class="mr-2">
-41 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
-42 |           </v-avatar>
-43 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
-44 |         </div>
-45 |       </template>
-46 |       
-47 |       <!-- Campaign Type column -->
-48 |       <template v-slot:item.campaignType="{ item }">
-49 |         <v-chip
-50 |           size="small"
-51 |           :color="getCampaignTypeColor(item.raw.campaignType)"
-52 |           class="text-capitalize"
-53 |         >
-54 |           {{ item.raw.campaignType }}
-55 |         </v-chip>
-56 |       </template>
-57 |       
-58 |       <!-- Created date column -->
-59 |       <template v-slot:item.createdAt="{ item }">
-60 |         {{ formatDate(item.raw.createdAt) }}
-61 |       </template>
-62 |       
-63 |       <!-- Actions column -->
-64 |       <template v-slot:item.actions="{ item }">
-65 |         <v-btn
-66 |           icon
-67 |           variant="text"
-68 |           density="comfortable"
-69 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
-70 |         >
-71 |           <v-icon>mdi-eye</v-icon>
-72 |         </v-btn>
-73 |         <v-btn
-74 |           icon
-75 |           variant="text"
-76 |           density="comfortable"
-77 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
-78 |         >
-79 |           <v-icon>mdi-pencil-outline</v-icon>
-80 |         </v-btn>
-81 |         <v-btn
-82 |           icon
-83 |           variant="text"
-84 |           density="comfortable"
-85 |           color="error"
-86 |           @click="emit('deleteProject', item.raw)"
-87 |         >
-88 |           <v-icon>mdi-delete</v-icon>
-89 |         </v-btn>
-90 |       </template>
-91 |       
-92 |       <!-- Empty state -->
-93 |       <template v-slot:no-data>
-94 |         <div class="d-flex flex-column align-center justify-center pa-6">
-95 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
-96 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
-97 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
-98 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="emit('createProject')">
-99 |             Add First Project
-100 |           </v-btn>
-101 |         </div>
-102 |       </template>
-103 |     </v-data-table-server>
-104 |   </v-card>
-105 | </template>
-106 | 
-107 | <script setup lang="ts">
-108 | import { ref, watch } from 'vue';
-109 | import { formatDate } from '@/helpers/dateUtils';
-110 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
-111 | import type { Project } from '@/types/project';
-112 | 
-113 | // Define props
-114 | interface Props {
-115 |   projects: Project[];
-116 |   mediaplanId: string;
-117 |   totalItems: number;
-118 |   isLoading: boolean;
-119 |   error: string | null;
-120 | }
-121 | 
-122 | // Define emits
-123 | const emit = defineEmits<{
-124 |   (e: 'createProject'): void;
-125 |   (e: 'deleteProject', project: Project): void;
-126 |   (e: 'updatePage', page: number): void;
-127 |   (e: 'updateItemsPerPage', itemsPerPage: number): void;
-128 | }>();
-129 | 
-130 | //
 ```
 
 src/components/overview/CreateFirstProjectDialog.vue
@@ -9594,218 +8654,208 @@ src/components/overview/MediaplanCard.vue
 
 src/components/overview/MediaplanFilters.vue
 ```
-1 | <!-- File: src/components/overview/MediaplanFilters.vue -->
-2 | <template>
-3 |   <!-- Main filters row -->
-4 |   <div class="filter-container">
-5 |     <!-- Brand dropdown -->
-6 |     <div class="filter-item">
-7 |       <v-select
-8 |           v-model="localBrandId"
-9 |           :items="props.sources.brands"
-10 |           item-title="name"
-11 |           item-value="_id"
-12 |           label="Brand"
-13 |           variant="underlined"
-14 |           hide-details
-15 |           prepend-inner-icon="mdi-filter"
-16 |           :disabled="props.loading"
-17 |       />
-18 |     </div>
-19 | 
-20 |     <!-- Sort dropdown -->
-21 |     <div class="filter-item">
-22 |       <v-select
-23 |           v-model="localSort"
-24 |           :items="sortOptions"
-25 |           item-title="text"
-26 |           item-value="value"
-27 |           label="Sort by"
-28 |           variant="underlined"
-29 |           hide-details
-30 |           prepend-inner-icon="mdi-sort"
-31 |           :disabled="props.loading"
-32 |       />
-33 |     </div>
-34 | 
-35 |     <!-- Countries dropdown -->
-36 |     <div class="filter-item">
-37 |       <v-autocomplete
-38 |           v-model="localCountries"
-39 |           :items="props.sources.countries"
-40 |           item-title="value"
-41 |           item-value="abbreviation"
-42 |           label="Country Selection"
-43 |           variant="underlined"
-44 |           hide-details
-45 |           multiple
-46 |           chips
-47 |           closable-chips
-48 |           prepend-inner-icon="mdi-filter"
-49 |           :disabled="props.loading"
-50 |       />
-51 |     </div>
-52 | 
-53 |     <!-- Filter type dropdown -->
-54 |     <div class="filter-item">
-55 |       <v-select
-56 |           v-model="localStatus"
-57 |           :items="filterOptions"
-58 |           item-title="text"
-59 |           item-value="value"
-60 |           label="Filter by"
-61 |           variant="underlined"
-62 |           hide-details
-63 |           prepend-inner-icon="mdi-filter"
-64 |           :disabled="props.loading"
-65 |       />
-66 |     </div>
-67 | 
-68 |     <!-- Search field -->
-69 |     <div class="filter-item search-field">
-70 |       <v-text-field
-71 |           v-model="localSearch"
-72 |           placeholder="Search..."
-73 |           prepend-inner-icon="mdi-magnify"
-74 |           variant="underlined"
-75 |           hide-details
-76 |           flat
-77 |           single-line
-78 |           clearable
-79 |           :disabled="props.loading"
-80 |       />
-81 |     </div>
-82 | 
-83 |     <!-- Create button -->
-84 |     <div class="filter-item create-button">
-85 |       <create-mediaplan-button :disabled="props.loading" />
-86 |     </div>
-87 |   </div>
-88 | </template>
-89 | 
-90 | <script setup lang="ts">
-91 | import { computed } from 'vue';
-92 | import type { MediaplanFilter, FilterSources } from '@/types';
-93 | import CreateMediaplanButton from "@/components/overview/CreateMediaplanButton.vue";
-94 | 
-95 | // Props
-96 | const props = defineProps<{
-97 |   filters: MediaplanFilter;
-98 |   sources: FilterSources;
-99 |   loading: boolean;
-100 |   sortBy: string;
-101 |   sortOrder: 'asc' | 'desc';
-102 | }>();
-103 | 
-104 | // Emits
-105 | const emit = defineEmits<{
-106 |   (e: 'update:filter', payload: { key: keyof MediaplanFilter; value: unknown }): void;
-107 |   (e: 'update:sort',   payload: { sortBy: string; sortOrder: 'asc'|'desc' }): void;
-108 | }>();
+1 | <template>
+2 |   <div class="filter-container">
+3 |     <div class="filter-item">
+4 |       <v-select
+5 |           v-model="localBrandId"
+6 |           :items="brandsFromStore"
+7 |           item-title="value"
+8 |           item-value="abbreviation"
+9 |           label="Brand"
+10 |           variant="underlined"
+11 |           return-object
+12 |           hide-details
+13 |           prepend-inner-icon="mdi-filter"
+14 |           :disabled="props.loading || sourcesStore.isLoading"
+15 |           :loading="sourcesStore.isLoading && !brandsFromStore.length"/>
+16 |     </div>
+17 |     <div class="filter-item">
+18 |       <v-select
+19 |           v-model="localSort"
+20 |           :items="sortOptions"
+21 |           item-title="text"
+22 |           item-value="value"
+23 |           label="Sort by"
+24 |           variant="underlined"
+25 |           hide-details
+26 |           prepend-inner-icon="mdi-sort"
+27 |           :disabled="props.loading"
+28 |       />
+29 |     </div>
+30 | 
+31 |     <div class="filter-item">
+32 |       <v-autocomplete
+33 |           v-model="localCountries"
+34 |           :items="countriesFromStore" item-title="value" item-value="abbreviation" label="Country Selection"
+35 |           variant="underlined"
+36 |           hide-details
+37 |           multiple
+38 |           chips
+39 |           closable-chips
+40 |           prepend-inner-icon="mdi-filter"
+41 |           :disabled="props.loading || sourcesStore.isLoading"
+42 |           :loading="sourcesStore.isLoading && !countriesFromStore.length"/>
+43 |     </div>
+44 | 
+45 |     <div class="filter-item">
+46 |       <v-select
+47 |           v-model="localStatus"
+48 |           :items="filterOptions"
+49 |           item-title="text"
+50 |           item-value="value"
+51 |           label="Filter by"
+52 |           variant="underlined"
+53 |           hide-details
+54 |           prepend-inner-icon="mdi-filter"
+55 |           :disabled="props.loading"
+56 |       />
+57 |     </div>
+58 | 
+59 |     <div class="filter-item search-field">
+60 |       <v-text-field
+61 |           v-model="localSearch"
+62 |           placeholder="Search..."
+63 |           prepend-inner-icon="mdi-magnify"
+64 |           variant="underlined"
+65 |           hide-details
+66 |           flat
+67 |           single-line
+68 |           clearable
+69 |           :disabled="props.loading"
+70 |       />
+71 |     </div>
+72 | 
+73 |     <div class="filter-item create-button">
+74 |       <create-mediaplan-button :disabled="props.loading"/>
+75 |     </div>
+76 |   </div>
+77 | </template>
+78 | 
+79 | <script setup lang="ts">
+80 | import {computed} from 'vue';
+81 | import type {MediaplanFilter, Brand, Source} from '@/types';
+82 | import CreateMediaplanButton from "@/components/overview/CreateMediaplanButton.vue";
+83 | import {useSourcesStore} from '@/stores/sourcesStore';
+84 | 
+85 | const sourcesStore = useSourcesStore();
+86 | 
+87 | const props = defineProps<{
+88 |   filters: MediaplanFilter;
+89 |   loading: boolean;
+90 |   sortBy: string;
+91 |   sortOrder: 'asc' | 'desc';
+92 | }>();
+93 | 
+94 | const emit = defineEmits<{
+95 |   (e: 'update:filter', payload: { key: keyof MediaplanFilter; value: unknown }): void;
+96 |   (e: 'update:sort', payload: { sortBy: string; sortOrder: 'asc' | 'desc' }): void;
+97 | }>();
+98 | 
+99 | const sortOptions = [
+100 |   {text: 'Last updated first', value: 'updated_at:desc'},
+101 |   {text: 'Earliest Start Date first', value: 'start_date:asc'},
+102 |   {text: 'Budget Lowest First', value: 'budget.total:asc'}
+103 | ];
+104 | const filterOptions = [
+105 |   {text: 'All', value: ''},
+106 |   {text: 'Created by me', value: 'created_by_me'},
+107 |   {text: 'For Approval', value: 'for_approval'}
+108 | ];
 109 | 
-110 | // Sort & filter options
-111 | const sortOptions = [
-112 |   { text: 'Last updated first', value: 'updated_at:desc' },
-113 |   { text: 'Earliest Start Date first', value: 'start_date:asc' },
-114 |   { text: 'Start Date Descending', value: 'start_date:desc' },
-115 |   { text: 'Creation Date Ascending', value: 'created_at:asc' },
-116 |   { text: 'Creation Date Descending', value: 'created_at:desc' },
-117 |   { text: 'End Date Ascending', value: 'end_date:asc' },
-118 |   { text: 'End Date Descending', value: 'end_date:desc' },
-119 |   { text: 'Budget Highest First', value: 'budget.total:desc' },
-120 |   { text: 'Budget Lowest First', value: 'budget.total:asc' }
-121 | ];
-122 | const filterOptions = [
-123 |   { text: 'All', value: '' },
-124 |   { text: 'Created by me', value: 'created_by_me' },
-125 |   { text: 'Approval requested', value: 'approval_requested' },
-126 |   { text: 'Currently running', value: 'currently_running' },
-127 |   { text: 'Active', value: 'active' },
-128 |   { text: 'Inactive', value: 'inactive' },
-129 |   { text: 'Draft', value: 'draft' },
-130 |   { text: 'Archived', value: 'archived' },
-131 |   { text: 'For Approval', value: 'for_approval' }
-132 | ];
+110 | const localSearch = computed({
+111 |   get: () => props.filters.search || '',
+112 |   set: v => emit('update:filter', {key: 'search', value: v})
+113 | });
+114 | const localBrandId = computed({
+115 |   get: () => props.filters.brand_id || null,
+116 |   set: v => emit('update:filter', {key: 'brand_id', value: v})
+117 | });
+118 | const localStatus = computed({
+119 |   get: () => props.filters.status || '',
+120 |   set: v => emit('update:filter', {key: 'status', value: v})
+121 | });
+122 | const localCountries = computed<string[]>({
+123 |   get: () => props.filters.country ? (props.filters.country as string).split(',') : [],
+124 |   set: arr => emit('update:filter', {key: 'country', value: arr.join(',')})
+125 | });
+126 | const localSort = computed({
+127 |   get: () => `${props.sortBy}:${props.sortOrder}`,
+128 |   set: v => {
+129 |     const [by, order] = v.split(':') as [string, 'asc' | 'desc'];
+130 |     emit('update:sort', {sortBy: by, sortOrder: order});
+131 |   }
+132 | });
 133 | 
-134 | // Computed bridges for v-model
-135 | const localSearch = computed({
-136 |   get: () => props.filters.search || '',
-137 |   set: v => emit('update:filter', { key: 'search', value: v })
-138 | });
-139 | const localBrandId = computed({
-140 |   get: () => props.filters.brand_id || null,
-141 |   set: v => emit('update:filter', { key: 'brand_id', value: v })
-142 | });
-143 | const localStatus = computed({
-144 |   get: () => props.filters.status || '',
-145 |   set: v => emit('update:filter', { key: 'status', value: v })
-146 | });
-147 | const localCountries = computed<string[]>({
-148 |   get: () => props.filters.country ? (props.filters.country as string).split(',') : [],
-149 |   set: arr => emit('update:filter', { key: 'country', value: arr.join(',') })
-150 | });
-151 | const localSort = computed({
-152 |   get: () => `${props.sortBy}:${props.sortOrder}`,
-153 |   set: v => {
-154 |     const [by, order] = v.split(':') as [string, 'asc'|'desc'];
-155 |     emit('update:sort', { sortBy: by, sortOrder: order });
-156 |   }
-157 | });
-158 | </script>
-159 | 
-160 | <style scoped>
-161 | .filter-container {
-162 |   display: flex;
-163 |   flex-wrap: wrap;
-164 |   gap: 16px;
-165 |   align-items: center;
-166 |   width: 100%;
-167 | }
-168 | .filter-item {
-169 |   min-width: 180px;
-170 | }
-171 | /* Search field grows to fill available space */
-172 | .search-field {
-173 |   flex-grow: 1;
-174 |   min-width: 200px;
-175 |   max-width: 280px;
-176 | }
-177 | /* Create button stays on the right */
-178 | .create-button {
-179 |   margin-left: auto;
-180 |   min-width: auto;
-181 | }
-182 | /* Media queries for smaller screens */
-183 | @media (max-width: 1200px) {
-184 |   .filter-item {
-185 |     min-width: 160px;
+134 | const brandsFromStore = computed((): Brand[] => {
+135 |   return (sourcesStore.getSourceList('brand') as Brand[] | undefined) || [];
+136 | });
+137 | 
+138 | const countriesFromStore = computed((): Source[] => {
+139 |   return (sourcesStore.getSourceList('country') as Source[] | undefined) || [];
+140 | });
+141 | 
+142 | </script>
+143 | 
+144 | <style scoped>
+145 | .filter-container {
+146 |   display: flex;
+147 |   flex-wrap: wrap;
+148 |   gap: 16px;
+149 |   align-items: center;
+150 |   width: 100%;
+151 | }
+152 | 
+153 | .filter-item {
+154 |   min-width: 180px;
+155 | }
+156 | 
+157 | .search-field {
+158 |   flex-grow: 1;
+159 |   min-width: 200px;
+160 |   max-width: 280px;
+161 | }
+162 | 
+163 | .create-button {
+164 |   margin-left: auto;
+165 |   min-width: auto;
+166 | }
+167 | 
+168 | @media (max-width: 1200px) {
+169 |   .filter-item {
+170 |     min-width: 160px;
+171 |   }
+172 | }
+173 | 
+174 | @media (max-width: 960px) {
+175 |   .filter-container {
+176 |     grid-template-columns: 1fr 1fr;
+177 |   }
+178 | 
+179 |   .filter-item {
+180 |     min-width: 140px;
+181 |   }
+182 | 
+183 |   .search-field {
+184 |     flex-basis: 100%;
+185 |     order: 5;
 186 |   }
-187 | }
-188 | @media (max-width: 960px) {
-189 |   .filter-container {
-190 |     grid-template-columns: 1fr 1fr;
-191 |   }
-192 |   .filter-item {
-193 |     min-width: 140px;
+187 | 
+188 |   .create-button {
+189 |     margin-left: 0;
+190 |     flex-basis: 100%;
+191 |     order: 6;
+192 |     display: flex;
+193 |     justify-content: flex-end;
 194 |   }
-195 |   .search-field {
-196 |     flex-basis: 100%;
-197 |     order: 5;
-198 |   }
-199 |   .create-button {
-200 |     margin-left: 0;
-201 |     flex-basis: 100%;
-202 |     order: 6;
-203 |     display: flex;
-204 |     justify-content: flex-end;
-205 |   }
-206 | }
-207 | @media (max-width: 600px) {
-208 |   .filter-item {
-209 |     flex-basis: 100%;
-210 |   }
-211 | }
-212 | </style>
+195 | }
+196 | 
+197 | @media (max-width: 600px) {
+198 |   .filter-item {
+199 |     flex-basis: 100%;
+200 |   }
+201 | }
+202 | </style>
 ```
 
 src/components/overview/MediaplanList.vue
@@ -10040,6 +9090,976 @@ src/components/overview/MediaplanOptionsMenu.vue
 
 src/components/overview/PaginationControls.vue
 ```
+```
+
+src/components/mediaplan/DeleteProjectDialog.vue
+```
+1 | <template>
+2 |   <v-dialog v-model="internalValue" max-width="500" persistent>
+3 |     <v-card>
+4 |       <v-toolbar color="error" density="comfortable" dark>
+5 |         <v-toolbar-title>Confirm Delete</v-toolbar-title>
+6 |       </v-toolbar>
+7 |       
+8 |       <v-card-text class="pa-6">
+9 |         <v-alert
+10 |           v-if="error"
+11 |           type="error"
+12 |           variant="tonal"
+13 |           class="mb-4"
+14 |           closable
+15 |         >
+16 |           {{ error }}
+17 |         </v-alert>
+18 |         
+19 |         <p class="text-body-1">
+20 |           Are you sure you want to delete the project <strong>{{ project?.name }}</strong>?
+21 |         </p>
+22 |         <p class="text-body-2 mt-2 text-red">
+23 |           This action cannot be undone.
+24 |         </p>
+25 |       </v-card-text>
+26 |       
+27 |       <v-card-actions class="pa-6 pt-0">
+28 |         <v-spacer></v-spacer>
+29 |         <v-btn 
+30 |           variant="text" 
+31 |           @click="closeDialog"
+32 |           :disabled="isLoading"
+33 |         >
+34 |           Cancel
+35 |         </v-btn>
+36 |         <v-btn 
+37 |           color="error" 
+38 |           variant="flat"
+39 |           :loading="isLoading"
+40 |           @click="confirmDeletion"
+41 |         >
+42 |           Delete Project
+43 |         </v-btn>
+44 |       </v-card-actions>
+45 |     </v-card>
+46 |   </v-dialog>
+47 | </template>
+48 | 
+49 | <script setup lang="ts">
+50 | import { computed } from 'vue';
+51 | import type { Project } from '@/types/project';
+52 | 
+53 | // Define props
+54 | interface Props {
+55 |   modelValue: boolean;
+56 |   project: Project | null;
+57 |   isLoading: boolean;
+58 |   error: string | null;
+59 | }
+60 | 
+61 | // Define emits
+62 | const emit = defineEmits<{
+63 |   (e: 'update:modelValue', value: boolean): void;
+64 |   (e: 'confirm'): void;
+65 |   (e: 'cancel'): void;
+66 | }>();
+67 | 
+68 | // Computed property for v-model binding
+69 | const internalValue = computed({
+70 |   get: () => props.modelValue,
+71 |   set: (value: boolean) => emit('update:modelValue', value)
+72 | });
+73 | 
+74 | const closeDialog = () => {
+75 |   emit('cancel');
+76 | };
+77 | 
+78 | const confirmDeletion = () => {
+79 |   emit('confirm');
+80 | };
+81 | 
+82 | // Receive props with defaults
+83 | const props = withDefaults(defineProps<Props>(), {
+84 |   project: null,
+85 |   error: null
+86 | });
+87 | </script>
+```
+
+src/components/mediaplan/MediaplanBreadcrumb.vue
+```
+1 | // src/components/mediaplan/MediaplanBreadcrumb.vue (Angepasst)
+2 | 
+3 | <script setup lang="ts">
+4 | import {computed} from 'vue';
+5 | import {useRouter} from 'vue-router';
+6 | import type {Mediaplan} from '@/types/mediaplan'; // Pfad prüfen
+7 | import type {Project} from '@/types/project';
+8 | import {getBrandLogo} from "@/helpers/brandUtils.ts";   // Pfad prüfen
+9 | const router = useRouter();
+10 | 
+11 | // --- Props ---
+12 | // Akzeptiert jetzt optional ein ganzes Project-Objekt
+13 | interface Props {
+14 |   mediaplan?: Mediaplan | null;
+15 |   project?: Project | null;     // NEU: Akzeptiert Project-Objekt statt nur Name
+16 |   campaignName?: string;        // Bleibt vorerst als String
+17 | }
+18 | 
+19 | // Define events
+20 | const emit = defineEmits(['back']);
+21 | 
+22 | // Props mit Defaults
+23 | const props = withDefaults(defineProps<Props>(), {
+24 |   mediaplan: null,
+25 |   project: null,
+26 |   campaignName: '',
+27 | });
+28 | 
+29 | // --- Computed Properties für die Anzeige ---
+30 | const breadcrumbItems = computed(() => {
+31 |   const items = [];
+32 |   // Immer Home/Übersicht als Basis? Oder dynamisch? Hier als Beispiel statisch.
+33 |   items.push({title: 'Mediaplans', to: '/', disabled: !props.mediaplan});
+34 | 
+35 |   if (props.mediaplan) {
+36 |     items.push({
+37 |       title: props.mediaplan.name || 'Mediaplan',
+38 |       // Link nur aktiv, wenn wir tiefer sind (also wenn ein Projekt übergeben wurde)
+39 |       to: props.project ? {name: 'MediaplanDetail', params: {mediaplanId: props.mediaplan._id}} : undefined,
+40 |       disabled: !props.project
+41 |     });
+42 | 
+43 |     if (props.project) {
+44 |       items.push({
+45 |         title: props.project.abbreviation || props.project.descriptive_vars?.projectname || 'Project',
+46 |         // Link nur aktiv, wenn wir tiefer sind (also wenn campaignName übergeben wurde)
+47 |         to: props.campaignName ? {
+48 |           name: 'ProjectDetail',
+49 |           params: {mediaplanId: props.mediaplan._id, projectId: props.project._id}
+50 |         } : undefined,
+51 |         disabled: !props.campaignName
+52 |       });
+53 | 
+54 |       if (props.campaignName) {
+55 |         items.push({
+56 |           title: props.campaignName,
+57 |           // Kein Link für das letzte Element
+58 |           disabled: true
+59 |         });
+60 |       }
+61 |     }
+62 |   }
+63 |   return items;
+64 | });
+65 | 
+66 | 
+67 | // --- Methods ---
+68 | const handleBack = () => {
+69 |   emit('back'); // Event auslösen
+70 |   // Gehe zur Mediaplan-Übersicht (oder eine Ebene höher, falls möglich/gewünscht)
+71 |   router.push({name: 'Overview'}); // Gehe zur allgemeinen Übersicht
+72 | };
+73 | 
+74 | </script>
+75 | 
+76 | <template>
+77 |   <div class="d-flex align-center">
+78 |     <v-btn
+79 |         icon
+80 |         variant="text"
+81 |         size="small"
+82 |         class="mr-1"
+83 |         @click="handleBack"
+84 |         aria-label="Go back to overview"
+85 |     >
+86 |       <v-icon> mdi-arrow-u-left-top
+87 |       </v-icon>
+88 |       <v-tooltip activator="parent" location="bottom">Back to Overview</v-tooltip>
+89 |     </v-btn>
+90 | 
+91 |     <div class="breadcrumb-content d-flex align-center flex-wrap">
+92 |       <div class="brand-logo mr-2 flex-shrink-0" v-if="mediaplan?.brand">
+93 |         <v-img
+94 |             :src="getBrandLogo(mediaplan.brand)"
+95 |             :alt="mediaplan.brand.name || ''"
+96 |             width="50"
+97 |             height="25"
+98 |             contain
+99 |         ></v-img>
+100 |       </div>
+101 | 
+102 |       <v-breadcrumbs :items="breadcrumbItems" class="pa-0">
+103 |         <template v-slot:title="{ item }">
+104 |               <span :class="{ 'text-disabled': item.disabled }">
+105 |                   {{ item.title }}
+106 |               </span>
+107 |         </template>
+108 |       </v-breadcrumbs>
+109 | 
+110 |     </div>
+111 |   </div>
+112 | </template>
+113 | 
+114 | <style scoped>
+115 | .breadcrumb-content {
+116 |   min-height: 40px; /* Höhe beibehalten */
+117 |   overflow: hidden; /* Verhindert Umbruchprobleme bei sehr langen Namen */
+118 | }
+119 | 
+120 | .brand-logo {
+121 |   display: flex;
+122 |   align-items: center;
+123 |   justify-content: center;
+124 | }
+125 | 
+126 | /* Optional: Stelle sicher, dass Breadcrumbs nicht zu viel Platz einnehmen */
+127 | .v-breadcrumbs {
+128 |   flex-grow: 1;
+129 |   /* white-space: nowrap; */ /* Verhindert Umbruch, ggf. mit text-overflow */
+130 | }
+131 | 
+132 | .v-breadcrumbs :deep(.v-breadcrumbs-item) {
+133 |   font-size: 0.86rem; /* Etwas kleinere Schrift */
+134 | }
+135 | 
+136 | .text-disabled {
+137 |   color: #757575 !important; /* Vuetify Standard für disabled */
+138 | }
+139 | </style>
+```
+
+src/components/mediaplan/MediaplanBudgetView.vue
+```
+1 | <template>
+2 |   <div class="budget-view-container">
+3 |     <v-card class="pa-6">
+4 |       <v-card-title class="text-h5 mb-4">Budget View</v-card-title>
+5 |       <v-card-text>
+6 |         <p class="text-body-1">
+7 |           This is a placeholder for the Budget View. This section will be implemented later.
+8 |         </p>
+9 |         <v-divider class="my-4"></v-divider>
+10 |         <p class="text-body-2 text-grey">
+11 |           The Budget View will allow users to manage financial aspects of campaigns, track spending, and allocate resources.
+12 |         </p>
+13 |       </v-card-text>
+14 |     </v-card>
+15 |   </div>
+16 | </template>
+17 | 
+18 | <script setup lang="ts">
+19 | // No props or state needed for this placeholder component
+20 | </script>
+21 | 
+22 | <style scoped>
+23 | .budget-view-container {
+24 |   margin-top: 16px;
+25 | }
+26 | </style>
+```
+
+src/components/mediaplan/MediaplanHeader.vue
+```
+1 | <template>
+2 |   <v-row align="center" justify="end" style="height: 57px;" class="mr-0">
+3 |     <div class="d-flex align-center border-b border-grey-lighten-2 mr-2 h-100">
+4 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Plan Budget:</div>
+5 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">{{ formatCurrency(planBudget) }}</div>
+6 | 
+7 |       <div class="text-subtitle-1 text-grey-darken-1 mr-4">Used:</div>
+8 |       <v-progress-linear
+9 |           :model-value="usedPercentage"
+10 |           color="success"
+11 |           height="8"
+12 |           class="ml-2 mr-4"
+13 |           style="width: 100px"
+14 |       ></v-progress-linear>
+15 |       <span class="text-subtitle-1 text-grey-darken-1">{{ usedPercentage }}%</span>
+16 |     </div>
+17 | 
+18 |     <v-text-field
+19 |         max-width="120px"
+20 |         min-width="100px"
+21 |         v-model="search"
+22 |         placeholder="Search..."
+23 |         hide-details
+24 |         class="mr-2" append-inner-icon="mdi-magnify"
+25 |         @update:modelValue="$emit('update:search', $event)"
+26 |         bg-color="white"
+27 |     ></v-text-field>
+28 | 
+29 |     <v-btn icon="mdi-dots-horizontal" variant="plain">
+30 |     </v-btn>
+31 |   </v-row>
+32 | </template>
+33 | 
+34 | <script setup lang="ts">
+35 | import {ref, watch} from 'vue';
+36 | 
+37 | // Define props
+38 | interface Props {
+39 |   planBudget: number;
+40 |   usedPercentage: number;
+41 |   search: string;
+42 | }
+43 | 
+44 | // Define events
+45 | defineEmits([
+46 |   'update:search'
+47 | ]);
+48 | 
+49 | // Receive props with defaults
+50 | const props = withDefaults(defineProps<Props>(), {
+51 |   planBudget: 0,
+52 |   usedPercentage: 0,
+53 |   search: ''
+54 | });
+55 | 
+56 | // Local state
+57 | const search = ref(props.search);
+58 | 
+59 | // Watch for prop changes
+60 | watch(() => props.search, (newValue) => {
+61 |   search.value = newValue;
+62 | });
+63 | 
+64 | // Format currency
+65 | const formatCurrency = (value: number): string => {
+66 |   // Empfehlung: 'de-DE' für korrekte Euro-Formatierung in Deutschland
+67 |   return new Intl.NumberFormat('de-DE', {
+68 |     style: 'currency',
+69 |     currency: 'EUR',
+70 |     minimumFractionDigits: 0,
+71 |     maximumFractionDigits: 0
+72 |   }).format(value);
+73 | };
+74 | </script>
+```
+
+src/components/mediaplan/MediaplanPlanningViewDatatable.vue
+```
+1 | <template>
+2 |   <div class="planning-view-container mt-4">
+3 |     <EditOrCreateProjectDialog
+4 |         v-model="isProjectDialogOpen"
+5 |         :is-edit="!!selectedProject"
+6 |         :initial-data="selectedProject || undefined"
+7 |         @saved="onProjectSaved"
+8 |     />
+9 |     <v-card class="projects-table elevation-0" variant="flat">
+10 |       <v-theme-provider theme="dark">
+11 |         <v-data-table-server
+12 |             v-model:items-per-page="itemsPerPageModel"
+13 |             v-model:page="pageModel"
+14 |             :headers="projectHeaders"
+15 |             :hide-default-header="type === 'single'"
+16 |             :hide-default-footer="type==='single'"
+17 |             :items="projects"
+18 |             :items-length="totalProjects"
+19 |             :loading="isLoading"
+20 |             item-value="_id"
+21 |             hover
+22 |             class="projects-data-table"
+23 |             @update:options="onOptionsUpdate"
+24 | 
+25 |         >
+26 | <!--          <template v-slot:item.edit="{ item }">
+27 | 
+28 |           </template>-->
+29 | 
+30 |           <template v-slot:item.abbreviation="{ item }">
+31 |             <router-link
+32 |                 :to="{ name: 'ProjectDetail', params: { mediaplanId: props.mediaplanId, projectId: item._id } }"
+33 |                 class="name-link d-flex align-center"
+34 |                 v-if="item.abbreviation && props.mediaplanId && type==='multi'"
+35 |                 @click.stop
+36 |             >
+37 |               <v-avatar size="32" class="mr-2 grey lighten-4"
+38 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
+39 |               <span>{{ item.abbreviation }}</span>
+40 |               <v-tooltip activator="parent" location="top">Open project</v-tooltip>
+41 |             </router-link>
+42 |             <div class="d-flex align-center" v-else-if="item.abbreviation">
+43 |               <v-avatar size="32" class="mr-2 grey lighten-4"
+44 |                         :image="getBrandLogo(item.descriptive_vars?.brand)"></v-avatar>
+45 |               <span>{{ item.abbreviation }}</span>
+46 |             </div>
+47 |             <div v-else>N/A</div>
+48 |           </template>
+49 | 
+50 |           <template v-slot:item.descriptive_vars.country="{ item }">
+51 |             <div class="d-flex align-center" v-if="item.descriptive_vars?.country">
+52 |               <CountryFlag size="1rem" :country="item.descriptive_vars.country" class="mr-2"/>
+53 |               <span>{{ item.descriptive_vars.country }}</span>
+54 |             </div>
+55 |             <div v-else>N/A</div>
+56 |           </template>
+57 | 
+58 |           <template v-slot:item.duration.formatted="{ item }">
+59 |             <div class="d-flex align-center" v-if="item.duration?.formatted">
+60 |               <v-icon size="small" class="mr-2">mdi-calendar-range</v-icon>
+61 |               <span>{{ item.duration.formatted }}</span>
+62 |             </div>
+63 |             <div v-else>N/A</div>
+64 |           </template>
+65 | 
+66 |           <template v-slot:item.detail="{ item }">
+67 |             <span class="d-inline-block text-truncate" style="max-width: 150px;">{{ item.detail || 'N/A' }}</span>
+68 |             <v-tooltip v-if="item.detail && item.detail.length > 30" activator="parent" location="top"
+69 |                        max-width="300px">{{ item.detail }}
+70 |             </v-tooltip>
+71 |           </template>
+72 | 
+73 |           <template v-slot:item.default_vars.campaigntype="{ item }">
+74 |             {{ item.default_vars?.campaigntype || 'N/A' }}
+75 |           </template>
+76 | 
+77 |           <template v-slot:item.default_vars.subsegment="{ item }">
+78 |             {{ item.default_vars?.subsegment || 'N/A' }}
+79 |           </template>
+80 |           <template v-slot:item.budget="{ item }">
+81 |             <BudgetProgress
+82 |                 :used-budget="item?.budget?.used"
+83 |                 :total-budget="item?.budget?.total"
+84 |                 color="success"
+85 |                 bg-color="#ffffff"
+86 |             />
+87 |           </template>
+88 | 
+89 |           <template v-slot:item.is_locked="{ item }">
+90 |             <v-icon v-if="item.is_locked != null" :color="item.is_locked ? 'warning' : 'white'">
+91 |               {{ item.is_locked ? 'mdi-lock' : 'mdi-lock-open-variant' }}
+92 |             </v-icon>
+93 |             <v-tooltip activator="parent" location="top">{{ item.is_locked ? 'Locked' : 'Unlocked' }}</v-tooltip>
+94 |           </template>
+95 | 
+96 |           <template v-slot:item.actions="{ item }">
+97 |             <v-btn icon density="compact" size="small" variant="text" @click.stop="openEditProject(item)" class="mr-2">
+98 |               <v-icon>mdi-pencil-outline</v-icon>
+99 |               <v-tooltip activator="parent" location="top">Edit Project</v-tooltip>
+100 |             </v-btn>
+101 |             <v-menu>
+102 |               <template v-slot:activator="{ props: menuProps }">
+103 |                 <v-btn icon="mdi-dots-vertical" variant="text" density="comfortable" v-bind="menuProps"></v-btn>
+104 |               </template>
+105 |               <v-list density="compact">
+106 |                 <v-list-item @click.stop="openEditProject(item)">
+107 |                   <v-list-item-title>Edit</v-list-item-title>
+108 |                 </v-list-item>
+109 |                 <v-list-item @click.stop="() => console.log('Delete Project:', item._id)" class="text-error">
+110 |                   <v-list-item-title>Delete</v-list-item-title>
+111 |                 </v-list-item>
+112 |               </v-list>
+113 |             </v-menu>
+114 |           </template>
+115 | 
+116 |           <template v-slot:loading>
+117 |             <v-skeleton-loader type="table-row@5"></v-skeleton-loader>
+118 |           </template>
+119 |           <template v-slot:no-data v-if="type === 'multi'">
+120 | 
+121 |             <div class="text-center pa-4 text-disabled">
+122 |               <v-icon size="large" class="mb-2">mdi-database-off-outline</v-icon>
+123 |               <p>No projects found for this mediaplan.</p>
+124 |             </div>
+125 |           </template>
+126 | 
+127 |           <template v-slot:bottom v-if="type === 'multi'">
+128 |             <div class="d-flex align-center pa-4 bg-grey-lighten-2">
+129 |               <v-btn
+130 |                   prepend-icon="mdi-plus"
+131 |                   class="black-text-button"
+132 |                   variant="text"
+133 |                   color="black"
+134 |                   @click="addProject"
+135 |                   :disabled="isLoading"
+136 |               >
+137 |                 Add Project
+138 |               </v-btn>
+139 |             </div>
+140 |           </template>
+141 |         </v-data-table-server>
+142 |       </v-theme-provider>
+143 |     </v-card>
+144 |   </div>
+145 | 
+146 | </template>
+147 | 
+148 | <script setup lang="ts">
+149 | import {ref, watch, computed} from 'vue';
+150 | import {useRouter} from 'vue-router';
+151 | import CountryFlag from '@/components/common/CountryFlag.vue';
+152 | import {getBrandLogo} from "@/helpers/brandUtils";
+153 | import type {Project} from '@/types/project';
+154 | import {projectHeaders} from "@/constants/project.ts";
+155 | import EditOrCreateProjectDialog from "@/components/project/EditOrCreateProjectDialog.vue";
+156 | import BudgetProgress from "@/components/common/dialog/BudgetProgress.vue";
+157 | 
+158 | /* Single for Display on Overviewpage, multi for complete datatable*/
+159 | type ComponentType = 'single' | 'multi';
+160 | 
+161 | // --- Props ---
+162 | interface Props {
+163 |   type: ComponentType | null | undefined;
+164 |   projects: Project[];
+165 |   totalProjects: number;
+166 |   isLoading: boolean;
+167 |   currentPage: number | null;
+168 |   itemsPerPage: number;
+169 |   mediaplanId: string;
+170 | }
+171 | 
+172 | const props = withDefaults(defineProps<Props>(), {
+173 |   type: 'multi',
+174 |   projects: () => [],
+175 |   totalProjects: 0,
+176 |   isLoading: false,
+177 |   currentPage: 0,
+178 |   itemsPerPage: 10,
+179 |   mediaplanId: null // Wichtig: Muss vom Parent (MediaplanDetail) übergeben werden!
+180 | 
+181 | });
+182 | 
+183 | // --- Emits ---
+184 | const emit = defineEmits<{
+185 |   (e: 'addProject'): void;
+186 |   (e: 'update:options', options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }): void;
+187 | }>();
+188 | 
+189 | // Router Instanz
+190 | const router = useRouter();
+191 | 
+192 | // --- Computed Properties für Tabelle ---
+193 | const pageModel = computed({
+194 |   get: () => props.currentPage + 1,
+195 |   set: (value) => {
+196 |   }
+197 | });
+198 | 
+199 | const itemsPerPageModel = computed({
+200 |   get: () => props.itemsPerPage,
+201 |   set: (value) => {
+202 |   }
+203 | });
+204 | 
+205 | 
+206 | // --- Methoden ---
+207 | const onOptionsUpdate = (options: { page: number; itemsPerPage: number; sortBy?: any[]; sortDesc?: boolean[] }) => {
+208 |   emit('update:options', options);
+209 | };
+210 | 
+211 | const addProject = () => {
+212 |   emit('addProject');
+213 | };
+214 | 
+215 | const isProjectDialogOpen = ref(false);
+216 | const selectedProject = ref<Project | null>(null);
+217 | 
+218 | const openCreateProject = () => {
+219 |   selectedProject.value = null;
+220 |   isProjectDialogOpen.value = true;
+221 | };
+222 | 
+223 | const openEditProject = (project: Project) => {
+224 |   selectedProject.value = project;
+225 |   isProjectDialogOpen.value = true;
+226 | };
+227 | 
+228 | const onProjectSaved = (project: Project) => {
+229 |   isProjectDialogOpen.value = false;
+230 |   console.log(project)
+231 |   // Example: refetch list here if needed
+232 |   // await fetchProjects()
+233 | };
+234 | </script>
+235 | 
+236 | 
+237 | <style scoped>
+238 | /* ... (Styles bleiben) ... */
+239 | 
+240 | </style>
+```
+
+src/components/mediaplan/MediaplanProjects.vue
+```
+1 | <template>
+2 |   <v-card>
+3 |     <v-toolbar flat color="primary" density="comfortable">
+4 |       <v-toolbar-title>Projects</v-toolbar-title>
+5 |       <v-spacer></v-spacer>
+6 |       <v-btn 
+7 |         variant="outlined" 
+8 |         prepend-icon="mdi-plus" 
+9 |         @click="$emit('createProject')"
+10 |         :disabled="isLoading"
+11 |         color="white"
+12 |       >
+13 |         Add Project
+14 |       </v-btn>
+15 |     </v-toolbar>
+16 |     
+17 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
+18 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
+19 |     </div>
+20 |     
+21 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
+22 |       <v-alert type="error" title="Error Loading Projects">
+23 |         {{ error }}
+24 |       </v-alert>
+25 |     </div>
+26 |     
+27 |     <v-data-table-server
+28 |       v-else
+29 |       v-model:items-per-page="itemsPerPage"
+30 |       v-model:page="page"
+31 |       :headers="projectHeaders"
+32 |       :items="projects"
+33 |       :items-length="totalProjects"
+34 |       :loading="isLoading"
+35 |       class="elevation-0"
+36 |       @update:options="onOptionsUpdate"
+37 |     >
+38 |       <!-- Country column with flag -->
+39 |       <template v-slot:item.country="{ item }">
+40 |         <div class="d-flex align-center">
+41 |           <v-avatar size="24" class="mr-2">
+42 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
+43 |           </v-avatar>
+44 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
+45 |         </div>
+46 |       </template>
+47 |       
+48 |       <!-- Campaign Type column -->
+49 |       <template v-slot:item.campaignType="{ item }">
+50 |         <v-chip
+51 |           size="small"
+52 |           :color="getCampaignTypeColor(item.raw.campaignType)"
+53 |           class="text-capitalize"
+54 |         >
+55 |           {{ item.raw.campaignType }}
+56 |         </v-chip>
+57 |       </template>
+58 |       
+59 |       <!-- Created date column -->
+60 |       <template v-slot:item.createdAt="{ item }">
+61 |         {{ formatDate(item.raw.createdAt) }}
+62 |       </template>
+63 |       
+64 |       <!-- Actions column -->
+65 |       <template v-slot:item.actions="{ item }">
+66 |         <v-tooltip text="View Details">
+67 |           <template v-slot:activator="{ props }">
+68 |             <v-btn
+69 |               icon
+70 |               variant="text"
+71 |               density="comfortable"
+72 |               v-bind="props"
+73 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
+74 |             >
+75 |               <v-icon>mdi-eye</v-icon>
+76 |             </v-btn>
+77 |           </template>
+78 |         </v-tooltip>
+79 |         
+80 |         <v-tooltip text="Edit Project">
+81 |           <template v-slot:activator="{ props }">
+82 |             <v-btn
+83 |               icon
+84 |               variant="text"
+85 |               density="comfortable"
+86 |               v-bind="props"
+87 |               :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
+88 |             >
+89 |               <v-icon>mdi-pencil-outline</v-icon>
+90 |             </v-btn>
+91 |           </template>
+92 |         </v-tooltip>
+93 |         
+94 |         <v-tooltip text="Delete Project">
+95 |           <template v-slot:activator="{ props }">
+96 |             <v-btn
+97 |               icon
+98 |               variant="text"
+99 |               density="comfortable"
+100 |               color="error"
+101 |               v-bind="props"
+102 |               @click="$emit('deleteProject', item.raw)"
+103 |             >
+104 |               <v-icon>mdi-delete</v-icon>
+105 |             </v-btn>
+106 |           </template>
+107 |         </v-tooltip>
+108 |       </template>
+109 |       
+110 |       <!-- Empty state -->
+111 |       <template v-slot:no-data>
+112 |         <v-sheet class="d-flex flex-column align-center justify-center pa-6" height="300">
+113 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
+114 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
+115 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
+116 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="$emit('createProject')">
+117 |             Add First Project
+118 |           </v-btn>
+119 |         </v-sheet>
+120 |       </template>
+121 |     </v-data-table-server>
+122 |   </v-card>
+123 | </template>
+124 | 
+125 | <script setup lang="ts">
+126 | import { ref, watch } from 'vue';
+127 | import { formatDate } from '@/helpers/dateUtils';
+128 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
+129 | import type { Project } from '@/types/project';
+130 | 
+131 | // Define props
+132 | interface Props {
+133 |   projects: Project[];
+134 |   mediaplanId: string;
+135 |   totalProjects: number;
+136 |   isLoading: boolean;
+137 |   error: string | null;
+138 | }
+139 | 
+140 | // Define emits
+141 | const emit = defineEmits<{
+142 |   (e: 'createProject'): void;
+143 |   (e: 'deleteProject', project: Project): void;
+144 |   (e: 'update:page', page: number): void;
+145 |   (e: 'update:itemsPerPage', itemsPerPage: number): void;
+146 | }>();
+147 | 
+148 | // Component state
+149 | const page = ref<number>(1);
+150 | const itemsPerPage = ref<number>(10);
+151 | 
+152 | // Watch for pagination changes
+153 | watch([page, itemsPerPage], () => {
+154 |   emit('update:page', page.value);
+155 |   emit('update:itemsPerPage', itemsPerPage.value);
+156 | });
+157 | 
+158 | // Project Table Headers
+159 | const projectHeaders = [
+160 |   { title: 'Name', key: 'name', sortable: true },
+161 |   { title: 'Country', key: 'country', sortable: true },
+162 |   { title: 'Language', key: 'language', sortable: true },
+163 |   { title: 'Campaign Type', key: 'campaignType', sortable: true },
+164 |   { title: 'Phase', key: 'phase', sortable: true },
+165 |   { title: 'Goal', key: 'goal', sortable: true },
+166 |   { title: 'Created At', key: 'createdAt', sortable: true },
+167 |   { title: 'Actions', key: 'actions', sortable: false, align: 'end' },
+168 | ];
+169 | 
+170 | // Method to handle datatable option updates (sorting, etc)
+171 | const onOptionsUpdate = (options: any) => {
+172 |   // You can add additional logic here for sorting if needed
+173 |   // For now, we just update pagination
+174 |   page.value = options.page;
+175 |   itemsPerPage.value = options.itemsPerPage;
+176 | };
+177 | 
+178 | // Receive props with defaults
+179 | const props = withDefaults(defineProps<Props>(), {
+180 |   projects: () => [],
+181 |   totalProjects: 0,
+182 |   error: null
+183 | });
+184 | </script>
+185 | 
+186 | <style scoped>
+187 | .error-container {
+188 |   border-radius: 4px;
+189 |   background-color: rgba(var(--v-theme-error), 0.1);
+190 | }
+191 | </style>
+```
+
+src/components/mediaplan/MediaplanViewToggle.vue
+```
+1 | <template>
+2 |   <div class="view-toggle-container">
+3 |     <v-btn-toggle
+4 |         v-model="selectedView"
+5 |         class="view-toggle"
+6 |         density="comfortable"
+7 |         @update:modelValue="$emit('update:modelValue', $event)"
+8 |     >
+9 |       <v-btn value="planning">Planning view</v-btn>
+10 |       <v-btn value="budget">Budget view</v-btn>
+11 |     </v-btn-toggle>
+12 |   </div>
+13 | </template>
+14 | 
+15 | <script setup lang="ts">
+16 | import { ref, watch } from 'vue'
+17 | 
+18 | // Define props
+19 | interface Props {
+20 |   modelValue: string
+21 | }
+22 | 
+23 | defineEmits(['update:modelValue'])
+24 | const props = defineProps<Props>()
+25 | 
+26 | const selectedView = ref(props.modelValue)
+27 | 
+28 | watch(
+29 |     () => props.modelValue,
+30 |     (newValue) => {
+31 |       selectedView.value = newValue
+32 |     },
+33 |     { immediate: true }
+34 | )
+35 | </script>
+36 | 
+37 | <style scoped>
+38 | .view-toggle .v-btn {
+39 |   background-color: white;
+40 |   color: black;
+41 |   border: 1px solid #ccc;
+42 |   border-radius: 0;
+43 |   font-weight: 500;
+44 | }
+45 | 
+46 | .view-toggle .v-btn.v-btn--active {
+47 |   background-color: black;
+48 |   color: white;
+49 |   border-color: black;
+50 | }
+51 | </style>
+```
+
+src/components/mediaplan/ProjectsList.vue
+```
+1 | <template>
+2 |   <v-card>
+3 |     <v-card-title class="d-flex justify-space-between align-center py-4 px-6">
+4 |       <div class="text-h6">Projects</div>
+5 |       <v-btn 
+6 |         color="primary" 
+7 |         prepend-icon="mdi-plus" 
+8 |         @click="emit('createProject')"
+9 |       >
+10 |         Add Project
+11 |       </v-btn>
+12 |     </v-card-title>
+13 |     
+14 |     <v-divider></v-divider>
+15 |     
+16 |     <div v-if="isLoading" class="d-flex justify-center align-center my-6">
+17 |       <v-progress-circular indeterminate color="primary"></v-progress-circular>
+18 |     </div>
+19 |     
+20 |     <div v-else-if="error" class="error-container mx-6 my-4 pa-4">
+21 |       <v-alert type="error" title="Error Loading Projects">
+22 |         {{ error }}
+23 |       </v-alert>
+24 |     </div>
+25 |     
+26 |     <v-data-table-server
+27 |       v-else
+28 |       v-model:items-per-page="itemsPerPage"
+29 |       v-model:page="page"
+30 |       :headers="projectHeaders"
+31 |       :items="projects"
+32 |       :items-length="totalItems"
+33 |       :loading="isLoading"
+34 |       class="elevation-0"
+35 |       @update:options="onOptionsUpdate"
+36 |     >
+37 |       <!-- Country column with flag -->
+38 |       <template v-slot:item.country="{ item }">
+39 |         <div class="d-flex align-center">
+40 |           <v-avatar size="24" class="mr-2">
+41 |             <v-img :src="`/flags/${item.raw.country.code.toLowerCase()}.svg`"></v-img>
+42 |           </v-avatar>
+43 |           <span>{{ item.raw.country.name }} ({{ item.raw.country.code }})</span>
+44 |         </div>
+45 |       </template>
+46 |       
+47 |       <!-- Campaign Type column -->
+48 |       <template v-slot:item.campaignType="{ item }">
+49 |         <v-chip
+50 |           size="small"
+51 |           :color="getCampaignTypeColor(item.raw.campaignType)"
+52 |           class="text-capitalize"
+53 |         >
+54 |           {{ item.raw.campaignType }}
+55 |         </v-chip>
+56 |       </template>
+57 |       
+58 |       <!-- Created date column -->
+59 |       <template v-slot:item.createdAt="{ item }">
+60 |         {{ formatDate(item.raw.createdAt) }}
+61 |       </template>
+62 |       
+63 |       <!-- Actions column -->
+64 |       <template v-slot:item.actions="{ item }">
+65 |         <v-btn
+66 |           icon
+67 |           variant="text"
+68 |           density="comfortable"
+69 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}`"
+70 |         >
+71 |           <v-icon>mdi-eye</v-icon>
+72 |         </v-btn>
+73 |         <v-btn
+74 |           icon
+75 |           variant="text"
+76 |           density="comfortable"
+77 |           :to="`/mediaplans/${mediaplanId}/projects/${item.raw._id}/edit`"
+78 |         >
+79 |           <v-icon>mdi-pencil-outline</v-icon>
+80 |         </v-btn>
+81 |         <v-btn
+82 |           icon
+83 |           variant="text"
+84 |           density="comfortable"
+85 |           color="error"
+86 |           @click="emit('deleteProject', item.raw)"
+87 |         >
+88 |           <v-icon>mdi-delete</v-icon>
+89 |         </v-btn>
+90 |       </template>
+91 |       
+92 |       <!-- Empty state -->
+93 |       <template v-slot:no-data>
+94 |         <div class="d-flex flex-column align-center justify-center pa-6">
+95 |           <v-icon icon="mdi-folder-outline" size="64" color="grey-lighten-1" class="mb-4"></v-icon>
+96 |           <div class="text-h6 text-grey-darken-1">No Projects Found</div>
+97 |           <div class="text-body-2 text-grey mb-4">This mediaplan doesn't have any projects yet.</div>
+98 |           <v-btn color="primary" prepend-icon="mdi-plus" @click="emit('createProject')">
+99 |             Add First Project
+100 |           </v-btn>
+101 |         </div>
+102 |       </template>
+103 |     </v-data-table-server>
+104 |   </v-card>
+105 | </template>
+106 | 
+107 | <script setup lang="ts">
+108 | import { ref, watch } from 'vue';
+109 | import { formatDate } from '@/helpers/dateUtils';
+110 | import { getCampaignTypeColor } from '@/helpers/campaignTypeUtils';
+111 | import type { Project } from '@/types/project';
+112 | 
+113 | // Define props
+114 | interface Props {
+115 |   projects: Project[];
+116 |   mediaplanId: string;
+117 |   totalItems: number;
+118 |   isLoading: boolean;
+119 |   error: string | null;
+120 | }
+121 | 
+122 | // Define emits
+123 | const emit = defineEmits<{
+124 |   (e: 'createProject'): void;
+125 |   (e: 'deleteProject', project: Project): void;
+126 |   (e: 'updatePage', page: number): void;
+127 |   (e: 'updateItemsPerPage', itemsPerPage: number): void;
+128 | }>();
+129 | 
+130 | //
 ```
 
 src/components/project/CampaignListView.vue
