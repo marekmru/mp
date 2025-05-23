@@ -335,29 +335,6 @@ src/components/TopBar.vue
 47 | </style>
 ```
 
-src/layouts/MainLayout.vue
-```
-1 | <template>
-2 |   <TopBar/>
-3 | 
-4 |   <v-main>
-5 |     <v-container fluid class="max-width-container">
-6 |       <slot/>
-7 |     </v-container>
-8 |   </v-main>
-9 | </template>
-10 | 
-11 | <script setup>
-12 | import TopBar from "@/components/TopBar.vue";
-13 | </script>
-14 | 
-15 | <style scoped>
-16 | .max-width-container {
-17 |   max-width: 1440px;
-18 | }
-19 | </style>
-```
-
 src/constants/campaign.ts
 ```
 1 | // src/constants/campaign.ts
@@ -1096,6 +1073,29 @@ src/helpers/statusUtils.ts
 93 |   'Cancelled',
 94 |   'Completed'
 95 | ];
+```
+
+src/layouts/MainLayout.vue
+```
+1 | <template>
+2 |   <TopBar/>
+3 | 
+4 |   <v-main>
+5 |     <v-container fluid class="max-width-container">
+6 |       <slot/>
+7 |     </v-container>
+8 |   </v-main>
+9 | </template>
+10 | 
+11 | <script setup>
+12 | import TopBar from "@/components/TopBar.vue";
+13 | </script>
+14 | 
+15 | <style scoped>
+16 | .max-width-container {
+17 |   max-width: 1440px;
+18 | }
+19 | </style>
 ```
 
 src/mocks/mediaplanProjects.ts
@@ -4322,113 +4322,117 @@ src/stores/createMediaplanStore.ts
 2 | import { defineStore } from 'pinia';
 3 | import { ref } from 'vue';
 4 | import type { PONumber } from '@/types/mediaplan';
-5 | // useSourcesStore is no longer needed here directly for brands
-6 | // import { useSourcesStore } from './sourcesStore';
-7 | 
-8 | export const useCreateMediaplanStore = defineStore('createMediaplan', () => {
-9 |     // const sourcesStore = useSourcesStore(); // Not needed if brands are handled in component
-10 | 
-11 |     // State
-12 |     // const brands = ref<Brand[]>([]); // Removed
-13 |     const poNumbers = ref<PONumber[]>([]);
-14 |     const isLoading = ref(false); // This can be for PO numbers fetching and mediaplan creation
-15 |     const error = ref<string | null>(null);
-16 | 
-17 |     // Actions
-18 |     // async function fetchBrands() { ... } // Removed
-19 | 
-20 |     async function fetchPONumbers() {
-21 |         isLoading.value = true;
-22 |         error.value = null;
-23 | 
-24 |         try {
-25 |             // In a real application, this would be an API call to get PO numbers
-26 |             // const response = await customFetch('/po-numbers');
-27 |             // poNumbers.value = response;
-28 | 
-29 |             // For demo purposes, use mock data
-30 |             poNumbers.value = [
-31 |                 { _id: 'po-1', name: 'PO12345', value: 10000 },
-32 |                 { _id: 'po-2', name: 'PO67890', value: 15000 },
-33 |                 { _id: 'po-3', name: 'PO24680', value: 20000 },
-34 |             ];
-35 |         } catch (err) {
-36 |             error.value = err instanceof Error ? err.message : 'Error fetching PO numbers';
-37 |             console.error('Error fetching PO numbers:', err);
-38 |         } finally {
-39 |             isLoading.value = false;
-40 |         }
-41 |     }
-42 | 
-43 |     async function createPO(poData: Omit<PONumber, '_id'> & { metadata?: any }): Promise<PONumber> {
-44 |         isLoading.value = true;
-45 |         error.value = null;
-46 | 
-47 |         try {
-48 |             // In a real application, this would be an API call to create a PO
-49 |             // const response = await customFetch('/po-numbers', {
-50 |             //   method: 'POST',
-51 |             //   headers: {
-52 |             //     'Content-Type': 'application/json',
-53 |             //   },
-54 |             //   body: JSON.stringify(poData),
-55 |             // });
-56 |             // return response;
-57 | 
-58 |             // For demo purposes, simulate API call
-59 |             await new Promise(resolve => setTimeout(resolve, 500));
-60 | 
-61 |             const newPO: PONumber = {
-62 |                 _id: `po-${Date.now()}`,
-63 |                 name: poData.name,
-64 |                 value: poData.value
-65 |             };
-66 | 
-67 |             poNumbers.value.push(newPO);
+5 | import customFetch from "../helpers/customFetch.ts";
+6 | import type {Mediaplan} from "../types";
+7 | // useSourcesStore is no longer needed here directly for brands
+8 | // import { useSourcesStore } from './sourcesStore';
+9 | 
+10 | export const useCreateMediaplanStore = defineStore('createMediaplan', () => {
+11 |     // const sourcesStore = useSourcesStore(); // Not needed if brands are handled in component
+12 | 
+13 |     // State
+14 |     // const brands = ref<Brand[]>([]); // Removed
+15 |     const poNumbers = ref<PONumber[]>([]);
+16 |     const isLoading = ref(false); // This can be for PO numbers fetching and mediaplan creation
+17 |     const error = ref<string | null>(null);
+18 | 
+19 |     // Actions
+20 |     // async function fetchBrands() { ... } // Removed
+21 | 
+22 |     async function fetchPONumbers() {
+23 |         isLoading.value = true;
+24 |         error.value = null;
+25 | 
+26 |         try {
+27 |             // In a real application, this would be an API call to get PO numbers
+28 |             // const response = await customFetch('/po-numbers');
+29 |             // poNumbers.value = response;
+30 | 
+31 |             // For demo purposes, use mock data
+32 |             poNumbers.value = [
+33 |                 { _id: 'po-1', name: 'PO12345', value: 10000 },
+34 |                 { _id: 'po-2', name: 'PO67890', value: 15000 },
+35 |                 { _id: 'po-3', name: 'PO24680', value: 20000 },
+36 |             ];
+37 |         } catch (err) {
+38 |             error.value = err instanceof Error ? err.message : 'Error fetching PO numbers';
+39 |             console.error('Error fetching PO numbers:', err);
+40 |         } finally {
+41 |             isLoading.value = false;
+42 |         }
+43 |     }
+44 | 
+45 |     async function createPO(poData: Omit<PONumber, '_id'> & { metadata?: any }): Promise<PONumber> {
+46 |         isLoading.value = true;
+47 |         error.value = null;
+48 | 
+49 |         try {
+50 |             // In a real application, this would be an API call to create a PO
+51 |             // const response = await customFetch('/po-numbers', {
+52 |             //   method: 'POST',
+53 |             //   headers: {
+54 |             //     'Content-Type': 'application/json',
+55 |             //   },
+56 |             //   body: JSON.stringify(poData),
+57 |             // });
+58 |             // return response;
+59 | 
+60 |             // For demo purposes, simulate API call
+61 |             await new Promise(resolve => setTimeout(resolve, 500));
+62 | 
+63 |             const newPO: PONumber = {
+64 |                 _id: `po-${Date.now()}`,
+65 |                 name: poData.name,
+66 |                 value: poData.value
+67 |             };
 68 | 
-69 |             return newPO;
-70 |         } catch (err) {
-71 |             error.value = err instanceof Error ? err.message : 'Error creating PO';
-72 |             console.error('Error creating PO:', err);
-73 |             throw err;
-74 |         } finally {
-75 |             isLoading.value = false;
-76 |         }
-77 |     }
-78 | 
-79 |     // Mediaplan creation logic (example, can be expanded)
-80 |     async function createMediaplan(mediaplanData: any): Promise<any> {
-81 |         isLoading.value = true;
-82 |         error.value = null;
-83 |         try {
-84 |             // Simulate API call
-85 |             console.log('Simulating mediaplan creation with data:', mediaplanData);
-86 |             await new Promise(resolve => setTimeout(resolve, 1000));
-87 |             const mockMediaplanId = `mp-${Date.now()}`;
-88 |             // In a real API call, you would return the created mediaplan object
-89 |             return { _id: mockMediaplanId, ...mediaplanData };
-90 |         } catch (err) {
-91 |             error.value = err instanceof Error ? err.message : 'Error creating mediaplan';
-92 |             console.error(error.value, err);
-93 |             throw err;
-94 |         } finally {
-95 |             isLoading.value = false;
-96 |         }
-97 |     }
-98 | 
-99 | 
-100 |     return {
-101 |         // State
-102 |         poNumbers,
-103 |         isLoading,
-104 |         error,
-105 | 
-106 |         // Actions
-107 |         fetchPONumbers,
-108 |         createPO,
-109 |         createMediaplan, // Added for completeness if store handles creation
-110 |     };
-111 | });
+69 |             poNumbers.value.push(newPO);
+70 | 
+71 |             return newPO;
+72 |         } catch (err) {
+73 |             error.value = err instanceof Error ? err.message : 'Error creating PO';
+74 |             console.error('Error creating PO:', err);
+75 |             throw err;
+76 |         } finally {
+77 |             isLoading.value = false;
+78 |         }
+79 |     }
+80 | 
+81 |     // Mediaplan creation logic (example, can be expanded)
+82 |     async function createMediaplan(mediaplanData: Mediaplan): Promise<Mediaplan | null> {
+83 |         isLoading.value = true;
+84 |         error.value = null;
+85 |         try {
+86 |             // Actual API call to POST /mediaplans
+87 |             const newMediaplan = await customFetch('mediaplans', {
+88 |                 method: 'POST',
+89 |                 body: JSON.stringify(mediaplanData),
+90 |             }) as Mediaplan; // Assuming the response is the created Mediaplan object
+91 |             return newMediaplan;
+92 |         } catch (err) {
+93 |             error.value = err instanceof Error ? err.message : 'Error creating mediaplan';
+94 |             console.error('Error creating mediaplan:', err);
+95 |             // Optionally, you might want to emit an error event or rethrow
+96 |             // depending on how you want to handle errors globally vs. locally
+97 |             return null; // Or throw err;
+98 |         } finally {
+99 |             isLoading.value = false;
+100 |         }
+101 |     }
+102 | 
+103 | 
+104 |     return {
+105 |         // State
+106 |         poNumbers,
+107 |         isLoading,
+108 |         error,
+109 | 
+110 |         // Actions
+111 |         fetchPONumbers,
+112 |         createPO,
+113 |         createMediaplan, // Added for completeness if store handles creation
+114 |     };
+115 | });
 ```
 
 src/stores/lineitemStore.ts
@@ -6698,420 +6702,6 @@ src/components/campaign/LineItemTable.vue
 168 | </style>
 ```
 
-src/components/common/CountryFlag.vue
-```
-1 | <template>
-2 |   <span :class="`fi fi-${country.toLowerCase()}`" :style="flagStyle"></span>
-3 | </template>
-4 | 
-5 | <script setup lang="ts">
-6 | import {computed} from 'vue';
-7 | import 'flag-icons/css/flag-icons.min.css';
-8 | 
-9 | const props = defineProps<{
-10 |   country: string;
-11 |   size?: string;
-12 | }>();
-13 | 
-14 | const flagStyle = computed(() => {
-15 |   return {
-16 |     fontSize: props.size || '1rem',
-17 |     lineHeight: 1,
-18 |     verticalAlign: 'middle',
-19 |     display: 'inline-block'
-20 |   };
-21 | });
-22 | </script>
-23 | 
-24 | <style scoped>
-25 | 
-26 | 
-27 | span[class^="fi"] {
-28 | 
-29 | }
-30 | 
-31 | </style>
-```
-
-src/components/common/FormattedCurrencyInput.vue
-```
-1 | <!-- src/components/form/CurrencyInput.vue -->
-2 | <template>
-3 |   <v-text-field
-4 |       v-model="displayValue"
-5 |       v-bind="attrs"
-6 |       type="text"
-7 |       inputmode="decimal"
-8 |       autocomplete="off"
-9 |       @keydown="onKeyDown"
-10 |       @input="onInput"
-11 |       @blur="onBlur"
-12 |   />
-13 | </template>
-14 | 
-15 | <script setup lang="ts">
-16 | import {ref, watch, useAttrs} from 'vue'
-17 | 
-18 | // Define only our custom props
-19 | const props = defineProps<{
-20 |   modelValue: number | null
-21 |   decimal?: 'comma' | 'dot'
-22 |   allowDecimals?: boolean
-23 | }>()
-24 | 
-25 | // Emit the numeric value back to the parent
-26 | const emit = defineEmits<{
-27 |   (e: 'update:modelValue', value: number | null): void
-28 | }>()
-29 | 
-30 | // Capture and pass through all other <v-text-field> props
-31 | const attrs = useAttrs()
-32 | 
-33 | // Internal display value (formatted string)
-34 | const displayValue = ref('')
-35 | 
-36 | // Default prop values
-37 | const decimal = props.decimal ?? 'comma'
-38 | const allowDecimals = props.allowDecimals ?? true
-39 | 
-40 | // Format number to string (1.000,00 or 1,000.00)
-41 | function format(value: number | null): string {
-42 |   if (value == null) return ''
-43 | 
-44 |   const hasDecimals = value % 1 !== 0
-45 | 
-46 |   return new Intl.NumberFormat(
-47 |       decimal === 'dot' ? 'en-US' : 'de-DE',
-48 |       {
-49 |         minimumFractionDigits: hasDecimals && allowDecimals ? 2 : 0,
-50 |         maximumFractionDigits: allowDecimals ? 2 : 0
-51 |       }
-52 |   ).format(value)
-53 | }
-54 | 
-55 | // Parse user input string to number
-56 | function parse(value: string): number | null {
-57 |   const sanitized = value
-58 |       .replace(/\s/g, '')
-59 |       .replace(decimal === 'comma' ? /\./g : /,/g, '') // remove 1.000
-60 |       .replace(decimal === 'comma' ? /,/g : /\./g, '.') // 1.000,00 → 1000.00
-61 | 
-62 |   const number = parseFloat(sanitized)
-63 |   return isNaN(number) ? null : number
-64 | }
-65 | 
-66 | // Initial sync: modelValue → display
-67 | watch(() => props.modelValue, (val) => {
-68 |   displayValue.value = format(val)
-69 | }, {immediate: true})
-70 | 
-71 | // Key restriction handler
-72 | function onKeyDown(e: KeyboardEvent) {
-73 |   const decimalChar = decimal === 'comma' ? ',' : '.'
-74 | 
-75 |   const isAllowed = [
-76 |     'Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight',
-77 |     ...Array.from({length: 10}, (_, i) => `${i}`)
-78 |   ]
-79 | 
-80 |   if (allowDecimals) isAllowed.push(decimalChar)
-81 | 
-82 |   if (!isAllowed.includes(e.key)) {
-83 |     e.preventDefault()
-84 |   }
-85 | }
-86 | 
-87 | // Input handler (while typing)
-88 | function onInput(e: Event) {
-89 |   const val = (e.target as HTMLInputElement).value
-90 |   displayValue.value = val
-91 |   emit('update:modelValue', parse(val))
-92 | }
-93 | 
-94 | // Format final value on blur
-95 | function onBlur() {
-96 |   displayValue.value = format(parse(displayValue.value))
-97 | }
-98 | </script>
-```
-
-src/components/common/MediaplanBuilderTypeSwitch.vue
-```
-1 | <template>
-2 |     <v-select
-3 |         v-model="localBuilderType"
-4 |         :items="builderOptions"
-5 |         item-title="name"
-6 |         item-value="id"
-7 |         density="compact"
-8 |         hide-details
-9 |         variant="outlined"
-10 |         class="ml-2"
-11 |         style="max-width: 140px"
-12 |         @update:model-value="emit('update:builderType', $event)"
-13 |     />
-14 | </template>
-15 | 
-16 | <script setup>
-17 | 
-18 | import {ref, watch, defineEmits} from 'vue'
-19 | 
-20 | const emit = defineEmits(['update:builderType'])
-21 | const props = defineProps({
-22 |   builderType: {type: String, default: 'sea'}
-23 | })
-24 | 
-25 | const localBuilderType = ref(props.builderType)
-26 | watch(() => props.builderType, (val) => localBuilderType.value = val)
-27 | 
-28 | const builderOptions = [
-29 |   {id: 'sea', name: 'SEA'},
-30 |   {id: 'social', name: 'Social'},
-31 |   {id: 'display', name: 'Display'},
-32 |   {id: '2layer', name: '2-Layer'}
-33 | ]
-34 | </script>
-```
-
-src/components/common/MediaplanTopSection.vue
-```
-1 | <template>
-2 |   <!-- Top breadcrumb row -->
-3 |   <v-row class="mb-0">
-4 |     <v-col cols="12" md="5" class="d-flex align-center pt-0 pb-0">
-5 |       <MediaplanBreadcrumb :mediaplan="mediaplan" :project="project"/>
-6 |     </v-col>
-7 |   </v-row>
-8 | 
-9 |   <!-- Main control bar -->
-10 |   <v-row class="mb-7" no-gutters align="center">
-11 |     <!-- Left side: Builder type & view toggle -->
-12 |     <v-col class="d-flex align-center">
-13 |       <MediaplanViewToggle
-14 |           v-model="internalView"
-15 |           class="ml-4"
-16 |       />
-17 |       <MediaplanBuilderTypeSwitch
-18 |           :builder-type="selectedBuilderType"
-19 |           @update:builderType="selectedBuilderType = $event"
-20 |       />
-21 |     </v-col>
-22 | 
-23 |     <!-- Right side: Header with budget and search -->
-24 |     <v-col class="d-flex justify-end pr-0">
-25 |       <MediaplanHeader
-26 |           :plan-budget="mediaplan?.budget?.total || 0"
-27 |           :used-percentage="calculatePercentage(mediaplan?.budget?.used, mediaplan?.budget?.total)"
-28 |           :search="search"
-29 |           @update:search="val => emit('update:search', val)"
-30 |           :is-loading="isLoading"
-31 |       />
-32 |     </v-col>
-33 |   </v-row>
-34 | </template>
-35 | 
-36 | <script setup lang="ts">
-37 | import {toRefs, computed} from 'vue'
-38 | import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue'
-39 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue'
-40 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue'
-41 | import MediaplanBuilderTypeSwitch from '@/components/common/MediaplanBuilderTypeSwitch.vue'
-42 | 
-43 | import type {Mediaplan} from '@/types/mediaplan'
-44 | import type {Project} from '@/types/project'
-45 | import type {Campaign} from '@/types/campaign'
-46 | 
-47 | const props = defineProps<{
-48 |   mediaplan: Mediaplan | null
-49 |   project: Project | null
-50 |   campaign?: Campaign | null
-51 |   search: string
-52 |   isLoading: boolean
-53 |   currentView: 'planning' | 'budget'
-54 |   builderType: 'sea' | 'social' | 'display' | '2layer'
-55 | }>()
-56 | 
-57 | const emit = defineEmits<{
-58 |   (e: 'update:search', value: string): void
-59 |   (e: 'update:current-view', value: 'planning' | 'budget'): void
-60 |   (e: 'update:builderType', value: 'sea' | 'social' | 'display' | '2layer'): void
-61 | }>()
-62 | 
-63 | const {mediaplan, project, campaign, search, isLoading, currentView, builderType} = toRefs(props)
-64 | 
-65 | // Sync the internal view toggle with prop
-66 | const internalView = computed<'planning' | 'budget'>({
-67 |   get: () => currentView.value,
-68 |   set: val => emit('update:current-view', val),
-69 | })
-70 | 
-71 | // Sync builder type selection
-72 | const selectedBuilderType = computed<'sea' | 'social' | 'display' | '2layer'>({
-73 |   get: () => builderType.value,
-74 |   set: val => emit('update:builderType', val),
-75 | })
-76 | 
-77 | // Determine breadcrumb level
-78 | const levelDisplay = computed(() => {
-79 |   if (campaign?.value) return 'Campaign'
-80 |   if (project.value) return 'Project'
-81 |   return 'Mediaplan'
-82 | })
-83 | 
-84 | function calculatePercentage(used: number | undefined, total: number | undefined): number {
-85 |   if (!used || !total) return 0
-86 |   return (used / total) * 100
-87 | }
-88 | </script>
-89 | 
-90 | <style scoped>
-91 | /* Optional: eigene Styles hier hinzufügen */
-92 | </style>
-```
-
-src/components/common/NotificationSnackbar.vue
-```
-1 | <template>
-2 |   <v-snackbar
-3 |     v-model="notification.show"
-4 |     :color="notification.type"
-5 |     :timeout="notification.timeout"
-6 |     class="notification-snackbar"
-7 |   >
-8 |     <div class="d-flex align-center">
-9 |       <v-icon :icon="getIconForType(notification.type)" class="mr-3" />
-10 |       <span>{{ notification.text }}</span>
-11 |     </div>
-12 |     <template v-slot:actions v-if="notification.closable">
-13 |       <v-btn
-14 |         icon
-15 |         variant="text"
-16 |         @click="closeNotification"
-17 |         size="small"
-18 |       >
-19 |         <v-icon>mdi-close</v-icon>
-20 |       </v-btn>
-21 |     </template>
-22 |   </v-snackbar>
-23 | </template>
-24 | 
-25 | <script setup lang="ts">
-26 | import { notification, closeNotification, NotificationType } from '@/helpers/notificationUtils';
-27 | 
-28 | /**
-29 |  * Gets the appropriate icon for the notification type
-30 |  * @param type Notification type
-31 |  * @returns Material Design Icon name
-32 |  */
-33 | const getIconForType = (type: NotificationType): string => {
-34 |   switch (type) {
-35 |     case NotificationType.SUCCESS:
-36 |       return 'mdi-check-circle';
-37 |     case NotificationType.ERROR:
-38 |       return 'mdi-alert-circle';
-39 |     case NotificationType.WARNING:
-40 |       return 'mdi-alert';
-41 |     case NotificationType.INFO:
-42 |     default:
-43 |       return 'mdi-information';
-44 |   }
-45 | };
-46 | </script>
-47 | 
-48 | <style scoped>
-49 | .notification-snackbar {
-50 |   z-index: 9999;
-51 | }
-52 | </style>
-```
-
-src/components/common/PaginationControls.vue
-```
-1 | <template>
-2 |   <div class="d-flex justify-center align-center my-4">
-3 |     <v-pagination
-4 |         v-model="modelValue"
-5 |         :length="length"
-6 |         :disabled="disabled"
-7 |         :total-visible="totalVisible"
-8 |         rounded="circle"
-9 |         @update:model-value="updatePage"
-10 |     />
-11 | 
-12 |     <div v-if="showItemsPerPage" class="ml-4 d-flex align-center">
-13 |       <span class="text-caption mr-2">Items per page:</span>
-14 |       <v-select
-15 |           v-model="itemsPerPage"
-16 |           :items="itemsPerPageOptions"
-17 |           density="compact"
-18 |           variant="outlined"
-19 |           hide-details
-20 |           class="items-per-page-select"
-21 |           @update:model-value="updateItemsPerPage"
-22 |       />
-23 |     </div>
-24 |   </div>
-25 | </template>
-26 | 
-27 | <script setup lang="ts">
-28 | import { computed, ref, watch } from 'vue';
-29 | 
-30 | interface Props {
-31 |   modelValue: number;
-32 |   length: number;
-33 |   disabled?: boolean;
-34 |   totalVisible?: number;
-35 |   showItemsPerPage?: boolean;
-36 |   itemsPerPageValue?: number;
-37 |   itemsPerPageOptions?: number[];
-38 | }
-39 | 
-40 | const props = withDefaults(defineProps<Props>(), {
-41 |   disabled: false,
-42 |   totalVisible: 7,
-43 |   showItemsPerPage: true,
-44 |   itemsPerPageValue: 10,
-45 |   itemsPerPageOptions: () => [10, 25, 50, 100]
-46 | });
-47 | 
-48 | const emit = defineEmits<{
-49 |   (e: 'update:model-value', value: number): void;
-50 |   (e: 'update:items-per-page', value: number): void;
-51 | }>();
-52 | 
-53 | // Internal model value for v-pagination (needs to be 1-based)
-54 | const modelValue = computed({
-55 |   get: () => props.modelValue + 1, // Convert from 0-based to 1-based
-56 |   set: (value: number) => {
-57 |     emit('update:model-value', value - 1); // Convert from 1-based to 0-based
-58 |   }
-59 | });
-60 | 
-61 | // Items per page handling
-62 | const itemsPerPage = ref(props.itemsPerPageValue);
-63 | 
-64 | // When props change, update the local state
-65 | watch(() => props.itemsPerPageValue, (newValue) => {
-66 |   itemsPerPage.value = newValue;
-67 | });
-68 | 
-69 | const updatePage = (page: number) => {
-70 |   emit('update:model-value', page - 1); // Convert from 1-based to 0-based
-71 | };
-72 | 
-73 | const updateItemsPerPage = (value: number) => {
-74 |   itemsPerPage.value = value;
-75 |   emit('update:items-per-page', value);
-76 | };
-77 | </script>
-78 | 
-79 | <style scoped>
-80 | .items-per-page-select {
-81 |   width: 80px;
-82 | }
-83 | </style>
-```
-
 src/components/mediaplan/DeleteProjectDialog.vue
 ```
 1 | <template>
@@ -8082,6 +7672,420 @@ src/components/mediaplan/ProjectsList.vue
 130 | //
 ```
 
+src/components/common/CountryFlag.vue
+```
+1 | <template>
+2 |   <span :class="`fi fi-${country.toLowerCase()}`" :style="flagStyle"></span>
+3 | </template>
+4 | 
+5 | <script setup lang="ts">
+6 | import {computed} from 'vue';
+7 | import 'flag-icons/css/flag-icons.min.css';
+8 | 
+9 | const props = defineProps<{
+10 |   country: string;
+11 |   size?: string;
+12 | }>();
+13 | 
+14 | const flagStyle = computed(() => {
+15 |   return {
+16 |     fontSize: props.size || '1rem',
+17 |     lineHeight: 1,
+18 |     verticalAlign: 'middle',
+19 |     display: 'inline-block'
+20 |   };
+21 | });
+22 | </script>
+23 | 
+24 | <style scoped>
+25 | 
+26 | 
+27 | span[class^="fi"] {
+28 | 
+29 | }
+30 | 
+31 | </style>
+```
+
+src/components/common/FormattedCurrencyInput.vue
+```
+1 | <!-- src/components/form/CurrencyInput.vue -->
+2 | <template>
+3 |   <v-text-field
+4 |       v-model="displayValue"
+5 |       v-bind="attrs"
+6 |       type="text"
+7 |       inputmode="decimal"
+8 |       autocomplete="off"
+9 |       @keydown="onKeyDown"
+10 |       @input="onInput"
+11 |       @blur="onBlur"
+12 |   />
+13 | </template>
+14 | 
+15 | <script setup lang="ts">
+16 | import {ref, watch, useAttrs} from 'vue'
+17 | 
+18 | // Define only our custom props
+19 | const props = defineProps<{
+20 |   modelValue: number | null
+21 |   decimal?: 'comma' | 'dot'
+22 |   allowDecimals?: boolean
+23 | }>()
+24 | 
+25 | // Emit the numeric value back to the parent
+26 | const emit = defineEmits<{
+27 |   (e: 'update:modelValue', value: number | null): void
+28 | }>()
+29 | 
+30 | // Capture and pass through all other <v-text-field> props
+31 | const attrs = useAttrs()
+32 | 
+33 | // Internal display value (formatted string)
+34 | const displayValue = ref('')
+35 | 
+36 | // Default prop values
+37 | const decimal = props.decimal ?? 'comma'
+38 | const allowDecimals = props.allowDecimals ?? true
+39 | 
+40 | // Format number to string (1.000,00 or 1,000.00)
+41 | function format(value: number | null): string {
+42 |   if (value == null) return ''
+43 | 
+44 |   const hasDecimals = value % 1 !== 0
+45 | 
+46 |   return new Intl.NumberFormat(
+47 |       decimal === 'dot' ? 'en-US' : 'de-DE',
+48 |       {
+49 |         minimumFractionDigits: hasDecimals && allowDecimals ? 2 : 0,
+50 |         maximumFractionDigits: allowDecimals ? 2 : 0
+51 |       }
+52 |   ).format(value)
+53 | }
+54 | 
+55 | // Parse user input string to number
+56 | function parse(value: string): number | null {
+57 |   const sanitized = value
+58 |       .replace(/\s/g, '')
+59 |       .replace(decimal === 'comma' ? /\./g : /,/g, '') // remove 1.000
+60 |       .replace(decimal === 'comma' ? /,/g : /\./g, '.') // 1.000,00 → 1000.00
+61 | 
+62 |   const number = parseFloat(sanitized)
+63 |   return isNaN(number) ? null : number
+64 | }
+65 | 
+66 | // Initial sync: modelValue → display
+67 | watch(() => props.modelValue, (val) => {
+68 |   displayValue.value = format(val)
+69 | }, {immediate: true})
+70 | 
+71 | // Key restriction handler
+72 | function onKeyDown(e: KeyboardEvent) {
+73 |   const decimalChar = decimal === 'comma' ? ',' : '.'
+74 | 
+75 |   const isAllowed = [
+76 |     'Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight',
+77 |     ...Array.from({length: 10}, (_, i) => `${i}`)
+78 |   ]
+79 | 
+80 |   if (allowDecimals) isAllowed.push(decimalChar)
+81 | 
+82 |   if (!isAllowed.includes(e.key)) {
+83 |     e.preventDefault()
+84 |   }
+85 | }
+86 | 
+87 | // Input handler (while typing)
+88 | function onInput(e: Event) {
+89 |   const val = (e.target as HTMLInputElement).value
+90 |   displayValue.value = val
+91 |   emit('update:modelValue', parse(val))
+92 | }
+93 | 
+94 | // Format final value on blur
+95 | function onBlur() {
+96 |   displayValue.value = format(parse(displayValue.value))
+97 | }
+98 | </script>
+```
+
+src/components/common/MediaplanBuilderTypeSwitch.vue
+```
+1 | <template>
+2 |     <v-select
+3 |         v-model="localBuilderType"
+4 |         :items="builderOptions"
+5 |         item-title="name"
+6 |         item-value="id"
+7 |         density="compact"
+8 |         hide-details
+9 |         variant="outlined"
+10 |         class="ml-2"
+11 |         style="max-width: 140px"
+12 |         @update:model-value="emit('update:builderType', $event)"
+13 |     />
+14 | </template>
+15 | 
+16 | <script setup>
+17 | 
+18 | import {ref, watch, defineEmits} from 'vue'
+19 | 
+20 | const emit = defineEmits(['update:builderType'])
+21 | const props = defineProps({
+22 |   builderType: {type: String, default: 'sea'}
+23 | })
+24 | 
+25 | const localBuilderType = ref(props.builderType)
+26 | watch(() => props.builderType, (val) => localBuilderType.value = val)
+27 | 
+28 | const builderOptions = [
+29 |   {id: 'sea', name: 'SEA'},
+30 |   {id: 'social', name: 'Social'},
+31 |   {id: 'display', name: 'Display'},
+32 |   {id: '2layer', name: '2-Layer'}
+33 | ]
+34 | </script>
+```
+
+src/components/common/MediaplanTopSection.vue
+```
+1 | <template>
+2 |   <!-- Top breadcrumb row -->
+3 |   <v-row class="mb-0">
+4 |     <v-col cols="12" md="5" class="d-flex align-center pt-0 pb-0">
+5 |       <MediaplanBreadcrumb :mediaplan="mediaplan" :project="project"/>
+6 |     </v-col>
+7 |   </v-row>
+8 | 
+9 |   <!-- Main control bar -->
+10 |   <v-row class="mb-7" no-gutters align="center">
+11 |     <!-- Left side: Builder type & view toggle -->
+12 |     <v-col class="d-flex align-center">
+13 |       <MediaplanViewToggle
+14 |           v-model="internalView"
+15 |           class="ml-4"
+16 |       />
+17 |       <MediaplanBuilderTypeSwitch
+18 |           :builder-type="selectedBuilderType"
+19 |           @update:builderType="selectedBuilderType = $event"
+20 |       />
+21 |     </v-col>
+22 | 
+23 |     <!-- Right side: Header with budget and search -->
+24 |     <v-col class="d-flex justify-end pr-0">
+25 |       <MediaplanHeader
+26 |           :plan-budget="mediaplan?.budget?.total || 0"
+27 |           :used-percentage="calculatePercentage(mediaplan?.budget?.used, mediaplan?.budget?.total)"
+28 |           :search="search"
+29 |           @update:search="val => emit('update:search', val)"
+30 |           :is-loading="isLoading"
+31 |       />
+32 |     </v-col>
+33 |   </v-row>
+34 | </template>
+35 | 
+36 | <script setup lang="ts">
+37 | import {toRefs, computed} from 'vue'
+38 | import MediaplanBreadcrumb from '@/components/mediaplan/MediaplanBreadcrumb.vue'
+39 | import MediaplanHeader from '@/components/mediaplan/MediaplanHeader.vue'
+40 | import MediaplanViewToggle from '@/components/mediaplan/MediaplanViewToggle.vue'
+41 | import MediaplanBuilderTypeSwitch from '@/components/common/MediaplanBuilderTypeSwitch.vue'
+42 | 
+43 | import type {Mediaplan} from '@/types/mediaplan'
+44 | import type {Project} from '@/types/project'
+45 | import type {Campaign} from '@/types/campaign'
+46 | 
+47 | const props = defineProps<{
+48 |   mediaplan: Mediaplan | null
+49 |   project: Project | null
+50 |   campaign?: Campaign | null
+51 |   search: string
+52 |   isLoading: boolean
+53 |   currentView: 'planning' | 'budget'
+54 |   builderType: 'sea' | 'social' | 'display' | '2layer'
+55 | }>()
+56 | 
+57 | const emit = defineEmits<{
+58 |   (e: 'update:search', value: string): void
+59 |   (e: 'update:current-view', value: 'planning' | 'budget'): void
+60 |   (e: 'update:builderType', value: 'sea' | 'social' | 'display' | '2layer'): void
+61 | }>()
+62 | 
+63 | const {mediaplan, project, campaign, search, isLoading, currentView, builderType} = toRefs(props)
+64 | 
+65 | // Sync the internal view toggle with prop
+66 | const internalView = computed<'planning' | 'budget'>({
+67 |   get: () => currentView.value,
+68 |   set: val => emit('update:current-view', val),
+69 | })
+70 | 
+71 | // Sync builder type selection
+72 | const selectedBuilderType = computed<'sea' | 'social' | 'display' | '2layer'>({
+73 |   get: () => builderType.value,
+74 |   set: val => emit('update:builderType', val),
+75 | })
+76 | 
+77 | // Determine breadcrumb level
+78 | const levelDisplay = computed(() => {
+79 |   if (campaign?.value) return 'Campaign'
+80 |   if (project.value) return 'Project'
+81 |   return 'Mediaplan'
+82 | })
+83 | 
+84 | function calculatePercentage(used: number | undefined, total: number | undefined): number {
+85 |   if (!used || !total) return 0
+86 |   return (used / total) * 100
+87 | }
+88 | </script>
+89 | 
+90 | <style scoped>
+91 | /* Optional: eigene Styles hier hinzufügen */
+92 | </style>
+```
+
+src/components/common/NotificationSnackbar.vue
+```
+1 | <template>
+2 |   <v-snackbar
+3 |     v-model="notification.show"
+4 |     :color="notification.type"
+5 |     :timeout="notification.timeout"
+6 |     class="notification-snackbar"
+7 |   >
+8 |     <div class="d-flex align-center">
+9 |       <v-icon :icon="getIconForType(notification.type)" class="mr-3" />
+10 |       <span>{{ notification.text }}</span>
+11 |     </div>
+12 |     <template v-slot:actions v-if="notification.closable">
+13 |       <v-btn
+14 |         icon
+15 |         variant="text"
+16 |         @click="closeNotification"
+17 |         size="small"
+18 |       >
+19 |         <v-icon>mdi-close</v-icon>
+20 |       </v-btn>
+21 |     </template>
+22 |   </v-snackbar>
+23 | </template>
+24 | 
+25 | <script setup lang="ts">
+26 | import { notification, closeNotification, NotificationType } from '@/helpers/notificationUtils';
+27 | 
+28 | /**
+29 |  * Gets the appropriate icon for the notification type
+30 |  * @param type Notification type
+31 |  * @returns Material Design Icon name
+32 |  */
+33 | const getIconForType = (type: NotificationType): string => {
+34 |   switch (type) {
+35 |     case NotificationType.SUCCESS:
+36 |       return 'mdi-check-circle';
+37 |     case NotificationType.ERROR:
+38 |       return 'mdi-alert-circle';
+39 |     case NotificationType.WARNING:
+40 |       return 'mdi-alert';
+41 |     case NotificationType.INFO:
+42 |     default:
+43 |       return 'mdi-information';
+44 |   }
+45 | };
+46 | </script>
+47 | 
+48 | <style scoped>
+49 | .notification-snackbar {
+50 |   z-index: 9999;
+51 | }
+52 | </style>
+```
+
+src/components/common/PaginationControls.vue
+```
+1 | <template>
+2 |   <div class="d-flex justify-center align-center my-4">
+3 |     <v-pagination
+4 |         v-model="modelValue"
+5 |         :length="length"
+6 |         :disabled="disabled"
+7 |         :total-visible="totalVisible"
+8 |         rounded="circle"
+9 |         @update:model-value="updatePage"
+10 |     />
+11 | 
+12 |     <div v-if="showItemsPerPage" class="ml-4 d-flex align-center">
+13 |       <span class="text-caption mr-2">Items per page:</span>
+14 |       <v-select
+15 |           v-model="itemsPerPage"
+16 |           :items="itemsPerPageOptions"
+17 |           density="compact"
+18 |           variant="outlined"
+19 |           hide-details
+20 |           class="items-per-page-select"
+21 |           @update:model-value="updateItemsPerPage"
+22 |       />
+23 |     </div>
+24 |   </div>
+25 | </template>
+26 | 
+27 | <script setup lang="ts">
+28 | import { computed, ref, watch } from 'vue';
+29 | 
+30 | interface Props {
+31 |   modelValue: number;
+32 |   length: number;
+33 |   disabled?: boolean;
+34 |   totalVisible?: number;
+35 |   showItemsPerPage?: boolean;
+36 |   itemsPerPageValue?: number;
+37 |   itemsPerPageOptions?: number[];
+38 | }
+39 | 
+40 | const props = withDefaults(defineProps<Props>(), {
+41 |   disabled: false,
+42 |   totalVisible: 7,
+43 |   showItemsPerPage: true,
+44 |   itemsPerPageValue: 10,
+45 |   itemsPerPageOptions: () => [10, 25, 50, 100]
+46 | });
+47 | 
+48 | const emit = defineEmits<{
+49 |   (e: 'update:model-value', value: number): void;
+50 |   (e: 'update:items-per-page', value: number): void;
+51 | }>();
+52 | 
+53 | // Internal model value for v-pagination (needs to be 1-based)
+54 | const modelValue = computed({
+55 |   get: () => props.modelValue + 1, // Convert from 0-based to 1-based
+56 |   set: (value: number) => {
+57 |     emit('update:model-value', value - 1); // Convert from 1-based to 0-based
+58 |   }
+59 | });
+60 | 
+61 | // Items per page handling
+62 | const itemsPerPage = ref(props.itemsPerPageValue);
+63 | 
+64 | // When props change, update the local state
+65 | watch(() => props.itemsPerPageValue, (newValue) => {
+66 |   itemsPerPage.value = newValue;
+67 | });
+68 | 
+69 | const updatePage = (page: number) => {
+70 |   emit('update:model-value', page - 1); // Convert from 1-based to 0-based
+71 | };
+72 | 
+73 | const updateItemsPerPage = (value: number) => {
+74 |   itemsPerPage.value = value;
+75 |   emit('update:items-per-page', value);
+76 | };
+77 | </script>
+78 | 
+79 | <style scoped>
+80 | .items-per-page-select {
+81 |   width: 80px;
+82 | }
+83 | </style>
+```
+
 src/components/overview/CreateFirstProjectDialog.vue
 ```
 1 | <template>
@@ -8529,9 +8533,9 @@ src/components/overview/CreateMediaplanDialog.vue
 7 |           margin-bottom="4"
 8 |           @close="cancelDialog"
 9 |       />
-10 |       <v-form ref="form" @submit.prevent="submitForm">
+10 |       <v-form v-model="valid" ref="form" @submit.prevent="submitForm">
 11 |         <WithFormDefaults>
-12 |           <pre>{{ formData }}</pre>
+12 |           <!--          <pre>{{ formData }}</pre>-->
 13 |           <v-card-text class="pa-0">
 14 |             <FormElementVrowVcol label="Brand Output" required>
 15 |               <v-select
@@ -8648,68 +8652,68 @@ src/components/overview/CreateMediaplanDialog.vue
 126 |             </FormElementVrowVcol>
 127 |           </v-card-text>
 128 |         </WithFormDefaults>
-129 | 
-130 |         <DialogFooter
-131 |             cancel-text="Cancel"
-132 |             confirm-text="Next Step"
-133 |             :loading="isSubmitting"
-134 |             :disabled="!form?.isValid || isLoadingSources || poStore.isLoading"
-135 |             :submit-button="true"
-136 |             @cancel="cancelDialog"
-137 |         />
-138 |       </v-form>
-139 |     </v-card>
-140 |   </v-dialog>
-141 | 
-142 |   <CreatePoDialog
-143 |       v-model="createPODialogVisible"
-144 |       :initial-brand-id="formData.brand?.abbreviation" @created="handlePoCreated"
-145 |   />
-146 | 
-147 |   <CreateFirstProjectDialog
-148 |       mode="create-mediaplan"
-149 |       v-if="showProjectDialog"
-150 |       v-model="showProjectDialog"
-151 |       :mediaplan-id="createdMediaplanId"
-152 |       :mediaplan-name="formData.name"
-153 |       :po-numbers="formData.po_numbers"
-154 |       :start-date="formData.start_date"
-155 |       :end-date="formData.end_date"
-156 |       :brand="formData.brand ? { _id: formData.brand.abbreviation, name: formData.brand.value } : undefined"
-157 |       @created="handleProjectCreated"
-158 |   />
-159 | </template>
-160 | 
-161 | <script setup lang="ts">
-162 | import {ref, computed, onMounted, watch, nextTick, reactive} from 'vue';
-163 | import {useAuthStore} from '@/stores/auth';
-164 | import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
-165 | import {useSourcesStore} from '@/stores/sourcesStore';
-166 | import {usePoNumberStore} from '@/stores/poNumberStore';
-167 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
-168 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
-169 | import DateRangePicker from './DateRangePicker.vue';
-170 | import CreateFirstProjectDialog from '@/components/overview/CreateFirstProjectDialog.vue';
-171 | import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
-172 | import type {MediaplanCreate, Brand as MediaplanBrandType, PONumber, Source, Mediaplan} from '@/types/mediaplan';
-173 | import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
-174 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
-175 | import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
-176 | import {getBrandLogo} from "@/helpers/brandUtils.ts";
-177 | 
-178 | type ComponentBrandType = Source;
-179 | 
-180 | const props = defineProps<{
-181 |   modelValue: boolean;
-182 | }>();
-183 | 
-184 | const emit = defineEmits<{
-185 |   (e: 'update:modelValue', value: boolean): void;
-186 |   (e: 'created', mediaplanId: string): void;
-187 |   (e: 'project-created', projectId: string): void;
-188 | }>();
-189 | 
-190 | const form = ref<any>();
+129 |         <DialogFooter
+130 |             cancel-text="Cancel"
+131 |             confirm-text="Next Step"
+132 |             :loading="isSubmitting"
+133 |             :disabled="!valid || isLoadingSources || poStore.isLoading"
+134 |             :submit-button="true"
+135 |             @cancel="cancelDialog"
+136 |         />
+137 |       </v-form>
+138 |     </v-card>
+139 |   </v-dialog>
+140 | 
+141 |   <CreatePoDialog
+142 |       v-model="createPODialogVisible"
+143 |       :initial-brand-id="formData.brand?.abbreviation" @created="handlePoCreated"
+144 |   />
+145 | 
+146 |   <CreateFirstProjectDialog
+147 |       mode="create-mediaplan"
+148 |       v-if="showProjectDialog"
+149 |       v-model="showProjectDialog"
+150 |       :mediaplan-id="createdMediaplanId"
+151 |       :mediaplan-name="formData.name"
+152 |       :po-numbers="formData.po_numbers"
+153 |       :start-date="formData.start_date"
+154 |       :end-date="formData.end_date"
+155 |       :brand="formData.brand ? { _id: formData.brand.abbreviation, name: formData.brand.value } : undefined"
+156 |       @created="handleProjectCreated"
+157 |   />
+158 | </template>
+159 | 
+160 | <script setup lang="ts">
+161 | import {ref, computed, onMounted, watch, nextTick, reactive} from 'vue';
+162 | import {useAuthStore} from '@/stores/auth';
+163 | import {useCreateMediaplanStore} from '@/stores/createMediaplanStore';
+164 | import {useSourcesStore} from '@/stores/sourcesStore';
+165 | import {usePoNumberStore} from '@/stores/poNumberStore';
+166 | import DialogFooter from "@/components/common/dialog/DialogFooter.vue";
+167 | import DialogHeader from "@/components/common/dialog/DialogHeader.vue";
+168 | import DateRangePicker from './DateRangePicker.vue';
+169 | import CreateFirstProjectDialog from '@/components/overview/CreateFirstProjectDialog.vue';
+170 | import CreatePoDialog from '@/components/overview/CreatePoDialog.vue';
+171 | import type {MediaplanCreate, Brand as MediaplanBrandType, PONumber, Source, Mediaplan} from '@/types/mediaplan';
+172 | import {showSuccess, showError, showWarning} from '@/helpers/notificationUtils';
+173 | import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
+174 | import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
+175 | import {getBrandLogo} from "@/helpers/brandUtils.ts";
+176 | 
+177 | const valid = ref(null)
+178 | 
+179 | type ComponentBrandType = Source;
+180 | 
+181 | const props = defineProps<{
+182 |   modelValue: boolean;
+183 | }>();
+184 | 
+185 | const emit = defineEmits<{
+186 |   (e: 'update:modelValue', value: boolean): void;
+187 |   (e: 'created', mediaplanId: string): void;
+188 |   (e: 'project-created', projectId: string): void;
+189 | }>();
+190 | 
 191 | const authStore = useAuthStore();
 192 | const createMediaplanStore = useCreateMediaplanStore();
 193 | const sourcesStore = useSourcesStore();

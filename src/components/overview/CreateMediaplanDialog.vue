@@ -7,9 +7,9 @@
           margin-bottom="4"
           @close="cancelDialog"
       />
-      <v-form ref="form" @submit.prevent="submitForm">
+      <v-form v-model="valid" ref="form" @submit.prevent="submitForm">
         <WithFormDefaults>
-<!--          <pre>{{ formData }}</pre>-->
+          <!--          <pre>{{ formData }}</pre>-->
           <v-card-text class="pa-0">
             <FormElementVrowVcol label="Brand Output" required>
               <v-select
@@ -126,12 +126,11 @@
             </FormElementVrowVcol>
           </v-card-text>
         </WithFormDefaults>
-<pre>{{form?.isValid}}</pre>--
         <DialogFooter
             cancel-text="Cancel"
             confirm-text="Next Step"
             :loading="isSubmitting"
-            :disabled="!form?.isValid || isLoadingSources || poStore.isLoading"
+            :disabled="!valid || isLoadingSources || poStore.isLoading"
             :submit-button="true"
             @cancel="cancelDialog"
         />
@@ -175,6 +174,8 @@ import WithFormDefaults from "@/components/common/dialog/WithFormDefaults.vue";
 import FormElementVrowVcol from "@/components/common/dialog/FormElementVrowVcol.vue";
 import {getBrandLogo} from "@/helpers/brandUtils.ts";
 
+const valid = ref(null)
+
 type ComponentBrandType = Source;
 
 const props = defineProps<{
@@ -187,7 +188,6 @@ const emit = defineEmits<{
   (e: 'project-created', projectId: string): void;
 }>();
 
-const form = ref<any>();
 const authStore = useAuthStore();
 const createMediaplanStore = useCreateMediaplanStore();
 const sourcesStore = useSourcesStore();
